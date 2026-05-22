@@ -1,0 +1,222 @@
+~/.ia-global/
+│
+├── assistente.py        # CLI principal (entrypoint)
+├── brain.py             # ROUTER inteligente (decide o modelo)
+├── executor.py          # executa chamadas (Ollama/Groq/Gemini/OpenRouter/NVIDIA)
+├── memory.py            # memória + compressão
+├── cache.py             # cache simples (hash + lookup)
+├── config.py            # configs centralizadas
+├── daemon_monitor.py
+│
+├── evolucao_cerebral.md
+└── cache.db             # futuro (sqlite opcional)
+
+           ┌──────────────┐
+USER TEXT  │              │
+──────────▶│  EMBEDDING   │
+           │  MODEL       │
+           └──────┬───────┘
+                  ↓
+         vetor numérico (1536d)
+                  ↓
+         ┌─────────────────┐
+         │  VECTOR STORE   │
+         │  (FAISS / JSON) │
+         └──────┬──────────┘
+                ↓
+     similaridade (cosine)
+                ↓
+      contexto recuperado
+      
+input → memory search → model select → build prompt → execute → store memory
+
+         ┌──────────────────────┐
+         │   INPUT DO USUÁRIO   │
+         └─────────┬────────────┘
+                   ↓
+        ┌──────────────────────┐
+        │ MEMÓRIA SEMÂNTICA    │◄──────┐
+        │ (embeddings search)  │       │
+        └─────────┬────────────┘       │
+                  ↓                    │
+     ┌─────────────────────────┐      │
+     │ MEMÓRIA COMPRESSA       │      │
+     │ (resumos do passado)    │      │
+     └─────────┬───────────────┘      │
+               ↓                      │
+     ┌──────────────────────────┐     │
+     │ CONTEXTO MÍNIMO ATIVO    │     │
+     └─────────┬────────────────┘     │
+               ↓                      │
+     ┌──────────────────────────┐     │
+     │  ESCOLHA DE MODELO       │     │
+     │ (local vs cloud)         │     │
+     └─────────┬────────────────┘     │
+               ↓                      │
+        ┌───────────────┐            │
+        │ LLM EXECUTION │            │
+        └───────┬───────┘            │
+                ↓                    │
+         ┌──────────────┐           │
+         │ NOVA MEMÓRIA │───────────┘
+         └──────────────┘
+
+INPUT
+  ↓
+RESPOSTA DO MODELO
+  ↓
+AVALIAÇÃO (crítica do sistema)
+  ↓
+ARMAZENAMENTO DE ERRO
+  ↓
+RETRIEVAL FUTURO (evitar erro antigo)
+  ↓
+AJUSTE DE CONTEXTO
+
+- pergunta
+- resposta do modelo
+- o que estava errado
+- por que estava errado
+- como deveria ter respondido
+
+INPUT → resposta do modelo
+OUTPUT → avaliação + correção
+
+antes de responder:
+→ buscar erros parecidos
+→ injetar no contexto
+→ evitar repetição
+
+         USER INPUT
+              ↓
+     memory semantic search
+              ↓
+      error memory search
+              ↓
+        LLM (local/cloud)
+              ↓
+          RESPONSE
+              ↓
+        CRITIC MODEL
+              ↓
+     error memory storage
+              ↓
+   future behavior adjustment
+
+-------------------------------------------
+
+                 USER
+                  ↓
+        [ Memory Retriever ]
+      (semantic + error + facts)
+                  ↓
+         [ Reflexion Engine ]
+     (draft → critique → improve)
+                  ↓
+              LLM CALL
+                  ↓
+         final answer output
+                  ↓
+        [ Memory Writer ]
+   (facts + errors + embeddings)
+
+~/.ia-global/memory/
+ ├── core.db
+ ├── facts.json
+ ├── errors.json
+ ├── episodic.json
+ ├── embeddings.cbor2 (ou sqlite vec)
+ 
+1. Modelo gera código
+2. Código é executado em sandbox
+3. Erro é capturado
+4. Modelo corrige
+5. Repete até passar
+6. Salva aprendizado
+
+        USER TASK
+            ↓
+   LLM gera solução v1
+            ↓
+     EXECUTOR SANDBOX
+            ↓
+     ❌ erro ou ✔ sucesso
+            ↓
+   LLM recebe traceback
+            ↓
+   gera versão v2 corrigida
+            ↓
+        loop até OK
+            ↓
+      salva aprendizado
+      
+REFLEXION + AUTO-TRAIN
+
+Prompt
+  ↓
+Memória semântica
+  ↓
+LLM gera código
+  ↓
+Executa
+  ↓
+Erro?
+  ↓
+Reflexion Engine corrige
+  ↓
+Loop
+  ↓
+Salva experiência
+
+
+AUTO-DEBUGGER MULTI-AGENTE
+
+         TASK
+          ↓
+   ┌───────────────┐
+   │  AGENTE DEV A │ → gera solução
+   ├───────────────┤
+   │  AGENTE DEV B │ → gera solução diferente
+   ├───────────────┤
+   │  AGENTE DEV C │ → gera solução diferente
+   └───────────────┘
+          ↓
+     EXECUTOR SANDBOX
+          ↓
+     TESTE / ERROS
+          ↓
+   ┌───────────────┐
+   │ AGENTE DEBUG  │ → corrige baseado no erro
+   └───────────────┘
+          ↓
+      ITERA MELHOR SOLUÇÃO
+
+múltiplos modelos competem
+sistema testa automaticamente
+outro agente corrige erros
+loop de melhoria contínua
+
+🧠 PRÓXIMO NÍVEL (se quiser ir mais fundo ainda)
+
+Posso te levar para:
+
+🔥 1. Evolução genética de código (Genetic Programming LLM)
+código muta automaticamente
+seleção por fitness
+
+🔥 2. Sistema de “replay de erro”
+sistema aprende padrões de falha globais
+
+🔥 3. Agente arquiteto
+decide estrutura antes de gerar código
+
+🔥 4. Auto-Reflexion + Multi-agent híbrido (nível top)
+debate entre agentes + auto-correção + memória
+
+Se quiser continuar evolução pesada, manda:
+
+👉 “quero evolução genética de código”
+
+ou
+
+👉 “quero sistema completo tipo AutoGPT local”

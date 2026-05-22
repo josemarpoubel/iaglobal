@@ -1,0 +1,12 @@
+# Ignorar ambientes virtuais e caches
+    venv/
+    __pycache__/
+    *.pyc
+    
+    # Ignorar dados binários e temporários
+    mesh.cbor
+    *.db
+    sugestao_teste.json
+    
+    # Opcional: Ignorar arquivos de log ou ambiente
+    .env
