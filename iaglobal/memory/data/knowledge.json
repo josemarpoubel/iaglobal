@@ -1,0 +1,150 @@
+[
+  {
+    "id": "k_1780523238032_0",
+    "category": "pattern",
+    "title": "V3 sql injection test",
+    "content": "security_design found SQL injection risk in user input",
+    "tags": [
+      "security_design",
+      "sql_injection",
+      "v3"
+    ],
+    "source": "test",
+    "timestamp": 1780523238.0323455,
+    "hits": 0
+  },
+  {
+    "id": "k_1780534707238_1",
+    "category": "best_practice",
+    "title": "Codigo gerado: Tarefa: Requisitos:\nFuncionais:\n- crie u",
+    "content": "<!DOCTYPE html>\n<html lang=\"pt-br\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Contato</title>\n  <link rel=\"stylesheet\" href=\"css/style.css\">\n</head>\n<body>\n  <div class=\"container\">\n    <h1>Entre em Contato</h1>\n    <form id=\"contatoForm\" method=\"post\">\n      <label for=\"nome\">Nome:</label>\n      <input type=\"text\" id=\"nome\" name=\"nome\" required>\n      <label for=\"email\">E-mail:</label>\n      <input type=\"email\" id=\"email\" n",
+    "tags": [
+      "coder",
+      "Tarefa: Requisitos:\n"
+    ],
+    "source": "coder",
+    "timestamp": 1780534707.2389915,
+    "hits": 0
+  },
+  {
+    "id": "k_1780535273551_2",
+    "category": "best_practice",
+    "title": "Codigo gerado: Tarefa: Requisitos:\nFuncionais:\n- crie u",
+    "content": "import os\n\nclass Config:\n    SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev_key'\n    SQLALCHEMY_DATABASE_URI = os.environ.get('DATABASE_URL') or 'sqlite:///database.db'\n    SQLALCHEMY_TRACK_MODIFICATIONS = False",
+    "tags": [
+      "coder",
+      "Tarefa: Requisitos:\n"
+    ],
+    "source": "coder",
+    "timestamp": 1780535273.5512416,
+    "hits": 0
+  },
+  {
+    "id": "k_1780535311190_3",
+    "category": "pattern",
+    "title": "Issues de segurança no design",
+    "content": "['Sem mecanismo de autenticação identificado', 'Comunicação sem TLS/SSL']",
+    "tags": [
+      "security_design",
+      "security",
+      "design"
+    ],
+    "source": "security_design",
+    "timestamp": 1780535311.1901698,
+    "hits": 0
+  },
+  {
+    "id": "k_1780535311191_4",
+    "category": "pattern",
+    "title": "Issues de performance no design",
+    "content": "['Sem estratégia de caching definida', 'Potencial listagem sem paginação', 'Operações I/O-bound sem async']",
+    "tags": [
+      "performance_design",
+      "performance",
+      "design"
+    ],
+    "source": "performance_design",
+    "timestamp": 1780535311.191239,
+    "hits": 0
+  },
+  {
+    "id": "k_1780535311191_5",
+    "category": "bug",
+    "title": "Issues de segurança no código",
+    "content": "[{'description': '[REINCIDENCIA] eval/exec ja causou erro antes', 'severity': 'high', 'pattern': 'eval|exec|__import__'}]",
+    "tags": [
+      "security_audit",
+      "security",
+      "code"
+    ],
+    "source": "security_audit",
+    "timestamp": 1780535311.1915534,
+    "hits": 0
+  },
+  {
+    "id": "k_1780535311191_6",
+    "category": "best_practice",
+    "title": "Solucao de alta qualidade (tester)",
+    "content": "def test_prompt():\n    # Prompt enginnering\n    prompt = \"Crie uma página web em PHP para capturar emails\"\n    \n    # Casos de uso\n    cases_of_use = [\n        {\"Usuário\": \"Crie uma página web em PHP para capturar emails\", \"Tarefa concluída\": True}\n    ]\n    \n    # Critérios de aceite\n    criteria_of_acceptance = [\n        {\"Código executa sem erros\": True}\n    ]\n    \n    return {\n        \"Prompt\": prompt,\n        \"Casos de uso\": cases_of_use,\n        \"Critérios de aceite\": criteria_of_acceptanc",
+    "tags": [
+      "tester",
+      "high_score"
+    ],
+    "source": "tester",
+    "timestamp": 1780535311.191828,
+    "hits": 0
+  },
+  {
+    "id": "k_1780535311192_7",
+    "category": "best_practice",
+    "title": "Solucao de alta qualidade (debug_coder)",
+    "content": "def test_prompt():\n    # Prompt enginnering\n    prompt = \"Crie uma página web em PHP para capturar emails\"\n    \n    # Casos de uso\n    cases_of_use = [\n        {\"Usuário\": \"Crie uma página web em PHP para capturar emails\", \"Tarefa concluída\": True}\n    ]\n    \n    # Critérios de aceite\n    criteria_of_acceptance = [\n        {\"Código executa sem erros\": True}\n    ]\n    \n    return {\n        \"Prompt\": prompt,\n        \"Casos de uso\": cases_of_use,\n        \"Critérios de aceite\": criteria_of_acceptanc",
+    "tags": [
+      "debug_coder",
+      "high_score"
+    ],
+    "source": "debug_coder",
+    "timestamp": 1780535311.1920965,
+    "hits": 0
+  },
+  {
+    "id": "k_1780535810103_8",
+    "category": "best_practice",
+    "title": "Codigo gerado: Tarefa: Requisitos:\nFuncionais:\n- crie u",
+    "content": "<!DOCTYPE html>\n<html lang=\"pt-br\">\n<head>\n  <meta charset=\"UTF-8\">\n  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n  <title>Contato</title>\n  <link rel=\"stylesheet\" href=\"css/style.css\">\n  <script src=\"https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.min.js\"></script>\n</head>\n<body>\n  <div class=\"container\">\n    <h1>Entre em Contato</h1>\n    <form id=\"contatoForm\" method=\"post\">\n      <label for=\"nome\">Nome:</label>\n      <input type=\"text\" id=\"nome\" name=\"nome\" re",
+    "tags": [
+      "coder",
+      "Tarefa: Requisitos:\n"
+    ],
+    "source": "coder",
+    "timestamp": 1780535810.1038306,
+    "hits": 0
+  },
+  {
+    "id": "k_1780536596437_9",
+    "category": "best_practice",
+    "title": "Codigo gerado:",
+    "content": "# código sem erro\n\ndef test_prompt(message):\n    from time import sleep; print(f\"Opcional prompt para o ambiente: {message}\")\n\n# exemplo de uso \ntest_prompt(\"Olá, me conheça!\")",
+    "tags": [
+      "coder",
+      ""
+    ],
+    "source": "coder",
+    "timestamp": 1780536596.4370065,
+    "hits": 0
+  },
+  {
+    "id": "k_1780536596457_10",
+    "category": "pattern",
+    "title": "Issues de segurança no design",
+    "content": "['Comunicação sem TLS/SSL']",
+    "tags": [
+      "security_design",
+      "security",
+      "design"
+    ],
+    "source": "security_design",
+    "timestamp": 1780536596.4573107,
+    "hits": 0
+  }
+]

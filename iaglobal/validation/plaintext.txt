@@ -1,0 +1,7 @@
+validation/
+├── engine.py          ← ORQUESTRADOR
+├── parser.py          ← ast.parse único
+├── syntax.py          ← sintaxe
+├── ast_security.py    ← whitelist
+├── normalization.py   ← limpeza LLM
+├── result.py          ← retorno padrão

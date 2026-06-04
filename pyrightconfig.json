@@ -1,0 +1,18 @@
+{
+  "include": [
+    "iaglobal"
+  ],
+  "exclude": [
+    "**/node_modules",
+    "**/__pycache__",
+    ".venv",
+    "venv"
+  ],
+  "executionEnvironments": [
+    {
+      "root": "iaglobal",
+      "pythonVersion": "3.13"
+    }
+  ]
+}
+

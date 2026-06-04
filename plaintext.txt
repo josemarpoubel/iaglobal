@@ -1,0 +1,400 @@
+IAGlobal — Multi-Agent Cognitive System
+=========================================
+Framework multi-agente autônomo com pipeline determinístico em DAG,
+memória persistente multicamadas, evolução genética da arquitetura,
+orquestração híbrida local/cloud e 536 testes validados.
+
+═══════════════════════════════════════════════════════════════
+                    PIPELINE V3 — 6 FASES / 25 NÓS
+═══════════════════════════════════════════════════════════════
+
+Pipeline completo em grafo acíclico dirigido (DAG) com execução
+topológica. Cada nó é uma skill executável com contrato formal.
+
+ ┌─ FASE 1: DEFINIÇÃO ───────────────────────────────────────┐
+ │ 01. prompt_intake     — Extrai domínio, objetivo,         │
+ │                         ambiguidade, gaps do prompt bruto │
+ │ 02. enhancement       — Refina e enriquece o prompt:      │
+ │                         expande contexto, sugere          │
+ │                         abordagens, identifica pré-requis. │
+ │ 03. orchestrator_agent— Coordena o fluxo entre agentes,   │
+ │                         define plano de execução (CRÍTICO)│
+ │ 04. pm                — Product Manager: cria Epics,      │
+ │                         Features, User Stories, Backlog   │
+ │ 05. requirements      — Converte intent em requisitos     │
+ │                         formais (funcionais, não-funcionais│
+ │                         regras de negócio, critérios aceite│
+ │ 06. architect         — Projeta arquitetura: componentes, │
+ │                         fluxos, tecnologias, módulos      │
+ │ 07. search            — Busca web para enriquecer contexto│
+ │                         com dados atualizados             │
+ │ 08. knowledge         — Extrai conhecimento relevante de  │
+ │                         execuções anteriores (patterns,    │
+ │                         bugs, best practices)             │
+ │ 09. dependency        — Mapeia dependências (imports →    │
+ │                         pacotes) via regex + 200+ tabela  │
+ │ 10. risk_analysis     — Identifica riscos técnicos:       │
+ │                         viabilidade, segurança, débito    │
+ │ 11. security_design   — Design de segurança: auth,        │
+ │                         criptografia, OWASP, compliance   │
+ │ 12. performance_design— Design de performance: caching,   │
+ │                         concorrência, SLOs, índices       │
+ └────────────────────────────────────────────────────────────┘
+
+ ┌─ FASE 2: PLANEJAMENTO ────────────────────────────────────┐
+ │ 13. planner           — Gera plano de execução com        │
+ │                         subtarefas baseado na arquitetura │
+ └────────────────────────────────────────────────────────────┘
+
+ ┌─ FASE 3: CONSTRUÇÃO ──────────────────────────────────────┐
+ │ 14. coder             — Geração de código (Python, PHP,   │
+ │                         JS, HTML/CSS) com suporte a       │
+ │                         projetos multi-arquivo            │
+ └────────────────────────────────────────────────────────────┘
+
+ ┌─ FASE 4: QUALIDADE ───────────────────────────────────────┐
+ │ 15. reviewer          — Revisão de código: boas práticas, │
+ │                         padrões, legibilidade, manutenção │
+ │ 16. semantic_validator— Validação semântica: requisitos   │
+ │                         atendidos, spec match, cobertura  │
+ │ 17. security_audit    — Auditoria de segurança: eval/exec, │
+ │                         SQLi, XSS, hardcoded secrets      │
+ │ 18. performance_audit — Auditoria de performance: N+1,    │
+ │                         bottlenecks, complexidade         │
+ └────────────────────────────────────────────────────────────┘
+
+ ┌─ FASE 5: CORREÇÃO ────────────────────────────────────────┐
+ │ 19. tester            — Executa testes em sandbox isolada │
+ │ 20. debug_coder       — Loop de correção (max 3x)        │
+ │      ↕                                                    │
+ │    ← coder (retorna se teste falha)                       │
+ └────────────────────────────────────────────────────────────┘
+
+ ┌─ FASE 6: ENTREGA ─────────────────────────────────────────┐
+ │ 21. documentation     — Gera README, ADR, docstrings,     │
+ │                         diagramas de arquitetura          │
+ │ 22. release           — Cria CHANGELOG, release notes,    │
+ │                         plano de deploy, versão semântica │
+ │ 23. metrics           — Coleta métricas da execução:      │
+ │                         latência, nós visitados, score    │
+ │ 24. optimization      — Análise de otimizações possíveis  │
+ │                         para execuções futuras            │
+ │ 25. result_agent      — Agrega saídas de todos os agentes,│
+ │                         formata resposta final (RESULTADO)│
+ └────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════
+                  ESTRUTURA DO PROJETO
+═══════════════════════════════════════════════════════════════
+
+iaglobal/
+│
+├── _paths.py                 Paths absolutos centralizados
+│                              (DATA_ROOT, TEMP_DIR, CORE_DB)
+│
+├── __init__.py               Pacote core — imports modulares
+├── __main__.py               Entrypoint CLI: `python -m iaglobal`
+│
+├── agents/                   Agentes especializados (17 arquivos)
+│   ├── coder_agent.py        Geração de código via LLM
+│   ├── critic_agent.py       Sensor de qualidade (contrato restrito)
+│   ├── debugger_agent.py     Correção iterativa de código
+│   ├── enhancement_agent.py  V3: refine de prompt pós-intake
+│   ├── knowledge_writer_agent.py  Escrita automática de KB
+│   ├── multi_agent.py        Coordenador multi-agente (integrado ao Proxy)
+│   ├── performance_audit_agent.py  V3: auditoria de performance
+│   ├── performance_design_agent.py V3: design de performance
+│   ├── planner_agent.py      Planejamento de execução
+│   ├── reflexion_agent.py    Reflexão pós-execução
+│   ├── result_agent.py       V3: agregação e formatação final
+│   ├── search_agent.py       Busca web DuckDuckGo
+│   ├── security_audit_agent.py   V3: auditoria de segurança
+│   ├── security_design_agent.py  V3: design de segurança
+│   ├── semantic_validator.py Validação semântica de requisitos
+│   ├── skill_generator_agent.py  Geração automática de skills
+│   ├── tester_agent.py       Geração e execução de testes
+│   └── typing_agent.py       Simulação de digitação humana
+│
+├── api/                      Interface programática pública
+│   ├── __init__.py
+│   └── mcp_server.py         Servidor MCP (Model Context Protocol)
+│
+├── blockchain/               Geração de blockchain (legado)
+│   ├── genesis.py            GenesisBlock, Block, Blockchain
+│   └── __init__.py
+│
+├── cli/                      Interface de linha de comando
+│   ├── main.py               Entry point: run, status, interactive
+│   ├── output.py             OutputRenderer (mensagens formatadas)
+│   ├── status.py             Dashboard de métricas do sistema
+│   ├── bootstrap.py          InitGuardian, inicialização do sistema
+│   └── evolution_lab.py      CLI de evolução (10 subcomandos)
+│
+├── core/                     Orquestração e governança central
+│   ├── assistant.py          Assistant CME (9 estágios)
+│   ├── cognitive_proxy.py    Proxy determinístico (6 estágios)
+│   ├── governance.py         GovernanceLayer (contratos formais)
+│   ├── retry_handler.py      Retry inteligente + escalonamento
+│   ├── orchestrator.py       11 estágios closed-loop + async
+│   ├── neuro_orchestrator.py Orquestrador neural
+│   ├── decision_engine.py    Engine de decisão
+│   ├── bootstrap_engine.py   Motor de bootstrap
+│   ├── cognitive_runtime.py  Runtime cognitivo
+│   ├── diagnostico.py        Diagnóstico do sistema
+│   └── env_loader.py         Carregamento de variáveis de ambiente
+│
+├── events/                   Sistema de eventos
+│   ├── event_dispatcher.py   Despachante de eventos
+│   ├── event_store.py        Armazenamento de eventos
+│   ├── event_types.py        Tipos de evento
+│   ├── decision_event.py     Eventos de decisão
+│   └── replay.py             Replay de eventos
+│
+├── evolution/                Evolução genética autônoma
+│   ├── evolutionengine.py    Motor principal: seleção, mutação, crossover
+│   ├── evolution_replay.py   Replay de gerações + GenerationPatch
+│   ├── evolutionruntime.py   Runtime do ciclo evolutivo
+│   ├── collapse_detector.py  Detector de colapso (6 indicadores)
+│   ├── darwin_harness.py     Test harness Darwin
+│   ├── meta_agent_designer.py    Especialização híbrida
+│   ├── self_optimizer.py     Auto-otimização
+│   ├── canonical_graph.py    Canonicalização de grafos
+│   ├── execution_context.py  Contexto de execução
+│   ├── execution_registry.py Registry de execução
+│   ├── task_analyzer.py      Análise de tarefas
+│   ├── task_agent_factory.py Factory de agentes com DEPENDS_ON_MAP
+│   ├── skills/               Sistema de skills
+│   │   ├── skill.py          25 Skills V3 definidas
+│   │   ├── skill_registry.py Registry global
+│   │   ├── skill_executor.py Executor com fallback
+│   │   ├── dynamic_registry.py  Skills dinâmicas (SQLite)
+│   │   ├── run_fn_factory.py Factory de run_fn para skills
+│   │   └── skill_versions.py Versionamento
+│   └── agents/               Agentes de evolução
+│       ├── knowledge_agent.py    Agente de conhecimento
+│       └── gap_analyzer.py       Analisador de gaps
+│
+├── execution/                Execução e sandbox
+│   ├── executor.py           Executor de código
+│   ├── sandbox.py            Sandbox de segurança
+│   ├── runtime.py            Runtime de execução
+│   ├── critical_executor.py  Executor crítico
+│   └── process_manager.py    Gerenciador de processos
+│
+├── graphs/                   DAG, nós e execução paralela
+│   ├── builder.py            PIPELINE_SKILLS V3 (run functions)
+│   ├── execution_graph.py    run() + async_run() + run_parallel()
+│   ├── node.py               Node + LineageEntry
+│   ├── edge.py               Edge (conexões entre nós)
+│   ├── artifact.py           Artifact (resultado do pipeline)
+│   ├── bandit.py             BanditPolicy (ε-greedy selection)
+│   ├── credit.py             CreditAssignmentEngine
+│   ├── workdir.py            WorkDir (diretório de trabalho)
+│   ├── telemetry.py          ExecutionEvent
+│   ├── policy.py             Políticas de execução
+│   ├── task.py               Task dataclass com lifecycle
+│   ├── scheduler.py          Escalonador topológico
+│   ├── task_runner.py        Runner de tarefas
+│   ├── execution_context.py  Contexto de execução
+│   ├── state_store.py        Armazenamento de estado
+│   └── execution_engine.py   Engine de execução (mini Prefect)
+│
+├── memory/                   Persistência e cache
+│   ├── memory.py             Evolução documental
+│   ├── memory_error.py       errors.json + learning
+│   ├── memory_storage.py     success_registry (cbor2)
+│   ├── memory_vector.py      lazy SentenceTransformer
+│   ├── db_manager.py         SQLite + insights
+│   ├── cache.py              L1 RAM + L2 SQLite
+│   ├── cognitive_cache.py    Cache cognitivo
+│   ├── semantic_cache.py     Cache semântico (embeddings)
+│   ├── fusion_engine.py      Web + Memory Fusion Engine
+│   ├── consolidation.py      Consolidação inteligente
+│   ├── ranking.py            Ranking cognitivo
+│   ├── term_short.py         Memória de curto prazo (STM)
+│   ├── term_long.py          Memória de longo prazo (LTM)
+│   ├── core.py               Core de memória
+│   ├── persistence.py        Persistência genérica
+│   ├── backup_manager.py     Gerenciador de backups
+│   ├── check_db.py           Verificação de banco
+│   └── data/                 Dados persistidos
+│       ├── errors.json       Histórico de erros
+│       ├── knowledge.json    Base de conhecimento
+│       ├── core.db           Banco SQLite principal
+│       ├── cache.db          Cache SQLite
+│       ├── script/           Scripts gerados
+│       ├── work/             Diretórios de trabalho (evo)
+│       ├── temp/             Arquivos temporários
+│       ├── cache/            Cache de provedores
+│       ├── logs/             Logs do sistema
+│       ├── provider_metrics/ Métricas de provedores
+│       └── memory_backups/   Backups de memória
+│
+├── models/                   Modelos de dados
+│   ├── task.py               Modelo de tarefa
+│   ├── agent_context.py      Contexto de agente
+│   └── event_bus.py          Barramento de eventos
+│
+├── observability/            Observabilidade
+│   └── __init__.py
+│
+├── pipeline/                 Motor do pipeline
+│   ├── engine.py             PipelineEngine (execução)
+│   ├── stages.py             Definição de estágios
+│   ├── result.py             PipelineResult
+│   └── pipelinestate.py      Estado do pipeline
+│
+├── providers/                Provedores LLM (15 arquivos)
+│   ├── provider_router.py    Roteamento + fallback chain
+│   ├── provider_config.py    Configuração lazy
+│   ├── provider_state.py     Score + cooldown
+│   ├── provider_metrics.py   Métricas de provedores
+│   ├── provider_scorer.py    Scoring de provedores
+│   ├── provider_registry.py  Registry de provedores
+│   ├── provider_load_balancer.java  Load balancer
+│   ├── task_router.py        Roteamento por task
+│   ├── token_usage.py        Controle de tokens
+│   ├── async_http.py         aiohttp session (multi-loop)
+│   ├── ollama_provider.py    Ollama (qwen2.5:0.5b)
+│   ├── groq_provider.py      Groq (llama-3.1-8b-instant)
+│   ├── openrouter_provider.py     OpenRouter
+│   ├── nvidia_provider.py    NVIDIA (llama-3.3-70b)
+│   ├── opencode_provider.py  OpenCode (nemotron-3)
+│   └── gemini_provider.py    Gemini (gemini-2.5-flash)
+│
+├── reflection/               Reflexão e aprendizado
+│   ├── reflexion_engine.py   Motor de reflexão
+│   ├── learning_loop.py      Loop de aprendizado
+│   ├── failure_analysis.py   Análise de falhas
+│   └── self_critique.py      Autocrítica
+│
+├── security/                 Camada de segurança
+│   ├── sandbox_rules.py      Regras da sandbox
+│   ├── sandbox_executor.py   Executor em sandbox
+│   ├── ast_gateway.py        Gateway AST (bloqueia eval/exec)
+│   ├── network_guard.py      Bloqueio de rede
+│   └── resource_limits.py    Limites de recursos
+│
+├── state/                    Gerenciamento de estado
+│   └── __init__.py
+│
+├── storage/                  Armazenamento legado
+│   ├── converter.py          Conversão CBOR2 ↔ SQLite
+│   └── daemon_monitor.py     Monitor de daemon
+│
+├── tests/                    43 arquivos de teste
+│   ├── test_v3_agents.py     Testes dos 7 agentes V3
+│   ├── test_v3_pipeline.py   Testes do pipeline V3
+│   ├── test_evolution_agents.py   Testes de evolução
+│   ├── test_evolution_learning.py Testes de aprendizado evolutivo
+│   ├── test_evolution_replay.py   Testes de replay
+│   ├── test_lineage_tracking.py   Testes de linhagem
+│   ├── test_collapse_detector.py  Testes de colapso
+│   ├── test_execution_engine.py   Testes de engine
+│   ├── test_task_agents.py        Testes de task agents
+│   ├── test_pipeline_skills.py    Testes de skills
+│   ├── test_bandit_loadbalancer_integration.py
+│   ├── test_bandit_scoring.py
+│   ├── test_sanity_barrier.py
+│   ├── test_async_compat.py
+│   ├── test_paths_centralized.py
+│   ├── test_pipeline.py
+│   ├── test_security_integration.py
+│   ├── test_memory.py
+│   ├── test_agents.py
+│   ├── test_integracao_cli.py
+│   └── (outros 24 arquivos de teste)
+│
+├── tools/                    Ferramentas
+│   ├── search.py             Ferramenta de busca
+│   ├── search_tools.py       Utilitários de busca
+│   ├── tool_router.py        Roteamento de ferramentas
+│   └── web_brain.py          Busca multicamadas (DDG+Wiki+RSS)
+│
+├── training/                 Treinamento
+│   ├── auto_trainer.py       Treinador automático
+│   ├── dataset_builder.py    Construtor de datasets
+│   └── feedback_loop.py      Loop de feedback
+│
+├── utils/                    Utilitários
+│   ├── logger.py             Logger configurado
+│   ├── hash_utils.py         Utilitários de hash
+│   └── helpers.py            Funções auxiliares
+│
+└── validation/               Validação
+    ├── ast_security.py       Segurança AST
+    ├── engine.py             Motor de validação
+    ├── gateway.py            Gateway de validação
+    ├── normalization.py      Normalização
+    ├── parser.py             Parser
+    ├── scoring.py            Scoring
+    └── syntax.py             Validação sintática
+
+═══════════════════════════════════════════════════════════════
+                    PROVIDERS LLM
+═══════════════════════════════════════════════════════════════
+
+Provider    Modelo                        Timeout  Async
+──────────  ────────────────────────────  ───────  ─────
+Ollama      qwen2.5:0.5b (local)          30s     ✅
+Groq        llama-3.1-8b-instant          30s     ✅
+OpenRouter  (seleção por score)           30s     ✅
+NVIDIA      meta/llama-3.3-70b-instruct   30s     ✅
+OpenCode    nemotron-3-super-free         30s     ✅
+Gemini      gemini-2.5-flash-lite         30s     ✅
+
+Seleção por BanditPolicy (ε-greedy) com CreditAssignmentEngine.
+Fallback chain automática em caso de falha.
+
+═══════════════════════════════════════════════════════════════
+                        TESTES
+═══════════════════════════════════════════════════════════════
+
+Total: 536 testes, 0 falhas, 2 warnings (SwigPyPacked/SwigPyObject)
+
+Suites principais:
+  test_v3_agents.py        33 testes  — 7 agentes V3
+  test_v3_pipeline.py      21 testes  — Pipeline V3 + async
+  test_evolution_agents.py 18 testes  — Evolução V3
+  test_evolution_learning.py 25 testes — Darwin harness
+  test_evolution_replay.py 26 testes  — Replay + patches
+  test_collapse_detector.py 13 testes — 6 indicadores
+  test_lineage_tracking.py 10 testes  — Lineage
+  test_execution_engine.py 10 testes  — v2 engine
+  test_bandit_loadbalancer_integration.py 24 testes — Bandit
+  test_task_agents.py      13 testes  — Factory
+  test_pipeline_skills.py  17 testes  — Skills
+  test_sanity_barrier.py    8 testes  — Sanity Barrier
+  test_async_compat.py      3 testes  — Sync/async
+  test_paths_centralized.py — Paths centralizados
+
+═══════════════════════════════════════════════════════════════
+                 ARQUITETURA DE MEMÓRIA
+═══════════════════════════════════════════════════════════════
+
+ShortTermMemory (STM)   → TTL adaptativo, expurgo automático
+LongTermMemory (LTM)    → Score de importância, consolidação
+Vector Memory           → Embeddings (SentenceTransformer)
+Semantic Cache          → Cache por similaridade (cosine)
+Knowledge Graph         → Conceitos + relações ponderadas
+Knowledge Base          → KB entries + FAQs
+Fusion Engine           → Web + Memory fusion
+Error Learning          → errors.json + query_relevant_errors()
+
+═══════════════════════════════════════════════════════════════
+                     GOVERNANÇA
+═══════════════════════════════════════════════════════════════
+
+AgentContract → Authority enum (READ_ONLY..DECIDE)
+GovernanceLayer.validate_call() antes de cada fase
+7 contratos definidos: critic, planner, search, multi_agent,
+                        coder, debugger, tester
+
+Regra de ouro: Nenhum agente tem autonomia completa.
+               Decisão final = CognitiveProxy.
+
+═══════════════════════════════════════════════════════════════
+                      LICENÇA
+═══════════════════════════════════════════════════════════════
+
+MIT

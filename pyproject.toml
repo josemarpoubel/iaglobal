@@ -1,0 +1,58 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iaglobal"
+version = "0.1.0"
+description = "Sistema autônomo multi-agente com IA híbrida (local + cloud), memória persistente e reflexão auto-corretiva e com metamotor de busca soberano"
+authors = [{name = "kitohamachi"}]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["ai", "agents", "llm", "ollama", "multi-agent", "reflexion"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "accelerate",
+    "cbor2",
+    "deepdiff",
+    "ddgs",
+    "google-generativeai",
+    "google-genai",
+    "httpx",
+    "jsonschema",
+    "numpy",
+    "openai",
+    "peft",
+    "python-dotenv",
+    "requests",
+    "sentence-transformers",
+    "transformers",
+    "trl",
+    "watchdog",
+]
+
+[project.urls]
+Homepage = "https://github.com/kitohamachi/iaglobal"
+Repository = "https://github.com/kitohamachi/iaglobal"
+
+[tool.setuptools.packages.find]
+include = ["iaglobal*"]
+
+[project.scripts]
+iaglobal = "iaglobal.cli.main:run_cli"
+evolution-lab = "iaglobal.cli.evolution_lab:run_evolution_lab"
+
+[tool.pytest.ini_options]
+# Ignora tudo que não esteja na pasta de testes
+testpaths = ["iaglobal/tests"]
+# Só considera classes que começam com 'Test'
+python_classes = ["Test*"]
+# Só considera funções que começam com 'test_'
+python_functions = ["test_*"]
+asyncio_mode = "auto"

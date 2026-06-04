@@ -1,12 +1,33 @@
-# Ignorar ambientes virtuais e caches
-    venv/
-    __pycache__/
-    *.pyc
-    
-    # Ignorar dados binários e temporários
-    mesh.cbor
-    *.db
-    sugestao_teste.json
-    
-    # Opcional: Ignorar arquivos de log ou ambiente
-    .env
+# Ambientes virtuais e caches
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Dados binários e temporários
+*.db
+*.cbor
+sugestao_teste.json
+
+# Memória e dados gerados
+iaglobal/memory/data/temp/
+iaglobal/memory/data/cache/
+iaglobal/memory/data/logs/
+iaglobal/memory/data/script/
+iaglobal/memory/data/work/
+iaglobal/memory/data/provider_metrics/
+iaglobal/memory/data/memory_backups/
+
+# Arquivos de ambiente e segredos
+.env
+.env.*
+backup.env
+
+# Build e distribuição
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/

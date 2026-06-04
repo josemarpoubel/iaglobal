@@ -1,0 +1,418 @@
+# iaglobal/cli/evolution_lab.py
+
+"""
+Evolutionary Test Lab CLI.
+
+Unified terminal interface for all evolution tools:
+  init, evolve, snapshots, report, diff, patch-sequence,
+  detect-collapse, lineage, fitness-curve, export-json.
+
+Usage:
+  iaglobal evolution-lab <subcommand> [options]
+  # or via dedicated entry point:
+  evolution-lab <subcommand> [options]
+
+Subcommands:
+  init                Seed core graph + EVO population
+  evolve <N>          Run N evolution cycles
+  snapshots           List all generations
+  report              Full replay report
+  diff <A> <B>        Git-style diff between two generations
+  patch-sequence      All consecutive generation patches
+  detect-collapse     Run CollapseDetector on current state
+  lineage <name>      Show ancestry tree for a node
+  fitness-curve       Show per-generation mean fitness
+  export-json <file>  Export patches as JSON array
+  help                Show this message
+"""
+
+import argparse
+import json
+import sys
+import time
+
+from iaglobal.graphs.node import Node
+from iaglobal.graphs.execution_graph import ExecutionGraph
+from iaglobal.evolution.evolutionengine import EvolutionEngine
+from iaglobal.evolution.evolution_replay import EvolutionReplay, CORE_NODE_NAMES
+from iaglobal.evolution.collapse_detector import CollapseDetector
+from iaglobal.evolution.skills.skill_registry import skill_registry
+from iaglobal.memory.memory_storage import init_storage
+
+
+# ── Helpers ──────────────────────────────────────────────────────────────
+
+CORE = [
+    ("prompt_intake", "prompt_intake", "general"),
+    ("architect", "architect", "general"),
+    ("planner", "planner", "general"),
+    ("coder", "coder", "coding"),
+    ("reviewer", "reviewer", "general"),
+    ("debug_coder", "debugger", "debug"),
+]
+
+
+def _make_graph() -> ExecutionGraph:
+    graph = ExecutionGraph()
+    for name, node_type, strategy in CORE:
+        node = Node(
+            name=name,
+            run=lambda ctx, n=name: {"output": f"{n}", "success": True},
+            depends_on=[], strategy=strategy, node_type=node_type,
+        )
+        graph.add_node(node)
+    return graph
+
+
+def _make_pipeline_graph() -> ExecutionGraph:
+    """Build the real 25-node V3 pipeline graph for evolution-lab."""
+    from unittest.mock import MagicMock
+    from iaglobal.graphs.builder import build_default_graph
+
+    orchestrator = MagicMock()
+    orchestrator.planner = MagicMock()
+    orchestrator.planner.plan = MagicMock(return_value={"steps": []})
+    orchestrator.evolver = MagicMock()
+    orchestrator.evolver.designer = MagicMock()
+    orchestrator.evolver.designer.specialization_instructions = {}
+
+    graph = build_default_graph(orchestrator, "evolution-lab pipeline graph")
+    return graph
+
+
+def _record_fitness(engine: EvolutionEngine, times: int = 3):
+    for node in engine.graph.nodes.values():
+        if node.name.startswith("evo_") or "_mut_" in node.name or "_x_" in node.name:
+            for _ in range(times):
+                node.record(success=True, latency=0.5)
+
+
+def _fmt(val: float) -> str:
+    return f"{val:.4f}"
+
+
+def _bar(val: float, width: int = 40) -> str:
+    n = max(0, min(width, int(val * width)))
+    return "█" * n + "░" * (width - n)
+
+
+# ── Subcommands ──────────────────────────────────────────────────────────
+
+def cmd_init(args: argparse.Namespace):
+    """Seed core graph + EVO population."""
+    init_storage(clear=True)
+    skill_registry.clear()
+    graph = _make_graph() if not args.pipeline else _make_pipeline_graph()
+    engine = EvolutionEngine(graph, mutation_rate=args.mutation_rate)
+    engine._seed_evo_population()
+    _record_fitness(engine, 3)
+    n_core = len(CORE_NODE_NAMES) if args.pipeline else len({c[0] for c in CORE})
+    n_evo = len([n for n in graph.nodes.values() if n.name.startswith("evo_")])
+    print(f"  Graph initialized: {n_core} core + {n_evo} EVO nodes ({'pipeline' if args.pipeline else 'synthetic'} mode)")
+    print(f"  Mutation rate: {engine.mutation_rate}")
+    _store_engine(graph, engine)
+    return graph, engine
+
+
+def cmd_evolve(args: argparse.Namespace):
+    """Run N evolution cycles."""
+    graph, engine = _load_or_init(args)
+    n = max(1, args.n)
+    for i in range(n):
+        print(f"\n  >>> Evolution cycle {i + 1}/{n} <<<")
+        engine.evolve()
+        _record_fitness(engine, 3)
+        replay = EvolutionReplay(graph, engine)
+        snaps = replay.snapshots()
+        last = snaps[-1] if snaps else None
+        if last:
+            print(f"      Gen {last.generation}: {last.evo_count} EVO nodes, "
+                  f"fitness={_fmt(last.mean_fitness)}, "
+                  f"{last.strategy_diversity} strategies")
+    _store_engine(graph, engine)
+    return graph, engine
+
+
+def cmd_snapshots(args: argparse.Namespace):
+    """List all generations."""
+    graph, engine = _load_or_init(args)
+    replay = EvolutionReplay(graph, engine)
+    snaps = replay.snapshots()
+    if not snaps:
+        print("  No snapshots available.")
+        return
+    print(f"  {'Gen':<6} {'EVO':<6} {'Core':<6} {'Mean Fitness':<16} {'Strategies':<12} {'Nodes'}")
+    print(f"  {'-'*60}")
+    for snap in snaps:
+        node_list = ", ".join(
+            n for n in sorted(snap.nodes)
+            if n not in CORE_NODE_NAMES
+        )[:80]
+        print(f"  {snap.generation:<6} {snap.evo_count:<6} {snap.core_count:<6} "
+              f"{_fmt(snap.mean_fitness):<16} {snap.strategy_diversity:<12} "
+              f"{node_list}")
+
+
+def cmd_report(args: argparse.Namespace):
+    """Full replay report."""
+    graph, engine = _load_or_init(args)
+    replay = EvolutionReplay(graph, engine)
+    print(replay.report())
+
+
+def cmd_diff(args: argparse.Namespace):
+    """Git-style diff between two generations."""
+    graph, engine = _load_or_init(args)
+    replay = EvolutionReplay(graph, engine)
+    try:
+        patch = replay.diff_patch(args.gen_a, args.gen_b)
+    except ValueError as e:
+        print(f"  Error: {e}")
+        print("  Use 'snapshots' to see available generations.")
+        return
+    _print_patch(patch)
+
+
+def cmd_patch_sequence(args: argparse.Namespace):
+    """All consecutive generation patches."""
+    graph, engine = _load_or_init(args)
+    replay = EvolutionReplay(graph, engine)
+    patches = replay.patch_sequence()
+    if not patches:
+        print("  No patches — need at least 2 generations.")
+        return
+    for p in patches:
+        print(f"  {p.summary}")
+        if args.verbose:
+            _print_patch_detail(p)
+            print()
+
+
+def cmd_detect_collapse(args: argparse.Namespace):
+    """Run CollapseDetector on current state."""
+    graph, engine = _load_or_init(args)
+    from iaglobal.evolution.collapse_detector import CollapseDetector
+    detector = CollapseDetector(
+        entropy_threshold=args.entropy_threshold,
+        variance_threshold=args.variance_threshold,
+        stagnation_threshold=args.stagnation_threshold,
+        min_population=args.min_population,
+        genetic_diversity_threshold=args.diversity_threshold,
+        convergence_threshold=args.convergence_threshold,
+    )
+    report = detector.detect(graph)
+    print(report.summary() if hasattr(report, 'summary') else str(report))
+
+
+def cmd_lineage(args: argparse.Namespace):
+    """Show ancestry tree for a node."""
+    graph, engine = _load_or_init(args)
+    replay = EvolutionReplay(graph, engine)
+    name = args.name
+    if name == "__list__":
+        evo_names = sorted(
+            n.name for n in graph.nodes.values()
+            if n.name.startswith("evo_") or "_mut_" in n.name or "_x_" in n.name
+        )
+        print("  Available EVO nodes:")
+        for n in evo_names:
+            node = graph.nodes.get(n)
+            fit = _fmt(node.fitness()) if node else "?"
+            print(f"    {n}  (fitness={fit})")
+        return
+    if name not in graph.nodes:
+        print(f"  Node '{name}' not found. Use 'lineage __list__' to see available nodes.")
+        return
+    tree = replay.ancestry_tree(name)
+    print(tree)
+
+    # Also show fitness history
+    fh = replay.fitness_by_node(name)
+    if fh:
+        print(f"\n  Fitness history for '{name}':")
+        for gen, fit in fh:
+            print(f"    Gen {gen}: {_fmt(fit)}  {_bar(fit)}")
+
+
+def cmd_fitness_curve(args: argparse.Namespace):
+    """Show per-generation mean fitness."""
+    graph, engine = _load_or_init(args)
+    replay = EvolutionReplay(graph, engine)
+    curve = replay.fitness_curve()
+    if not curve:
+        print("  No fitness data.")
+        return
+    print(f"  {'Gen':<6} {'Fitness':<12} {'Bar'}")
+    print(f"  {'-'*50}")
+    for gen, fit in curve:
+        print(f"  {gen:<6} {_fmt(fit):<12} {_bar(fit)}")
+
+
+def cmd_export_json(args: argparse.Namespace):
+    """Export all patches as JSON array to a file."""
+    graph, engine = _load_or_init(args)
+    replay = EvolutionReplay(graph, engine)
+    patches = replay.patch_sequence()
+    data = [p.to_dict() for p in patches]
+    path = args.file
+    with open(path, "w") as f:
+        json.dump(data, f, indent=2, default=str)
+    print(f"  Exported {len(patches)} patches to {path}")
+
+
+# ── Storage helpers ──────────────────────────────────────────────────────
+
+_GRAPH_CACHE = None
+_ENGINE_CACHE = None
+
+
+def _store_engine(graph, engine):
+    global _GRAPH_CACHE, _ENGINE_CACHE
+    _GRAPH_CACHE = graph
+    _ENGINE_CACHE = engine
+
+
+def _load_or_init(args) -> tuple:
+    global _GRAPH_CACHE, _ENGINE_CACHE
+    if _GRAPH_CACHE is not None and _ENGINE_CACHE is not None:
+        return _GRAPH_CACHE, _ENGINE_CACHE
+    graph, engine = cmd_init(args)
+    return graph, engine
+
+
+# ── Output helpers ───────────────────────────────────────────────────────
+
+def _print_patch(patch):
+    print(f"  Gen {patch.from_gen} → {patch.to_gen}")
+    print(f"    Author: {patch.author}")
+    print(f"    Timestamp: {patch.timestamp}")
+    print(f"    Summary: {patch.summary}")
+    if patch.nodes_added:
+        print(f"    Added ({len(patch.nodes_added)}):")
+        for name in sorted(patch.nodes_added):
+            nd = patch.nodes_added[name]
+            print(f"      + {name}  (f={_fmt(nd.get('fitness', 0))}, "
+                  f"strategy={nd.get('strategy', '?')})")
+    if patch.nodes_removed:
+        print(f"    Removed ({len(patch.nodes_removed)}):")
+        for name in sorted(patch.nodes_removed):
+            print(f"      - {name}")
+    if patch.nodes_modified:
+        print(f"    Modified ({len(patch.nodes_modified)}):")
+        for name, before, after in patch.nodes_modified:
+            bf = before.get("fitness", 0)
+            af = after.get("fitness", 0)
+            print(f"      ~ {name}: {_fmt(bf)} → {_fmt(af)} (Δ={af - bf:+.4f})")
+            if before.get("strategy") != after.get("strategy"):
+                print(f"        strategy: {before['strategy']} → {after['strategy']}")
+    if patch.strategy_shifts:
+        print(f"    Strategy shifts:")
+        for name, (old_s, new_s) in patch.strategy_shifts.items():
+            print(f"      {name}: {old_s} → {new_s}")
+    print(f"    Fitness: {_fmt(patch.fitness_before)} → {_fmt(patch.fitness_after)} "
+          f"(Δ={patch.fitness_delta:+.4f})")
+    print(f"    Diversity: {patch.diversity_before} → {patch.diversity_after} "
+          f"(Δ={patch.diversity_delta:+d})")
+
+
+def _print_patch_detail(patch):
+    if patch.nodes_added:
+        for name in sorted(patch.nodes_added):
+            nd = patch.nodes_added[name]
+            print(f"      + {name}  f={_fmt(nd.get('fitness', 0))}  "
+                  f"s={nd.get('strategy', '?')}")
+    if patch.nodes_removed:
+        for name in sorted(patch.nodes_removed):
+            print(f"      - {name}")
+    if patch.nodes_modified:
+        for name, before, after in patch.nodes_modified:
+            print(f"      ~ {name}  {_fmt(before.get('fitness', 0))} → "
+                  f"{_fmt(after.get('fitness', 0))}")
+
+
+# ── Main entry point ─────────────────────────────────────────────────────
+
+def run_evolution_lab():
+    parser = argparse.ArgumentParser(
+        description="Evolutionary Test Lab CLI",
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+        epilog=__doc__,
+    )
+    parser.add_argument("--mutation-rate", type=float, default=0.3,
+                        help="Mutation rate (default: 0.3)")
+    parser.add_argument("--verbose", "-v", action="store_true",
+                        help="Verbose output")
+    parser.add_argument("--pipeline", action="store_true",
+                        help="Use real 25-node V3 pipeline graph instead of synthetic")
+
+    # Collapse detector thresholds
+    parser.add_argument("--entropy-threshold", type=float, default=0.5)
+    parser.add_argument("--variance-threshold", type=float, default=0.01)
+    parser.add_argument("--stagnation-threshold", type=int, default=3)
+    parser.add_argument("--min-population", type=int, default=2)
+    parser.add_argument("--diversity-threshold", type=float, default=0.4)
+    parser.add_argument("--convergence-threshold", type=float, default=0.95)
+
+    subparsers = parser.add_subparsers(dest="subcommand", help="Subcommand")
+
+    # init
+    sp = subparsers.add_parser("init", help="Seed core graph + EVO population")
+    sp.set_defaults(func=cmd_init)
+
+    # evolve
+    sp = subparsers.add_parser("evolve", help="Run N evolution cycles")
+    sp.add_argument("n", type=int, nargs="?", default=1, help="Number of cycles")
+    sp.set_defaults(func=cmd_evolve)
+
+    # snapshots
+    sp = subparsers.add_parser("snapshots", help="List all generations")
+    sp.set_defaults(func=cmd_snapshots)
+
+    # report
+    sp = subparsers.add_parser("report", help="Full replay report")
+    sp.set_defaults(func=cmd_report)
+
+    # diff
+    sp = subparsers.add_parser("diff", help="Git-style diff between two generations")
+    sp.add_argument("gen_a", type=int, help="Source generation")
+    sp.add_argument("gen_b", type=int, help="Target generation")
+    sp.set_defaults(func=cmd_diff)
+
+    # patch-sequence
+    sp = subparsers.add_parser("patch-sequence", help="All consecutive patches")
+    sp.set_defaults(func=cmd_patch_sequence)
+
+    # detect-collapse
+    sp = subparsers.add_parser("detect-collapse", help="Run CollapseDetector")
+    sp.set_defaults(func=cmd_detect_collapse)
+
+    # lineage
+    sp = subparsers.add_parser("lineage", help="Show ancestry tree for a node")
+    sp.add_argument("name", type=str, nargs="?", default="__list__",
+                    help="Node name (or '__list__' to list available)")
+    sp.set_defaults(func=cmd_lineage)
+
+    # fitness-curve
+    sp = subparsers.add_parser("fitness-curve", help="Show per-generation fitness")
+    sp.set_defaults(func=cmd_fitness_curve)
+
+    # export-json
+    sp = subparsers.add_parser("export-json", help="Export patches as JSON array")
+    sp.add_argument("file", type=str, help="Output JSON file path")
+    sp.set_defaults(func=cmd_export_json)
+
+    # help
+    sp = subparsers.add_parser("help", help="Show this help message")
+    sp.set_defaults(func=lambda a: parser.print_help())
+
+    args = parser.parse_args()
+
+    if not args.subcommand:
+        parser.print_help()
+        return
+
+    args.func(args)
+
+
+if __name__ == "__main__":
+    run_evolution_lab()

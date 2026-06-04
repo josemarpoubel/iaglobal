@@ -1,0 +1,33 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "model": "ollama/qwen2.5:0.5b",
+  "provider": {
+    "ollama": {
+      "url": "http://localhost:11434"
+    }
+  },
+
+  "mcp": {
+    "iaglobal": {
+      "type": "local",
+      "command": ["/home/user/venv/bin/python3", "-m", "iaglobal.api.mcp_server"],
+      "enabled": true,
+      "timeout": 300000
+    }
+  },
+  "lsp": {
+    "python": {
+      "command": ["/usr/local/bin/pyright-langserver", "--stdio"],
+      "extensions": [".py"],
+      "settings": {
+        "python.analysis.exclude": [
+          "**/node_modules",
+          "**/__pycache__",
+          "venv",
+          ".venv"
+        ]
+      }
+    }
+  }
+}
+
