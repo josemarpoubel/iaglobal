@@ -1,0 +1,26 @@
+# Ambientes virtuais e caches
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Dados binários e temporários
+*.db
+*.cbor
+sugestao_teste.json
+
+# Memória e dados gerados
+
+# Arquivos de ambiente e segredos
+.env
+.env.*
+backup.env
+
+# Build e distribuição
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/

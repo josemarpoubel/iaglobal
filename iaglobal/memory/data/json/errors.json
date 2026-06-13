@@ -1,0 +1,26 @@
+{
+  "updated_at": "2026-06-13T20:56:19.598883+00:00",
+  "learning_errors": [],
+  "runtime_errors": [
+    {
+      "timestamp": "2026-06-13T20:56:19.594157+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: code_executor",
+      "details": {
+        "node": "code_executor"
+      }
+    },
+    {
+      "timestamp": "2026-06-13T20:56:19.598828+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: result_agent",
+      "details": {
+        "node": "result_agent"
+      }
+    }
+  ]
+}

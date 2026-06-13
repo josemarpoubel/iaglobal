@@ -1,0 +1,550 @@
+================================================================================
+PIPELINE GENESIS — SISTEMA AUTO-EVOLUTIVO DE IA
+================================================================================
+
+GENESIS_ID: GENESIS_7F3A9B2C8D1E4F6A5B9E2D7C1A8F3B6E9D4C2A7B5E8F1A3C6D9B2E5A8C1F4D7B
+GENESIS_HASH: sha3_512("Mavis-josemarpoubel-2026-06-13-18:30:00-autoevolutivo")
+SEMENTE: Mavis-project-2026-06-13
+CRIADO_EM: 2026-06-13T18:30:00Z
+CRIADO_POR: josemarpoubel
+PROPOSITO: Sistema auto-evolutivo e auto-regenerativo de IA
+CONTRATO_LICENCA: MIT
+POLITICAS: [LGPD-compliant, no-external-calls-without-audit, budget-guarded, lineage-validated]
+
+--------------------------------------------------------------------------------
+ESPECIFICACOES DO GENESIS
+--------------------------------------------------------------------------------
+
+1. Toda identidade de agente e gerada a partir deste genesis_id via:
+   agent_id = sha3_512(genesis_id + ":" + role + ":" + version)
+
+2. Toda chamada cross-agent exige validacao de linhagem:
+   if caller.genesis != callee.genesis: REJECT
+
+3. Toda evolucao cria nova geracao mantendo genesis_id (mesma familia):
+   generation = sha3_512(genesis_id + ":gen:" + parent_agent_id)
+
+4. Hash de linhagem completo:
+   lineage_hash = sha3_512(genesis_id + parent_id + child_id + timestamp + payload)
+
+================================================================================
+NÓ 00: GENESIS (CRIADOR DE FAMÍLIAS)
+================================================================================
+ENTRADA: nenhum (é o nó raiz)
+SAIDA: genesis_record.json + genesis_id registrado no .txt de auditoria
+FUNCAO: Estabelece a família de agentes. Define propósito, licenca, politicas.
+VALIDACOES: nenhuma (é a fonte de verdade)
+CUSTO_TOKENS: 0
+TIMEOUT_S: 0
+FALHA_Comportamento: abortar (nó crítico, sem fallback)
+
+================================================================================
+NÓ 01: PROMPT_INTAKE
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:prompt_intake:v1)
+PAPEL: prompt_intake
+GERACAO: 1
+ENTRADA: prompt bruto do usuario (texto livre)
+SAIDA: prompt_intake_record.json {prompt_raw, timestamp, user_id, session_id}
+FUNCAO: Captura o pedido inicial. Valida que nao é vazio. Adiciona metadados.
+VALIDACOES:
+  - prompt nao vazio
+  - tamanho max 8000 chars
+  - sanitize injection attempts
+BUDGET_GUARD: max 500 tokens
+TIMEOUT_S: 10
+FALHA_Comportamento: retry 2x → escalar pra humano
+
+================================================================================
+NÓ 02: ENHANCEMENT
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:enhancement:v1)
+PAPEL: enhancement
+GERACAO: 1
+ENTRADA: prompt_intake_record.json
+SAIDA: enhanced_prompt.json {prompt_enhanced, ambiguidades_resolvidas, contexto_adicionado}
+FUNCAO: Melhora clareza. Resolve ambiguidades. Adiciona contexto relevante.
+VALIDACOES:
+  - cross-check: enhanced_prompt e mais claro que original
+  - confidence_score > 0.7
+BUDGET_GUARD: max 2000 tokens
+TIMEOUT_S: 30
+FALHA_Comportamento: retry 2x → usar prompt original
+
+================================================================================
+NÓ 03: BUDGET_GUARD (NOVO)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:budget_guard:v1)
+PAPEL: budget_guard
+GERACAO: 1
+ENTRADA: enhanced_prompt.json
+SAIDA: budget_plan.json {max_tokens_total, max_cost_usd, max_runtime_s, checkpoints}
+FUNCAO: Define orçamento da run. Cria checkpoints onde custo é avaliado.
+VALIDACOES:
+  - max_cost_usd <= limite_global (config externo)
+  - max_runtime_s <= 3600
+BUDGET_GUARD: self-applied
+TIMEOUT_S: 5
+FALHA_Comportamento: abortar com relatorio de orcamento
+
+================================================================================
+NÓ 04: ORCHESTRATOR_AGENT
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:orchestrator:v1)
+PAPEL: orchestrator
+GERACAO: 1
+ENTRADA: enhanced_prompt.json + budget_plan.json
+SAIDA: orchestration_plan.json {subtarefas, dependencias, agentes_necessarios, paralelizavel}
+FUNCAO: Decide o que fazer. Roteia subtarefas. Define paralelização.
+VALIDACOES:
+  - lineage_check: caller.genesis == ORCHESTRATOR.genesis
+  - budget_check: estimativa de tokens cabe no budget
+BUDGET_GUARD: max 1500 tokens
+TIMEOUT_S: 20
+FALHA_Comportamento: retry 1x → escalar pra PM
+
+================================================================================
+NÓ 05: PM (PRODUCT MANAGER)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:pm:v1)
+PAPEL: pm
+GERACAO: 1
+ENTRADA: orchestration_plan.json
+SAIDA: pm_spec.json {entregaveis, criterios_aceitacao, dependencias_externas, riscos}
+FUNCAO: Planeja entregáveis. Define "done". Mapeia riscos.
+VALIDACOES:
+  - criterios_aceitacao sao mensuraveis
+  - pelo menos 1 risco identificado
+BUDGET_GUARD: max 2000 tokens
+TIMEOUT_S: 30
+FALHA_Comportamento: retry 2x → escalar pra humano
+
+================================================================================
+NÓ 06: REQUIREMENTS
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:requirements:v1)
+PAPEL: requirements
+GERACAO: 1
+ENTRADA: pm_spec.json
+SAIDA: requirements.json {requisitos_funcionais, requisitos_nao_funcionais, historias_usuario}
+FUNCAO: Traduz plano em requisitos estruturados.
+VALIDACOES:
+  - cada requisito tem id unico
+  - cobre todos os entregaveis do pm_spec
+BUDGET_GUARD: max 3000 tokens
+TIMEOUT_S: 45
+FALHA_Comportamento: retry 2x → usar pm_spec como requirements
+
+================================================================================
+NÓ 07: DOMAIN_ANALYSIS
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:domain_analysis:v1)
+PAPEL: domain_analysis
+GERACAO: 1
+ENTRADA: requirements.json
+SAIDA: domain_model.json {entidades, relacionamentos, bounded_contexts, glossario}
+FUNCAO: Modela o domínio. Identifica contextos delimitados.
+VALIDACOES:
+  - entidades tem atributos definidos
+  - relacionamentos tem cardinalidade
+BUDGET_GUARD: max 4000 tokens
+TIMEOUT_S: 60
+FALHA_Comportamento: retry 2x → usar requirements como base
+
+================================================================================
+NÓ 08: RESEARCH (search + knowledge unificados)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:research:v1)
+PAPEL: research
+GERACAO: 1
+ENTRADA: domain_model.json
+SAIDA: research_report.json {fontes_consultadas, knowledge_indexed, padroes_encontrados, citacoes}
+FUNCAO: Busca informacoes. Indexa na knowledge base. Documenta fontes.
+VALIDACOES:
+  - pelo menos 1 fonte citada
+  - knowledge_base atualizada (verificar hash)
+BUDGET_GUARD: max 5000 tokens
+TIMEOUT_S: 90
+FALHA_Comportamento: retry 1x → seguir sem research (avisar no relatório)
+
+================================================================================
+NÓ 09: BUSINESS_RULES
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:business_rules:v1)
+PAPEL: business_rules
+GERACAO: 1
+ENTRADA: domain_model.json + research_report.json
+SAIDA: business_rules.json {regras, invariantes, validacoes, excecoes}
+FUNCAO: Define regras de negócio. Identifica invariantes. Mapeia exceções.
+VALIDACOES:
+  - cada regra tem condicao + acao
+  - invariantes sao testaveis
+BUDGET_GUARD: max 3000 tokens
+TIMEOUT_S: 45
+FALHA_Comportamento: retry 2x → seguir sem regras explicitas
+
+================================================================================
+NÓ 10: COMPLIANCE_CHECK (NOVO - paralelo)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:compliance_check:v1)
+PAPEL: compliance_check
+GERACAO: 1
+ENTRADA: business_rules.json + requirements.json
+SAIDA: compliance_report.json {lgpd_ok, licenca_ok, termos_ok, alertas[], bloqueios[]}
+FUNCAO: Verifica conformidade legal, LGPD, licenças.
+VALIDACOES:
+  - nenhum bloqueio severo
+  - alertas sao revisados
+BUDGET_GUARD: max 1500 tokens
+TIMEOUT_S: 20
+FALHA_Comportamento: abortar pipeline se bloqueio severo
+
+================================================================================
+NÓ 11: TECHNOLOGY_SELECTION
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:technology_selection:v1)
+PAPEL: technology_selection
+GERACAO: 1
+ENTRADA: requirements.json + research_report.json + compliance_report.json
+SAIDA: tech_stack.json {linguagem, frameworks, libs, justificativas, alternativas_rejeitadas}
+FUNCAO: Escolhe stack. Justifica cada escolha. Documenta alternativas.
+VALIDACOES:
+  - cada tecnologia tem versao fixa
+  - licenca compativel com compliance
+  - justificativa por tecnologia
+BUDGET_GUARD: max 3000 tokens
+TIMEOUT_S: 45
+FALHA_Comportamento: retry 2x → usar stack padrao do genesis
+
+================================================================================
+NÓ 12: ARCHITECT
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:architect:v1)
+PAPEL: architect
+GERACAO: 1
+ENTRADA: tech_stack.json + domain_model.json
+SAIDA: architecture_plan.json {padroes, decisoes, adrs[], decomposicao_subsistemas}
+FUNCAO: Define arquitetura macro. Cria ADRs (Architecture Decision Records).
+VALIDACOES:
+  - cada ADR tem contexto, decisao, consequencias
+  - decomposicao cobre todos os requisitos
+BUDGET_GUARD: max 4000 tokens
+TIMEOUT_S: 60
+FALHA_Comportamento: retry 2x → usar padrao MVC simples
+
+================================================================================
+NÓ 13: DESIGN_PARALLEL (4 sub-designs em paralelo)
+================================================================================
+13a) SYSTEM_DESIGN
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:system_design:v1)
+SAIDA: system_design.json {componentes, fluxos, diagramas, interfaces}
+
+13b) API_DESIGN
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:api_design:v1)
+SAIDA: api_design.json {endpoints, schemas, autenticacao, versionamento, rate_limits}
+
+13c) DATA_DESIGN
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:data_design:v1)
+SAIDA: data_design.json {modelos, indices, migracoes, particionamento, backup_strategy}
+
+13d) PERFORMANCE_DESIGN
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:performance_design:v1)
+SAIDA: performance_design.json {slo, sli, cache_strategy, cdn, load_balancing}
+
+PARALELIZAVEL: SIM
+BUDGET_GUARD: max 2000 tokens CADA
+TIMEOUT_S: 60 CADA
+FALHA_Comportamento: retry 2x cada → seguir com parcial (marcar gaps)
+
+================================================================================
+NÓ 14: DESIGN_RECONCILER (NOVO)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:design_reconciler:v1)
+PAPEL: design_reconciler
+GERACAO: 1
+ENTRADA: system_design + api_design + data_design + performance_design
+SAIDA: reconciled_design.json {consolidado, conflitos_resolvidos, decisoes_tomadas}
+FUNCAO: Detecta conflitos entre os 4 designs. Resolve. Documenta decisão.
+VALIDACOES:
+  - nenhum conflito em aberto
+  - todas as decisoes de reconciliacao documentadas
+BUDGET_GUARD: max 2500 tokens
+TIMEOUT_S: 45
+FALHA_Comportamento: abortar se conflito crítico
+
+================================================================================
+NÓ 15: ARCHITECTURE_VALIDATOR
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:architecture_validator:v1)
+PAPEL: architecture_validator
+GERACAO: 1
+ENTRADA: reconciled_design.json + architecture_plan.json
+SAIDA: architecture_validation.json {aprovado, problemas[], sugestoes[], score}
+FUNCAO: Valida arquitetura final. Aprova ou reprova.
+VALIDACOES:
+  - score >= 0.7
+  - nenhum problema critico
+BUDGET_GUARD: max 2000 tokens
+TIMEOUT_S: 30
+FALHA_Comportamento: voltar pro ARCHITECT se reprovado (max 3 ciclos)
+
+================================================================================
+NÓ 16: EXECUTION_PLAN
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:execution_plan:v1)
+PAPEL: execution_plan
+GERACAO: 1
+ENTRADA: architecture_validation.json (aprovado)
+SAIDA: execution_plan.json {passos, dependencias, ordem, estimativa_tempo, criterios_parada}
+FUNCAO: Cria plano executável passo-a-passo.
+VALIDACOES:
+  - ordem topologica valida
+  - cada passo tem criterio de conclusao
+BUDGET_GUARD: max 2000 tokens
+TIMEOUT_S: 30
+FALHA_Comportamento: retry 2x
+
+================================================================================
+NÓ 17: BUILDERS_PARALLEL (3 builders em paralelo)
+================================================================================
+17a) FRONTEND_BUILDER
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:frontend_builder:v1)
+SAIDA: frontend_code/ {componentes, paginas, assets, testes_visuais}
+
+17b) BACKEND_BUILDER
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:backend_builder:v1)
+SAIDA: backend_code/ {modulos, rotas, services, middlewares, testes}
+
+17c) DATABASE_BUILDER
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:database_builder:v1)
+SAIDA: database_migrations/ {schemas, indices, seeds, procedures}
+
+PARALELIZAVEL: SIM
+LINEAGE_CHECK: cada builder verifica genesis_id antes de gerar
+BUDGET_GUARD: max 8000 tokens CADA
+TIMEOUT_S: 180 CADA
+FALHA_Comportamento: retry 2x cada → marcar como incompleto
+
+================================================================================
+NÓ 18: INTEGRATION (substitui EOLUTES/CATIOTON)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:integration:v1)
+PAPEL: integration
+GERACAO: 1
+ENTRADA: frontend_code + backend_code + database_migrations
+SAIDA: integrated_system/ {build_artifacts, docker_compose, env_files, integration_tests}
+FUNCAO: Integra os 3 outputs. Cria build. Valida que tudo se encaixa.
+VALIDACOES:
+  - testes de integracao passam
+  - docker-compose up funciona
+  - nenhum import quebrado
+BUDGET_GUARD: max 4000 tokens
+TIMEOUT_S: 120
+FALHA_Comportamento: retry 2x → escalar pra DEBUGGER
+
+================================================================================
+NÓ 19: TEST_GENERATOR
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:test_generator:v1)
+PAPEL: test_generator
+GERACAO: 1
+ENTRADA: integrated_system + requirements.json
+SAIDA: test_suite/ {unit_tests, integration_tests, e2e_tests, contract_tests, coverage_report}
+FUNCAO: Gera testes baseados no que foi codado (TDD reverso) e nos requisitos.
+VALIDACOES:
+  - cada requisito tem pelo menos 1 teste
+  - cobertura >= 70%
+BUDGET_GUARD: max 6000 tokens
+TIMEOUT_S: 120
+FALHA_Comportamento: aceitar com warning se cobertura < 70%
+
+================================================================================
+NÓ 20: SECURITY_REVIEW (NOVO)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:security_review:v1)
+PAPEL: security_review
+GERACAO: 1
+ENTRADA: integrated_system + test_suite
+SAIDA: security_report.json {vulnerabilidades[], sast_results, deps_audit, secrets_scan, score}
+FUNCAO: SAST, scan de dependências, scan de secrets, análise de permissões.
+VALIDACOES:
+  - nenhuma vulnerabilidade CRITICAL
+  - nenhum secret exposto
+  - score >= 0.6
+BUDGET_GUARD: max 3000 tokens
+TIMEOUT_S: 60
+FALHA_Comportamento: bloquear merge se CRITICAL → voltar pro BUILDERS
+
+================================================================================
+NÓ 21: SEMANTIC_VALIDATOR
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:semantic_validator:v1)
+PAPEL: semantic_validator
+GERACAO: 1
+ENTRADA: integrated_system + test_suite + security_report.json
+SAIDA: semantic_validation.json {intent_match_score, alinhamento_com_prompt, problemas[]}
+FUNCAO: Verifica se o que foi gerado realmente atende o pedido original.
+VALIDACOES:
+  - intent_match_score >= 0.75
+BUDGET_GUARD: max 2500 tokens
+TIMEOUT_S: 45
+FALHA_Comportamento: voltar pro ARCHITECT (max 2 ciclos)
+
+================================================================================
+NÓ 22: DEBUGGER_HEALING
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:debugger_healing:v1)
+PAPEL: debugger_healing
+GERACAO: 1
+ENTRADA: test_suite + security_report + semantic_validation
+SAIDA: healing_report.json {bugs_encontrados, bugs_corrigidos, nao_resolvidos, regenerar[]}
+FUNCAO: Identifica falhas. Tenta corrigir. Marca o que não conseguiu.
+VALIDACOES:
+  - taxa de auto-cura >= 60%
+  - nao_resolvidos documentados
+BUDGET_GUARD: max 5000 tokens
+TIMEOUT_S: 120
+FALHA_Comportamento: escalar bugs nao_resolvidos pra revisão humana
+
+================================================================================
+NÓ 23: FIX_VALIDATOR (NOVO)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:fix_validator:v1)
+PAPEL: fix_validator
+GERACAO: 1
+ENTRADA: healing_report + integrated_system
+SAIDA: fix_validation.json {validado, regressoes[], aprovado}
+FUNCAO: Roda testes de novo após healing. Verifica regressões.
+VALIDACOES:
+  - todos os testes passam
+  - nenhuma regressao
+BUDGET_GUARD: max 2000 tokens
+TIMEOUT_S: 60
+FALHA_Comportamento: voltar pro DEBUGGER_HEALING (max 3 ciclos)
+
+================================================================================
+NÓ 24: DOCUMENTATION
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:documentation:v1)
+PAPEL: documentation
+GERACAO: 1
+ENTRADA: TODOS os outputs anteriores
+SAIDA: docs/ {readme, api_docs, arch_decisions, runbook, changelog, lineage_manifest}
+FUNCAO: Gera documentação completa. Inclui manifesto de linhagem.
+VALIDACOES:
+  - readme tem quickstart funcional
+  - lineage_manifest tem todos os agent_ids e genesis_hash
+BUDGET_GUARD: max 4000 tokens
+TIMEOUT_S: 90
+FALHA_Comportamento: aceitar com warning
+
+================================================================================
+NÓ 25: DEPLOY (NOVO - CRÍTICO)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:deploy:v1)
+PAPEL: deploy
+GERACAO: 1
+ENTRADA: integrated_system (validado) + docs/
+SAIDA: deploy_record.json {ambiente, versao, feature_flag, canary_pct, rollback_plan, deploy_url}
+FUNCAO: Deploy com feature flag + canary. Plano de rollback pronto.
+MODOS:
+  - staging (sempre roda)
+  - canary (5% → 25% → 100%)
+  - production (após aprovação)
+VALIDACOES:
+  - health_check passa em staging
+  - metricas baseline não regrediram
+  - rollback_plan testado
+BUDGET_GUARD: max 1000 tokens (infra)
+TIMEOUT_S: 300
+FALHA_Comportamento: rollback automatico se health_check falhar
+
+================================================================================
+NÓ 26: TELEMETRY (NOVO - fecha o loop de auto-evolução)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:telemetry:v1)
+PAPEL: telemetry
+GERACAO: 1
+ENTRADA: deploy_record + eventos_runtime
+SAIDA: telemetry_stream.json {uso, erros, latencia, feedback_usuario, evolucao_sugerida}
+FUNCAO: Coleta métricas em produção. Identifica padrões. Sugere evoluções.
+MENSAGEM_ESPECIAL: alimenta o FEEDBACK_LOOP abaixo
+BUDGET_GUARD: max 1000 tokens/dia
+TIMEOUT_S: continuo
+FALHA_Comportamento: log apenas, nao bloqueia
+
+================================================================================
+NÓ 27: FEEDBACK_LOOP (NOVO - O QUE TORNA AUTO-EVOLUTIVO DE VERDADE)
+================================================================================
+AGENT_ID: sha3_512(GENESIS_7F3A9B2C8D1E4F6A:feedback_loop:v1)
+PAPEL: feedback_loop
+GERACAO: 1
+ENTRADA: telemetry_stream + healing_report + fix_validation
+SAIDA: evolution_proposal.json {melhorias[], bugs_cronicos[], novos_padroes, prompt_enhancements}
+FUNCAO: Analisa feedback. Gera propostas de evolução. Volta pro PROMPT_INTAKE.
+VALIDACOES:
+  - cada proposta tem impacto_estimado + risco
+  - nenhum regressao critica conhecida
+BUDGET_GUARD: max 2000 tokens/ciclo
+TIMEOUT_S: 300
+FALHA_Comportamento: segurar proposta até revisão humana
+
+================================================================================
+LINEAGE_MANIFEST (gerado no DOCUMENTATION e atualizado por toda a pipeline)
+================================================================================
+
+Cada agente, ao ser instanciado, registra:
+
+genesis_id: GENESIS_7F3A9B2C8D1E4F6A5B9E2D7C1A8F3B6E9D4C2A7B5E8F1A3C6D9B2E5A8C1F4D7B
+agent_id: sha3_512(genesis_id + ":" + role + ":" + version)
+parent_id: id do agente que invocou este (ou genesis_id se for raiz)
+generation: numero da geracao dentro da familia
+lineage_hash: sha3_512(genesis_id + parent_id + agent_id + timestamp + payload_hashed)
+criado_em: ISO8601 timestamp
+criado_por: id do caller
+hash_prompt: sha3_512 do prompt usado (pra auditoria)
+
+Validacao cross-agent (executada antes de qualquer chamada):
+  if caller.genesis != self.genesis:
+    raise LineageViolationError(f"Cross-family call blocked: {caller.genesis} -> {self.genesis}")
+
+================================================================================
+CICLO DE VIDA DA PIPELINE
+================================================================================
+
+ESTADO 1: INTAKE
+  Prompt chega → PROMPT_INTAKE → ENHANCEMENT → BUDGET_GUARD
+
+ESTADO 2: PLANNING
+  ORCHESTRATOR → PM → REQUIREMENTS → DOMAIN_ANALYSIS → RESEARCH → BUSINESS_RULES
+  Paralelo: COMPLIANCE_CHECK
+
+ESTADO 3: DESIGN
+  TECHNOLOGY_SELECTION → ARCHITECT
+  Paralelo: SYSTEM_DESIGN + API_DESIGN + DATA_DESIGN + PERFORMANCE_DESIGN
+  → DESIGN_RECONCILER → ARCHITECTURE_VALIDATOR → EXECUTION_PLAN
+
+ESTADO 4: BUILD
+  Paralelo: FRONTEND_BUILDER + BACKEND_BUILDER + DATABASE_BUILDER
+  → INTEGRATION → TEST_GENERATOR → SECURITY_REVIEW
+
+ESTADO 5: VALIDATE
+  SEMANTIC_VALIDATOR → DEBUGGER_HEALING → FIX_VALIDATOR (loop até OK)
+
+ESTADO 6: RELEASE
+  DOCUMENTATION → DEPLOY (staging → canary → production)
+
+ESTADO 7: EVOLVE (continuo)
+  TELEMETRY → FEEDBACK_LOOP → volta pro PROMPT_INTAKE
+
+================================================================================
+BUDGET TOTAL POR RUN
+================================================================================
+
+Estimativa conservadora: 50.000 tokens, US$ 0.50, 15 min
+Estimativa pessimista: 100.000 tokens, US$ 2.00, 30 min
+Limite hard: 200.000 tokens, US$ 5.00, 60 min (abortar se exceder)
+
+================================================================================
+FIM DO MANIFESTO
+================================================================================

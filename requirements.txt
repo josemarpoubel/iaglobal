@@ -1,0 +1,70 @@
+# IAGlobal — Dependências
+# Auto-gerado em 10/06/2026
+
+# Core HTTP/async
+aiohttp
+httpx
+requests
+
+# LLM Providers
+openai
+google-generativeai
+google-genai
+google-ai-generativelanguage
+
+# Embeddings / ML local
+fastembed
+torch
+transformers
+accelerate
+trl
+peft
+
+# Busca web
+ddgs
+grokipedia_api
+
+# Documentos / Parsing
+PyPDF2
+fitz
+pdfminer
+fpdf2
+
+# Serialização
+cbor2
+
+# Web scraping framework
+scrapy
+
+# Browser automation (Perplexity provider)
+playwright
+
+# HuggingFace
+huggingface_hub
+
+# Validação
+jsonschema
+
+# Utilitários
+deepdiff
+python-dotenv
+watchdog
+
+# API Server
+flask
+flask-sqlalchemy
+
+# Testes
+pytest
+
+# MCP Server
+mcp
+
+# Legado (compatibilidade)
+numpy
+sentence-transformers
+
+urllib3
+charset-normalizer
+
+
