@@ -93,7 +93,9 @@ async def async_generate(
         return ""
 
     # Limpa o prefixo do modelo (ex: 'hf_router/Qwen' -> 'Qwen')
-    clean_model = model.replace("hf_router/", "", 1).strip() or DEFAULT_MODEL
+    import re
+    clean_model = re.sub(r'^hf_router_\w+/', '', model)
+    clean_model = clean_model.replace("hf_router/", "", 1).strip() or DEFAULT_MODEL
     messages = build_multimodal_messages(prompt) if isinstance(prompt, str) else prompt
 
     client = get_async_client()
@@ -139,7 +141,9 @@ def generate(
     """Modo Síncrono (bloqueante). Mantido para retrocompatibilidade."""
     if not get_api_key(): return ""
     
-    clean_model = model.replace("hf_router/", "", 1).strip() or DEFAULT_MODEL
+    import re
+    clean_model = re.sub(r'^hf_router_\w+/', '', model)
+    clean_model = clean_model.replace("hf_router/", "", 1).strip() or DEFAULT_MODEL
     messages = build_multimodal_messages(prompt) if isinstance(prompt, str) else prompt
     client = get_sync_client()
 

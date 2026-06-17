@@ -80,6 +80,10 @@ PRICING: Dict[str, Dict[str, float]] = {
     "gemini/gemini-2.5-pro":                              {"input": 0.00125,  "output": 0.00500},
     "gemini/*":                                           {"input": 0.00010,  "output": 0.00040},
 
+    # ── HuggingFace Router ──
+    "hf_router_glm5f/zai-org/GLM-5.2:featherless-ai":    {"input": 0.0,     "output": 0.0},
+    "hf_router/*":                                        {"input": 0.0,     "output": 0.0},
+
     # ── Ollama (local, custo zero) ──
     "ollama/*":                                           {"input": 0.0,     "output": 0.0},
 }

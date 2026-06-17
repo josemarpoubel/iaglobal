@@ -77,6 +77,7 @@ PROVIDER_TIMEOUT = {
     "hf_router_glm4": 60,
     "hf_router_glm5": 60,
     "hf_router_glm45": 60,
+    "hf_router_glm5f": 60,
     "hf_router_phi4": 60,
     "hf_router_qwen36": 60,
     "hf_router_v4pro": 60,
@@ -115,6 +116,7 @@ PROVIDERS = {
     "hf_router_glm4": hf_router_generate,
     "hf_router_glm5": hf_router_generate,
     "hf_router_glm45": hf_router_generate,
+    "hf_router_glm5f": hf_router_generate,
     "hf_router_phi4": hf_router_generate,
     "hf_router_qwen36": hf_router_generate,
     "hf_router_v4pro": hf_router_generate,
@@ -155,6 +157,7 @@ ASYNC_PROVIDERS = {
     "hf_router_glm4": hf_router_async_generate,
     "hf_router_glm5": hf_router_async_generate,
     "hf_router_glm45": hf_router_async_generate,
+    "hf_router_glm5f": hf_router_async_generate,
     "hf_router_phi4": hf_router_async_generate,
     "hf_router_qwen36": hf_router_async_generate,
     "hf_router_v4pro": hf_router_async_generate,
@@ -173,6 +176,7 @@ def CREDIT_CANDIDATES():
         ("openrouter", "openrouter/meta-llama/llama-3.2-3b-instruct:free"),
         ("groq", "groq/llama-3.3-70b-versatile"),
         ("poe", "poe/GLM-5-T"),
+        ("hf_router_glm5f", "hf_router_glm5f/zai-org/GLM-5.2:featherless-ai"),
         ("ollama", "ollama/qwen2.5:0.5b"),
     ]
 
@@ -183,7 +187,7 @@ BANDIT_NODE = "model_router"
 # Providers com chave de API válida no .env — podem ser desbanidos
 _PROVIDERS_WITH_KEYS = {
     "ollama", "groq", "openrouter", "nvidia", "opencode",
-    "gemini", "openai", "poe", "hf_router", "hf_inference",
+    "gemini", "openai", "poe", "hf_router", "hf_router_glm5f", "hf_inference",
 }
 
 _BANS_CLEARED = False
