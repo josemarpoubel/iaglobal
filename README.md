@@ -3,6 +3,14 @@
 ## Conceptual Architecture Diagram
 
 * *Note: This diagram illustrates the flow from Ingestion through the metabolic cycles, highlighting the feedback loops for self-repair and evolution.*
+<p align="center">
+  <img src="assets/biological-cell-ia.jpeg" alt="Arquitetura Celular IA" width="450">
+</p>
+
+<p align="center">
+  <img src="assets/self-evolutionary-cycle-ia.png" alt="Ciclo Auto-Evolutivo IA" width="600">
+</p>
+
 
 ## Architecture Overview: Biological Metaphor for Self-Evolving Multi-Agent Systems
 
