@@ -5,8 +5,9 @@ Mapeia o comportamento atômico de um agente dentro do Grafo Evolutivo.
 """
 
 from dataclasses import dataclass, field
-from typing import List, Optional, Callable, Dict, Any, TYPE_CHECKING  # <-- Importe TYPE_CHECKING
+from typing import List, Optional, Callable, Dict, Any, TYPE_CHECKING
 from enum import Enum
+from iaglobal.utils.logger import logger
 # Node é importado apenas sob TYPE_CHECKING (para evitar circular: skill → graphs → skill_executor → skill)
 if TYPE_CHECKING:
     from iaglobal.graphs.node import Node
@@ -147,7 +148,7 @@ def _search_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
         return {"output": "", "web_context": "", "success": False, "error": str(e), "strategy_used": "search_tool"}
 
 
-def _placeholder_run(name: str, context: Dict[str, Any]) -> Dict[str, Any]:
+async def _placeholder_run(name: str, context: Dict[str, Any]) -> Dict[str, Any]:
     """
     Fallback dinâmico corrigido para respeitar o contrato global do Grafo.
     """
@@ -1052,6 +1053,46 @@ SKILL_PROMPT_IMPROVER = Skill(
     tags=["pipeline", "definition"],
 )
 
+SKILL_FAILURE_ANALYSIS = Skill(
+    name="failure_analysis",
+    version="v1",
+    description="FailureAnalysisAgent – analisa logs de falha e extrai padrões para guardrails",
+    inputs=["code_executor", "debugger"],
+    outputs=["failure_analysis"],
+    execution_policy=ExecutionPolicy.SINGLE_RUN,
+    tags=["quality", "analysis"],
+)
+
+SKILL_KNOWLEDGE_WRITER = Skill(
+    name="knowledge_writer",
+    version="v1",
+    description="KnowledgeWriterAgent – extrai conhecimento de conversas e persiste na base de conhecimento",
+    inputs=["coder", "task"],
+    outputs=["knowledge_entry"],
+    execution_policy=ExecutionPolicy.SINGLE_RUN,
+    tags=["knowledge", "persistence"],
+)
+
+SKILL_MULTI_AGENT = Skill(
+    name="multi_agent",
+    version="v1",
+    description="PipelineOrchestrator – orquestrador multi-agente do ciclo metabólico iaglobal",
+    inputs=["task"],
+    outputs=["solution"],
+    execution_policy=ExecutionPolicy.SINGLE_RUN,
+    tags=["orchestration", "pipeline"],
+)
+
+SKILL_TYPING_AGENT = Skill(
+    name="typing_agent",
+    version="v1",
+    description="TypingAgent – simula digitação humana em tempo real para interação web",
+    inputs=["task"],
+    outputs=["typed_text"],
+    execution_policy=ExecutionPolicy.SINGLE_RUN,
+    tags=["utility", "automation"],
+)
+
 _BUILTIN_SKILLS = [
     SKILL_PLANNER,
     SKILL_INGESTION,
@@ -1127,6 +1168,10 @@ _BUILTIN_SKILLS = [
     SKILL_MULTI_CODER,
     SKILL_PROMPT_BUILDER,
     SKILL_PROMPT_IMPROVER,
+    SKILL_FAILURE_ANALYSIS,
+    SKILL_KNOWLEDGE_WRITER,
+    SKILL_MULTI_AGENT,
+    SKILL_TYPING_AGENT,
 ]
 
 def register_builtin_skills():

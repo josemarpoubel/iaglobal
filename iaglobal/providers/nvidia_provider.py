@@ -11,7 +11,7 @@ from iaglobal.utils.logger import logger
 
 def generate(
     prompt: str,
-    model: str = "nvidia/mistralai/mistral-small-4-119b-2603",
+    model: str = "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
     timeout: int = 60,
     token_collector: Optional[TokenCollector] = None
 ) -> str:
@@ -69,7 +69,7 @@ def generate(
         return ""
 
 
-async def async_generate(prompt: str, model: str = "nvidia/mistralai/mistral-small-4-119b-2603", timeout: int = 60, token_collector: Optional[TokenCollector] = None) -> str:
+async def async_generate(prompt: str, model: str = "nvidia/mistralai/mistral-large-3-675b-instruct-2512", timeout: int = 60, token_collector: Optional[TokenCollector] = None) -> str:
     from iaglobal.providers.async_http import async_post
     api_key = ProviderConfig.NVIDIA_API_KEY or ""
     url = "https://integrate.api.nvidia.com/v1/chat/completions"

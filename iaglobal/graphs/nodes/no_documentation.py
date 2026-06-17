@@ -4,6 +4,7 @@ import logging
 
 from iaglobal.providers.provider_router import async_route_generate
 from iaglobal.memory.memory_error import record_error
+from iaglobal.graphs.communication.acetylcholine_bus import AgentMessage
 
 logger = logging.getLogger(__name__)
 
@@ -11,6 +12,16 @@ logger = logging.getLogger(__name__)
 async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
+
+    ag_mailbox = memory.get("agentmailbox", {})
+    bus = ag_mailbox.get("_agent_bus")
+    inbox = ag_mailbox.get("_mailbox_manager")
+    if bus is not None and inbox is not None:
+        mailbox = inbox.get_or_create("documentation")
+        msgs = mailbox.process_inbox(max_messages=5)
+        if msgs:
+            for msg in msgs:
+                logger.info("[DOCUMENTATION] Mensagem recebida de %s: type=%s", msg.sender, msg.type)
 
     # Prefere output do coder (que ja deve ter gerado conteudo de documento)
     coder_output = memory.get("coder", {}).get("output", "")
@@ -57,6 +68,14 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
         )
         if doc and len(doc) > 100:
             logger.info("[DOCUMENTATION] Documento gerado: %d chars", len(doc))
+            if bus is not None:
+                msg = AgentMessage(
+                    sender="documentation", receiver="result_agent",
+                    type="doc_ready",
+                    payload={"document": doc, "task": task},
+                )
+                bus.publish(msg)
+                logger.info("[DOCUMENTATION] Mensagem enviada para result_agent via bus")
             return {**ctx, "output": doc, "document": doc}
         record_error("documentation", "Empty/short document", {"task": task[:100]})
     except Exception as e:

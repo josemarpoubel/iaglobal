@@ -14,6 +14,11 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
     # PHASE 1 — DISCOVERY & UNDERSTANDING
     # ======================================================
 
+    ("agentmailbox", {
+        "strategy": "fast",
+        "depends_on": []
+    }),
+
     ("prompt_intake", {
         "strategy": "general",
         "depends_on": []
@@ -21,6 +26,16 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
 
     ("enhancement", {
         "strategy": "general",
+        "depends_on": ["prompt_intake"]
+    }),
+
+    ("interpreter", {
+        "strategy": "fast",
+        "depends_on": ["prompt_intake"]
+    }),
+
+    ("web_classifier", {
+        "strategy": "fast",
         "depends_on": ["prompt_intake"]
     }),
 
@@ -92,6 +107,16 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
         ]
     }),
 
+    ("prompt_builder", {
+        "strategy": "general",
+        "depends_on": ["dependency"]
+    }),
+
+    ("prompt_improver", {
+        "strategy": "general",
+        "depends_on": ["prompt_builder"]
+    }),
+
     ("technology_selection", {
         "strategy": "research",
         "depends_on": ["dependency"]
@@ -108,6 +133,11 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
             "business_rules",
             "technology_selection"
         ]
+    }),
+
+    ("risk_analysis", {
+        "strategy": "general",
+        "depends_on": ["architect"]
     }),
 
     ("system_design", {
@@ -179,6 +209,11 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
         "depends_on": ["task_breakdown"]
     }),
 
+    ("multi_coder", {
+        "strategy": "general",
+        "depends_on": ["execution_plan", "prompt_builder"]
+    }),
+
     # ======================================================
     # PHASE 5 — BUILD
     # ======================================================
@@ -230,6 +265,16 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
         ]
     }),
 
+    ("genesis_builder", {
+        "strategy": "general",
+        "depends_on": ["integrator"]
+    }),
+
+    ("code_executor", {
+        "strategy": "general",
+        "depends_on": ["integrator"]
+    }),
+
     # ======================================================
     # PHASE 6 — VALIDATION
     # ======================================================
@@ -258,6 +303,16 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
 
     ("compliance_audit", {
         "strategy": "general",
+        "depends_on": ["semantic_validator"]
+    }),
+
+    ("performance", {
+        "strategy": "general",
+        "depends_on": ["semantic_validator"]
+    }),
+
+    ("security", {
+        "strategy": "security",
         "depends_on": ["semantic_validator"]
     }),
 
@@ -319,6 +374,11 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
         "depends_on": ["deployment_plan"]
     }),
 
+    ("artifact_writer", {
+        "strategy": "general",
+        "depends_on": ["release"]
+    }),
+
     # ======================================================
     # PHASE 9 — OBSERVABILITY
     # ======================================================
@@ -336,6 +396,11 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
     ("retrospective", {
         "strategy": "general",
         "depends_on": ["optimization"]
+    }),
+
+    ("reflexion", {
+        "strategy": "general",
+        "depends_on": ["retrospective"]
     }),
 
     # ======================================================
@@ -401,6 +466,30 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
     ("evolution_trigger", {
         "strategy": "general",
         "depends_on": ["pipeline_updater"]
+    }),
+
+    # ======================================================
+    # ORPHAN AGENTS — handlers delegating to agent classes
+    # ======================================================
+
+    ("failure_analysis", {
+        "strategy": "fast",
+        "depends_on": ["code_executor"]
+    }),
+
+    ("knowledge_writer", {
+        "strategy": "general",
+        "depends_on": ["multi_coder"]
+    }),
+
+    ("multi_agent", {
+        "strategy": "general",
+        "depends_on": ["prompt_intake"]
+    }),
+
+    ("typing_agent", {
+        "strategy": "fast",
+        "depends_on": ["prompt_intake"]
     }),
 ]
 

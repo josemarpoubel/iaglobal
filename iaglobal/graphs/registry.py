@@ -7,6 +7,7 @@ from .nodes import create_skill_node
 
 
 NODE_REGISTRY: dict = {
+    "scheduler": lambda: create_skill_node("scheduler"),
     "prompt_intake": lambda: create_skill_node("prompt_intake"),
     "enhancement": lambda: create_skill_node("enhancement"),
     "orchestrator_agent": lambda: create_skill_node("orchestrator_agent"),

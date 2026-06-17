@@ -201,6 +201,14 @@ class Nodes:
             return None
         return await llm(prompt)
 
+    def _resolve_model(self, ctx: dict) -> str:
+        """
+        Resolve model for LLM calls.
+        
+        Returns empty string to let bandit/router decide the best model.
+        This follows the leiame.md guidance to centralize model decision in bandit.
+        """
+        return ""
 
 #===========================================================================================
 
@@ -1101,7 +1109,7 @@ class Nodes:
         logger.info("🧐 [CRITIC v2] Avaliando solução (multi-dimensional)...")
         from iaglobal.agents.critic_agent import CriticAgent
         critic = CriticAgent()
-        result = critic.avaliar_com_scores(artifact.task, artifact.code)
+        result = await critic.avaliar_com_scores(artifact.task, artifact.code)
 
         artifact.score = result.get("score", 50.0)
         artifact.critic_scores = result.get("scores", {
@@ -2768,7 +2776,7 @@ class Nodes:
         # ---------------------------------------------------------
 
         try:
-            critic_result = critic.avaliar_com_scores(task, code)
+            critic_result = await critic.avaliar_com_scores(task, code)
             critic_score = float(critic_result.get("score", 50))
         except Exception as e:
             logger.warning(f"⚠️ CriticAgent falhou: {e}")
@@ -6386,7 +6394,7 @@ class Nodes:
 
         try:
             critic_scores = (
-                CriticAgent()
+                await CriticAgent()
                 .avaliar_com_scores(
                     enriched_task,
                     ""

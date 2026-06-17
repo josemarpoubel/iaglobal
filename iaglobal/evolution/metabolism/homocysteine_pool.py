@@ -37,7 +37,7 @@ class CandidateSkill:
             "score": self.score,
             "route": self.route,
             "source_gap": self.source_gap,
-            "created_at": self.created_at,
+            "created_at": round(self.created_at, 6),
         }
 
     @classmethod

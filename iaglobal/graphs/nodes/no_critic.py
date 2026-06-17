@@ -1,5 +1,6 @@
 from typing import Dict, Any
 import logging
+import asyncio
 
 from iaglobal.agents.critic_agent import CriticAgent
 from iaglobal.memory.memory_error import record_error
@@ -21,7 +22,8 @@ async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
         msgs = mailbox.process_inbox(max_messages=5)
         if msgs:
             for msg in msgs:
-                logger.info("[CRITIC] Mensagem recebida de %s: type=%s", msg.sender, msg.type)
+                logger.info("[CRITIC] Mensagem recebida de %s: type=%s | payload=%s", 
+                           msg.sender, msg.type, msg.payload)
 
     coder_output = memory.get("multi_coder", {}).get("output", "") or memory.get("coder", {}).get("output", "")
     if not coder_output:
@@ -34,7 +36,7 @@ async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
     prompt_built = memory.get("prompt_builder", {}).get("built_prompt", "") or task
 
     try:
-        result = _critic.avaliar(task=task, prompt=prompt_built, output=coder_output)
+        result = await _critic.avaliar(task=task, prompt=prompt_built, output=coder_output)
         approved = result.get("approved", False)
         score = result.get("score", 0)
         issues = result.get("issues", [])
@@ -61,6 +63,14 @@ async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
             )
             bus.publish(msg)
             logger.info("[CRITIC] Mensagem enviada para result_agent via bus")
+        
+        # Process inbox again at end
+        if bus is not None and inbox is not None:
+            mailbox = inbox.get_or_create("critic")
+            msgs = mailbox.process_inbox(max_messages=5)
+            if msgs:
+                for msg in msgs:
+                    logger.info("[CRITIC] Mensagem tardia recebida de %s: type=%s", msg.sender, msg.type)
 
         return {
             **ctx,

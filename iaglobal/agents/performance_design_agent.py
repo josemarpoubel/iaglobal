@@ -33,7 +33,8 @@ from dataclasses import dataclass, field, asdict
 from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple
 
-from iaglobal.utils.logger import logger
+from iaglobal.utils.logger import get_logger
+logger = get_logger(__name__)
 
 # Integrações biológicas opcionais
 try:

@@ -1,11 +1,9 @@
-"""
-IAGlobal v3 - Node 02: enhancement
-- Analisa e enriquece o prompt normalizado (melhora intenções, entidades, escopo)
-- Realiza parse de contexto para definir requisitos e escopo
-- Injeta instruções de especialização via MetaAgentDesigner se aplicável
-"""
-
 from typing import Dict, Any
+import logging
+
+from iaglobal.agents.enhancement_agent import EnhancementAgent
+
+logger = logging.getLogger(__name__)
 
 
 async def run_enhancement(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -15,7 +13,22 @@ async def run_enhancement(ctx: Dict[str, Any]) -> Dict[str, Any]:
         prompt = {"raw": task, "normalized": task, "tokens": len(task.split()), "intents": ["unknown"]}
 
     raw = prompt["normalized"]
-    # TBD: real intent/entity parser; stub
+    intake = {
+        "raw": raw,
+        "normalized": raw,
+        "domain": ctx.get("input", {}).get("domain", "unknown"),
+    }
+    knowledge_context = str(ctx.get("knowledge_context", ""))
+    error_context = str(ctx.get("error_context", ""))
+
+    agent = EnhancementAgent()
+    result = agent.enhance(
+        task=raw,
+        intake=intake,
+        knowledge_context=knowledge_context,
+        error_context=error_context,
+    )
+
     intents = ["analysis", "planning"]
     entities = []
 
@@ -27,6 +40,10 @@ async def run_enhancement(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "complexity": "medium",
         },
         "specialization_instructions": None,
+        "enhanced_task": result.get("enhanced_task", ""),
+        "approach": result.get("approach", []),
+        "prerequisites": result.get("prerequisites", []),
+        "suggested_libs": result.get("suggested_libs", []),
     }
 
     out = {**ctx, "enhancement": enhancement_def}

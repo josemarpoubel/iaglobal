@@ -130,7 +130,7 @@ class ModelEscalator:
 
     TIERS = {
         0: {  # Cloud APIs (mais rápidos, maior qualidade)
-            "models": ["openrouter/poolside/laguna-m.1:free", "nvidia/mistralai/mistral-small-4-119b-2603",
+            "models": ["openrouter/poolside/laguna-m.1:free", "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
                        "groq/llama-3.1-8b-instant", "gemini/gemini-2.5-flash-lite"],
             "label": "cloud",
         },

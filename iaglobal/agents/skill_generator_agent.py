@@ -15,13 +15,13 @@ from collections import Counter
 
 from iaglobal._paths import CORE_DB, get_db_connection as _norm_path
 
-from iaglobal.evolution.skills import Skill
+from iaglobal.evolution.skills.skill import Skill
 
 from iaglobal.evolution.skills.skill import ExecutionPolicy
 
 from iaglobal.evolution.skills.run_fn_factory import make_dynamic_run_fn
 
-from iaglobal.evolution.skills.dynamic_registry import dynamic_registry as TEMPLATE_REGISTRY
+from iaglobal.evolution.skills.dynamic_registry import dynamic_registry
 
 from iaglobal.memory.fusion_engine import KnowledgeGraph
 
@@ -76,7 +76,7 @@ class SkillGeneratorAgent:
         import time
         start = time.time()
 
-        fn_factory = TEMPLATE_REGISTRY.get(template_key)
+        fn_factory = dynamic_registry.get(template_key)
         run_fn = fn_factory() if fn_factory else make_dynamic_run_fn(name, "llm", description)
 
         skill = Skill(

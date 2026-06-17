@@ -1,11 +1,12 @@
-"""
-IAGlobal v3 - Node 01: prompt_intake
-- Recebe prompt bruto do usuário, normaliza e injeta no sistema
-- Faz parser inicial de intenção, contexto e escopo
-- Resultado: dicionário structureado que alimenta enhancement
-"""
-
 from typing import Dict, Any
+import logging
+
+from iaglobal.agents.intent_classifier_agent import IntentClassifierAgent
+from iaglobal.graphs.communication.acetylcholine_bus import AgentMessage
+
+logger = logging.getLogger(__name__)
+
+_intent_classifier = IntentClassifierAgent()
 
 
 async def run_prompt_intake(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -16,14 +17,47 @@ async def run_prompt_intake(ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {**ctx, "prompt": {"raw": "", "normalized": "", "tokens": 0, "intents": []}, "initial_scope": {"phase": "definition"}}
 
     normalized = raw.strip()
+    classification = _intent_classifier.classify(normalized)
 
-    # TBD: intents, entities parser (will be enhanced in enhancement node)
     prompt_def = {
         "raw": raw,
         "normalized": normalized,
         "tokens": len(normalized.split()),
-        "intents": ["unknown"],
+        "intents": classification["intents"],
+        "entities": classification["entities"],
+        "domain": classification["domain"],
+        "confidence": classification["confidence"],
     }
+
+    logger.info(
+        "[PROMPT_INTAKE] domain=%s intents=%s confidence=%.2f",
+        classification["domain"], classification["intents"], classification["confidence"],
+    )
+
+    memory = ctx.get("memory", {})
+    ag_mailbox = memory.get("agentmailbox", {})
+    bus = ag_mailbox.get("_agent_bus")
+    inbox = ag_mailbox.get("_mailbox_manager")
+
+    if bus is not None and inbox is not None:
+        mailbox = inbox.get_or_create("prompt_intake")
+        msgs = mailbox.process_inbox(max_messages=5)
+        if msgs:
+            for msg in msgs:
+                logger.info("[PROMPT_INTAKE] Mensagem recebida de %s: type=%s", msg.sender, msg.type)
+
+    if bus is not None:
+        msg = AgentMessage(
+            sender="prompt_intake",
+            receiver="enhancement",
+            type="prompt_ready",
+            payload={
+                "domain": classification["domain"],
+                "intents": classification["intents"],
+                "entities": classification.get("entities", {}),
+            },
+        )
+        bus.publish(msg)
 
     out = {**ctx, "prompt": prompt_def, "initial_scope": {"phase": "definition"}}
     return out

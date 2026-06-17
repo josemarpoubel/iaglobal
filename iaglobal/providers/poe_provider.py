@@ -12,7 +12,7 @@ from iaglobal.utils.logger import logger
 def generate(
     prompt: str,
     model: str = "poe/GLM-5-T",
-    timeout: int = 120,
+    timeout: int = 180,
     token_collector: Optional[TokenCollector] = None
 ) -> str:
 
@@ -64,7 +64,7 @@ def generate(
 async def async_generate(
     prompt: str,
     model: str = "poe/GLM-5-T",
-    timeout: int = 120,
+    timeout: int = 180,
     token_collector: Optional[TokenCollector] = None
 ) -> str:
     from iaglobal.providers.async_http import async_post

@@ -175,6 +175,8 @@ class ExecutionRegistry:
             self._executed.clear()
             self._entries.clear()
             self._execution_order.clear()
+            if hasattr(self, '_executed_nodes'):
+                self._executed_nodes.clear()
 
 
 # Instância global unificada

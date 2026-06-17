@@ -1,124 +1,323 @@
+# iaglobal/agents/semantic_validator.py
+"""
+Semantic Validation Module - Implementation for code validation with rules and scoring.
+"""
+
+from __future__ import annotations
+
+import ast
 import re
-from typing import Dict, Any
-from iaglobal.utils.logger import logger
+import asyncio
+from dataclasses import dataclass, field
+from enum import Enum
+from typing import Dict, Any, List, Optional, Pattern
+
+from iaglobal.utils.helpers import run_async_safe
 
 
-class SemanticValidatorAgent:
-    """
-    Validates that generated code meets semantic requirements:
-    - Requirements are fulfilled
-    - Algorithm is correct
-    - Technical terms are present
-    - Output makes logical sense
-    """
+# =============================================================================
+# Enums and Data Classes
+# =============================================================================
+
+class Language(Enum):
+    PYTHON = "python"
+    HTML = "html"
+    GENERIC = "generic"
+
+
+@dataclass
+class RuleResult:
+    name: str
+    description: str
+    passed: bool
+    weight: float
+    category: str
+    suggestion: Optional[str] = None
+
+
+@dataclass
+class ValidationResult:
+    valid: bool
+    score: float
+    language: Language
+    errors: List[str] = field(default_factory=list)
+    suggestions: List[str] = field(default_factory=list)
+    rule_results: List[RuleResult] = field(default_factory=list)
+    score_by_category: Dict[str, float] = field(default_factory=dict)
+    elapsed_ms: float = 0.0
+
+    def to_legacy_dict(self) -> Dict[str, Any]:
+        return {
+            "valid": self.valid,
+            "score": self.score,
+            "errors": self.errors,
+            "details": {
+                "language": self.language.value,
+                "rule_results": [
+                    {
+                        "name": r.name,
+                        "passed": r.passed,
+                        "weight": r.weight,
+                        "category": r.category,
+                        "suggestion": r.suggestion,
+                    }
+                    for r in self.rule_results
+                ],
+                "score_by_category": self.score_by_category,
+            }
+        }
+
+
+# =============================================================================
+# Language Detector
+# =============================================================================
+
+class LanguageDetector:
+    @staticmethod
+    async def detect(code: str) -> Language:
+        code_stripped = code.strip()
+        if not code_stripped:
+            return Language.GENERIC
+
+        if code_stripped.startswith("<!DOCTYPE html") or code_stripped.startswith("<html"):
+            return Language.HTML
+
+        python_indicators = ["def ", "class ", "import ", "from ", "async def", "await "]
+        if any(indicator in code_stripped for indicator in python_indicators):
+            return Language.PYTHON
+
+        return Language.GENERIC
+
+
+# =============================================================================
+# Validation Rules
+# =============================================================================
+
+class ValidationRule:
+    """Base class for validation rules."""
+
+    def __init__(self, name: str, weight: float, category: str):
+        self.name = name
+        self.weight = weight
+        self.category = category
+
+    async def evaluate(self, code: str, task: str, language: Language) -> Optional[RuleResult]:
+        raise NotImplementedError
+
+
+class PythonStructureRule(ValidationRule):
+    """Checks for function/class definitions in generative Python tasks."""
 
     def __init__(self):
-        self.requirement_patterns = {
-            "sha3_512": re.compile(r"sha3.?512|sha512|SHA3.?512", re.IGNORECASE),
-            "sha256": re.compile(r"sha.?256|SHA.?256", re.IGNORECASE),
-            "genesis": re.compile(r"genesis", re.IGNORECASE),
-            "blockchain": re.compile(r"block.?chain|BlockChain|blockchain", re.IGNORECASE),
-            "serialize": re.compile(r"serialize|serializ|cbor|json\.dumps|pickle", re.IGNORECASE),
-            "hashlib": re.compile(r"import hashlib|from hashlib", re.IGNORECASE),
-        }
+        super().__init__("python_structure", weight=30.0, category="structure")
 
-    def validate(self, code: str, task: str) -> Dict[str, Any]:
-        logger.info("🔬 [SEMANTIC VALIDATOR] Validando requisitos semânticos...")
+    async def evaluate(self, code: str, task: str, language: Language) -> Optional[RuleResult]:
+        if language != Language.PYTHON:
+            return None
 
-        if not code or not code.strip():
-            return {
-                "valid": False,
-                "score": 0.0,
-                "errors": ["Código vazio"],
-                "details": {},
-            }
+        generative_keywords = ["criar", "criar uma", "criar um", "implementar", "escrever", "gerar", "função", "classe"]
+        if not any(kw in task.lower() for kw in generative_keywords):
+            return None
 
-        task_lower = task.lower()
-        code_lower = code.lower()
-        errors = []
-        checks = {}
-        total_weight = 0.0
-        passed_weight = 0.0
-
-        is_python = self._is_python_code(code)
-        is_html = code_lower.strip().startswith("<!doctype") or code_lower.strip().startswith("<html")
-
-        if not is_python and not is_html:
-            logger.info("✅ [SEMANTIC VALIDATOR] Código não-Python — validação genérica aceita")
-            return {"valid": True, "score": 100.0, "errors": [], "details": {"language": "non-python"}}
-
-        requirement_checks = [
-            ("hashlib_import", "Usar hashlib", 15.0, "import hashlib" in code_lower or "from hashlib" in code_lower),
-        ]
-
-        self._check_keyword_requirement(task_lower, code_lower, "sha3_512", "SHA3-512", 20.0, checks)
-        self._check_keyword_requirement(task_lower, code_lower, "genesis", "genesis", 20.0, checks)
-        self._check_keyword_requirement(task_lower, code_lower, "blockchain", "blockchain", 15.0, checks)
-        self._check_keyword_requirement(task_lower, code_lower, "serialize", "serialização", 15.0, checks)
-
-        if not is_html and ("tarefa" in task_lower or "gerar" in task_lower or "criar" in task_lower):
-            if "def " not in code_lower and "class " not in code_lower:
-                errors.append("Código não contém função ou classe definida")
-                checks["has_function"] = {"passed": False, "weight": 10.0}
-
-        if is_html:
-            has_html_tag = "<html" in code_lower and "</html>" in code_lower
-            has_body = "<body" in code_lower and "</body>" in code_lower
-            if not has_html_tag or not has_body:
-                errors.append("HTML incompleto: faltam tags <html> ou <body>")
-                checks["html_structure"] = {"passed": has_html_tag and has_body, "weight": 10.0}
-
-        if is_html and not checks.get("html_structure", {}).get("passed") == False:
-            score = 100.0
-            valid = True
-            logger.info("✅ [SEMANTIC VALIDATOR] HTML válido (tags estruturais presentes)")
-            return {"valid": True, "score": 100.0, "errors": [], "details": checks}
-
-        for name, desc, weight, passed in requirement_checks:
-            checks[name] = {"passed": passed, "weight": weight}
-
-        for check_name, check_data in checks.items():
-            total_weight += check_data["weight"]
-            if check_data["passed"]:
-                passed_weight += check_data["weight"]
-
-        score = (passed_weight / total_weight * 100.0) if total_weight > 0 else 0.0
-
-        if score < 50:
-            errors.append("Score semântico baixo: %.1f%%" % score)
-
-        valid = len(errors) == 0
-
-        result = {
-            "valid": valid,
-            "score": round(score, 2),
-            "errors": errors,
-            "details": checks,
-        }
-
-        if valid:
-            logger.info("✅ [SEMANTIC VALIDATOR] Aprovado (score=%.1f%%)", score)
-        else:
-            logger.warning("❌ [SEMANTIC VALIDATOR] Rejeitado: %s", errors)
-
-        return result
-
-    @staticmethod
-    def _is_python_code(code: str) -> bool:
-        import ast
         try:
-            ast.parse(code)
-            return True
-        except SyntaxError:
-            return False
+            tree = await asyncio.to_thread(ast.parse, code)
+            has_func_or_class = any(
+                isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                for node in ast.walk(tree)
+            )
 
-    def _check_keyword_requirement(self, task_lower: str, code_lower: str, key: str, label: str, weight: float, checks: dict):
-        pattern = self.requirement_patterns.get(key)
-        if not pattern:
-            return
-        required = pattern.search(task_lower) is not None
-        if required:
-            present = pattern.search(code_lower) is not None
-            checks["req_%s" % key] = {"passed": present, "weight": weight}
-            if not present:
-                logger.warning("⚠️ [SEMANTIC VALIDATOR] Requisito '%s' não encontrado no código", label)
+            if has_func_or_class:
+                return RuleResult(self.name, "Possui estrutura (função/classe)", True, self.weight, self.category)
+            else:
+                return RuleResult(
+                    self.name, "Código Python sem função ou classe", False, self.weight, self.category,
+                    suggestion="Adicione uma definição de função (def) ou classe (class)"
+                )
+        except SyntaxError:
+            return RuleResult(self.name, "Erro de sintaxe no código Python", False, self.weight, self.category)
+
+
+class HtmlStructureRule(ValidationRule):
+    """Checks for complete HTML structure."""
+
+    def __init__(self):
+        super().__init__("html_structure", weight=30.0, category="structure")
+
+    async def evaluate(self, code: str, task: str, language: Language) -> Optional[RuleResult]:
+        if language != Language.HTML:
+            return None
+
+        has_doctype = "<!DOCTYPE html" in code or "<!doctype html" in code.lower()
+        has_html = "<html" in code.lower() and "</html>" in code.lower()
+        has_body = "<body" in code.lower() and "</body>" in code.lower()
+
+        if has_doctype and has_html and has_body:
+            return RuleResult(self.name, "HTML completo com doctype, html e body", True, self.weight, self.category)
+        else:
+            missing = []
+            if not has_doctype:
+                missing.append("DOCTYPE")
+            if not has_html:
+                missing.append("tags <html>")
+            if not has_body:
+                missing.append("tags <body>")
+            return RuleResult(
+                self.name, f"HTML incompleto: faltando {', '.join(missing)}", False, self.weight, self.category,
+                suggestion=f"Adicione {', '.join(missing)} ao documento HTML"
+            )
+
+
+class KeywordPresenceRule(ValidationRule):
+    """Checks for required keyword in code when mentioned in task."""
+
+    def __init__(self, name: str, weight: float, category: str, pattern: Pattern, label: str):
+        super().__init__(name, weight, category)
+        self.pattern = pattern
+        self.label = label
+
+    async def evaluate(self, code: str, task: str, language: Language) -> Optional[RuleResult]:
+        if self.pattern.search(task) is None:
+            return None
+
+        found = self.pattern.search(code) is not None
+        if found:
+            return RuleResult(self.name, f"{self.label} presente no código", True, self.weight, self.category)
+        else:
+            return RuleResult(
+                self.name, f"{self.label} ausente no código", False, self.weight, self.category,
+                suggestion=f"Adicione {self.label} ao código"
+            )
+
+
+class PythonImportHashlibRule(ValidationRule):
+    """Checks for hashlib import when task requires it."""
+
+    def __init__(self):
+        super().__init__("python_import_hashlib", weight=20.0, category="imports")
+        self.hashlib_pattern = re.compile(r"\bimport\s+hashlib\b|\bfrom\s+hashlib\s+import\b")
+
+    async def evaluate(self, code: str, task: str, language: Language) -> Optional[RuleResult]:
+        if language != Language.PYTHON:
+            return None
+
+        hashlib_keywords = ["hashlib", "sha3", "sha256", "sha512", "md5", "hash"]
+        if not any(kw in task.lower() for kw in hashlib_keywords):
+            return None
+
+        has_import = self.hashlib_pattern.search(code) is not None
+        if has_import:
+            return RuleResult(self.name, "Import hashlib presente", True, self.weight, self.category)
+        else:
+            return RuleResult(
+                self.name, "Import hashlib ausente", False, self.weight, self.category,
+                suggestion="Adicione 'import hashlib' ao código"
+            )
+
+
+# =============================================================================
+# Rule Registry
+# =============================================================================
+
+class RuleRegistry:
+    def __init__(self):
+        self.rules: List[ValidationRule] = []
+
+    def register(self, rule: ValidationRule) -> "RuleRegistry":
+        self.rules.append(rule)
+        return self
+
+    def deregister(self, name: str) -> "RuleRegistry":
+        self.rules = [r for r in self.rules if r.name != name]
+        return self
+
+    @classmethod
+    def default(cls) -> "RuleRegistry":
+        registry = cls()
+        registry.register(PythonStructureRule())
+        registry.register(HtmlStructureRule())
+        registry.register(PythonImportHashlibRule())
+        registry.register(KeywordPresenceRule(
+            "req_sha3_512", weight=20.0, category="cryptography",
+            pattern=re.compile(r"sha3.?512", re.IGNORECASE), label="SHA3-512"
+        ))
+        return registry
+
+
+# =============================================================================
+# Score Aggregator
+# =============================================================================
+
+DEFAULT_PASS_THRESHOLD = 70.0
+
+
+class ScoreAggregator:
+    @staticmethod
+    def aggregate(results: List[RuleResult]) -> tuple:
+        if not results:
+            return 100.0, {}, [], []
+
+        total_weight = sum(r.weight for r in results)
+        if total_weight == 0:
+            return 100.0, {}, [], []
+
+        passed_weight = sum(r.weight for r in results if r.passed)
+        score = (passed_weight / total_weight) * 100.0
+
+        by_category: Dict[str, List[RuleResult]] = {}
+        for r in results:
+            by_category.setdefault(r.category, []).append(r)
+
+        score_by_category = {}
+        for cat, rules in by_category.items():
+            cat_weight = sum(r.weight for r in rules)
+            cat_passed = sum(r.weight for r in rules if r.passed)
+            score_by_category[cat] = (cat_passed / cat_weight * 100.0) if cat_weight > 0 else 100.0
+
+        errors = [r.description for r in results if not r.passed]
+        suggestions = [r.suggestion for r in results if not r.passed and r.suggestion]
+
+        return score, score_by_category, errors, suggestions
+
+
+# =============================================================================
+# Semantic Validator Agent
+# =============================================================================
+
+class SemanticValidatorAgent:
+    def __init__(
+        self,
+        registry: Optional[RuleRegistry] = None,
+        pass_threshold: float = DEFAULT_PASS_THRESHOLD
+    ):
+        self.registry = registry or RuleRegistry.default()
+        self.pass_threshold = pass_threshold
+
+    def validate(self, code: str, task: str = "") -> Dict[str, Any]:
+        return run_async_safe(self.validate_async, code, task)
+
+    async def validate_async(self, code: str, task: str = "") -> ValidationResult:
+        start_time = asyncio.get_event_loop().time()
+
+        language = await LanguageDetector.detect(code)
+        rule_results = []
+
+        for rule in self.registry.rules:
+            result = await rule.evaluate(code, task, language)
+            if result is not None:
+                rule_results.append(result)
+
+        score, score_by_category, errors, suggestions = ScoreAggregator.aggregate(rule_results)
+        valid = score >= self.pass_threshold and len(errors) == 0
+
+        elapsed_ms = (asyncio.get_event_loop().time() - start_time) * 1000
+
+        return ValidationResult(
+            valid=valid,
+            score=score,
+            language=language,
+            errors=errors,
+            suggestions=suggestions,
+            rule_results=rule_results,
+            score_by_category=score_by_category,
+            elapsed_ms=elapsed_ms,
+        )

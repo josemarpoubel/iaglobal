@@ -22,7 +22,8 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Protocol, runtime_checkable
 
-from iaglobal.utils.logger import logger
+from iaglobal.utils.logger import get_logger
+logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
 # Domínio — tipos e enumerações

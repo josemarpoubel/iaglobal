@@ -17,7 +17,7 @@ from iaglobal.security.ast_gateway import ASTGateway
 from iaglobal.utils.logger import get_logger
 
 
-logger = get_logger(__name__)
+logger = get_logger("iaglobal.agents.debugger_agent")
 
 
 @dataclass(slots=True)
@@ -73,7 +73,7 @@ class DebuggerAgent:
     # PUBLIC API
     # ==========================================================
 
-    def run(self, task: Task) -> DebugResult:
+    async def run(self, task: Task) -> DebugResult:
         """
         Fluxo principal do agente.
         """
@@ -90,20 +90,16 @@ class DebuggerAgent:
         for attempt in range(1, self.max_attempts + 1):
 
             logger.info(
-                "[DebuggerAgent] Attempt=%s/%s",
+                "Attempt=%s/%s",
                 attempt,
                 self.max_attempts,
             )
 
             try:
                 self._validate(code)
-
             except Exception as e:
-
-                logger.exception(
-                    "[DebuggerAgent] AST validation failed"
-                )
-
+                last_error = str(e)
+                logger.exception("AST validation failed")
                 return DebugResult(
                     success=False,
                     code=code,
@@ -112,7 +108,7 @@ class DebuggerAgent:
                     execution_time=time.perf_counter() - start_time,
                 )
 
-            output = executar(code)
+            output = await executar("", {"task": code})
 
             error = self.extract_error(output)
 
@@ -135,7 +131,7 @@ class DebuggerAgent:
             last_error = error
 
             logger.warning(
-                "[DebuggerAgent] Execution failed: %s",
+                "Execution failed: %s",
                 error[:300],
             )
 
@@ -192,22 +188,14 @@ class DebuggerAgent:
         )
 
         logger.info(
-            "[DebuggerAgent] Selected model=%s",
+            "Repair model=%s",
             model,
         )
-
         try:
-
-            response = asyncio.run(
-                self.bandit.async_execute_model(
-                    model=model,
-                    prompt=prompt,
-                    task_type="debug",
-                )
+            response = self.bandit.async_execute_model(
+                model=model, prompt=prompt, task_type="debug",
             )
-
             fixed_code = self._extract_code(response)
-
             if not fixed_code:
                 logger.warning(
                     "[DebuggerAgent] Empty model response"
@@ -216,14 +204,11 @@ class DebuggerAgent:
 
             try:
                 self._validate(fixed_code)
-
             except Exception as e:
-
                 logger.warning(
                     "[DebuggerAgent] Generated code rejected: %s",
                     e,
                 )
-
                 return code, model
 
             self.bandit.update_policy(
@@ -234,15 +219,12 @@ class DebuggerAgent:
                 latency=0.5,
                 reward=0.75,
             )
-
             return fixed_code, model
 
         except Exception as e:
-
             logger.exception(
                 "[DebuggerAgent] Self-healing failure"
             )
-
             self.bandit.update_policy(
                 node="debugger_agent",
                 model=model,
@@ -251,7 +233,40 @@ class DebuggerAgent:
                 latency=1.0,
                 reward=0.0,
             )
+            return code, model
 
+    async def _repair_code_async(
+        self,
+        task: Task,
+        code: str,
+        error: str,
+    ) -> tuple[str, Optional[str]]:
+        prompt = self.build_fix_prompt(task=task, error=error, code=code)
+        model = self.bandit.select_model(node="debugger_agent", strategy="debug")
+        logger.info("[DebuggerAgent] Repair async model=%s", model)
+        try:
+            response = await self.bandit.async_execute_model(
+                model=model, prompt=prompt, task_type="debug"
+            )
+            fixed_code = self._extract_code(response)
+            if not fixed_code:
+                return code, model
+            try:
+                self._validate(fixed_code)
+            except Exception as e:
+                logger.warning("[DebuggerAgent] Generated code rejected: %s", e)
+                return code, model
+            self.bandit.update_policy(
+                node="debugger_agent", model=model, strategy="debug",
+                success=True, latency=0.5, reward=0.75,
+            )
+            return fixed_code, model
+        except Exception as e:
+            logger.exception("Self-healing failure")
+            self.bandit.update_policy(
+                node="debugger_agent", model=model, strategy="debug",
+                success=False, latency=1.0, reward=0.0,
+            )
             return code, model
 
     # ==========================================================
@@ -373,11 +388,31 @@ TAREFA ORIGINAL
     ) -> str:
 
         fake_task = Task(
-            description=task,
-            code=codigo,
+            objective=task,
+            context={"code": codigo},
         )
 
         repaired_code, _ = self._repair_code(
+            task=fake_task,
+            code=codigo,
+            error=erro,
+        )
+
+        return repaired_code
+
+    async def corrigir_codigo_async(
+        self,
+        codigo: str,
+        erro: str,
+        task: str,
+    ) -> str:
+
+        fake_task = Task(
+            objective=task,
+            context={"code": codigo},
+        )
+
+        repaired_code, _ = await self._repair_code_async(
             task=fake_task,
             code=codigo,
             error=erro,

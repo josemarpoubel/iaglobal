@@ -40,7 +40,9 @@ class AcetylcholineBus:
 
     def publish(self, message: AgentMessage):
         self._messages.append(message)
-        logger.info("[ACH-BUS] %s → %s | type=%s | priority=%s", message.sender, message.receiver, message.type, message.priority)
+        logger.info("[ACH-BUS] %s → %s | type=%s | priority=%s | payload_keys=%s", 
+                    message.sender, message.receiver, message.type, message.priority, 
+                    list(message.payload.keys()) if message.payload else "none")
         self._route(message)
 
     def subscribe(self, topic: str, handler: Callable):

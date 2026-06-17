@@ -26,11 +26,11 @@ class EvolutionParams:
 
     def to_dict(self) -> Dict[str, Any]:
         return {
-            "mutation_rate": self.mutation_rate,
-            "crossover_rate": self.crossover_rate,
-            "selection_pressure": self.selection_pressure,
+            "mutation_rate": round(self.mutation_rate, 6),
+            "crossover_rate": round(self.crossover_rate, 6),
+            "selection_pressure": round(self.selection_pressure, 6),
             "population_size": self.population_size,
-            "exploration_rate": self.exploration_rate,
+            "exploration_rate": round(self.exploration_rate, 6),
         }
 
     @classmethod
@@ -55,7 +55,7 @@ class MetaTrial:
         return {
             "params": self.params.to_dict(),
             "improvement": self.improvement,
-            "timestamp": self.timestamp,
+            "timestamp": round(self.timestamp, 6),
             "task_type": self.task_type,
         }
 

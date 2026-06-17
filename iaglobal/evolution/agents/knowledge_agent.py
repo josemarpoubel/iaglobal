@@ -117,7 +117,7 @@ class KnowledgeAgent:
             "content": content.strip(),
             "tags": cleaned_tags,
             "source": source or "",
-            "timestamp": time.time(),
+            "timestamp": round(time.time(), 6),
             "hits": 0,
         }
         self._cache.append(entry)

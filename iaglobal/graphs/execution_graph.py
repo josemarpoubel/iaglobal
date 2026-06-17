@@ -108,8 +108,8 @@ class ExecutionGraph:
             type="node_start", payload={"node": node.name, "time": time.time()},
         ))
         
-        # 2. Lock assíncrono (assumindo que seu node.acquire agora possui versão async)
-        if not await node.acquire_async():
+        # 2. Lock via thread (Node.acquire é síncrono)
+        if not await asyncio.to_thread(node.acquire):
             return {
                 "output": None, "latency": 0.0, "success": False,
                 "error": f"Node '{node.name}' já está em execução (lock)", 
@@ -150,13 +150,9 @@ class ExecutionGraph:
             # Fallback para node.run
             if not executed and node.run:
                 try:
-                    if asyncio.iscoroutinefunction(node.run):
-                        result = await node.run(ctx)
-                    else:
-                        loop = asyncio.get_running_loop()
-                        result = await loop.run_in_executor(
-                            cpu_affinity.get_thread_pool(), node.run, ctx
-                        )
+                    result = node.run(ctx)
+                    if asyncio.iscoroutine(result):
+                        result = await result
                     executed = True
                 except Exception:
                     node_run_failed = True
@@ -212,11 +208,10 @@ class ExecutionGraph:
             result_text = ""
             await workdir.async_append_log(f"erro: {last_error}")
         finally:
-            # Liberação assíncrona garantida
-            await node.release_async() 
+            # Liberação via thread (Node.release é síncrono)
+            await asyncio.to_thread(node.release) 
             # Rotação removida pois agora usamos pin_to_hash (afinidade determinística)
-
-# ... (após o bloco try/except/finally) ...
+            latency = time.time() - start
 
 # --- ATUALIZAÇÃO DA POLÍTICA PÓS EXECUÇÃO ---
         # Se 'bandit' e 'chosen_model' foram definidos no escopo anterior
@@ -234,18 +229,18 @@ class ExecutionGraph:
             except Exception as e_train:
                 logger.warning(f"[GRAPH-ASYNC] Falha ao atualizar bandit: {e_train}")
         
-        # Gravação de métricas do nó
-        await node.record_async(success, latency, last_error)
+        # Gravação de métricas do nó (Node.record é síncrono)
+        await asyncio.to_thread(node.record, success, latency, last_error)
 
-        # Publicação assíncrona no barramento de eventos
-        await self.bus.publish_async(AgentMessage(
+        # Publicação no barramento de eventos (AcetylcholineBus.publish é síncrono)
+        await asyncio.to_thread(self.bus.publish, AgentMessage(
             sender=node.name, receiver="execution_graph",
             type="node_complete",
             payload={"node": node.name, "success": success, "latency": latency},
         ))
 
-        # Check de imunidade assíncrono
-        loop_check = await self._loop_detector.check_async(node.name, success)
+        # Check de imunidade (LoopDetector.check é síncrono)
+        loop_check = await asyncio.to_thread(self._loop_detector.check, node.name, success)
         if loop_check.get("in_loop"):
             logger.warning("🛡️ [IMMUNITY-ASYNC] Loop detectado no nó '%s' (%d execuções)",
                            node.name, loop_check.get("executions", 0))
@@ -334,7 +329,7 @@ class ExecutionGraph:
             for node_name, state in checkpoint.items():
                 self.results[node_name] = {"output": state.get("result_data"), "status": "COMPLETED", "success": True}
                 executed.add(node_name)
-                await asyncio.to_thread(exec_registry.complete, execution_id, node_name)
+                await asyncio.to_thread(exec_registry.complete_node, execution_id, node_name)
 
         start_time = time.time()
 
@@ -441,7 +436,7 @@ class ExecutionGraph:
                     self.results[name] = result
                     node_status[name] = "COMPLETED"
                     await asyncio.to_thread(checkpoint_db.update_node_status, execution_id, name, "COMPLETED")
-                    await asyncio.to_thread(exec_registry.complete, execution_id, node.node_id, result.get("result_text", ""))
+                    await asyncio.to_thread(exec_registry.complete_node, execution_id, node.node_id, result.get("result_text", ""))
 
         return self._aggregate(time.time() - start_time, execution_id)
 

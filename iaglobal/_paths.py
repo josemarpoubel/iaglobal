@@ -113,6 +113,8 @@ MTA_POOL_FILE = TEMP_DIR / "mta_pool.json"
 
 ERROR_LOG = JSON_DIR / "errors.json"
 
+ERROR_DIR = DATA_ROOT / "error"
+
 # =========================================================
 # ARTIFACTS / EMBEDDINGS
 # =========================================================
@@ -141,7 +143,7 @@ def _ensure_dirs():
         BACKUP_DIR, CACHE_DIR, LOG_DIR, DOCS_DIR, SCRIPTS_DIR, 
         TEMP_DIR, RESULTS_DIR, SNAPSHOTS_DIR, WORK_DIR, 
         PROVIDER_METRICS_DIR, IMAGES_DIR, MONITORED_DIR, 
-        DOCS_TEMP_DIR, SANDBOX_DIR,
+        DOCS_TEMP_DIR, SANDBOX_DIR, ERROR_DIR,
     ]
 
     for d in critical_dirs:

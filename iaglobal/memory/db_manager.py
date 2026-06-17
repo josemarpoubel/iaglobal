@@ -1,6 +1,7 @@
 # iaglobal/memory/db_manager.py
 
 import sqlite3
+import threading
 
 from pathlib import Path
 from typing import Dict, Any, Optional
@@ -8,30 +9,36 @@ from iaglobal.utils.logger import logger
 from iaglobal import _paths
 
 class DatabaseManager:
-    """Gerenciador de banco de dados unificado para insights e conhecimento. (Singleton)"""
+    """Gerenciador de banco de dados unificado para insights e conhecimento. (Singleton thread-safe)"""
     _instance = None
     _initialized = False
+    _lock = threading.Lock()
 
     MAX_RETRY_COUNT = 3
 
     def __new__(cls):
         if cls._instance is None:
-            cls._instance = super().__new__(cls)
-            cls._instance._initialized = False
+            with cls._lock:
+                if cls._instance is None:
+                    cls._instance = super().__new__(cls)
+                    cls._initialized = False
         return cls._instance
 
     @classmethod
     def _reset_instance(cls):
         """Reset singleton (uso exclusivo em testes com path temporário)."""
-        cls._instance = None
-        cls._initialized = False
+        with cls._lock:
+            cls._instance = None
+            cls._initialized = False
 
     def __init__(self):
         if self._initialized:
             return
-        self._initialized = True
-        self.db_path = _paths.CORE_DB
-        self._init_tables()
+        with self._lock:
+            if not self._initialized:
+                self._initialized = True
+                self.db_path = _paths.CORE_DB
+                self._init_tables()
 
     def _init_tables(self):
         """Cria todas as tabelas essenciais e otimiza o banco para modo WAL."""
@@ -172,7 +179,7 @@ class DatabaseManager:
 
         try:
             conditions = []
-            params = []
+            params: list[Any] = []
 
             if agent:
                 conditions.append("agent = ?")
@@ -190,17 +197,17 @@ class DatabaseManager:
                 conditions.append("score >= ?")
                 params.append(min_score)
 
-            where = ""
+            where_clause = ""
             if conditions:
-                where = "WHERE " + " AND ".join(conditions)
+                where_clause = "WHERE " + " AND ".join(conditions)
 
             sql = (
-                f"SELECT id, agent, task_id, content, score, timestamp "
-                f"FROM insights {where} ORDER BY score DESC, timestamp DESC "
-                f"LIMIT ? OFFSET ?"
+                "SELECT id, agent, task_id, content, score, timestamp "
+                "FROM insights " + where_clause + " "
+                "ORDER BY score DESC, timestamp DESC "
+                "LIMIT ? OFFSET ?"
             )
-            params.append(limit)
-            params.append(offset)
+            params.extend([limit, offset])
 
             cursor = conn.execute(sql, params)
             rows = cursor.fetchall()
@@ -248,7 +255,7 @@ class DatabaseManager:
 
         try:
             conditions = []
-            params = []
+            params: list[Any] = []
 
             if agent:
                 conditions.append("agent = ?")
@@ -266,12 +273,12 @@ class DatabaseManager:
                 conditions.append("score >= ?")
                 params.append(min_score)
 
-            where = ""
+            where_clause = ""
             if conditions:
-                where = "WHERE " + " AND ".join(conditions)
+                where_clause = "WHERE " + " AND ".join(conditions)
 
             cursor = conn.execute(
-                f"SELECT COUNT(*) FROM insights {where}", params
+                f"SELECT COUNT(*) FROM insights {where_clause}", params
             )
             row = cursor.fetchone()
             return row[0] if row else 0
@@ -294,7 +301,8 @@ class DatabaseManager:
             )
             row = cursor.fetchone()
             return row[0] if row else None
-        except sqlite3.Error:
+        except sqlite3.Error as e:
+            logger.error(f"❌ Erro ao get_cached_search: {e}")
             return None
         finally:
             conn.close()
@@ -490,17 +498,17 @@ class DatabaseManager:
         conn = self._get_conn()
         try:
             conditions = []
-            params = []
+            params: list[Any] = []
             if execution_id:
                 conditions.append("execution_id = ?")
                 params.append(execution_id)
             if step:
                 conditions.append("step = ?")
                 params.append(step)
-            where = "WHERE " + " AND ".join(conditions) if conditions else ""
+            where_clause = "WHERE " + " AND ".join(conditions) if conditions else ""
             cursor = conn.execute(
                 f"SELECT execution_id, step, timestamp, event_data, created_at "
-                f"FROM decision_events {where} ORDER BY id DESC LIMIT ? OFFSET ?",
+                f"FROM decision_events {where_clause} ORDER BY id DESC LIMIT ? OFFSET ?",
                 params + [limit, offset]
             )
             rows = cursor.fetchall()
@@ -528,15 +536,15 @@ class DatabaseManager:
         conn = self._get_conn()
         try:
             conditions = []
-            params = []
+            params: list[Any] = []
             if execution_id:
                 conditions.append("execution_id = ?")
                 params.append(execution_id)
             if step:
                 conditions.append("step = ?")
                 params.append(step)
-            where = "WHERE " + " AND ".join(conditions) if conditions else ""
-            cursor = conn.execute(f"SELECT COUNT(*) FROM decision_events {where}", params)
+            where_clause = "WHERE " + " AND ".join(conditions) if conditions else ""
+            cursor = conn.execute(f"SELECT COUNT(*) FROM decision_events {where_clause}", params)
             row = cursor.fetchone()
             return row[0] if row else 0
         except sqlite3.Error as e:

@@ -146,7 +146,7 @@ class TestImmunityIntegration:
         from iaglobal.evolution.skills.skill import Skill
         registry = SkillRegistry()
         for name, _ in PIPELINE_SKILLS[:5]:
-            registry.register(Skill(name=name, description="test", run_fn=lambda ctx: {"output": "ok"}))
+            registry.register(Skill(name=name, version="v1", description="test", run_fn=lambda ctx: {"output": "ok"}))
         mock_orch = MagicMock()
         mock_orch._model_fn = lambda p: "print('ok')"
         graph = build_graph_from_skills(mock_orch, registry=registry)

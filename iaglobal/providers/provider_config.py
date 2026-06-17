@@ -3,6 +3,10 @@
 import logging
 import os
 
+from iaglobal.core.env_loader import load_env
+
+load_env()
+
 logger = logging.getLogger("iaglobal.providers")
 
 
@@ -48,7 +52,9 @@ class _ConfigMeta(type):
         value = os.getenv(env_key, default)
         source = "env" if os.environ.get(env_key) is not None else "default"
         _ENV_CACHE[key] = value
-        logger.debug("[CONFIG] %s=%s (source=%s, env_key=%s)", key, str(value)[:30] if value else None, source, env_key)
+
+        logger.debug("[CONFIG] %s=*** (source=%s)", key, source)
+
         return value
 
 

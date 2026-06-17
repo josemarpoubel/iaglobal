@@ -161,6 +161,23 @@ class DataBridge:
             with open(caminho, "r", encoding="utf-8") as f:
                 payload = json.load(f)
 
+            # Schema validation para prevenir JSON injection
+            schema = {
+                "type": "object",
+                "properties": {
+                    "task": {"type": "string"},
+                    "tarefa": {"type": "string"},
+                    "prompt": {"type": "string"},
+                    "input": {"type": "string"},
+                    "checksum_origem": {"type": "string"},
+                    "timestamp_ingestao": {"type": "string"}
+                },
+                "additionalProperties": False  # Bloqueia campos extras não definidos
+            }
+            
+            from jsonschema import validate, ValidationError
+            validate(instance=payload, schema=schema)
+
             # Validação defensiva do layout esperado
             if not isinstance(payload, dict):
                 logger.warning(f"Formato inválido em {caminho.name}: Esperava um objeto JSON.")

@@ -158,14 +158,41 @@ def _spaceflight_news(query: str) -> str:
 
 # ── 3. CLIMA ───────────────────────────────────────────────────────
 
+def _sanitizar_query_para_coordenadas(query: str) -> str:
+    """
+    Sanitiza query para extração de coordenadas.
+    
+    Remove caracteres que poderiam ser usados para regex injection ou SQL injection.
+    
+    Args:
+        query: Query de entrada
+        
+    Returns:
+        Query sanitizada
+    """
+    # Remover caracteres perigosos para regex
+    # Manter apenas dígitos, sinais de negativo, ponto decimal e espaços
+    sanitized = re.sub(r"[^\d\s.-]", " ", query)
+    return sanitized
+
+
 def _weather(query: str) -> str:
     """Busca clima via Open-Meteo (sem API key)."""
     try:
         import re
-        coords = re.findall(r"[-]?\d+\.?\d*", query)
+        
+        # Sanitizar query antes de aplicar regex
+        query_sanitizada = _sanitizar_query_para_coordenadas(query)
+        
+        coords = re.findall(r"[-]?\d+\.?\d*", query_sanitizada)
         lat, lon = -23.5505, -46.6333
         if len(coords) >= 2:
-            lat, lon = float(coords[0]), float(coords[1])
+            try:
+                lat, lon = float(coords[0]), float(coords[1])
+            except (ValueError, IndexError):
+                # Se conversão falhar, usar defaults
+                pass
+        
         url = f"https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&timezone=auto"
         with urllib.request.urlopen(url, timeout=8) as r:
             data = json.loads(r.read().decode("utf-8"))

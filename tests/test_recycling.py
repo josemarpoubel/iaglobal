@@ -56,7 +56,7 @@ class TestSkillRecycler:
         skill_registry._skills = {}
         try:
             skill_registry.register(Skill(
-                name="manual_skill", description="manual",
+                name="manual_skill", version="v1", description="manual",
                 run_fn=lambda ctx: {"output": "ok"}, tags=["production"],
             ))
             r = SkillRecycler.recycle()

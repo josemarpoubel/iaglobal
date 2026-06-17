@@ -1,7 +1,40 @@
 # iaglobal/agents/security_audit_agent.py
 
 import re
+from typing import List
 from iaglobal.utils.logger import logger
+
+
+def _contem_padrao_regex_perigoso(code: str) -> bool:
+    """
+    Detecta padrões regex que podem causar catastrophic backtracking.
+    
+    Args:
+        code: Código a ser analisado
+        
+    Returns:
+        True se padrão perigoso detectado, False caso contrário
+    """
+    # Patterns regex perigosos que podem causar DoS
+    dangerous_patterns = [
+        r'(\w+\\s*\\*\\s*){100,}',  # Repetição excessiva
+        r'(.*\\s*){100,}',  # Repetição excessiva de qualquer caractere
+        r'(\\[a-zA-Z0-9]{100,})',  # Sequências longas de escapes
+        r'(\\([^\\]|$)){100,}',  # Sequências longas de escapes incompletos
+    ]
+    
+    for pattern in dangerous_patterns:
+        try:
+            # Tentar compilar o pattern para verificar se é válido
+            re.compile(pattern)
+            # Se compilar, verificar se existe no código
+            if re.search(pattern, code):
+                return True
+        except re.error:
+            # Pattern inválido, ignorar
+            continue
+    
+    return False
 
 
 class SecurityAuditAgent:
@@ -46,6 +79,25 @@ class SecurityAuditAgent:
             if "hardcoded" in error_context.lower() or "secret" in error_context.lower():
                 patterns.insert(0, (r"(API_KEY|SECRET_KEY|PASSWORD)\s*=.*['\"]", "[REINCIDENCIA] Secret hardcoded ja ocorreu antes", "high"))
 
+        # Validar código antes de aplicar patterns (prevenir regex DoS)
+        if _contem_padrao_regex_perigoso(code):
+            logger.error("🚫 [SECURITY-AUDIT] Código contém padrão regex perigoso — potencial DoS")
+            issues.append({
+                "description": "Código contém padrão regex perigoso — potencial negação de serviço (DoS)",
+                "severity": "high",
+                "pattern": "regex_dos"
+            })
+            severity_count["high"] = severity_count.get("high", 0) + 1
+            # Não continuar com a auditoria se padrão perigoso detectado
+            return {
+                "security_audit_report": {
+                    "total_issues": len(issues),
+                    "severity_count": severity_count,
+                    "issues": issues,
+                },
+                "security_issues": issues,
+            }
+        
         for pattern, desc, severity in patterns:
             if re.search(pattern, code, re.IGNORECASE):
                 issues.append({"description": desc, "severity": severity, "pattern": pattern})

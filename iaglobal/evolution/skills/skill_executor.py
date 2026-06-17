@@ -95,7 +95,7 @@ class SkillExecutor:
 
         return contract_ctx
 
-    def execute(
+    async def execute(
         self,
         skill_name: str,
         ctx: Dict[str, Any],
@@ -143,7 +143,7 @@ class SkillExecutor:
         logger.info("[SKILL] Executando: %s v%s", skill_name, skill.version)
 
         try:
-            result = skill.run_fn(contract_ctx) # Passa o contexto filtrado do contrato, e não o ctx gigante bruto
+            result = await skill.run_fn(contract_ctx) # Passa o contexto filtrado do contrato, e não o ctx gigante bruto
 
             if not skill.validate_output(result):
                 raise SkillExecutionError(
@@ -159,7 +159,7 @@ class SkillExecutor:
             quarantine.record_failure(skill_name, str(e), impact=1)
             raise SkillExecutionError(f"Falha na execução de '{skill_name}': {e}")
 
-    def execute_with_fallback(
+    async def execute_with_fallback(
         self,
         skill_name: str,
         ctx: Dict[str, Any],
@@ -168,7 +168,7 @@ class SkillExecutor:
         _visited: Optional[set] = None,
     ) -> Dict[str, Any]:
         try:
-            return self.execute(skill_name, ctx, version)
+            return await self.execute(skill_name, ctx, version)
         except SkillExecutionError as e:
             skill = self.registry.get(skill_name)
             if not skill or _depth >= 2:
@@ -188,7 +188,7 @@ class SkillExecutor:
                 _visited.add(alt.name)
                 logger.info("[SKILL] Tentando alternativa '%s' no lugar de '%s'", alt.name, skill_name)
                 try:
-                    result = self.execute_with_fallback(alt.name, ctx, version, _depth + 1, _visited)
+                    result = await self.execute_with_fallback(alt.name, ctx, version, _depth + 1, _visited)
                     logger.info("[SKILL] Alternativa '%s' executou com sucesso no lugar de '%s'", alt.name, skill_name)
                     return result
                 except SkillExecutionError as alt_e:

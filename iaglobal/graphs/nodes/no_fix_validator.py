@@ -1,6 +1,14 @@
-"""Stub handler for fix_validator — passes context through."""
+import logging
 from typing import Dict, Any
+from iaglobal.agents.semantic_validator import SemanticValidatorAgent
 
+logger = logging.getLogger(__name__)
 
 async def run_fix_validator(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    logger.info("Executing fix_validator handler")
+    agent = SemanticValidatorAgent()
+    code = ctx.get("coder", {}).get("output", "")
+    task = ctx.get("task", "")
+    result = await agent.validate_async(code=code, task=task)
+    ctx["fix_validator"] = result.to_legacy_dict()
     return ctx

@@ -3,6 +3,7 @@
 import os
 import sys
 import secrets
+import hashlib
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from typing import Dict, List
@@ -50,9 +51,13 @@ class CpuAffinityManager:
         Atribui núcleo baseado no hash do agente.
         Isso garante que o mesmo agente sempre rode no mesmo núcleo (melhoria de cache).
         """
-        # Converte o hash (ID) para um inteiro e usa o módulo dos cores
-        # Se agent_id for o seu hash SHA3-512, isso é perfeito.
-        core_index = int(agent_id[:8], 16) % len(self._cores)
+        # Se agent_id já for hex válido, usa direto; senão, faz hash primeiro
+        try:
+            int(agent_id[:8], 16)
+            hex_part = agent_id[:8]
+        except ValueError:
+            hex_part = hashlib.sha256(agent_id.encode()).hexdigest()[:8]
+        core_index = int(hex_part, 16) % len(self._cores)
         core = self._cores[core_index]
         
         with self._lock:
@@ -61,16 +66,24 @@ class CpuAffinityManager:
         return core
 
     def pin_for_agent(self, agent: str) -> int:
-        """Atribui e fixa um núcleo para o agente (alias para assign_core)."""
-        return self.assign_core(agent)
+        """Atribui e fixa um núcleo para o agente via hash determinístico."""
+        return self.assign_core_deterministic(agent)
 
     def pin_to_hash(self, agent_id: str) -> int:
         """
         Fixa o processo ao núcleo baseado no hash do ID (afinidade determinística).
         Esta é a fonte de verdade para afinidade no sistema.
         """
-        core_index = int(agent_id[:8], 16) % len(self._cores)
+        try:
+            int(agent_id[:8], 16)
+            hex_part = agent_id[:8]
+        except ValueError:
+            hex_part = hashlib.sha256(agent_id.encode()).hexdigest()[:8]
+        core_index = int(hex_part, 16) % len(self._cores)
         core = self._cores[core_index]
+        
+        with self._lock:
+            self._last_agent_map[agent_id] = core
         
         if sys.platform == "linux":
             try:

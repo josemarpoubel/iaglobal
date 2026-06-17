@@ -334,10 +334,12 @@ import asyncio
 
 # ... no lugar da chamada atual run_cli() ...
 
-if __name__ == "__main__":
+def main():
+    """Entry point síncrono para console_scripts."""
     try:
-        # A forma correta de iniciar o ponto de entrada assíncrono
-        asyncio.run(run_cli()) 
+        asyncio.run(run_cli())
     except KeyboardInterrupt:
-        # Lidar com encerramento pelo usuário de forma elegante
         pass
+
+if __name__ == "__main__":
+    main()

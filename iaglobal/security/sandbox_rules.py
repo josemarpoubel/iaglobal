@@ -33,6 +33,8 @@ class SandboxRules:
         "dataclasses", "abc", "copy",
         "operator", "bisect", "heapq",
         "array", "struct", "time",
+        # Standard library modules needed for validation and code execution
+        "logging", "pathlib", "os",
         "django", "flask", "fastapi", "tkinter",
         "requests", "urllib", "urllib3", "httpx",
         "bs4", "beautifulsoup4", "lxml", "parsel",
@@ -43,6 +45,11 @@ class SandboxRules:
         "dotenv",
         "fpdf", "fpdf2",
         "PIL", "Pillow", "reportlab",
+        # Módulos essenciais do projeto IAGlobal
+        "iaglobal", "iaglobal.core", "iaglobal.agents", "iaglobal.models",
+        "iaglobal.security", "iaglobal.utils", "iaglobal.graphs",
+        "iaglobal.cognition", "iaglobal.evolution", "iaglobal.immunity",
+        "iaglobal.memory", "iaglobal.server",
     }
 
     DEFAULT_ALLOWED_READ_PATHS: Set[str] = {

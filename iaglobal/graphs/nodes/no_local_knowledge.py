@@ -5,13 +5,11 @@ import logging
 from iaglobal.evolution.agents.knowledge_agent import knowledge
 from iaglobal.memory.term_long import LongTermMemory
 from iaglobal.memory.term_short import ShortTermMemory
-from iaglobal.memory.memory_vector import MemoryVector
 from iaglobal._paths import CORE_DB
 
 logger = logging.getLogger(__name__)
 _ltm = LongTermMemory(db_path=CORE_DB)
 _stm = ShortTermMemory()
-_mem_vec = MemoryVector()
 _MIN_KNOWLEDGE_CHARS = 200
 
 
@@ -31,6 +29,8 @@ def _query_local(task: str) -> List[Dict]:
             results.append({"source": "ltm", "content": content, "relevance": 0.9})
 
     try:
+        from iaglobal.memory.memory_vector import MemoryVector
+        _mem_vec = MemoryVector()
         vec_results = _mem_vec.search(task, top_k=3)
         for m in vec_results:
             content = m if isinstance(m, str) else m.get("content", "")

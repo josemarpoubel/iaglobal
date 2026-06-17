@@ -10,7 +10,7 @@ from iaglobal.tools.search_tools import SearchTools
 from iaglobal.memory.memory_vector import store
 from iaglobal.memory.db_manager import db
 from iaglobal.utils.logger import logger
-from iaglobal.providers.provider_router import route_generate, resolve_model
+from iaglobal.providers.provider_router import route_generate
 
 class SearchAgent:
     def __init__(self):

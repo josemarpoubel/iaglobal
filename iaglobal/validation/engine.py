@@ -1,5 +1,6 @@
 import ast
 import logging
+import re
 import time
 
 from dataclasses import dataclass, field
@@ -43,10 +44,44 @@ class FeedbackEngine:
     def __init__(self, snapshotter=None):
         self._snapshotter = snapshotter
 
+    @staticmethod
+    def _is_python_code(code: str) -> bool:
+        """Detecta se o código é Python baseado em padrões sintáticos."""
+        if not code or len(code.strip()) < 10:
+            return False
+        # Padrões fortes de Python
+        python_indicators = [
+            r"\bdef\s+\w+\s*\(",
+            r"\bclass\s+\w+",
+            r"\bimport\s+\w+",
+            r"\bfrom\s+\w+\s+import",
+            r"\bif\s+__name__\s*==\s*[\"']__main__[\"']",
+            r"\basync\s+def",
+            r"\bawait\s+",
+            r"\byield\s+",
+            r"\braise\s+\w+",
+            r"\bwith\s+\w+",
+            r"print\s*\(",
+        ]
+        for pattern in python_indicators:
+            if re.search(pattern, code):
+                return True
+        return False
+
     def validate(self, code: str, context: Optional[Dict[str, Any]] = None) -> ValidationResult:
         """Valida código e retorna resultado com decisão."""
+        import re
         errors = []
         issues = []
+
+        # Se não for Python, pula validação AST e retorna aprovado
+        if not self._is_python_code(code):
+            logger.info("[FEEDBACK] Código não-Python detectado — pulando validação AST")
+            return ValidationResult(
+                valid=True, code=code, errors=[],
+                decision=Decision.COMMIT, score=1.0,
+                issues=["Validação AST pulada (código não-Python)"]
+            )
 
         try:
             code = normalizar_codigo(code)

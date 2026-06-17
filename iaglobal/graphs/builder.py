@@ -29,8 +29,9 @@ logger = logging.getLogger("ia-global")
 
 # List of node names in canonical order (7 phases from ROADMAP)
 RUN_NODE_NAMES: List[str] = [
-    # Messaging (1) — roda antes de tudo para ativar mailboxes
+    # Messaging (2) — roda antes de tudo para ativar mailboxes e corrigir claim
     "agentmailbox",
+    "scheduler",
     # Definition (20)
     "prompt_intake", "prompt_improver", "enhancement", "orchestrator_agent", "pm", "requirements",
     "domain_analysis", "business_rules", "local_knowledge", "search", "knowledge", "knowledge_analyzer", "prompt_builder", "dependency",
@@ -52,7 +53,11 @@ RUN_NODE_NAMES: List[str] = [
     # Metacognition (7)
     "evaluator", "gap_analyzer", "skill_generator", "sandbox_validator",
     "evolution_committee", "pipeline_updater", "evolution_trigger",
+    # Evolution Core (5)
+    "evolution_knowledge", "evolution_homocysteine", "evolution_methylation",
+    "evolution_skill_executor", "evolution_dynamic_registry",
     "multi_coder",  # Special construction node
+    "failure_analysis",  # Coleta e analisa falhas do sistema (errors.json, metrics, logs)
 ]
 
 

@@ -41,7 +41,7 @@ from typing import Callable, List, Optional, Protocol, Union
 from iaglobal.models.task import Task
 from iaglobal.reflection.reflexion_engine import reflexion_loop, extract_code_block
 from iaglobal.utils.logger import logger as _base_logger
-from iaglobal.providers.provider_router import route_generate, resolve_model
+from iaglobal.providers.provider_router import route_generate
 
 # ─────────────────────────────────────────────────────────────────────────────
 # Logging estruturado (alinhado com a convenção do multi_agent evoluído)
@@ -307,7 +307,7 @@ class LLMGatewayProtocol(Protocol):
     Contrato do gateway LLM.
     Permite substituição por mock em testes sem tocar no agente.
     """
-    def generate(self, task: str, prompt: str, task_type: str) -> Optional[str]:
+    async def generate(self, task: str, prompt: str, task_type: str) -> Optional[str]:
         ...
 
 
@@ -318,9 +318,8 @@ class ProviderLLMGateway:
     Isola completamente a dependência do provider do agente.
     """
 
-    def generate(self, task: str, prompt: str, task_type: str) -> Optional[str]:
-        model = resolve_model(task)
-        response = route_generate(model, prompt, task_type=task_type)
+    async def generate(self, task: str, prompt: str, task_type: str) -> Optional[str]:
+        response = await route_generate("", prompt, task_type=task_type)
         return str(response) if response else None
 
 
@@ -414,7 +413,7 @@ class ReflexionAgent:
 
     # ─── Análise de resultado ─────────────────────────────────────────────
 
-    def analisar_resultado(
+    async def analisar_resultado(
         self,
         codigo: str,
         resultado_sandbox: dict,
@@ -426,9 +425,10 @@ class ReflexionAgent:
         Retrocompatibilidade: retorna str.
         Use `analisar_resultado_rich` para o resultado tipado completo.
         """
-        return self.analisar_resultado_rich(codigo, resultado_sandbox, task).as_str
+        result = await self.analisar_resultado_rich(codigo, resultado_sandbox, task)
+        return result.as_str
 
-    def analisar_resultado_rich(
+    async def analisar_resultado_rich(
         self,
         codigo: str,
         resultado_sandbox: dict,
@@ -457,7 +457,7 @@ class ReflexionAgent:
 
         t0 = time.perf_counter()
         try:
-            raw = self._gateway.generate(
+            raw = await self._gateway.generate(
                 task=task_str,
                 prompt=prompt,
                 task_type=self._config.task_type_reflection,
@@ -488,7 +488,7 @@ class ReflexionAgent:
 
     # ─── Sugestão de melhoria ─────────────────────────────────────────────
 
-    def sugerir_melhoria(
+    async def sugerir_melhoria(
         self,
         codigo: str,
         analise: str,
@@ -500,9 +500,10 @@ class ReflexionAgent:
         Retrocompatibilidade: retorna str (código melhorado ou original).
         Use `sugerir_melhoria_rich` para o resultado tipado completo.
         """
-        return self.sugerir_melhoria_rich(codigo, analise, task).as_str
+        result = await self.sugerir_melhoria_rich(codigo, analise, task)
+        return result.as_str
 
-    def sugerir_melhoria_rich(
+    async def sugerir_melhoria_rich(
         self,
         codigo: str,
         analise: str,
@@ -526,7 +527,7 @@ class ReflexionAgent:
 
         t0 = time.perf_counter()
         try:
-            raw = self._gateway.generate(
+            raw = await self._gateway.generate(
                 task=task_str,
                 prompt=prompt,
                 task_type=self._config.task_type_improvement,
@@ -563,7 +564,7 @@ class ReflexionAgent:
 
     # ─── Pipeline completo: análise → melhoria ────────────────────────────
 
-    def refletir_e_melhorar(
+    async def refletir_e_melhorar(
         self,
         codigo: str,
         resultado_sandbox: dict,
@@ -578,7 +579,7 @@ class ReflexionAgent:
         Returns:
             ImprovementResult com código melhorado e contexto completo
         """
-        analysis_result = self.analisar_resultado_rich(codigo, resultado_sandbox, task)
+        analysis_result = await self.analisar_resultado_rich(codigo, resultado_sandbox, task)
         if analysis_result.is_fallback:
             self._log.warning("Análise em fallback, pulando melhoria")
             return ImprovementResult(
@@ -586,7 +587,7 @@ class ReflexionAgent:
                 original_code=codigo,
                 status=ReflexionStatus.FALLBACK,
             )
-        return self.sugerir_melhoria_rich(codigo, analysis_result.as_str, task)
+        return await self.sugerir_melhoria_rich(codigo, analysis_result.as_str, task)
 
     # ─── Fallbacks internos ───────────────────────────────────────────────
 

@@ -10,6 +10,8 @@ from typing import Union, Optional, List, Dict
 
 import logging
 
+from iaglobal.models.task import Task
+
 from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")

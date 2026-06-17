@@ -6,6 +6,7 @@ import subprocess
 import tempfile
 import traceback
 import resource
+import threading
 
 import ast
 import stat
@@ -456,12 +457,24 @@ def executar_codigo_sandbox(
 
 class Sandbox:
     """
-    Wrapper principal para orquestração e execução isolada.
+    Wrapper principal para orquestração e execução isolada. (Thread-safe)
     """
+    
+    _instances: Dict[int, 'Sandbox'] = {}
+    _instances_lock = threading.Lock()
 
     def __init__(self, timeout_segundos: int = 30):
         self.timeout_segundos = timeout_segundos
-        self.execution_history: List[Dict[str, Any]] = []
+        self._execution_history: List[Dict[str, Any]] = []
+        self._history_lock = threading.RLock()
+
+    @classmethod
+    def get_instance(cls, timeout_segundos: int = 30) -> 'Sandbox':
+        """Retorna instância singleton thread-safe da Sandbox."""
+        with cls._instances_lock:
+            if timeout_segundos not in cls._instances:
+                cls._instances[timeout_segundos] = cls(timeout_segundos)
+            return cls._instances[timeout_segundos]
 
     # ---------------------------------------------------------------------
     # EXECUÇÃO NATIVA
@@ -473,34 +486,19 @@ class Sandbox:
         codigo: str,
     ) -> Dict[str, Any]:
         """
-        Executa código localmente e registra falhas estruturais.
+        Executa código localmente com segurança reforçada.
+        
+        NOTA: Esta função usa execução via subprocesso isolado para segurança.
+        O uso direto de exec() foi removido para prevenir RCE (Remote Code Execution).
         """
 
-        contexto_execucao = {}
-
-        try:
-            exec(codigo, contexto_execucao)
-
-            resultado = {
-                "sucesso": True,
-                "output": "Execução concluída com sucesso.",
-            }
-
-            self._registrar_historico(codigo, resultado)
-
-            return resultado
-
-        except Exception as e:
-            registrar_erro_no_banco(task, e)
-
-            resultado = {
-                "sucesso": False,
-                "output": str(e),
-            }
-
-            self._registrar_historico(codigo, resultado)
-
-            raise
+        # Usar execução via subprocesso isolado (forma segura)
+        resultado = self.execute(codigo)
+        
+        # Registrar histórico
+        self._registrar_historico(codigo, resultado)
+        
+        return resultado
 
     # ---------------------------------------------------------------------
     # EXECUÇÃO VIA SUBPROCESSO
@@ -530,33 +528,33 @@ class Sandbox:
         resultado: Dict[str, Any],
     ) -> None:
         """
-        Registra execução no histórico interno.
+        Registra execução no histórico interno (thread-safe).
         """
+        with self._history_lock:
+            self._execution_history.append(
+                {
+                    "code": codigo[:300],
+                    "success": resultado.get("sucesso", False),
+                    "output": resultado.get("output", "")[:500],
+                }
+            )
 
-        self.execution_history.append(
-            {
-                "code": codigo[:300],
-                "success": resultado.get("sucesso", False),
-                "output": resultado.get("output", "")[:500],
-            }
-        )
-
-        # Mantém histórico limitado para evitar crescimento infinito
-        self.execution_history = self.execution_history[-100:]
+            # Mantém histórico limitado para evitar crescimento infinito
+            self._execution_history = self._execution_history[-100:]
 
     def get_execution_history(self) -> List[Dict[str, Any]]:
         """
-        Retorna cópia protegida do histórico.
+        Retorna cópia protegida do histórico (thread-safe).
         """
-
-        return self.execution_history.copy()
+        with self._history_lock:
+            return self._execution_history.copy()
 
     def clear_history(self) -> None:
         """
-        Limpa histórico interno da sandbox.
+        Limpa histórico interno da sandbox (thread-safe).
         """
-
-        self.execution_history.clear()
+        with self._history_lock:
+            self._execution_history.clear()
 
     # ---------------------------------------------------------------------
     # VALIDAÇÃO E SEGURANÇA
@@ -593,10 +591,10 @@ class Sandbox:
     @property
     def total_execucoes(self) -> int:
         """
-        Quantidade total de execuções registradas.
+        Quantidade total de execuções registradas (thread-safe).
         """
-
-        return len(self.execution_history)
+        with self._history_lock:
+            return len(self._execution_history)
 
     def ultima_execucao(self) -> Optional[Dict[str, Any]]:
         """

@@ -15,7 +15,10 @@ def proxy():
 # 2. Teste do Pipeline de Execução
 def test_cognitive_proxy_run_success(proxy):
     # Mock das dependências internas
-    proxy.task_classifier.classify = MagicMock(return_value=TaskFingerprint(domain="coding", intent="fix"))
+    proxy.task_classifier.classify = MagicMock(return_value=TaskFingerprint(
+        domain="coding", subdomain="backend", language="python",
+        intent="fix", complexity="low", risk="low"
+    ))
     proxy._route = MagicMock(return_value=("def hello(): print('world')", "mock-model"))
     proxy.feedback.validate = MagicMock(return_value=MagicMock(valid=True, code="def hello(): print('world')"))
     

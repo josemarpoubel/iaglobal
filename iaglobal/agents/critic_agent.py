@@ -16,28 +16,30 @@ PODE SOMENTE:
 
 import re
 import json
-from typing import Dict, Any, List
+import asyncio
+from typing import Dict, Any, List, Optional
 
 from iaglobal.validation.engine import ValidationEngine
-from iaglobal.providers.provider_router import route_generate
-from iaglobal.providers.provider_config import ProviderConfig
+from iaglobal.providers.provider_router import async_route_generate
+from iaglobal.graphs.bandit import BanditPolicy
 from iaglobal.utils.logger import logger
 
 
 class CriticAgent:
 
-    def __init__(self):
+    def __init__(self, bandit: Optional[BanditPolicy] = None):
         self.DANGEROUS_PATTERNS = [
             "eval(", "exec(", "os.system(", "subprocess.run(shell=True"
         ]
         self.validator = ValidationEngine()
         self._critic_degraded = False
+        self._bandit = bandit
 
     # =========================================================================
     # API PÚBLICA — CONTRATO OBRIGATÓRIO
     # =========================================================================
 
-    def avaliar(self, task: str, prompt: str, output: str) -> Dict[str, Any]:
+    async def avaliar(self, task: str, prompt: str, output: str) -> Dict[str, Any]:
         """Avalia saída do modelo. Retorna JSON conforme contrato.
 
         Contrato de saída (OBRIGATÓRIO):
@@ -61,15 +63,15 @@ class CriticAgent:
                     suggestions.extend(static["suggestions"])
 
             # 2. Avaliação via LLM (apenas score, sem decisão)
-            scores = self._avaliar_multidimensional(task, output)
+            scores = await self._avaliar_multidimensional(task, output)
 
             # 3. Calcular score agregado
             score = self._calcular_score_agregado(scores)
 
             # 4. Detectar problemas comuns
-            if not output or len(output.strip()) < 10:
+            if not output or len(output.strip()) < 3:
                 issues.append("Resposta vazia ou muito curta")
-                score = min(score, 10)
+                score = min(score, 30)
             if "UNKNOWN" in output:
                 issues.append("Modelo reportou UNKNOWN — pode ser insuficiente")
                 score = min(score, 30)
@@ -78,7 +80,7 @@ class CriticAgent:
                 suggestions.append("Corrigir erro antes de usar")
                 score = max(0, score - 20)
 
-            approved = score >= 60
+            approved = score >= 50
 
             result = {
                 "approved": approved,
@@ -106,18 +108,38 @@ class CriticAgent:
                 "_critic_degraded": True,
             }
 
-    def avaliar_solucao(self, task: str, codigo: str) -> str:
+    async def avaliar_solucao(self, task: str, codigo: str) -> str:
         """Wrapper compatibilidade — retorna string JSON."""
-        result = self.avaliar(task, "", codigo)
+        result = await self.avaliar(task, "", codigo)
         return json.dumps(result)
 
-    def avaliar_com_scores(self, task: str, codigo: str) -> Dict[str, Any]:
+    async def avaliar_com_scores(self, task: str, codigo: str) -> Dict[str, Any]:
         """Wrapper compatibilidade — retorna dict."""
-        return self.avaliar(task, "", codigo)
+        return await self.avaliar(task, "", codigo)
 
     # =========================================================================
     # MÉTODOS INTERNOS (APENAS AVALIAÇÃO, SEM DECISÃO)
     # =========================================================================
+
+    @staticmethod
+    def _is_python_code(codigo: str) -> bool:
+        """Detecta se o código é Python."""
+        if not codigo or len(codigo.strip()) < 10:
+            return False
+        import re
+        python_indicators = [
+            r"\bdef\s+\w+\s*\(",
+            r"\bclass\s+\w+",
+            r"\bimport\s+\w+",
+            r"\bfrom\s+\w+\s+import",
+            r"\basync\s+def",
+            r"\bawait\s+",
+            r"\byield\s+",
+        ]
+        for pattern in python_indicators:
+            if re.search(pattern, codigo):
+                return True
+        return False
 
     def _auditar_codigo(self, codigo: str) -> Dict:
         """Auditoria estática — apenas detecta problemas, sem decidir."""
@@ -128,15 +150,19 @@ class CriticAgent:
             issues.append("Código vazio")
             return {"issues": issues, "suggestions": suggestions}
 
-        if codigo.strip().startswith("<!DOCTYPE") or codigo.strip().startswith("<html"):
+        # HTML/PHP/XML - pula validação Python
+        if codigo.strip().startswith("<!DOCTYPE") or codigo.strip().startswith("<html") or "<?php" in codigo.lower():
             return {"issues": [], "suggestions": []}
 
-        try:
-            self.validator.validate(codigo)
-        except SyntaxError as e:
-            issues.append(f"Erro de sintaxe: {e}")
-            suggestions.append("Corrigir sintaxe do código")
+        # Só valida Python se for código Python
+        if self._is_python_code(codigo):
+            try:
+                self.validator.validate(codigo)
+            except SyntaxError as e:
+                issues.append(f"Erro de sintaxe: {e}")
+                suggestions.append("Corrigir sintaxe do código")
 
+        # Padrões perigosos (aplicáveis a qualquer linguagem)
         for pattern in self.DANGEROUS_PATTERNS:
             if pattern in codigo:
                 issues.append(f"Padrão perigoso detectado: {pattern}")
@@ -144,33 +170,35 @@ class CriticAgent:
 
         return {"issues": issues, "suggestions": suggestions}
 
-    def _avaliar_multidimensional(self, task: str, codigo: str) -> Dict[str, Any]:
+    async def _avaliar_multidimensional(self, task: str, codigo: str) -> Dict[str, Any]:
         """Avalia código via LLM — retorna scores, NÃO toma decisão."""
         prompt = self._montar_prompt_avaliacao(task, codigo)
 
-        modelos = self._get_modelos()
-
-        for model in modelos:
+        if self._bandit:
             try:
-                resultado = route_generate(model, prompt, task_type="critic")
-                if resultado:
-                    scores = self._parse_json_response(resultado.strip())
-                    if scores:
-                        self._critic_degraded = False
-                        return scores
-                    logger.debug(f"[CRITIC] {model} retornou JSON inválido")
+                model = self._bandit.select_model(node="critic", strategy="critic")
+                logger.debug(f"[CRITIC] Bandit selecionou modelo: {model}")
+                resultado = await self._bandit.async_execute_model(model, prompt, task_type="critic")
             except Exception as e:
-                logger.debug(f"[CRITIC] {model} falhou: {e}")
+                logger.debug(f"[CRITIC] Bandit execução falhou: {e}")
+                resultado = None
+        else:
+            try:
+                resultado = await async_route_generate("", prompt, task_type="critic")
+            except Exception as e:
+                logger.debug(f"[CRITIC] provider_router falhou: {e}")
+                resultado = None
+
+        if resultado:
+            scores = self._parse_json_response(resultado.strip())
+            if scores:
+                self._critic_degraded = False
+                return scores
+            logger.debug("[CRITIC] Resposta inválida (JSON)")
 
         self._critic_degraded = True
-        logger.warning("[CRITIC] Todos os modelos falharam — scores degradados")
+        logger.warning("[CRITIC] Avaliação falhou — scores degradados")
         return self._fallback_scores()
-
-    def _get_modelos(self) -> List[str]:
-        """Retorna lista de modelos para avaliação (sem decisão de roteamento)."""
-        return [
-            "ollama/" + ProviderConfig.DEFAULT_OLLAMA_MODEL,
-        ]
 
     def _montar_prompt_avaliacao(self, task: str, codigo: str) -> str:
         """Prompt de avaliação — APENAS solicita JSON de score, sem ação."""

@@ -26,7 +26,8 @@ ALL_NODE_NAMES: List[str] = [
     "retrospective", "result_agent", "critic", "memory_writer", "memory_cleaner",
     "evaluator", "gap_analyzer", "skill_generator", "sandbox_validator",
     "evolution_committee", "pipeline_updater", "evolution_trigger",
-    "multi_coder"
+    "multi_coder",
+    "failure_analysis"
 ]
 
 # Preencher NODE_REGISTRY para compatibilidade
@@ -47,21 +48,22 @@ def create_skill_node(name: str, depends_on: list = None):
         ExecutionNode compatible object with run method
     """
     from ..execution_graph import Node
+    import importlib
     handler = None
     
-    # Try to load each node from the nodes.py file nodes list handlers
+    # Try to load each node from the nodes package (no_<name> modules)
     try:
-        root = __import__('iaglobal.graphs.nodes.nodes', fromlist=[name])
-        nodes_obj = getattr(root, 'Nodes', None)
-        if nodes_obj:
-            handler = getattr(nodes_obj, f'run_{name}', None)
+        mod = importlib.import_module(f'iaglobal.graphs.nodes.no_{name}')
+        fn = getattr(mod, f'run_{name}', None)
+        if callable(fn):
+            handler = fn
     except Exception:
         pass
     
     # If not found, use a noop handler to prevent crash
     if handler is None:
         async def _noop(ctx: dict):
-            return {"output": f"Node {name} executed (handler missing from nodes.py)"}
+            return {"output": f"Node {name} executed (handler missing)"}
         handler = _noop
     
     # Wrap sync handlers to async for ExecutionGraph compatibility

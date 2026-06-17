@@ -1,13 +1,10 @@
 from typing import Dict, Any, List
 import logging
 
-from iaglobal.memory.memory_vector import MemoryVector
 from iaglobal.memory.term_short import ShortTermMemory
-from iaglobal.memory.term_long import LongTermMemory
-from iaglobal.graphs.nodes._disk_swap import cleanup_task, swap_status
+from iaglobal.graphs.nodes._disk_swap import cleanup_task
 
 logger = logging.getLogger(__name__)
-_mem_vec = MemoryVector()
 _stm = ShortTermMemory()
 
 
@@ -21,10 +18,9 @@ async def run_memory_cleaner(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     logger.info("[CLEANER] Iniciando limpeza (critic score=%.1f, approved=%s)", score, approved)
 
+    used_sources = {k for k in memory.keys() if k in ("coder", "multi_coder", "prompt_builder")}
     discarded = []
-    search_sources = ["search"]
-
-    for src in search_sources:
+    for src in ("search", "local_knowledge"):
         src_data = memory.get(src, {})
         src_output = src_data.get("output", "")
         if src_output and src not in used_sources:
@@ -38,7 +34,8 @@ async def run_memory_cleaner(ctx: Dict[str, Any]) -> Dict[str, Any]:
         logger.warning("[CLEANER] Falha ao limpar STM: %s", e)
 
     try:
-        _mem_vec.clear()
+        from iaglobal.memory.memory_vector import MemoryVector
+        MemoryVector().clear()
         logger.info("[CLEANER] MemoryVector limpo")
     except Exception as e:
         logger.debug("[CLEANER] Falha ao limpar MemoryVector: %s", e)

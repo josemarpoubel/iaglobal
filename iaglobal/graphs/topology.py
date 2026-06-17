@@ -61,7 +61,8 @@ PHASES = {
         "debugger",
         "validator",
         "fix_validator",
-        "debug_coder"
+        "debug_coder",
+        "failure_analysis"
     ],
     "entrega": [
         "documentation",        # Geração de docs/manuais de usuário
@@ -88,6 +89,8 @@ PHASES = {
 
 # Dicionário de dependências intra-phase e inter-phase
 NODE_DEPENDENCIES = {
+    # Scheduler fix — roda cedo para corrigir claim antes dos outros nós
+    "scheduler": ["agentmailbox"],
     # Construção
     "coder": ["prompt_builder"],
     "multi_coder": ["coder"],
@@ -138,6 +141,7 @@ NODE_DEPENDENCIES = {
     "validator": ["tester", "debugger"],
     "fix_validator": ["validator"],
     "debug_coder": ["fix_validator"],
+    "failure_analysis": ["code_executor"],
     # Entrega
     "documentation": ["debug_coder"],
     "deployment_plan": ["documentation"],
@@ -156,7 +160,13 @@ NODE_DEPENDENCIES = {
     "sandbox_validator": ["skill_generator"],
     "evolution_committee": ["skill_generator", "sandbox_validator"],
     "pipeline_updater": ["evolution_committee"],
-    "evolution_trigger": ["pipeline_updater"]
+    "evolution_trigger": ["pipeline_updater"],
+    # Evolution Core
+    "evolution_knowledge": ["knowledge_analyzer"],
+    "evolution_homocysteine": ["skill_generator"],
+    "evolution_methylation": ["evolution_homocysteine"],
+    "evolution_skill_executor": ["evolution_dynamic_registry"],
+    "evolution_dynamic_registry": ["evolution_homocysteine"]
 }
 
 def get_node_phase(node_name: str) -> str:

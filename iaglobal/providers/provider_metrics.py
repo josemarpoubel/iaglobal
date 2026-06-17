@@ -68,7 +68,7 @@ PRICING: Dict[str, Dict[str, float]] = {
     "groq/*":                                             {"input": 0.00010,  "output": 0.00020},
 
     # ── NVIDIA ──
-    "nvidia/mistralai/mistral-small-4-119b-2603":                 {"input": 0.00010,  "output": 0.00010},
+    "nvidia/mistralai/mistral-large-3-675b-instruct-2512":       {"input": 0.00035,  "output": 0.00140},
     "nvidia/*":                                           {"input": 0.00010,  "output": 0.00010},
 
     # ── OpenCode ──
@@ -332,7 +332,7 @@ class ProviderMetrics:
         stats = self.get_provider_stats()
 
         if provider not in stats:
-            return 0.5  # neutral
+            return 0.0  # neutral
 
         s = stats[provider]
 

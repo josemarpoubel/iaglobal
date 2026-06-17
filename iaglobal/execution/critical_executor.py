@@ -34,14 +34,14 @@ def store_error(prompt: str, resposta: str, critica: str, metadata: Optional[Dic
     except Exception as e:
         logger.error(f"Error storing feedback: {e}")
 
-def processar(prompt: str) -> Tuple[str, str]:
+async def processar(prompt: str) -> Tuple[str, str]:
     """Process prompt with critique feedback."""
     from iaglobal.providers.provider_router import escolher_modelo
     modelo = escolher_modelo(prompt)
-    resposta = executar(modelo, {"task": prompt})
+    resposta = await executar(modelo, {"task": prompt})
     
     critica_prompt = criticar(resposta, prompt)
-    critica = executar("nvidia", {"task": critica_prompt})
+    critica = await executar("nvidia", {"task": critica_prompt})
     
     store_error(prompt, resposta, critica, None)
     
@@ -55,14 +55,14 @@ class CriticalExecutor:
         self.execution_log = []
         self.critiques = []
     
-    def execute_with_critique(self, prompt: str) -> Dict[str, Any]:
+    async def execute_with_critique(self, prompt: str) -> Dict[str, Any]:
         """Execute with automatic critique."""
         # Get response
-        response = executar(self.primary_provider, {"task": prompt})
+        response = await executar(self.primary_provider, {"task": prompt})
         
         # Generate critique
         critique_prompt = criticar(response, prompt)
-        critique = executar("nvidia", {"task": critique_prompt})
+        critique = await executar("nvidia", {"task": critique_prompt})
         
         # Store learning
         store_error(prompt, response, critique)
@@ -79,23 +79,23 @@ class CriticalExecutor:
         
         return result
     
-    def execute_safe(self, prompt: str, fallback_provider: str = "ollama") -> str:
+    async def execute_safe(self, prompt: str, fallback_provider: str = "ollama") -> str:
         """Execute with fallback on failure."""
         try:
-            return executar(self.primary_provider, {"task": prompt})
+            return await executar(self.primary_provider, {"task": prompt})
         except Exception as e:
             logger.warning(f"Primary provider failed: {e}. Using fallback: {fallback_provider}")
             try:
-                return executar(fallback_provider, {"task": prompt})
+                return await executar(fallback_provider, {"task": prompt})
             except Exception as e2:
                 logger.error(f"Fallback also failed: {e2}")
                 raise
     
-    def batch_execute_with_critique(self, prompts: list) -> list:
+    async def batch_execute_with_critique(self, prompts: list) -> list:
         """Execute multiple prompts with critique."""
         results = []
         for prompt in prompts:
-            results.append(self.execute_with_critique(prompt))
+            results.append(await self.execute_with_critique(prompt))
         return results
     
     def get_execution_log(self) -> list:

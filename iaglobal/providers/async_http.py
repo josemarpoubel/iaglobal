@@ -37,11 +37,19 @@ def is_provider_blocked(provider: str) -> bool:
 
 
 def block_provider(provider: str, status: int):
-    """Bloqueia provider por erro fatal (402, 401, 429)."""
-    if status in (401, 402, 429):
-        block_time = _BLOCK_AUTH_WINDOW if status in (401, 402) else _BLOCK_WINDOW
+    """Bloqueia provider por erro fatal (402, 401, 429).
+    
+    429 (rate limit) é temporário — bloqueia só 60s.
+    401/402 (auth) são mais graves — bloqueia 24h.
+    """
+    if status in (401, 402):
+        block_time = _BLOCK_AUTH_WINDOW
         _BLOCKED_PROVIDERS[provider] = time.time() + block_time
         logger.warning("[CIRCUIT-BREAKER] Provider %s bloqueado por status %d por %ds", provider, status, block_time)
+    elif status == 429:
+        block_time = 60
+        _BLOCKED_PROVIDERS[provider] = time.time() + block_time
+        logger.warning("[CIRCUIT-BREAKER] Provider %s bloqueado por rate-limit (429) por %ds", provider, block_time)
 
 
 async def get_session() -> aiohttp.ClientSession:
@@ -56,7 +64,7 @@ async def get_session() -> aiohttp.ClientSession:
         session = _sessions.get(loop_id)
         if session is None or session.closed:
             session = aiohttp.ClientSession(
-                timeout=aiohttp.ClientTimeout(total=120),
+                timeout=aiohttp.ClientTimeout(total=180),
                 headers={"Content-Type": "application/json"},
             )
             _sessions[loop_id] = session

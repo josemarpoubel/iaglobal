@@ -5,11 +5,41 @@ import time
 import json
 import sqlite3
 import cbor2
+import inspect
+import asyncio
 from typing import Optional, Dict, Any, List
 from pathlib import Path
 
 from iaglobal._paths import CORE_DB, SNAPSHOTS_DIR
 from iaglobal.utils.logger import logger
+
+
+def make_checkpoint_safe(obj: Any) -> Any:
+    """Converte objetos não serializáveis em representações seguras para checkpoint.
+    
+    Substitui corrotinas, tasks, funções assíncronas por metadados serializáveis.
+    """
+    if inspect.iscoroutine(obj):
+        return {"__type__": "coroutine", "repr": repr(obj)}
+    if inspect.iscoroutinefunction(obj):
+        return {"__type__": "coroutine_function", "name": obj.__name__}
+    if isinstance(obj, asyncio.Task):
+        return {"__type__": "task", "id": id(obj), "name": obj.get_name()}
+    if inspect.isasyncgen(obj):
+        return {"__type__": "async_generator", "repr": repr(obj)}
+    if inspect.isasyncgenfunction(obj):
+        return {"__type__": "async_generator_function", "name": obj.__name__}
+    
+    if isinstance(obj, dict):
+        return {k: make_checkpoint_safe(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [make_checkpoint_safe(v) for v in obj]
+    if isinstance(obj, tuple):
+        return tuple(make_checkpoint_safe(v) for v in obj)
+    if isinstance(obj, set):
+        return [make_checkpoint_safe(v) for v in obj]
+    
+    return obj
 
 
 class Snapshotter:
@@ -63,11 +93,13 @@ class Snapshotter:
         timestamp = time.time()
         path = self.snapshots_dir / f"snapshot_{snapshot_id}.cbor2"
 
+        safe_state_data = make_checkpoint_safe(state_data)
+
         snapshot = {
             "snapshot_id": snapshot_id,
             "timestamp": timestamp,
             "schema_version": 1,
-            "state_data": state_data,
+            "state_data": safe_state_data,
         }
 
         try:

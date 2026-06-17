@@ -20,6 +20,7 @@ from iaglobal._paths import SCRIPTS_DIR, RESULTS_DIR
 from iaglobal.validation.engine import ValidationEngine
 from iaglobal.providers.provider_router import escolher_modelo, route_generate, async_route_generate, CREDIT_CANDIDATES as credit_candidates_fn
 from iaglobal.providers.provider_config import ProviderConfig
+from iaglobal.utils.helpers import run_async_safe
 
 from iaglobal.utils.logger import start_session_log, stop_session_log, logger as global_logger
 
@@ -181,23 +182,29 @@ class PipelineEngine:
                     pass
             return True
 
+        # Escolha do modelo via Bandit (NÃO sobrescrever depois!)
         candidates = [m for _, m in credit_candidates_fn()]
+        chosen_model = None
         try:
             chosen_model = self.orchestrator.bandit.select_model(
                 node="cognitive_dag_root", strategy="dev_fast", candidates=candidates,
             )
             logger.info("🎯 BANDIT selecionou: %s", chosen_model)
-        except Exception:
-            chosen_model = None
+        except Exception as e:
+            logger.warning("🎯 BANDIT indisponível (%s), usando fallback de candidatos", e)
+            chosen_model = candidates[0] if candidates else None
+            logger.info("🎯 Fallback chosen_model: %s", chosen_model)
 
-# (async_route_generate_parallel) em vez de bater direto num provider específico.
-        chosen_model = ""
+        # Fallback final: se mesmo assim chosen_model ficou None/vazio, pega o primeiro candidato
+        if not chosen_model:
+            chosen_model = candidates[0] if candidates else "ollama/qwen2.5:0.5b"
+            logger.warning("🎯 chosen_model vazio — usando fallback hardcoded: %s", chosen_model)
 
         try:
             # Garantimos que a chamada ao grafo seja tratada de forma assíncrona robusta
             graph_result = await self.orchestrator.async_run_graph_task(
-                prompt, 
-                chosen_model=chosen_model, 
+                prompt,
+                chosen_model=chosen_model,
                 parallel=parallel
             )
         except Exception as e:
@@ -209,16 +216,25 @@ class PipelineEngine:
             raise RuntimeError("O Grafo retornou um resultado vazio ou inválido.")
 
         raw_results = graph_result.get("raw_results", {})
-        dag_nodes = ["documentation", "code_executor", "result_agent", "multi_coder", "coder"]
-        
+
+        # Log defensivo: mostra o que veio do grafo pra debug futuro
+        if not raw_results:
+            logger.warning("[PIPELINE] raw_results está VAZIO. Chaves disponíveis no graph_result: %s",
+                           list(graph_result.keys()))
+        else:
+            logger.info("[PIPELINE] raw_results tem %d nós: %s",
+                        len(raw_results), list(raw_results.keys()))
+
+        dag_nodes = ["result_agent", "documentation", "code_executor", "multi_coder", "coder"]
+
         # Iteração sobre os nós para encontrar a primeira saída válida
         for node_name in dag_nodes:
             node_result = raw_results.get(node_name)
-            
+
             # Valida se o nó retornou um dicionário antes de tentar acessar chaves
             if isinstance(node_result, dict):
                 output = node_result.get("output") or node_result.get("final_file") or ""
-                
+
                 # Consideramos output válido se for string e tiver conteúdo relevante (> 10 chars)
                 if output and len(str(output)) > 10:
                     state.generated_code = str(output)
@@ -226,16 +242,36 @@ class PipelineEngine:
                     state.script_path = node_result.get("final_file", "")
 
                     logger.info("✅ [ASYNC PIPELINE] Sucesso no nó %s: %d chars", node_name, len(state.generated_code))
-                    
+
                     if state.script_path:
                         logger.info("   Arquivo identificado em: %s", state.script_path)
-                    
+
                     # Retorna imediatamente ao encontrar a primeira saída válida
                     return
 
-        # Se passamos por todos os nós e nada foi encontrado
-        logger.warning("⚠️ [ASYNC PIPELINE] DAG finalizada sem produzir saída válida nos nós esperados.")
-        raise RuntimeError("Nenhum dos nós da DAG (documentation, code_executor, etc.) produziu código válido.")
+        # Fallback 1: tenta o final_output do grafo
+        final_output = graph_result.get("final_output", "")
+        if final_output and len(str(final_output)) > 10:
+            state.generated_code = str(final_output)
+            state.score = 50
+            logger.info("✅ [ASYNC PIPELINE] Usando final_output do grafo: %d chars", len(state.generated_code))
+            return
+
+        # Fallback 2: tenta qualquer nó que tenha gerado código (qualquer nome)
+        for node_name, node_result in raw_results.items():
+            if isinstance(node_result, dict):
+                output = node_result.get("output") or node_result.get("final_file") or ""
+                if output and len(str(output)) > 10:
+                    state.generated_code = str(output)
+                    state.score = node_result.get("score", 50) if isinstance(node_result.get("score"), (int, float)) else 50
+                    state.script_path = node_result.get("final_file", "") or ""
+                    logger.info("✅ [ASYNC PIPELINE] Sucesso via nó '%s' (fallback): %d chars", node_name, len(state.generated_code))
+                    return
+
+        # Se mesmo assim nada
+        logger.warning("⚠️ [ASYNC PIPELINE] DAG finalizada sem produzir saída válida. nodes_executed=%s, final_output_len=%d",
+                       graph_result.get("nodes_executed"), len(str(final_output)))
+        raise RuntimeError("Nenhum dos nós da DAG produziu código válido.")
 
     def _generation_stage(self, state: PipelineState):
 
@@ -304,7 +340,7 @@ class PipelineEngine:
             last_error = None
             for modelo in fallback_models:
                 try:
-                    resposta = route_generate(
+                    resposta = run_async_safe(async_route_generate,
                         model=modelo,
                         prompt=state.prompt,
                         task_type="general",

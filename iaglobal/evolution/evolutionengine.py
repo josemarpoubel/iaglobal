@@ -351,6 +351,9 @@ class EvolutionEngine:
         await asyncio.to_thread(self._mutate_nodes)
         await asyncio.to_thread(self._crossover_phase)
         
+        # 3b. Evolução de handlers (geração de código via AST)
+        await self._evolve_handlers()
+        
         # 4. Finalização
         await asyncio.to_thread(self._finalize_evolution_step)
         
@@ -679,6 +682,20 @@ class EvolutionEngine:
         
         if new_nodes:
             logger.info("🧬 %d híbrido(s) adicionado(s)!", len(new_nodes))
+
+    async def _evolve_handlers(self):
+        """Evolui handlers no nível de código-fonte via mutation/crossover AST."""
+        try:
+            from iaglobal.evolution.handler_evolution import HandlerEvolver
+            evolver = HandlerEvolver(engine=self, generation=self.generation)
+            stats = await asyncio.to_thread(evolver.evolve)
+            if stats["registered"]:
+                logger.info(
+                    "[EVO] Handler evolution: %d mutações, %d crossovers, %d registrados",
+                    stats["mutations"], stats["crossovers"], stats["registered"],
+                )
+        except Exception as exc:
+            logger.warning("[EVO] Handler evolution error (non-fatal): %s", exc)
 
     # --------------------------------------------------
     # LINEAGE ANALYSIS

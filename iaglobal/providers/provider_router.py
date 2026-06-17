@@ -48,44 +48,44 @@ from iaglobal.providers.poe_provider import async_generate as poe_async_generate
 
 # Timeouts por provider
 PROVIDER_TIMEOUT = {
-    "ollama": 120,
-    "groq": 15,
-    "openrouter": 15,
-    "nvidia": 15,
-    "opencode": 15,
-    "gemini": 15,
-    "poe": 30,
-    "perplexity": 15,
-    "openai": 15,
-    "huggingchat": 30,
-    "hf_router": 30,
-    "hf_router_qwen": 30,
-    "hf_router_qwenext": 30,
-    "hf_router_30b": 30,
-    "hf_router_32b": 30,
-    "hf_router_opus": 30,
-    "hf_router_llama": 30,
-    "hf_router_groq": 30,
-    "hf_router_groq8": 30,
-    "hf_router_hermes": 30,
-    "hf_router_nemotron": 30,
-    "hf_router_nemo2": 30,
-    "hf_router_ultra": 30,
-    "hf_router_oss": 30,
-    "hf_router_oss2": 30,
-    "hf_router_glm": 30,
-    "hf_router_glm4": 30,
-    "hf_router_glm5": 30,
-    "hf_router_glm45": 30,
-    "hf_router_phi4": 30,
-    "hf_router_qwen36": 30,
-    "hf_router_v4pro": 30,
-    "hf_router_r1": 30,
-    "hf_router_35": 30,
-    "hf_router_amelia": 30,
-    "hf_router_kimi": 30,
-    "hf_router_minimax": 30,
-    "hf_inference": 30,
+    "ollama": 60,
+    "groq": 120,
+    "openrouter": 60,
+    "nvidia": 60,
+    "opencode": 60,
+    "gemini": 60,
+    "poe": 180,
+    "perplexity": 60,
+    "openai": 60,
+    "huggingchat": 60,
+    "hf_router": 60,
+    "hf_router_qwen": 60,
+    "hf_router_qwenext": 60,
+    "hf_router_30b": 60,
+    "hf_router_32b": 60,
+    "hf_router_opus": 60,
+    "hf_router_llama": 60,
+    "hf_router_groq": 60,
+    "hf_router_groq8": 60,
+    "hf_router_hermes": 60,
+    "hf_router_nemotron": 60,
+    "hf_router_nemo2": 60,
+    "hf_router_ultra": 60,
+    "hf_router_oss": 60,
+    "hf_router_oss2": 60,
+    "hf_router_glm": 60,
+    "hf_router_glm4": 60,
+    "hf_router_glm5": 60,
+    "hf_router_glm45": 60,
+    "hf_router_phi4": 60,
+    "hf_router_qwen36": 60,
+    "hf_router_v4pro": 60,
+    "hf_router_r1": 60,
+    "hf_router_35": 60,
+    "hf_router_amelia": 60,
+    "hf_router_kimi": 60,
+    "hf_router_minimax": 60,
+    "hf_inference": 60,
 }
 
 PROVIDERS = {
@@ -168,9 +168,9 @@ ASYNC_PROVIDERS = {
 
 def CREDIT_CANDIDATES():
     return [
-        ("nvidia", "nvidia/mistralai/mistral-small-4-119b-2603"),
+        ("nvidia", "nvidia/mistralai/mistral-large-3-675b-instruct-2512"),
         ("opencode", "opencode/deepseek-v4-flash-free"),
-        ("openrouter", "openrouter/meta-llama/llama-3.1-8b-instruct"),
+        ("openrouter", "openrouter/meta-llama/llama-3.2-3b-instruct:free"),
         ("groq", "groq/llama-3.3-70b-versatile"),
         ("poe", "poe/GLM-5-T"),
         ("ollama", "ollama/qwen2.5:0.5b"),
@@ -200,6 +200,17 @@ def _clear_circuit_breaker_bans():
         if provider in _PROVIDERS_WITH_KEYS:
             del bandit._banned_providers[provider]
             cleared.append(provider)
+
+    # Também limpa os bloqueios no nível HTTP (async_http._BLOCKED_PROVIDERS)
+    from iaglobal.providers.async_http import _BLOCKED_PROVIDERS
+    http_cleared = []
+    for provider in list(_BLOCKED_PROVIDERS.keys()):
+        if provider in _PROVIDERS_WITH_KEYS:
+            del _BLOCKED_PROVIDERS[provider]
+            http_cleared.append(provider)
+    if http_cleared:
+        logger.info("[ROUTER] Bans HTTP limpos para %d providers: %s", len(http_cleared), http_cleared)
+
     if cleared:
         logger.info("[ROUTER] Bans limpos para %d providers com API key: %s", len(cleared), cleared)
     _BANS_CLEARED = True
@@ -373,9 +384,9 @@ async def async_route_generate_parallel(prompt: str, task_type: str = "general")
 # RETROCOMPATIBILIDADE SÍNCRONA (WRAPPER)
 # ==============================================================================
 
-def route_generate(model: str, prompt: str, task_type: str = "general") -> str:
-    """Invólucro para chamadas legadas que não usam 'await'."""
-    return asyncio.run(async_route_generate_parallel(prompt, task_type=task_type))
+async def route_generate(model: str, prompt: str, task_type: str = "general") -> str:
+    """Roteia para o provider adequado via bandit."""
+    return await async_route_generate(model, prompt, task_type=task_type)
 
 def escolher_modelo(prompt: str = "") -> str:
     """Delegado ao Bandit."""

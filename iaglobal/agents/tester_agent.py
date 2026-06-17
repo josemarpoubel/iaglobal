@@ -11,7 +11,7 @@ from iaglobal.models.task import Task
 
 from iaglobal.utils.logger import logger
 
-from iaglobal.providers.provider_router import route_generate, resolve_model
+from iaglobal.providers.provider_router import route_generate
 from iaglobal.providers.task_router import detect_task_type
 
 # Caminho da pasta de testes do projeto
@@ -49,7 +49,7 @@ class TesterAgent:
     # GERAR TESTES
     # =========================================================
 
-    def gerar_testes(self, codigo: str, task: Union[str, Task]) -> str:
+    async def gerar_testes(self, codigo: str, task: Union[str, Task]) -> str:
         logger.info("🧪 [TESTER AGENT]: Gerando testes...")
 
         task_text = str(task)
@@ -75,9 +75,8 @@ Gere testes unitários para validar o código abaixo.
 
         try:
 
-            modelo = resolve_model(str(task))
             task_type = detect_task_type(task_text)
-            resposta = route_generate(modelo, prompt, task_type=task_type)
+            resposta = await route_generate("", prompt, task_type=task_type)
 
             if not resposta:
                 return ""
@@ -95,14 +94,14 @@ Gere testes unitários para validar o código abaixo.
 SUITE DE TESTES:
 {teste}"""
 
-    def gerar_bateria_testes(self, tarefa: str, codigo: str) -> str:
-        return self.gerar_testes(codigo, tarefa)
+    async def gerar_bateria_testes(self, tarefa: str, codigo: str) -> str:
+        return await self.gerar_testes(codigo, tarefa)
 
     # =========================================================
     # SALVAR E EXECUTAR TESTE EM ARQUIVO .py
     # =========================================================
 
-    def gerar_salvar_e_executar(
+    async def gerar_salvar_e_executar(
         self, codigo: str, task: Union[str, Task]
     ) -> dict:
         """
@@ -112,7 +111,7 @@ SUITE DE TESTES:
         task_text = str(task)
 
         # 1. Gera o código de teste
-        raw = self.gerar_testes(codigo, task)
+        raw = await self.gerar_testes(codigo, task)
         if not raw:
             return {"sucesso": False, "output": "Nenhum teste gerado", "arquivo": ""}
 
@@ -189,7 +188,7 @@ SUITE DE TESTES:
     # EXECUTAR AVALIAÇÃO DE SOLUÇÕES
     # =========================================================
 
-    def avaliar_solucao(
+    async def avaliar_solucao(
         self,
         codigo: str,
         resultado_execucao: Dict[str, Any],
@@ -228,9 +227,8 @@ SUITE DE TESTES:
       """
 
         try:
-            modelo = resolve_model(task_text)
             task_type = detect_task_type(task_text)
-            resposta = route_generate(modelo, prompt, task_type=task_type)
+            resposta = await route_generate("", prompt, task_type=task_type)
 
             if not resposta:
                 return "Avaliação indisponível (resposta vazia)."
@@ -245,7 +243,7 @@ SUITE DE TESTES:
     # RANQUEAMENTO DE SOLUÇÕES
     # =========================================================
 
-    def rankear_solucoes(
+    async def rankear_solucoes(
         self,
         solucoes: List[str],
         task: Union[str, Task]
@@ -275,9 +273,8 @@ SUITE DE TESTES:
     """
 
         try:
-            modelo = resolve_model(task_text)
             task_type = detect_task_type(task_text)
-            resposta = route_generate(modelo, prompt, task_type=task_type)
+            resposta = await route_generate("", prompt, task_type=task_type)
 
             if not resposta:
                 return "Ranking indisponível."

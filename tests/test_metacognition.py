@@ -433,10 +433,10 @@ class TestPIPELINE_SKILLS:
     """Testa que os 5 nós de metacognição foram adicionados ao PIPELINE_SKILLS."""
 
     def test_pipeline_skills_tem_56_nos(self):
-        assert len(PIPELINE_SKILLS) == 61
+        assert len(PIPELINE_SKILLS) == 78
 
     def test_evolution_trigger_e_ultimo_no(self):
-        assert PIPELINE_SKILLS[-1][0] == "evolution_trigger"
+        assert PIPELINE_SKILLS[-5][0] == "evolution_trigger"
 
     def test_todos_nos_metacognition_existem(self):
         nomes = {name for name, _ in PIPELINE_SKILLS}

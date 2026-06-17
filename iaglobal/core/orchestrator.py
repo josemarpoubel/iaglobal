@@ -42,6 +42,7 @@ from iaglobal.tools.tool_router import ToolRouter
 from iaglobal.graphs.membrane import Membrane, Organelle, MembraneMessage
 from iaglobal.evolution.evolutionengine import EvolutionEngine
 from iaglobal.utils.logger import get_logger, logger
+from iaglobal.utils.helpers import run_async_safe
 
 logger = logging.getLogger("ORCHESTRATOR")
 
@@ -258,10 +259,10 @@ class Orchestrator:
             )
 
             try:
-                from iaglobal.providers.provider_router import route_generate
                 from iaglobal.providers.provider_config import ProviderConfig
                 model = f"ollama/{ProviderConfig.DEFAULT_OLLAMA_MODEL or 'qwen2.5:0.5b'}"
-                analise = route_generate(model=model, prompt=prompt, task_type="general")
+                from iaglobal.providers.provider_router import async_route_generate
+                analise = run_async_safe(async_route_generate, model=model, prompt=prompt, task_type="general")
             except Exception:
                 analise = f"Falha crítica detectada no nó '{node_id}': {error_msg[:200]}. A análise automática não pôde ser gerada."
 
@@ -354,9 +355,10 @@ class Orchestrator:
         # =====================================================================
         try:
             from iaglobal.providers.ollama_provider import warmup
-            warmup()
-        except Exception:
-            pass
+            if not warmup():
+                logger.warning("[ORCH] Ollama warmup falhou — modelo pode nao estar disponivel localmente")
+        except Exception as e:
+            logger.warning("[ORCH] Ollama warmup exception: %s", e)
 
         # =====================================================================
         # PHASE 1: MONITOR — Prompt → Analyze → Plan → Allocate → Execute → Monitor
@@ -517,7 +519,7 @@ class Orchestrator:
         except Exception as e:
             logger.warning("[ORCH] Pipeline execute failed: %s", e)
             try:
-                payload["result"] = route_generate(model=chosen_model, prompt=prompt_for_llm, task_type="general")
+                payload["result"] = run_async_safe(async_route_generate, model=chosen_model, prompt=prompt_for_llm, task_type="general")
                 payload["raw_results"] = {"fallback": payload["result"]}
                 payload["stages"]["execute"]["status"] = "done"
             except RuntimeError:
@@ -773,7 +775,7 @@ class Orchestrator:
         if success:
             try:
                 metacog_ctx = self._build_metacognition_context(payload, task, execution_id)
-                metacog_results = asyncio.run(self._run_metacognition_flow(metacog_ctx))
+                metacog_results = run_async_safe(self._run_metacognition_flow, metacog_ctx)
                 payload["metacognition"] = metacog_results
                 payload["stages"]["metacognition"]["status"] = "done"
                 logger.info("[ORCH] Metacognition: score=%s triggered=%s",
@@ -810,9 +812,11 @@ class Orchestrator:
 
         try:
             from iaglobal.providers.ollama_provider import warmup
-            await asyncio.to_thread(warmup)
-        except Exception:
-            pass
+            ok = await asyncio.to_thread(warmup)
+            if not ok:
+                logger.warning("[ORCH] Ollama warmup falhou (async) — modelo pode nao estar disponivel localmente")
+        except Exception as e:
+            logger.warning("[ORCH] Ollama warmup exception (async): %s", e)
 
         print(f"\n💬 Iniciando o prompt do usuario (async)...")
         logger.info("[ORCH] ═══════════════════════════════════════════════")

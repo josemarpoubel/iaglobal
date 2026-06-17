@@ -134,33 +134,9 @@ class SandboxExecutor:
             stderr = (result.stderr or "").strip()
             sucesso = result.returncode == 0
 
-            # Auto-install: se falhou por ImportError, instala e tenta de novo
+            # Se falhou, retorna erro explicito. Instalacao automatica removida para evitar bloqueios assincronos.
             if not sucesso and "ModuleNotFoundError" in stderr:
-                import re
-                match = re.search(r"ModuleNotFoundError: No module named '(\w+)'", stderr)
-                if match:
-                    lib = match.group(1)
-                    logger.info("[SANDBOX] ImportError: '%s' não encontrado — instalando...", lib)
-                    try:
-                        subprocess.run(
-                            [sys.executable, "-m", "pip", "install", lib],
-                            capture_output=True, text=True, timeout=30,
-                        )
-                        result = subprocess.run(
-                            [self.python_exec, "-I", tmp_path],
-                            capture_output=True, text=True,
-                            timeout=self.timeout, env=env,
-                            preexec_fn=_sandbox_preexec, cwd=sandbox_dir,
-                        )
-                        stdout = (result.stdout or "").strip()
-                        stderr = (result.stderr or "").strip()
-                        sucesso = result.returncode == 0
-                        if sucesso:
-                            logger.info("[SANDBOX] ✅ Auto-install de '%s' OK — reexecução sucedida", lib)
-                        else:
-                            logger.warning("[SANDBOX] Auto-install de '%s' falhou — erro persiste", lib)
-                    except Exception as e:
-                        logger.warning("[SANDBOX] Auto-install de '%s' exceção: %s", lib, e)
+                logger.warning("[SANDBOX] Falha de dependencia detectada: %s", stderr.split('\n')[-1])
 
             logger.info("[SANDBOX] Execucao #%d: returncode=%d | stdout=%d chars | stderr=%d chars",
                         self._execution_count, result.returncode, len(stdout), len(stderr))

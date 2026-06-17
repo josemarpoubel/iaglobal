@@ -16,6 +16,7 @@ from iaglobal.graphs.node import Node
 
 from iaglobal.graphs.pipeline_definition import PIPELINE_SKILLS
 
+from iaglobal.graphs.communication.acetylcholine_bus import AgentMessage
 from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
@@ -305,6 +306,13 @@ def build_default_graph(orchestrator: Any, task: str) -> ExecutionGraph:
     logger.debug(f"🧩 [INTEGRATOR] Grafo montado com {len(graph.nodes)} nós.")
     return graph
 
+def _make_handler_run(name: str) -> Callable:
+    """Factory: cria run_fn que delega ao handler no_<name>.py."""
+    import importlib
+    module = importlib.import_module(f"iaglobal.graphs.nodes.no_{name}")
+    return getattr(module, f"run_{name}")
+
+
 def _get_fallback_run_fn(
     skill_name: str,
     orchestrator: Any,
@@ -365,7 +373,20 @@ def _get_fallback_run_fn(
         "knowledge": lambda o: _make_knowledge_run(),
         "dependency": lambda o: _make_dependency_run(),
         # analise
-        "risk_analysis": lambda o: _make_risk_analysis_run(),
+        # orphan skills (handler-driven)
+        "agentmailbox": lambda o: _make_handler_run("agentmailbox"),
+        "interpreter": lambda o: _make_handler_run("interpreter"),
+        "web_classifier": lambda o: _make_handler_run("web_classifier"),
+        "prompt_builder": lambda o: _make_handler_run("prompt_builder"),
+        "prompt_improver": lambda o: _make_handler_run("prompt_improver"),
+        "risk_analysis": lambda o: _make_handler_run("risk_analysis"),
+        "genesis_builder": lambda o: _make_handler_run("genesis_builder"),
+        "multi_coder": lambda o: _make_handler_run("multi_coder"),
+        "code_executor": lambda o: _make_handler_run("code_executor"),
+        "performance": lambda o: _make_handler_run("performance"),
+        "security": lambda o: _make_handler_run("security"),
+        "reflexion": lambda o: _make_handler_run("reflexion"),
+        "artifact_writer": lambda o: _make_handler_run("artifact_writer"),
         "security_design": lambda o: _make_security_design_run(),
         "performance_design": lambda o: _make_performance_design_run(),
         # desenvolvimento
@@ -409,6 +430,14 @@ def _get_fallback_run_fn(
         "evolution_committee": lambda o: _make_evolution_committee_run(),
         "pipeline_updater": lambda o: _make_pipeline_updater_run(),
         "evolution_trigger": lambda o: _make_evolution_trigger_run(),
+        # orphan agents — handlers delegating to agent classes
+        "failure_analysis": lambda o: _make_handler_run("failure_analysis"),
+        "knowledge_writer": lambda o: _make_handler_run("knowledge_writer"),
+        "multi_agent": lambda o: _make_handler_run("multi_agent"),
+        "typing_agent": lambda o: _make_handler_run("typing_agent"),
+        # memoria — essenciais para pipeline integrity
+        "memory_writer": lambda o: _make_handler_run("memory_writer"),
+        "memory_cleaner": lambda o: _make_handler_run("memory_cleaner"),
     }
 
     maker = fallbacks.get(normalized)
@@ -530,6 +559,12 @@ def _register_default_skill_implementations(orchestrator: Any) -> None:
         SKILL_INTEGRATOR, SKILL_SEMANTIC_VALIDATOR,
         SKILL_QA, SKILL_DEBUG_CODER, SKILL_FIX_VALIDATOR,
         SKILL_DEPLOYMENT_PLAN, SKILL_RETROSPECTIVE,
+        SKILL_AGENTMAILBOX, SKILL_CODE_EXECUTOR, SKILL_GENESIS,
+        SKILL_INTERPRETER, SKILL_MULTI_CODER, SKILL_PERFORMANCE,
+        SKILL_PROMPT_BUILDER, SKILL_PROMPT_IMPROVER, SKILL_REFLEXION,
+        SKILL_SECURITY, SKILL_WEB_CLASSIFIER, SKILL_ARTIFACT_WRITER,
+        SKILL_FAILURE_ANALYSIS, SKILL_KNOWLEDGE_WRITER, SKILL_MULTI_AGENT,
+        SKILL_TYPING_AGENT,
     )
 
     skill_templates = {
@@ -590,6 +625,25 @@ def _register_default_skill_implementations(orchestrator: Any) -> None:
         "evolution_committee": SKILL_EVOLUTION_COMMITTEE,
         "pipeline_updater":   SKILL_PIPELINE_UPDATER,
         "evolution_trigger":  SKILL_EVOLUTION_TRIGGER,
+        # orphan skills — alinhamento Skills = Nodes = Handlers
+        "agentmailbox":       SKILL_AGENTMAILBOX,
+        "code_executor":      SKILL_CODE_EXECUTOR,
+        "genesis_builder":    SKILL_GENESIS,
+        "interpreter":        SKILL_INTERPRETER,
+        "multi_coder":        SKILL_MULTI_CODER,
+        "performance":        SKILL_PERFORMANCE,
+        "prompt_builder":     SKILL_PROMPT_BUILDER,
+        "prompt_improver":    SKILL_PROMPT_IMPROVER,
+        "reflexion":          SKILL_REFLEXION,
+        "risk_analysis":      SKILL_RISK_ANALYSIS,
+        "security":           SKILL_SECURITY,
+        "web_classifier":     SKILL_WEB_CLASSIFIER,
+        "artifact_writer":    SKILL_ARTIFACT_WRITER,
+        # orphan agents — handlers delegating to agent classes
+        "failure_analysis":   SKILL_FAILURE_ANALYSIS,
+        "knowledge_writer":   SKILL_KNOWLEDGE_WRITER,
+        "multi_agent":        SKILL_MULTI_AGENT,
+        "typing_agent":       SKILL_TYPING_AGENT,
     }
     skipped = []
     failed = []
@@ -2071,6 +2125,16 @@ async def run_integrator(ctx: Dict[str, Any]) -> Dict[str, Any]:
     files = {}
     source_count = 0
 
+    ag_mailbox = memory.get("agentmailbox", {})
+    bus = ag_mailbox.get("_agent_bus")
+    inbox = ag_mailbox.get("_mailbox_manager")
+    if bus is not None and inbox is not None:
+        mailbox = inbox.get_or_create("integrator")
+        msgs = mailbox.process_inbox(max_messages=5)
+        if msgs:
+            for msg in msgs:
+                logger.info("[INTEGRATOR] Mensagem recebida de %s: type=%s", msg.sender, msg.type)
+
     sources = [
         ("frontend_builder", "frontend"),
         ("backend_builder", "backend"),
@@ -2097,6 +2161,15 @@ async def run_integrator(ctx: Dict[str, Any]) -> Dict[str, Any]:
     integrated_code = "\n\n".join(code_parts) if code_parts else ""
 
     logger.info("[INTEGRATOR] Sources=%d | Total chars=%d", source_count, len(integrated_code))
+
+    if bus is not None and integrated_code:
+        msg = AgentMessage(
+            sender="integrator", receiver="coder",
+            type="code_integrated",
+            payload={"integrated_code": integrated_code, "files": files, "source_count": source_count},
+        )
+        bus.publish(msg)
+        logger.info("[INTEGRATOR] Mensagem enviada para coder via bus")
 
     return {
         **ctx,

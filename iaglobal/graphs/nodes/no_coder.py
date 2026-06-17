@@ -1,12 +1,11 @@
 from typing import Dict, Any
-import logging
 
-from iaglobal.providers.provider_router import async_route_generate
+from iaglobal.agents.coder_agent import CoderAgent, CodeArtifact
 from iaglobal.memory.memory_error import record_error
 from iaglobal.graphs.communication.acetylcholine_bus import AgentMessage
+from iaglobal.utils.logger import logger
 
-logger = logging.getLogger(__name__)
-
+_coder = CoderAgent()
 
 async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
     memory = ctx.get("memory", {})
@@ -20,7 +19,8 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         msgs = mailbox.process_inbox(max_messages=5)
         if msgs:
             for msg in msgs:
-                logger.info("[CODER] Mensagem recebida de %s: type=%s", msg.sender, msg.type)
+                logger.info("[CODER] Mensagem recebida de %s: type=%s | payload=%s", 
+                           msg.sender, msg.type, msg.payload)
                 if msg.payload.get("plan"):
                     logger.info("[CODER] Plano recebido do planner via bus")
 
@@ -38,30 +38,37 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         .get("coder", "")
     )
 
-    if specialization:
-        system = specialization
-        context = built_prompt if built_prompt else task
-        prompt = f"{system}\n\n{context}\n\nGere APENAS o conteudo solicitado, sem explicacoes."
-    else:
-        system = "Voce e um engenheiro de software gerando codigo limpo e funcional."
-        context = built_prompt if built_prompt else task
-        prompt = f"{system}\n\n{context}\n\nGere APENAS o codigo, sem explicacoes."
+    contexto = built_prompt if built_prompt else task
+    erros_contexto = memory.get("errors", {}).get("coder", "")
 
     try:
-        code = await async_route_generate(
-            model="", prompt=prompt, task_type="general"
+        artifact = await _coder.generate(
+            task=built_prompt or task,
+            contexto=contexto,
+            erros_contexto=erros_contexto,
         )
-        if code and len(code) > 50:
+        code = artifact.code if isinstance(artifact, CodeArtifact) else str(artifact)
+        if code and len(code) > 5:
             logger.info("[CODER] Conteudo gerado: %d chars", len(code))
-            if bus is not None:
-                msg = AgentMessage(
-                    sender="coder", receiver="critic",
-                    type="code_ready",
-                    payload={"code": code, "task": task},
-                )
-                bus.publish(msg)
-                logger.info("[CODER] Mensagem enviada para critic via bus")
-            return {**ctx, "output": code, "code": code}
+        if bus is not None:
+            msg = AgentMessage(
+                sender="coder",
+                receiver="critic",
+                type="code_ready",
+                payload={"code": code, "task": task},
+            )
+            bus.publish(msg)
+            logger.info("[CODER] Mensagem enviada para critic via bus")
+        
+        # Process inbox again at end to catch any late-arriving messages
+        if bus is not None and inbox is not None:
+            mailbox = inbox.get_or_create("coder")
+            msgs = mailbox.process_inbox(max_messages=5)
+            if msgs:
+                for msg in msgs:
+                    logger.info("[CODER] Mensagem tardia recebida de %s: type=%s", msg.sender, msg.type)
+        
+        return {**ctx, "output": code, "code": code}
         record_error("coder", "Empty/short content generated", {"task": task[:100]})
     except Exception as e:
         logger.warning("[CODER] Falha: %s", e)

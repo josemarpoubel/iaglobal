@@ -7,11 +7,13 @@ from pathlib import Path
 
 from iaglobal.evolution.agents.knowledge_agent import knowledge
 from iaglobal.memory.term_long import LongTermMemory
-from iaglobal.memory.memory_vector import store as mem_vector_store
+from iaglobal.memory.memory_vector import store as mem_vector_store, init_db as vector_init_db
 from iaglobal.graphs.nodes._disk_swap import load_all_for_task
 from iaglobal._paths import CORE_DB
 
 logger = logging.getLogger(__name__)
+# Inicializa o banco de vetores antes de usar LongTermMemory para garantir tabela `memory`
+vector_init_db()
 _ltm = LongTermMemory(db_path=CORE_DB)
 
 _GARBAGE_PATTERNS = [

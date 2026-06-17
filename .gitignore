@@ -14,7 +14,6 @@ sugestao_teste.json
 
 # Arquivos de ambiente e segredos
 .env
-.env.*
 backup.env
 
 # Build e distribuição
@@ -24,3 +23,17 @@ build/
 # IDE
 .vscode/
 .idea/
+.pytest_cache
+
+# Ferramentas de Linting e Formatação
+.mypy_cache/
+.ruff_cache/
+.black
+
+# Jupyter Notebooks (arquivos temporários)
+.ipynb_checkpoints/
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
+

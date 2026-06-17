@@ -187,9 +187,14 @@ def blackjack_executar_local(modelo: str, prompt: str) -> str:
     return _ollama_request(prompt, model=modelo or None)
 
 
-def executar(modelo: str, payload: dict) -> str:
+async def executar(modelo: str, payload: dict) -> str:
     model = (modelo or "").lower().strip()
     prompt = payload.get("task") or payload.get("prompt") or ""
+
+    # bandit decide o melhor modelo via router
+    if not model or model == "auto":
+        from iaglobal.providers.provider_router import route_generate
+        return await route_generate("", prompt, task_type="general")
 
     # ordem de prioridade: local -> cloud -> fallback
     try:
@@ -200,10 +205,8 @@ def executar(modelo: str, payload: dict) -> str:
             return _groq_request(prompt) or _ollama_request(prompt, model=model)
 
         if model.startswith("gemini/") or model.startswith("nvidia/"):
-            # fallback: usa o modelo Ollama padrão em vez de passar o nome do modelo cloud
             return _openrouter_request(prompt) or _ollama_request(prompt, model=ProviderConfig.DEFAULT_OLLAMA_MODEL)
 
-        # LOCAL OLLAMA (default seguro)
         return _ollama_request(prompt, model=model)
 
     except Exception as e:
@@ -226,8 +229,8 @@ class Executor:
     # -----------------------------
     # LLM CALL
     # -----------------------------
-    def execute_llm(self, task: str, constraints: Optional[list] = None) -> str:
-        result = executar(self.provider, {
+    async def execute_llm(self, task: str, constraints: Optional[list] = None) -> str:
+        result = await executar(self.provider, {
             "task": task,
             "system_constraints": constraints or []
         })
@@ -296,7 +299,7 @@ class Executor:
     # -----------------------------
     # SELF HEALING LOOP
     # -----------------------------
-    def autonomous_execute(self, codigo: str) -> ExecutionResult:
+    async def autonomous_execute(self, codigo: str) -> ExecutionResult:
 
         current = codigo
 
@@ -307,7 +310,7 @@ class Executor:
             if result.success:
                 return result
 
-            fixed = self.repair_code(current, result.traceback)
+            fixed = await self.repair_code(current, result.traceback)
             if not fixed:
                 return result
 
@@ -318,7 +321,7 @@ class Executor:
     # -----------------------------
     # REPAIR AGENT
     # -----------------------------
-    def repair_code(self, codigo: str, erro: str) -> Optional[str]:
+    async def repair_code(self, codigo: str, erro: str) -> Optional[str]:
 
         prompt = f"""
 Corrija o código Python abaixo.
@@ -333,7 +336,7 @@ Retorne apenas código corrigido.
 """
 
         try:
-            fixed = self.execute_llm(prompt)
+            fixed = await self.execute_llm(prompt)
             return fixed.strip() if len(fixed.strip()) > 5 else None
         except Exception as e:
             logger.error(f"Repair error: {e}")

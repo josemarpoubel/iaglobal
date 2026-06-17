@@ -6,7 +6,7 @@ from typing import Dict, Any, Optional, Union, List
 from iaglobal.models.task import Task
 from iaglobal.core.assistant import Assistant
 from iaglobal.utils.logger import logger
-from iaglobal.providers.provider_router import route_generate, resolve_model
+from iaglobal.providers.provider_router import route_generate
 from iaglobal.execution.executor import executar
 
 import logging
@@ -94,36 +94,74 @@ class PlannerAgent:
         if not resposta:
             return ""
 
-        # 1. Converte para string e limpa espaçamentos iniciais/finais
+        import re
         texto = str(resposta).strip()
 
-        # 2. Limpeza via Expressões Regulares de blocos markdown clássicos (```json ... ```)
-        import re
+        # 1. Remove blocos markdown clássicos (```json ... ```)
         try:
-            # Procura de forma resiliente por blocos contidos entre as tags triplas de crase
             match_markdown = re.search(r"```(?:json)?\s*(.*?)\s*```", texto, re.DOTALL | re.IGNORECASE)
             if match_markdown:
                 texto = match_markdown.group(1).strip()
         except Exception as re_err:
             logger.warning(f"⚠️ [PLANNER]: Falha não-bloqueante na varredura regex do markdown: {re_err}")
 
-        # 3. FILTRO ANATÔMICO DE ESCOPO (A Blindagem Suprema)
-        # Se o modelo ainda deixou textos extras fora do JSON (Ex: "Aqui está o plano: {...} Espero que ajude"),
-        # localiza cirurgicamente onde começam e terminam as chaves estruturais.
-        inicio_bloco = texto.find("{")
-        fim_bloco = texto.rfind("}")
+        # 2. Remove prefixos conversacionais comuns (Aqui está o plano:, etc.)
+        prefixes_to_remove = [
+            r"^Aqui está o plano\s*[:\-]\s*",
+            r"^Aqui está o JSON\s*[:\-]\s*",
+            r"^O plano é\s*[:\-]\s*",
+            r"^Resultado\s*[:\-]\s*",
+            r"^Resposta\s*[:\-]\s*",
+            r"^```\s*",
+            r"```\s*$",
+        ]
+        for prefix in prefixes_to_remove:
+            texto = re.sub(prefix, "", texto, flags=re.IGNORECASE)
 
-        if inicio_bloco != -1 and fim_bloco != -1 and fim_bloco > inicio_bloco:
-            # Fatia a string mantendo estritamente do primeiro '{' ao último '}'
-            texto_filtrado = texto[inicio_bloco:fim_bloco + 1]
-        else:
-            texto_filtrado = texto
+        # 3. FILTRO ANATÔMICO - Localiza o JSON válido mais externo
+        # Procura o primeiro { e o último } que formam um JSON balanceado
+        def extract_balanced_json(text: str) -> str:
+            """Extrai o primeiro objeto JSON balanceado completo."""
+            start = text.find('{')
+            if start == -1:
+                return text
+            
+            # Encontra o } correspondente balanceando chaves
+            depth = 0
+            in_string = False
+            escape = False
+            end = -1
+            
+            for i, char in enumerate(text[start:], start):
+                if escape:
+                    escape = False
+                    continue
+                if char == '\\' and in_string:
+                    escape = True
+                    continue
+                if char == '"' and not escape:
+                    in_string = not in_string
+                    continue
+                if not in_string:
+                    if char == '{':
+                        depth += 1
+                    elif char == '}':
+                        depth -= 1
+                        if depth == 0:
+                            end = i
+                            break
+            
+            if end != -1:
+                return text[start:end+1]
+            return text[start:]
 
-        # 4. Sanitização final de quebras de linha e caracteres ocultos de controle
+        texto_filtrado = extract_balanced_json(texto)
+
+        # 4. Sanitização final
         texto_sanitizado = texto_filtrado.strip()
-        
-        # Remove possíveis quebras de linha duplicadas ou espaços fantasmas que quebram o parser
         texto_sanitizado = re.sub(r'\n\s*\n', '\n', texto_sanitizado)
+        texto_sanitizado = re.sub(r',\s*}', '}', texto_sanitizado)  # Remove trailing commas
+        texto_sanitizado = re.sub(r',\s*]', ']', texto_sanitizado)  # Remove trailing commas in arrays
 
         return texto_sanitizado
 
@@ -335,7 +373,7 @@ class PlannerAgent:
     # PUBLIC API
     # =========================================================
 
-    def criar_plano_execucao(
+    async def criar_plano_execucao(
         self,
         task: Union[str, Task],
         contexto_memoria: Optional[str] = None,
@@ -392,13 +430,13 @@ EXEMPLO DE RETORNO EXATO DE MARCAÇÃO ESPERADO (SIGA ESTA ARQUITETURA):
 }}
 """
 
-        modelo = resolve_model(task_text)
+        modelo = ""
 
         try:
             # =================================================
             # EXECUÇÃO LLM
             # =================================================
-            resposta = executar(
+            resposta = await executar(
                 modelo,
                 {
                     "task": prompt,

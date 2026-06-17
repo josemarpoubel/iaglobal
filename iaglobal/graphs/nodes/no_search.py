@@ -1,4 +1,4 @@
-"""Search consolidado — 9+ fontes em sequência com disk swap."""
+"""Search consolidado — fontes em paralelo com stagger mínimo."""
 from typing import Dict, Any, Callable, List, Tuple
 import asyncio
 import logging
@@ -9,7 +9,7 @@ from iaglobal.agents.search_agent import SearchAgent
 from iaglobal.graphs.nodes._search_wikipedia import _wikipedia_async
 from iaglobal.graphs.nodes._search_sources import (
     github_search, stackoverflow_search, grokipedia_search,
-    brave_search, startpage_search, mojeek_search, qwant_search,
+    startpage_search, mojeek_search, qwant_search,
     searxng_search,
 )
 from iaglobal.graphs.nodes._search_router import run_search_router
@@ -46,7 +46,6 @@ SOURCES: List[Tuple[str, Callable, int]] = [
     ("duckduckgo", lambda t: async_search_tool(t), 15),
     ("search_agent", lambda t: _search_agent.process_task(t), 12),
     ("web_brain", lambda t: _web_brain.search_text(t, max_results=5), 12),
-    ("brave", brave_search, 10),
     ("startpage", startpage_search, 10),
     ("mojeek", mojeek_search, 10),
     ("qwant", qwant_search, 10),
@@ -56,7 +55,9 @@ SOURCES: List[Tuple[str, Callable, int]] = [
     ("wikipedia", lambda t: _wikipedia_async(t), 10),
 ]
 
-_SEARCH_DELAY = 3.0  # segundos entre cada fonte para evitar rate limit
+_BATCH_SIZE = 4
+_BATCH_DELAY = 1.0
+_MIN_RESULTS = 33000
 
 
 async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -71,13 +72,20 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {**ctx, "output": cached, "search_results": cached, "success": True}
 
     all_results = []
-    for i, (name, fn, timeout) in enumerate(SOURCES):
-        if i > 0:
-            await asyncio.sleep(_SEARCH_DELAY)
-        result = await _try_source(name, fn, task, timeout)
-        if result:
-            save_search(name, task, result)
-            all_results.append(f"=== {name.upper()} ===\n{result}")
+    for batch_start in range(0, len(SOURCES), _BATCH_SIZE):
+        batch = SOURCES[batch_start:batch_start + _BATCH_SIZE]
+        tasks = [_try_source(name, fn, task, timeout) for name, fn, timeout in batch]
+        results = await asyncio.gather(*tasks)
+        for (name, _, _), result in zip(batch, results):
+            if result:
+                save_search(name, task, result)
+                all_results.append(f"=== {name.upper()} ===\n{result}")
+        total_chars = sum(len(r) for r in all_results)
+        if total_chars >= _MIN_RESULTS:
+            logger.info("[SEARCH] %d chars acumulados (%d fontes) — parando cedo", total_chars, len(all_results))
+            break
+        if batch_start + _BATCH_SIZE < len(SOURCES):
+            await asyncio.sleep(_BATCH_DELAY)
 
     combined = "\n\n".join(all_results)
 

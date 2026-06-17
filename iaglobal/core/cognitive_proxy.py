@@ -12,7 +12,8 @@ Pipeline:
 import re
 import json
 import time
-from typing import Optional, List, Dict, Any, Union
+import asyncio
+from typing import Optional, List, Dict, Any, Union, Callable, TypeVar
 from dataclasses import dataclass, field
 
 from iaglobal._paths import MEMORIES_DB
@@ -21,7 +22,7 @@ from iaglobal.memory.term_long import LongTermMemory
 from iaglobal.tools.web_brain import WebBrain
 from iaglobal.agents.critic_agent import CriticAgent
 from iaglobal.agents.typing_agent import TypingService
-from iaglobal.providers.provider_router import route_generate
+from iaglobal.providers.provider_router import route_generate, async_route_generate
 from iaglobal.graphs.bandit import BanditPolicy
 from iaglobal.graphs.credit import CreditAssignmentEngine
 from iaglobal.graphs.telemetry import ExecutionEvent
@@ -40,6 +41,7 @@ from iaglobal.storage.snapshotter import snapshotter
 from iaglobal.validation.engine import FeedbackEngine, Decision
 
 from iaglobal.utils.logger import logger
+from iaglobal.utils.helpers import run_async_safe
 
 
 @dataclass
@@ -62,7 +64,6 @@ class CognitiveProxy:
         self.stm = ShortTermMemory(max_size=30, ttl_seconds=1800, db_path=MEMORIES_DB)
         self.ltm = LongTermMemory(max_size=200, db_path=MEMORIES_DB)
         self.webbrain = WebBrain() if web_enabled else None
-        self.critic = CriticAgent()
         self.sem_cache = SemanticCache(threshold=cache_threshold) if semantic_cache else None
         self.retry = RetryHandler(llm_router=self._llm_call) if retry_enabled else None
         self._critic_degraded = False
@@ -70,6 +71,7 @@ class CognitiveProxy:
         self.governance = _gov
         self.credit = CreditAssignmentEngine()
         self.bandit = BanditPolicy(self.credit)
+        self.critic = CriticAgent(bandit=self.bandit)
         self.task_classifier = TaskClassifierAgent()
         self._batch = batch_writer
         self.state_buffer = SystemStateBuffer(max_size=500, snapshot_interval_ops=50)
@@ -325,7 +327,7 @@ class CognitiveProxy:
                 result = self._gpt_web_fallback(prompt)
                 logger.info(f"[COGNITIVE-PROXY] GPT Web fallback: prompt_len={len(prompt)}")
                 return result
-            result = route_generate(model=model, prompt=prompt, task_type="cognitive_proxy")
+            result = run_async_safe(async_route_generate, model=model, prompt=prompt, task_type="cognitive_proxy")
             elapsed = time.time() - start
             if result:
                 logger.debug(f"[COGNITIVE-PROXY] LLM ok: model={model} elapsed={elapsed:.2f}s "
@@ -389,7 +391,7 @@ class CognitiveProxy:
             logger.debug(f"[COGNITIVE-PROXY] Prompt longo ({len(prompt)}), forçando Ollama")
 
         try:
-            result = route_generate(model=model_name, prompt=prompt, task_type="cognitive_proxy")
+            result = run_async_safe(async_route_generate, model=model_name, prompt=prompt, task_type="cognitive_proxy")
             if result:
                 elapsed = time.time() - start
                 self._record_bandit_result(model_name, True, elapsed)
@@ -417,7 +419,7 @@ class CognitiveProxy:
             "ollama/qwen2.5:0.5b",
             "groq/llama-3.1-8b-instant",
             "openrouter/meta-llama/llama-3.1-8b-instruct",
-            "nvidia/mistralai/mistral-small-4-119b-2603",
+            "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
             "opencode/nemotron-3-super-free",
         ]
 
@@ -507,7 +509,7 @@ class CognitiveProxy:
 
         # Critic como sensor passivo (APENAS score semântico)
         try:
-            critic_result = self.critic.avaliar(
+            critic_result = run_async_safe(self.critic.avaliar,
                 task=input_prompt[:500],
                 prompt=input_prompt[:500],
                 output=current_output,

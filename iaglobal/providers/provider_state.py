@@ -416,7 +416,7 @@ class ProviderState:
         if error_code == 408:
 
             return min(
-                120,
+                180,
                 3 * failures,
             )
 
