@@ -3,6 +3,7 @@
 """
 Code Executor — executa ou salva código, retorna arquivo final no formato correto.
 Totalmente em conformidade com as seções 2, 3 e 4 do AGENTS.md.
+Comunica com OmniMind e AcetylcholineBus para troca de mensagens.
 """
 import os
 import time
@@ -16,9 +17,31 @@ from typing import Dict, Any, Tuple
 from iaglobal.security.sandbox_executor import SandboxExecutor
 from iaglobal._paths import save_result_artifact, RESULTS_DIR, _detect_extension, TEMP_DIR
 from iaglobal.memory.memory_error import record_error
+from iaglobal.obsidian.omnimind import omni_mind
+from iaglobal.graphs.communication.acetylcholine_bus import AcetylcholineBus, AgentMessage
 
 logger = logging.getLogger(__name__)
 _sandbox = SandboxExecutor(timeout=30)
+_bus: AcetylcholineBus = None
+
+
+def _get_bus():
+    global _bus
+    if _bus is None:
+        _bus = AcetylcholineBus()
+    return _bus
+
+
+def _ensure_bus_started():
+    """Garante que o purger está rodando (segura se já existe event loop)."""
+    bus = _get_bus()
+    try:
+        loop = asyncio.get_running_loop()
+        if bus._purge_task is None or bus._purge_task.done():
+            bus._purge_task = asyncio.create_task(bus._periodic_purge(10.0))
+    except RuntimeError:
+        pass  # Sem event loop - será iniciado depois
+
 
 _EXECUTABLE_EXTS = {".py"}
 _RUNNABLE_EXTS = {".sh": ["bash"], ".rb": ["ruby"], ".pl": ["perl"]}
@@ -43,14 +66,45 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """
     Executa e isola códigos gerados em sandbox de forma assíncrona.
     Mapeia os resultados e telemetria para o JointOptimizationLoop.
+    Comunica com OmniMind e AcetylcholineBus.
     """
     start_time = time.time()
     resolved_model = "code_generator_source"
     
+    # Garante bus iniciado
+    _ensure_bus_started()
+    
+    # Registra agente na OmniMind
+    omni_mind.registrar_agente(
+        agent_id="code_executor",
+        nome="CodeExecutor",
+        geracao=0,
+        linhagem="execution-pipeline",
+        metadados={"purpose": "run_execute_save"}
+    )
+    
+    # Consulta OmniMind para orientação existencial
+    orientacao = omni_mind.consultar(
+        agent_id="code_executor",
+        pergunta=f"Executar código para: {ctx.get('task', '')[:80]}",
+        contexto={"phase": "execution"}
+    )
+    logger.info("[EXECUTOR] Orientação OmniMind: %s", orientacao.guidance[:100])
+    
+    # Consulta subconsciente (Obsidian) para intuição de execução
+    from iaglobal.obsidian.subconsciousapi import SubconsciousAPI
+    subconscious = SubconsciousAPI()
+    intuição_exec = subconscious.sussurrar_intuicao(["#execution", "#sandbox", "#static"])
+    logger.info("[EXECUTOR] Intuição do subconsciente: %s", intuição_exec[:100] if intuição_exec else 'vazio')
+    
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
     
-    raw_code = memory.get("coder", {}).get("output", "") or memory.get("multi_coder", {}).get("output", "")
+    # Prioriza frontend_builder sobre coder/multi_coder
+    raw_code = (memory.get("frontend_builder", {}).get("output", "") or
+                memory.get("frontend_builder", {}).get("output", "") or
+                memory.get("coder", {}).get("output", "") or
+                memory.get("multi_coder", {}).get("output", ""))
     
     if not raw_code:
         logger.warning("[EXECUTOR] Nenhum código detectado para execução.")
@@ -200,6 +254,24 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
             for v in violacoes[:5]
         ) if violacoes else ""
 
+        # Publica resultado no AcetylcholineBus
+        bus = _get_bus()
+        await bus.publish(
+            AgentMessage(
+                sender="code_executor",
+                receiver="memory_writer",
+                type="execution_complete",
+                payload={
+                    "output": output_text,
+                    "final_file": saved,
+                    "extension": ext,
+                    "success": is_success,
+                    "timestamp": time.time()
+                },
+                priority=7
+            )
+        )
+
         return {
             "output": output_text, "executed": True, "final_file": saved, 
             "extension": ext, "exec_error": error, "success": is_success,
@@ -216,6 +288,18 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
         latency_ms = (time.time() - start_time) * 1000.0
         logger.warning("[EXECUTOR] Falha crítica de processamento: %s", e)
         await asyncio.to_thread(record_error, "code_executor", str(e), {"task": task[:100]})
+        
+        # Publica erro no bus
+        bus = _get_bus()
+        await bus.publish(
+            AgentMessage(
+                sender="code_executor",
+                receiver="failure_analysis",
+                type="execution_failed",
+                payload={"error": str(e), "task": task[:100]},
+                priority=9
+            )
+        )
         
         return {
             "output": "", "executed": False, "final_file": None, "exec_error": str(e), "success": False,

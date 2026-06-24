@@ -272,7 +272,7 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
 
     ("code_executor", {
         "strategy": "general",
-        "depends_on": ["integrator"]
+        "depends_on": ["integrator", "frontend_builder"]
     }),
 
     # ======================================================

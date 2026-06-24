@@ -2,9 +2,21 @@ import logging
 import sys
 from iaglobal import _paths
 
+# Configura o logging root-level no import do módulo (garante visibilidade em todas as camadas)
+if not logging.root.handlers:
+    logging.basicConfig(
+        level=logging.INFO,
+        format='%(asctime)s [%(levelname)s] [%(name)s] %(message)s',
+        handlers=[
+            logging.StreamHandler(sys.stdout),
+        ]
+    )
+
 def setup_logger(name="iaglobal"):
     logger = logging.getLogger(name)
-    logger.setLevel(logging.DEBUG)
+    # Garante nível DEBUG para capturar todos os logs internos
+    if logger.level == logging.WARNING:
+        logger.setLevel(logging.DEBUG)
     
     if not logger.handlers:
         formatter = logging.Formatter('%(asctime)s [%(levelname)s] [%(name)s] %(message)s')

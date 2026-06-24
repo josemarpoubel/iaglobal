@@ -39,10 +39,10 @@ except ImportError:
     _MTA_AVAILABLE = False
 
 try:
-    from iaglobal.memory.skill_store import SkillStore, SkillStatus
-    _SKILL_STORE_AVAILABLE = True
+    from iaglobal.evolution.skills.skill_registry import skill_registry
+    _SKILL_REGISTRY_AVAILABLE = True
 except ImportError:
-    _SKILL_STORE_AVAILABLE = False
+    _SKILL_REGISTRY_AVAILABLE = False
 
 
 # ---------------------------------------------------------------------------
@@ -207,7 +207,9 @@ DOMAIN_REGISTRY: List[DomainProfile] = [
         keywords={"html": 0.7, "css": 0.6, "javascript": 0.7, "js": 0.6,
                   "frontend": 0.8, "web": 0.6, "site": 0.6, "pagina": 0.5,
                   "formulario": 0.5, "react": 0.8, "vue": 0.8, "angular": 0.8,
-                  "dom": 0.7, "responsive": 0.7, "spa": 0.8},
+                  "dom": 0.7, "responsive": 0.7, "spa": 0.8, "email": 0.5,
+                  "captar": 0.4, "landing": 0.5, "lead": 0.5, "newsletter": 0.5,
+                  "dark": 0.4, "escuro": 0.4, "tema": 0.3},
         anti_keywords=["api", "backend", "servidor"],
         persona_full=(
             "Você é um Desenvolvedor Front-End Sênior especializado em "
@@ -223,12 +225,15 @@ DOMAIN_REGISTRY: List[DomainProfile] = [
             Constraint("Use HTTPS para todas as requisições externas.", ConstraintSeverity.HIGH),
             Constraint("Valide formulários tanto no cliente quanto declare validação server-side.", ConstraintSeverity.MEDIUM),
             Constraint("Evite dependências externas desnecessárias — minimize surface de ataque.", ConstraintSeverity.MEDIUM),
+            Constraint("Mobile-first: meta viewport + CSS media queries (max-width: 768px) para responsividade.", ConstraintSeverity.CRITICAL),
         ],
         reflection_checks=[
             "Há risco de XSS via innerHTML ou dangerouslySetInnerHTML?",
             "Tokens ou chaves estão expostos no client-side?",
             "A interface é acessível via teclado?",
             "CSP está configurado?",
+            "Meta viewport está presente para mobile?",
+            "Media queries cobrem breakpoints mobile (768px) e tablet?",
         ],
     ),
 
@@ -783,10 +788,10 @@ class PromptImprover:
     def __init__(
         self,
         mta_recycler: Optional[Any] = None,
-        skill_store: Optional[Any] = None,
+        self_registry: Optional[Any] = None,
     ):
         self._mta = mta_recycler
-        self._skill_store = skill_store
+        self._skill_registry = skill_registry
         self._detector    = DetectorEngine()
         self._complexity  = ComplexityEngine()
         self._persona     = PersonaComposer()
@@ -837,16 +842,14 @@ class PromptImprover:
             except Exception:
                 pass
 
-        if self._skill_store and _SKILL_STORE_AVAILABLE:
+        if self._skill_registry and _SKILL_REGISTRY_AVAILABLE:
             try:
-                top_domain = domains[0][0].name if domains else "general"
-                skills = self._skill_store.top_skills(top_domain, limit=2)
+                skills = self._skill_registry.list_skills(active_only=True)[:2]
                 for skill in skills:
+                    usage = getattr(skill, 'usage_count', 0)
                     positive_examples.append(
-                        f"[SKILL VALIDADA: {skill.name}]\n"
-                        f"Taxa de sucesso: {skill.success_rate:.0%} | "
-                        f"Usos: {skill.usage_count}\n"
-                        f"Padrão: {skill.description}"
+                        f"[SKILL: {skill.name}]"
+                        f" Descrição: {skill.description[:100]}"
                     )
                 skill_used = bool(positive_examples)
             except Exception:

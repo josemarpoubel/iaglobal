@@ -9,6 +9,12 @@ in iaglobal.graphs.nodes package.
 Dependencies: nodes package exposing a registry/or list of node names
              execution_graph module with ExecutionNode/Graph
              topology for dependencies
+
+Updated per leiame.md:
+- context_weaver added after prompt_intake
+- mini_evaluator gates added
+- critic moved before release
+- Quality + Correction unified
 """
 
 import asyncio
@@ -28,31 +34,36 @@ from iaglobal.utils.logger import logger
 logger = logging.getLogger("ia-global")
 
 # List of node names in canonical order (7 phases from ROADMAP)
+# Updated per leiame.md: context_weaver + mini_evaluator + critic reordering
 RUN_NODE_NAMES: List[str] = [
     # Messaging (2) — roda antes de tudo para ativar mailboxes e corrigir claim
     "agentmailbox",
     "scheduler",
     # Definition (20)
-    "prompt_intake", "prompt_improver", "enhancement", "orchestrator_agent", "pm", "requirements",
+    "prompt_intake", "context_weaver", "prompt_improver", "enhancement", "orchestrator_agent", "pm", "requirements",
     "domain_analysis", "business_rules", "local_knowledge", "search", "knowledge", "knowledge_analyzer", "prompt_builder", "dependency",
     "technology_selection", "architect", "system_design", "api_design",
     "database_design", "security_design", "threat_modeling",
-    "performance_design", "observability_design", "architecture_validator",
+    "performance_design", "observability_design", "architecture_validator", "mini_evaluator_post_arch",
+    # Immune Check - verificação anti-parasitas
+    "immune_check",
     # Planning (3)
     "planner", "task_breakdown", "execution_plan",
-    # Construction (5)
-    "coder", "code_executor", "frontend_builder", "backend_builder", "database_builder", "api_builder",
-    # Quality (7)
+    # Construction (6) — ordem correta: coder → multi_coder → frontend_builder → code_executor
+    "coder", "multi_coder", "frontend_builder", "code_executor", "immune_check_build", "backend_builder", "database_builder", "api_builder", "mini_evaluator_post_build",
+    # Quality + Correction (unified - ciclo interno com retry)
     "test_generator", "integrator", "reviewer", "semantic_validator",
     "security_audit", "performance_audit", "compliance_audit",
-    # Fix (6)
-    "qa", "tester", "debugger", "validator", "fix_validator", "debug_coder",
-    # Delivery (7)
-    "documentation", "deployment_plan", "release", "metrics", "optimization",
-    "retrospective", "result_agent", "critic", "knowledge_writer", "memory_writer", "memory_cleaner",
+    "debug_coder", "fix_validator", "failure_analysis",
+    # Delivery (critic antes do release)
+    "documentation", "deployment_plan", "critic", "release", "metrics", "optimization",
+    "retrospective", "result_agent", "knowledge_writer", "memory_writer", "memory_cleaner",
     # Metacognition (7)
     "evaluator", "gap_analyzer", "skill_generator", "sandbox_validator",
     "evolution_committee", "pipeline_updater", "evolution_trigger",
+    # Immune System (2)
+    "apoptosis_kill",  # Apoptose programada para parasitas
+    "immune_monitor",  # Monitor contínuo de custo
     # Evolution Core (5)
     "evolution_knowledge", "evolution_homocysteine", "evolution_methylation",
     "evolution_skill_executor", "evolution_dynamic_registry",

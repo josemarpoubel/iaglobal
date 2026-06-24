@@ -1,6 +1,23 @@
 ## 🧬 DIAGNÓSTICO GENÔMICO
 
 O **iaglobal** é um sistema auto-evolutivo de organização celular digital que implementa os 8 ciclos metabólicos fundamentais:
+```
+┌─────────────────────────────────────────────────────────────┐
+│  AMBIENTE (prompt + contexto epigenético)                   │
+│         ↓                                                   │
+│  DNA (skills registry) ──[epigenética]──→ RNA (prompt       │
+│         ↑                                  enriquecido)     │
+│         │                                    ↓              │
+│         │                              CÉLULA (agente)      │
+│         │                                    ↓              │
+│         │                           PROTEÍNA (código)       │
+│         │                                    ↓              │
+│         │                           METABOLISMO (pipeline)  │
+│         │                                    ↓              │
+│         └──── MUTAÇÃO ←── METACOGNIÇÃO ←── FEEDBACK ─────┘  │
+│                     (fase 7)        (fases 4-6)             │
+└─────────────────────────────────────────────────────────────┘
+```
 
 - **DNA do organismo**: Arquitetura assíncrona (asyncio) com modularização rigorosa via nós dinâmicos (`nodes.py` carrega `no_*.py` automaticamente)
 - **Princípio reitor**: Todo acesso a LLM passa pelo `BanditPolicy` (seletor de provedores com circuit breaker)

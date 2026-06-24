@@ -449,15 +449,18 @@ class TestSubconsciousAPI:
         assert (vault / "04_Synapses").exists()
 
     def test_escrever_nota_instinto(self, tmp_path):
-        from iaglobal.obsidian.subconsciousapi import SubconsciousAPI
-        api = SubconsciousAPI(tmp_path / "vault")
-        caminho = api.escrever_instinto("teste", "conteudo")
-        assert caminho.exists()
-        texto = caminho.read_text()
-        assert "---" in texto
-        assert "id:" in texto
-        assert 'tipo: "Instinto"' in texto
-        assert "conteudo" in texto
+        async def _run():
+            from iaglobal.obsidian.subconsciousapi import SubconsciousAPI
+            api = SubconsciousAPI(tmp_path / "vault")
+            caminho = await api.escrever_instinto("teste", "conteudo")
+            assert caminho.exists()
+            texto = caminho.read_text()
+            assert "---" in texto
+            assert "id:" in texto
+            assert 'tipo: "Instinto"' in texto
+            assert "conteudo" in texto
+        import asyncio
+        asyncio.run(_run())
 
     def test_escrever_curto_prazo(self, tmp_path):
         from iaglobal.obsidian.subconsciousapi import SubconsciousAPI

@@ -18,6 +18,13 @@ from .fusion_engine import (
     AtualizacaoIncremental,
 )
 from .semantic_cache import SemanticCache
+from .async_memory import (
+    add_ltm,
+    add_stm,
+    retrieve_ltm,
+    get_ltm_stats,
+    add_memory_vector,
+)
 
 __all__ = [
     'Cache', 'Memory', 'MemoryStorage', 'MemoryVector',
@@ -26,4 +33,5 @@ __all__ = [
     'FusionEngine', 'WebCacheInteligente', 'AntiRedundanciaGlobal',
     'FakeNoiseDetector', 'KnowledgeGraph', 'AtualizacaoIncremental',
     'SemanticCache',
+    'add_ltm', 'add_stm', 'retrieve_ltm', 'get_ltm_stats', 'add_memory_vector',
 ]

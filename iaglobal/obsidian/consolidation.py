@@ -1,22 +1,27 @@
+# ============================================================
+# ARQUIVO 4: iaglobal/obsidian/consolidation.py
+# CORREÇÃO: Remove imports duplicados/mortos (BUG #4, BUG #5)
+#           iniciar_fase_rem e I/O tornam-se async (BUG #3)
+# ============================================================
 """REMSleepEngine — Ciclo de Consolidação de Memória (Fase REM).
 
 Simula o sono biológico:
   1. Lê memórias brutas do curto prazo (02_Short_Term)
   2. Sintetiza conhecimento via IA (ou fallback mockado)
   3. Grava no longo prazo (03_Long_Term) com links bidirecionais
-  4. Remove originais (poda sináptica)
+  4. Remove originais (poda sináptica — Lei do Vácuo da Prosperidade)
   5. Atualiza o mapa sináptico central (MOC)
 """
-from datetime import datetime, UTC
-
-import os
+import asyncio
+import logging
 import re
-import json
+from datetime import datetime, UTC
 from pathlib import Path
-from datetime import datetime
 from typing import Dict, List, Optional, Any
 
 from iaglobal._paths import PACKAGE_DIR
+
+logger = logging.getLogger(__name__)
 
 
 class REMSleepEngine:
@@ -24,6 +29,8 @@ class REMSleepEngine:
 
     Deve ser executado periodicamente (ex: a cada 1 hora ou
     quando o fluxo de requisições estiver baixo).
+    Todo I/O de disco é delegado para asyncio.to_thread para
+    não bloquear o event loop durante a consolidação.
     """
 
     def __init__(self, vault_path: Optional[Path] = None, ai_client=None):
@@ -36,55 +43,67 @@ class REMSleepEngine:
         for d in [self.short_term_dir, self.long_term_dir, self.synapses_dir]:
             d.mkdir(parents=True, exist_ok=True)
 
-    def iniciar_fase_rem(self) -> Dict[str, Any]:
-        """Executa o ciclo completo de consolidação."""
-        resultado = {
+    async def iniciar_fase_rem(self) -> Dict[str, Any]:
+        """Executa o ciclo completo de consolidação de forma assíncrona."""
+        resultado: Dict[str, Any] = {
             "iniciado_em": datetime.now(UTC).isoformat(),
             "memorias_processadas": 0,
             "memorias_consolidadas": 0,
             "erros": [],
         }
 
-        experiencias = self._listar_memorias_curto_prazo()
+        experiencias = await self._listar_memorias_curto_prazo()
         if not experiencias:
             resultado["status"] = "sem_memorias"
+            logger.info("[REMSleep] Nenhuma memória de curto prazo para consolidar.")
             return resultado
 
         resultado["memorias_processadas"] = len(experiencias)
+        logger.info("[REMSleep] Iniciando consolidação de %d memórias.", len(experiencias))
 
         for arquivo, conteudo in experiencias.items():
             try:
-                insight = self._solicitar_sintese_ia(conteudo)
+                insight = await self._solicitar_sintese_ia(conteudo)
                 if insight:
-                    self._gravar_longo_prazo(arquivo, insight)
-                    origem = self.short_term_dir / arquivo
-                    if origem.exists():
-                        origem.unlink()
+                    await self._gravar_longo_prazo(arquivo, insight)
+                    await self._remover_curto_prazo(arquivo)
                     resultado["memorias_consolidadas"] += 1
             except Exception as e:
+                logger.exception("[REMSleep] Falha ao consolidar '%s': %s", arquivo, e)
                 resultado["erros"].append(f"{arquivo}: {e}")
 
-        self._atualizar_mapa_conexoes()
+        await self._atualizar_mapa_conexoes()
         resultado["status"] = "concluido"
         resultado["concluido_em"] = datetime.now(UTC).isoformat()
+        logger.info(
+            "[REMSleep] Ciclo concluído: %d consolidadas, %d erros.",
+            resultado["memorias_consolidadas"], len(resultado["erros"]),
+        )
         return resultado
 
-    def _listar_memorias_curto_prazo(self) -> Dict[str, str]:
-        """Coleta todas as notas Markdown do curto prazo."""
-        memorias = {}
-        if not self.short_term_dir.exists():
+    async def _listar_memorias_curto_prazo(self) -> Dict[str, str]:
+        """Coleta todas as notas Markdown do curto prazo de forma não-bloqueante."""
+        def _read_all() -> Dict[str, str]:
+            memorias = {}
+            if not self.short_term_dir.exists():
+                return memorias
+            for f in self.short_term_dir.glob("*.md"):
+                memorias[f.name] = f.read_text(encoding="utf-8")
             return memorias
-        for f in self.short_term_dir.glob("*.md"):
-            memorias[f.name] = f.read_text(encoding="utf-8")
-        return memorias
 
-    def _solicitar_sintese_ia(self, conteudo_bruto: str) -> Optional[str]:
+        return await asyncio.to_thread(_read_all)
+
+    async def _solicitar_sintese_ia(self, conteudo_bruto: str) -> Optional[str]:
         """Solicita síntese do conteúdo via IA ou usa fallback mockado."""
         if self.ai_client:
             prompt = self._montar_prompt_sintese(conteudo_bruto)
             try:
-                return self.ai_client.generate(prompt)
-            except Exception:
+                # Suporte a clientes sync e async
+                if asyncio.iscoroutinefunction(self.ai_client.generate):
+                    return await self.ai_client.generate(prompt)
+                return await asyncio.to_thread(self.ai_client.generate, prompt)
+            except Exception as e:
+                logger.warning("[REMSleep] IA indisponível, usando mock: %s", e)
                 return self._mock_sintese(conteudo_bruto)
         return self._mock_sintese(conteudo_bruto)
 
@@ -118,7 +137,7 @@ links_relacionados: "[[Conceito_A]]"
 
     def _mock_sintese(self, conteudo_bruto: str) -> str:
         """Fallback mockado quando não há cliente de IA disponível."""
-        return f"""---
+        return """---
 tipo: ConhecimentoConsolidado
 tags: [#gargalo-resolvido, #metabolismo]
 fitness_impacto: alto
@@ -133,38 +152,56 @@ links_relacionados: "[[ROS_Sensor]], [[Mitochondria_Efficiency]]"
 - Próximos agentes devem consultar [[Mitochondria_Efficiency]] antes de alocar memória extra.
 """
 
-    def _gravar_longo_prazo(self, nome_arquivo: str, conteudo_consolidado: str) -> Path:
-        """Salva o conhecimento consolidado no longo prazo."""
-        self.long_term_dir.mkdir(parents=True, exist_ok=True)
-        caminho = self.long_term_dir / nome_arquivo
-        caminho.write_text(conteudo_consolidado, encoding="utf-8")
-        return caminho
+    async def _gravar_longo_prazo(self, nome_arquivo: str, conteudo_consolidado: str) -> Path:
+        """Salva o conhecimento consolidado no longo prazo de forma não-bloqueante."""
+        def _write():
+            self.long_term_dir.mkdir(parents=True, exist_ok=True)
+            caminho = self.long_term_dir / nome_arquivo
+            caminho.write_text(conteudo_consolidado, encoding="utf-8")
+            return caminho
 
-    def _atualizar_mapa_conexoes(self) -> None:
+        return await asyncio.to_thread(_write)
+
+    async def _remover_curto_prazo(self, nome_arquivo: str) -> None:
+        """Remove a memória bruta após consolidação (poda sináptica).
+
+        Isolado em método próprio para rastreabilidade e para permitir
+        que falhas na remoção sejam logadas sem cancelar a consolidação.
+        """
+        def _unlink():
+            origem = self.short_term_dir / nome_arquivo
+            if origem.exists():
+                origem.unlink()
+
+        await asyncio.to_thread(_unlink)
+
+    async def _atualizar_mapa_conexoes(self) -> None:
         """Reconstrói o Mapa Sináptico Central a partir das notas de longo prazo."""
-        todas_tags: set = set()
-        links_encontrados: list = []
+        def _build_and_write():
+            todas_tags: set = set()
+            links_encontrados: list = []
 
-        for f in self.long_term_dir.glob("*.md"):
-            texto = f.read_text(encoding="utf-8")
-            tags = re.findall(r"#[\w-]+", texto)
-            todas_tags.update(tags)
-            links_encontrados.append(f"[[{f.stem}]]")
+            for f in self.long_term_dir.glob("*.md"):
+                texto = f.read_text(encoding="utf-8")
+                tags = re.findall(r"#[\w-]+", texto)
+                todas_tags.update(tags)
+                links_encontrados.append(f"[[{f.stem}]]")
 
-        moc_content = f"""---
-tipo: MapaSinapticoCentral
-ultima_atualizacao: "{datetime.now(UTC).isoformat()}Z"
-total_notas: {len(links_encontrados)}
-tags_ativas: [{', '.join(f'"{t}"' for t in sorted(todas_tags))}]
----
+            moc_content = (
+                f"---\n"
+                f"tipo: MapaSinapticoCentral\n"
+                f"ultima_atualizacao: \"{datetime.now(UTC).isoformat()}Z\"\n"
+                f"total_notas: {len(links_encontrados)}\n"
+                f"tags_ativas: [{', '.join(f'\"{t}\"' for t in sorted(todas_tags))}]\n"
+                f"---\n\n"
+                f"# Córtex Sináptico Central (Subconsciente iaglobal)\n\n"
+                f"## Tags Ativas no Ecossistema\n"
+                f"{', '.join(sorted(todas_tags)) if todas_tags else '(nenhuma tag ativa)'}\n\n"
+                f"## Memórias de Longo Prazo Consolidadas\n"
+                + "\n".join(f"- {link}" for link in links_encontrados)
+            )
 
-# Córtex Sináptico Central (Subconsciente iaglobal)
+            moc_path = self.synapses_dir / "Mapa_Mental_Subconsciente.md"
+            moc_path.write_text(moc_content, encoding="utf-8")
 
-## Tags Ativas no Ecossistema
-{', '.join(sorted(todas_tags)) if todas_tags else '(nenhuma tag ativa)'}
-
-## Memórias de Longo Prazo Consolidadas
-""" + "\n".join(f"- {link}" for link in links_encontrados)
-
-        moc_path = self.synapses_dir / "Mapa_Mental_Subconsciente.md"
-        moc_path.write_text(moc_content, encoding="utf-8")
+        await asyncio.to_thread(_build_and_write)

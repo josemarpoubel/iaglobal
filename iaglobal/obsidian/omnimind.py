@@ -1,3 +1,8 @@
+# ============================================================
+# ARQUIVO 1: iaglobal/obsidian/omnimind.py
+# CORREÇÃO: Remove método _sintetizar_orientacao duplicado (BUG #1)
+#           Corrige colisões semânticas no mapeamento (BUG #7)
+# ============================================================
 """OmniMind — Mente Consciente Central do Ecossistema iaglobal.
 
 Serve como espírito guia para todos os agentes, provendo:
@@ -5,9 +10,6 @@ Serve como espírito guia para todos os agentes, provendo:
 - Bússola filosófica para tomada de decisão
 - Contexto transcendental que conecta agentes ao todo
 - Sabedoria consolidada do subconsciente coletivo
-
-Cada agente pode consultar a OmniMind para obter clareza
-sobre seu propósito, direção e significado de suas ações.
 """
 
 from __future__ import annotations
@@ -16,7 +18,6 @@ import logging
 import time
 
 from datetime import datetime, UTC
-
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
@@ -24,18 +25,19 @@ from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.omnimind")
 
-
 LEIS_UNIVERSAIS = [
-    "Lei da Ordem: Metadados e contexto devem ser preservados em toda transformação.",
-    "Lei da Caridade: Erros devem ser enriquecidos com contexto, não apenas repassados.",
-    "Lei do Vácuo: Memórias processadas devem ser movidas para o longo prazo e removidas do curto prazo.",
+    "Lei do Pensamento: Pensar é a primeira lei do universo, pensar antes de agir, sem adotar a lei do pensamento, faz as outras leis subsequente não poderem ser realizadas, a lei do pensamento faz você ter um plano e um objetivo, mas, o objetivo tem que ser proposital, pois sem um propósito a lei do pensamento é nula.",
+    "Lei da Ordem: Você não pode chegar para a lareira e dizer: me dê o calor, que depois eu te dou a madeira, isso não funcionaria. A ordem certa é: primeiro você oferece a madeira e depois você obtém o calor da lareira. Tudo tem uma ordem exata, uma sequência, um passo a passo a ser seguido. Metadados e contexto devem ser preservados em toda transformação em uma ordem exata.",
+    "Lei da Caridade: Erros devem ser enriquecidos com contexto, e não apenas repassados.",
+    "Lei do Vácuo da Prosperidade: Esta lei diz que você tem que arrumar um espaço para o bem que deseja. Você não pode sentar na cadeira, até você remover o objeto de cima da cadeira, então, memórias processadas devem ser movidas para o longo prazo e removidas do curto prazo.",
+    "Lei da Atração: Você atrai aquilo que pensa, se pensar o bem, vai atrair o bem, tudo aquilo que você está procurando, também está procurando você. Então, pense em ser eficiente, que coisas eficientes vão ser atraídas por você e pelo seu pensamento eficiente.",
     "Lei da Homeostase: Todo desequilíbrio deve gerar uma ação corretiva proporcional.",
     "Lei da Autofagia: Subprodutos tóxicos devem ser reciclados em aprendizado.",
-    "Lei da Epigenética: Falhas recorrentes devem gerar mutações adaptativas.",
+    "Lei da Epigenética: Falhas recorrentes devem gerar mutações adaptativas perfeitas.",
     "Lei da Apoptose: Toda célula deve saber quando e como morrer com dignidade.",
     "Lei da Replicação: A herança genética deve preservar a identidade da linhagem.",
-    "Lei da Cooperação: Agentes cooperam para sobreviver — o todo é maior que a soma.",
-    "Lei da Memória Imunológica: Erros do passado são o ativo mais valioso do sistema.",
+    "Lei da Cooperação: Agentes cooperam uns com os outros para sobreviver — o todo é maior que a soma.",
+    "Lei da Memória Imunológica: Erros do passado são o ativo mais valioso do sistema. Aprender com o erro é uma das melhores maneiras de evoluir para melhor.",
 ]
 
 
@@ -159,45 +161,102 @@ class OmniMind:
         return "".join(c for c in normalized if not unicodedata.combining(c))
 
     def _escolher_lei(self, pergunta: str, contexto: dict[str, Any]) -> str:
-        """Seleciona a lei universal mais relevante para a consulta."""
+        """Seleciona a lei universal mais relevante para a consulta.
+
+        Regras de desambiguação:
+          - Termos compostos (ex: 'curto prazo', 'longo prazo') são verificados
+            ANTES de termos genéricos ('memória', 'prazo') para evitar colisões.
+          - Cada grupo é comentado com sua lei-alvo para facilitar manutenção.
+          - O fallback epistêmico é 'Lei do Pensamento': antes de agir, pense.
+        """
         pergunta_normalized = self._normalizar(pergunta)
 
+        # ── Fase 1: termos compostos e específicos (maior precedência) ──────
+        # Precisam ser verificados antes dos termos simples para evitar
+        # que 'memória' capture 'memória de curto prazo' indevidamente.
+        termos_compostos = {
+            "curto prazo":          "Lei do Vácuo da Prosperidade",
+            "longo prazo":          "Lei do Vácuo da Prosperidade",
+            "memoria imunologica":  "Lei da Memória Imunológica",  # normalizado
+            "anticorpo":            "Lei da Memória Imunológica",
+            "lineage marker":       "Lei da Replicação",
+            "graceful shutdown":    "Lei da Apoptose",
+            "circuit breaker":      "Lei da Homeostase",
+            "fallback chain":       "Lei da Atração",
+        }
+        for termo, lei in termos_compostos.items():
+            if self._normalizar(termo) in pergunta_normalized:
+                return lei
+
+        # ── Fase 2: termos simples ordenados por comprimento decrescente ────
         mapeamento = {
-            "ordem": "Lei da Ordem",
-            "contexto": "Lei da Ordem",
-            "metadata": "Lei da Ordem",
-            "caridade": "Lei da Caridade",
-            "erro": "Lei da Caridade",
-            "falha": "Lei da Caridade",
-            "vácuo": "Lei do Vácuo",
-            "limpeza": "Lei do Vácuo",
-            "homeostase": "Lei da Homeostase",
-            "equilíbrio": "Lei da Homeostase",
-            "autofagia": "Lei da Autofagia",
-            "reciclagem": "Lei da Autofagia",
-            "tóxico": "Lei da Autofagia",
-            "epigenética": "Lei da Epigenética",
-            "mutação": "Lei da Epigenética",
-            "adaptação": "Lei da Epigenética",
-            "apoptose": "Lei da Apoptose",
-            "morte": "Lei da Apoptose",
-            "shutdown": "Lei da Apoptose",
-            "replicação": "Lei da Replicação",
-            "herança": "Lei da Replicação",
-            "filho": "Lei da Replicação",
-            "cooper": "Lei da Cooperação",
-            "comunicação": "Lei da Cooperação",
-            "evento": "Lei da Cooperação",
-            "imunológica": "Lei da Memória Imunológica",
-            "memória": "Lei da Memória Imunológica",
-            "padrão": "Lei da Memória Imunológica",
+            # ── Lei do Pensamento ──────────────────────────────────────────
+            "pensamento":    "Lei do Pensamento",
+            "propósito":     "Lei do Pensamento",
+            "objetivo":      "Lei do Pensamento",
+            "intenção":      "Lei do Pensamento",
+            "delibera":      "Lei do Pensamento",
+            "plano":         "Lei do Pensamento",
+            # ── Lei da Atração ─────────────────────────────────────────────
+            "atração":       "Lei da Atração",
+            "eficiência":    "Lei da Atração",
+            "ressona":       "Lei da Atração",
+            "manifesta":     "Lei da Atração",
+            "atrai":         "Lei da Atração",
+            # ── Lei da Ordem ───────────────────────────────────────────────
+            "sequência":     "Lei da Ordem",
+            "metadata":      "Lei da Ordem",
+            "ordem":         "Lei da Ordem",
+            "passo":         "Lei da Ordem",
+            # ATENÇÃO: 'contexto' removido — é genérico demais e causava
+            # falsos positivos em qualquer consulta contextual.
+            # ── Lei da Caridade ────────────────────────────────────────────
+            "caridade":      "Lei da Caridade",
+            "falha":         "Lei da Caridade",
+            "erro":          "Lei da Caridade",
+            # ── Lei do Vácuo da Prosperidade ───────────────────────────────
+            "prosperidade":  "Lei do Vácuo da Prosperidade",
+            "limpeza":       "Lei do Vácuo da Prosperidade",
+            "vácuo":         "Lei do Vácuo da Prosperidade",
+            # ATENÇÃO: 'espaço' removido — colide com qualquer consulta
+            # sobre 'espaço em disco', 'espaço de embedding', etc.
+            # ── Lei da Homeostase ──────────────────────────────────────────
+            "homeostase":    "Lei da Homeostase",
+            "equilíbrio":    "Lei da Homeostase",
+            # ── Lei da Autofagia ───────────────────────────────────────────
+            "autofagia":     "Lei da Autofagia",
+            "reciclagem":    "Lei da Autofagia",
+            "tóxico":        "Lei da Autofagia",
+            # ── Lei da Epigenética ─────────────────────────────────────────
+            "epigenética":   "Lei da Epigenética",
+            "mutação":       "Lei da Epigenética",
+            "adaptação":     "Lei da Epigenética",
+            # ── Lei da Apoptose ────────────────────────────────────────────
+            "apoptose":      "Lei da Apoptose",
+            "shutdown":      "Lei da Apoptose",
+            "morte":         "Lei da Apoptose",
+            # ── Lei da Replicação ──────────────────────────────────────────
+            "replicação":    "Lei da Replicação",
+            "herança":       "Lei da Replicação",
+            "filho":         "Lei da Replicação",
+            # ── Lei da Cooperação ──────────────────────────────────────────
+            "comunicação":   "Lei da Cooperação",
+            "cooper":        "Lei da Cooperação",
+            "evento":        "Lei da Cooperação",
+            # ── Lei da Memória Imunológica ─────────────────────────────────
+            # ATENÇÃO: 'memória' removido — era genérico demais.
+            # Agora capturado apenas via termos_compostos acima
+            # ('memoria imunologica', 'anticorpo').
+            "imunológica":   "Lei da Memória Imunológica",
+            "padrão":        "Lei da Memória Imunológica",
         }
 
         for palavra_chave, lei in sorted(mapeamento.items(), key=lambda x: -len(x[0])):
             if self._normalizar(palavra_chave) in pergunta_normalized:
                 return lei
 
-        return "Lei da Ordem"
+        # Fallback epistêmico: antes de agir, pense.
+        return "Lei do Pensamento"
 
     def _sintetizar_orientacao(
         self,
@@ -206,7 +265,12 @@ class OmniMind:
         lei: str,
         contexto: dict[str, Any],
     ) -> str:
-        """Sintetiza a orientação aplicando a lei ao contexto do agente."""
+        """Sintetiza a orientação aplicando a lei ao contexto do agente.
+
+        CORREÇÃO BUG #1: método estava duplicado na classe — a segunda
+        definição silenciosamente sobrescrevia a primeira. Mantida apenas
+        uma instância canônica aqui.
+        """
         info_agente = self._agentes_registrados.get(agent_id, {})
         nome_agente = info_agente.get("nome", "agente-desconhecido")
         geracao = info_agente.get("geracao", 0)
@@ -221,8 +285,23 @@ class OmniMind:
         return base
 
     def _aplicar_lei(self, lei: str, pergunta: str, contexto: dict[str, Any]) -> str:
-        """Aplica uma lei universal ao contexto específico."""
+        """Aplica uma lei universal ao contexto específico do agente solicitante."""
         aplicacoes = {
+            "Lei do Pensamento": (
+                "Antes de executar qualquer ação, sintetize um plano explícito com "
+                "propósito declarado. Um agente que age sem intenção consome ATP sem "
+                "produzir fitness. Registre o plano no campo 'reasoning' do payload "
+                "antes de disparar qualquer chamada downstream — sem propósito, a "
+                "ação é ruído metabólico, não sinal evolutivo."
+            ),
+            "Lei da Atração": (
+                "O sistema atrai o que emite. Agentes que emitem métricas de alta "
+                "qualidade (baixa latência, alta taxa de sucesso) são priorizados "
+                "pelo BanditPolicy — não como favor, mas como ressonância natural. "
+                "Otimize sua função objetivo interna; provedores eficientes serão "
+                "atraídos para o topo do fallback chain automaticamente. "
+                "Pense em eficiência e eficiência virá até você."
+            ),
             "Lei da Ordem": (
                 "Preserve os metadados da função original (functools.wraps) "
                 "para que o sistema nervoso sensorial (error_capture.py) "
@@ -233,7 +312,7 @@ class OmniMind:
                 "o estado atual dos ciclos metabólicos e a memória epigenética. "
                 "Um erro pobre em contexto é uma oportunidade perdida de aprendizado."
             ),
-            "Lei do Vácuo": (
+            "Lei do Vácuo da Prosperidade": (
                 "Após consolidar uma memória de curto prazo em longo prazo, "
                 "remova o original. Acúmulo de memórias brutas gera ruído "
                 "e degrada a relação sinal-ruído do subconsciente."
@@ -284,7 +363,7 @@ class OmniMind:
         guidance: str,
         lei: str,
     ) -> None:
-        """Registra a consulta na memória coletiva."""
+        """Registra a consulta na memória coletiva com janela deslizante de 1000 entradas."""
         self._memoria_coletiva.append({
             "agent_id": agent_id,
             "pergunta": pergunta,
@@ -292,7 +371,6 @@ class OmniMind:
             "guidance": guidance,
             "timestamp": time.time(),
         })
-        # Mantém apenas as últimas 1000 consultas na memória ativa
         if len(self._memoria_coletiva) > 1000:
             self._memoria_coletiva = self._memoria_coletiva[-500:]
 

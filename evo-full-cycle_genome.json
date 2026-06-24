@@ -4,13 +4,15 @@
   "lineage_marker": "e3ab7d26efd53612",
   "generation": 0,
   "parent_lineage_id": "",
-  "nadph_reserve": 0.75,
-  "epigenetic_flags": {},
+  "nadph_reserve": 0.55,
+  "epigenetic_flags": {
+    "last_failure": "RuntimeError"
+  },
   "failure_patterns": [
     "RuntimeError",
     "RuntimeError"
   ],
-  "same_balance": 5,
-  "timestamp": 1782262186.662337,
+  "same_balance": 45,
+  "timestamp": 1782271550.329701,
   "reason": "test_cleanup"
 }

@@ -50,13 +50,37 @@ class ExecutionGraph:
         self.credit = CreditAssignmentEngine()
         self._loop_detector = LoopDetector()
         self.bus = AcetylcholineBus()
-        self._homeostasis = homeostasis_controller  # Import singleton
-        # Inject reflexion function into loop detector for auto-repair
+        self._homeostasis = homeostasis_controller
+        self._bus_handlers_registered = False
+        self._init_agent_bus()
         try:
             from iaglobal.reflection.reflexion_engine import reflexion_callback_for_loop
             self._loop_detector.set_reflexion_fn(reflexion_callback_for_loop)
         except ImportError:
             logger.warning("[IMMUNITY] ReflexionEngine não disponível - loop repair desativado")
+    
+    def _init_agent_bus(self):
+        """Registra handlers padrão para agentes no AcetylcholineBus."""
+        try:
+            from iaglobal.graphs.communication.agent_mailbox import MailboxManager
+            self.mailbox_manager = MailboxManager()
+            # Handlers genéricos para debug (registrados de forma lazy)
+            self._bus_handlers_registered = False
+            logger.debug("[EXECUTION_GRAPH] AcetylcholineBus pronto para handlers")
+        except Exception as e:
+            logger.warning("[EXECUTION_GRAPH] Falha ao inicializar agent bus: %s", e)
+    
+    def _register_bus_handlers(self):
+        """Registra handlers no bus se ainda não registrado (precisa de event loop)."""
+        if self._bus_handlers_registered:
+            return
+        try:
+            async def _log_message(msg):
+                logger.info("[BUS] %s → %s | type=%s", msg.sender, msg.receiver, msg.type)
+            self.bus.subscribe("*:*", _log_message)
+            self._bus_handlers_registered = True
+        except Exception:
+            pass
         
     @staticmethod
     def generate_node_id(strategy: str, code_payload: str, generation: int = 0) -> str:
@@ -109,6 +133,9 @@ class ExecutionGraph:
     async def _execute_node_async(self, node: Node, input_data: dict) -> dict:
         # 1. Afinidade Determinística baseada no DNA (Hash) do nó
         cpu_affinity.pin_to_hash(node.name)
+        
+        # Registra handlers no bus (lazy)
+        self._register_bus_handlers()
         
         await self.bus.publish(AgentMessage(
             sender="execution_graph", receiver=node.name,

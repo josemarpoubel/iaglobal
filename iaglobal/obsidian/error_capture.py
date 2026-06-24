@@ -1,24 +1,31 @@
+# ============================================================
+# ARQUIVO 2: iaglobal/obsidian/error_capture.py
+# CORREÇÃO: Decorator agora suporta funções async (BUG #2)
+#           Remove import 'sys' não utilizado (BUG #8)
+# ============================================================
 """ErrorCapture — Captura automática de exceções para o Subconsciente.
 
 Intercepta erros em agentes e registra automaticamente no Curto Prazo
 (02_Short_Term) do vault Obsidian, para serem processados no próximo
 Ciclo do Sono (REMSleepEngine).
 """
-from datetime import datetime, UTC
-
+import asyncio
 import functools
-import sys
+import logging
 import traceback
 from typing import Optional, List
 
 from iaglobal.obsidian.subconsciousapi import SubconsciousAPI
+
+logger = logging.getLogger(__name__)
 
 
 class ErrorCapture:
     """Capturador de erros que registra falhas no subconsciente.
 
     Pode ser usado como context manager ou decorator para capturar
-    exceções automaticamente.
+    exceções automaticamente — suporta tanto funções síncronas quanto
+    coroutines async.
     """
 
     def __init__(self, vault_path=None, agente: str = "unknown"):
@@ -57,23 +64,47 @@ class ErrorCapture:
 
 
 def capturar_erro_subconsciente(agente: str = "unknown", tags: Optional[List[str]] = None):
-    """Decorator que captura exceções de uma função e registra no subconsciente.
+    """Decorator que captura exceções e registra no subconsciente.
+
+    Suporta tanto funções síncronas quanto coroutines async.
+    A detecção é feita em tempo de decoração via asyncio.iscoroutinefunction,
+    garantindo que o wrapper correto seja aplicado sem custo em runtime.
 
     Uso:
         @capturar_erro_subconsciente(agente="meu_agente")
-        def minha_funcao():
+        async def minha_coroutine():
+            ...
+
+        @capturar_erro_subconsciente(agente="meu_agente_sync")
+        def minha_funcao_sync():
             ...
     """
     def decorator(func):
-        @functools.wraps(func)
-        def wrapper(*args, **kwargs):
-            capture = ErrorCapture(agente=agente)
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                capture.capturar(tarefa=func.__name__, erro=e, tags=tags)
-                # Lei da Caridade: enriquece o erro com contexto sem alterar seu tipo
-                e.args = (f"[{agente}] Erro em {func.__name__}: {e}",)
-                raise
-        return wrapper
+        if asyncio.iscoroutinefunction(func):
+            # ── Wrapper para coroutines async ─────────────────────────────
+            @functools.wraps(func)
+            async def async_wrapper(*args, **kwargs):
+                capture = ErrorCapture(agente=agente)
+                try:
+                    return await func(*args, **kwargs)
+                except Exception as e:
+                    capture.capturar(tarefa=func.__name__, erro=e, tags=tags)
+                    # Lei da Caridade: enriquece o erro com contexto sem alterar seu tipo
+                    e.args = (f"[{agente}] Erro em {func.__name__}: {e}",)
+                    raise
+            return async_wrapper
+        else:
+            # ── Wrapper para funções síncronas ────────────────────────────
+            @functools.wraps(func)
+            def sync_wrapper(*args, **kwargs):
+                capture = ErrorCapture(agente=agente)
+                try:
+                    return func(*args, **kwargs)
+                except Exception as e:
+                    capture.capturar(tarefa=func.__name__, erro=e, tags=tags)
+                    # Lei da Caridade: enriquece o erro com contexto sem alterar seu tipo
+                    e.args = (f"[{agente}] Erro em {func.__name__}: {e}",)
+                    raise
+            return sync_wrapper
+
     return decorator

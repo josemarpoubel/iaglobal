@@ -1,20 +1,49 @@
-"""Network security guard module for sandbox isolation."""
+"""Network security guard module for sandbox isolation with MHC parasite detection."""
 
 import socket
 import sys
 import os
 import logging
+from pathlib import Path
 from typing import Any, Callable, Optional
 
-# Logger
-logger = logging.getLogger("ia-global")
+from iaglobal.utils.logger import get_logger
+
+logger = logging.getLogger("iaglobal")
+
+# MHC integration
+try:
+    from iaglobal.immunity.mhc_detector import mhc_detector
+    MHC_AVAILABLE = True
+except ImportError:
+    MHC_AVAILABLE = False
+
 
 class NetworkAccessBlocked(PermissionError):
     """Exception raised when script attempts network access."""
     pass
 
+
+def _get_caller_skill() -> str:
+    """Extrai nome da skill que chamou a função de rede."""
+    import traceback
+    for frame in traceback.extract_stack():
+        if "nodes" in frame.filename and "run_" in frame.name:
+            return frame.name.replace("run_", "")
+    return "unknown"
+
+
 def _bloquear_conexao_origem(*args, **kwargs):
     """Universal interceptor that aborts socket connection attempts."""
+    skill_name = _get_caller_skill()
+    
+    # Integração MHC: reportar tentativa de acesso não autorizado
+    if MHC_AVAILABLE:
+        mhc_detector.quarantine_if_parasite(skill_name, {
+            "unauthorized_path": f"network_call_to_{args[0] if args else 'unknown'}",
+            "unexpected_output": True
+        })
+    
     raise NetworkAccessBlocked(
         "SecurityError: Network access blocked. Sandbox has no permission for external connections."
     )
@@ -134,6 +163,30 @@ class NetworkGuard:
         except Exception as e:
             logger.error(f"Unexpected error during isolation test: {e}")
             return False
+
+    def check_path_access(self, path: str, skill_name: str) -> bool:
+        """
+        Verifica se path está dentro do workdir (detecção de parasita).
+        Ativa quarentena se acesso for fora do escopo.
+        """
+        try:
+            from iaglobal._paths import WORK_DIR
+            resolved = Path(path).resolve()
+            
+            # Verificar se está dentro do workdir
+            if not str(resolved).startswith(str(WORK_DIR.resolve())):
+                logger.warning(f"[MHC-PARASITE] {skill_name} tentou acessar path fora do workdir: {path}")
+                
+                if MHC_AVAILABLE:
+                    mhc_detector.quarantine_if_parasite(skill_name, {
+                        "unauthorized_path": path,
+                        "unexpected_output": False
+                    })
+                return False
+            return True
+        except Exception as e:
+            logger.error(f"[MHC] Erro ao verificar path: {e}")
+            return True  # Não bloquear se houver erro
 
 if __name__ == "__main__":
     try:

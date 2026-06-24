@@ -3,6 +3,7 @@
 """
 Prompt Improver — Ativa o PromptImprover de 5 estágios na pipeline.
 Totalmente em conformidade com as seções 2, 3 e 4 do AGENTS.md com telemetria ativa.
+Atualizado para usar context_weaver epigenético.
 """
 import time
 import logging
@@ -21,6 +22,7 @@ async def run_prompt_improver(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """
     Executa a otimização de prompt em 5 estágios de forma assíncrona e não-bloqueante.
     Mapeia latência, restrições e custos para o JointOptimizationLoop.
+    Usa output do context_weaver como prompt bruto (epigenética aplicada).
     """
     start_time = time.time()
     resolved_model = "prompt_improver_agent_llm"
@@ -28,10 +30,23 @@ async def run_prompt_improver(ctx: Dict[str, Any]) -> Dict[str, Any]:
     memory = ctx.get("memory", {})
     raw_prompt = ""
 
-    # Extração resiliente do prompt bruto de etapas anteriores
-    prompt_data = memory.get("prompt_intake", {})
-    if isinstance(prompt_data, dict):
-        raw_prompt = prompt_data.get("prompt", {}).get("normalized", "") or prompt_data.get("output", "")
+    # Extração resiliente do prompt bruto: prioriza context_weaver (epigenético)
+    context_weaver_output = memory.get("context_weaver", {}).get("output", "")
+    if context_weaver_output and len(context_weaver_output) > 5:
+        raw_prompt = context_weaver_output
+    
+    # Extrai domain do context_weaver ou prompt_intake
+    domain = memory.get("context_weaver", {}).get("detected_domain", "")
+    if not domain:
+        prompt_data = memory.get("prompt_intake", {})
+        if isinstance(prompt_data, dict) and isinstance(prompt_data.get("prompt"), dict):
+            domain = prompt_data.get("prompt", {}).get("domain", "")
+    
+    if not raw_prompt:
+        prompt_data = memory.get("prompt_intake", {})
+        if isinstance(prompt_data, dict):
+            raw_prompt = prompt_data.get("prompt", {}).get("normalized", "") or prompt_data.get("output", "")
+    
     if not raw_prompt:
         raw_prompt = memory.get("enhancement", {}).get("output", "")
 
@@ -56,12 +71,10 @@ async def run_prompt_improver(ctx: Dict[str, Any]) -> Dict[str, Any]:
     logger.info("[PROMPT_IMPROVER] Ativando motor de otimização de 5 estágios de forma não-bloqueante...")
 
     try:
-        # Como o processo de 5 estágios realiza análises massivas de strings/LLM de forma síncrona,
-        # desviamos a execução inteira para uma thread pool isolada, protegendo o laço de eventos
         def _execute_improver():
             return _improver.improve_with_report(
                 raw_prompt=raw_prompt,
-                domain="",
+                domain=domain,  # Pass domain to improve
                 knowledge_context=knowledge_context,
                 mode=PromptMode.FULL,
             )
@@ -84,7 +97,6 @@ async def run_prompt_improver(ctx: Dict[str, Any]) -> Dict[str, Any]:
         latency_ms = (time.time() - start_time) * 1000.0
         report_dict = report.to_dict() if hasattr(report, 'to_dict') else {}
 
-        # Retorno higienizado cumprindo as Regras 1, 3 e 5 do AGENTS.md (Sem dar dict unpack do ctx)
         return {
             "output": improved,
             "improved_prompt": improved,
@@ -93,7 +105,7 @@ async def run_prompt_improver(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 "model": resolved_model,
                 "success": True,
                 "latency": latency_ms,
-                "cost": ctx.get("estimated_cost", 0.004)  # Custo estimado de inferência dos 5 estágios
+                "cost": ctx.get("estimated_cost", 0.004)
             }
         }
 
@@ -101,7 +113,6 @@ async def run_prompt_improver(ctx: Dict[str, Any]) -> Dict[str, Any]:
         latency_ms = (time.time() - start_time) * 1000.0
         logger.warning("[PROMPT_IMPROVER] Falha no motor de otimização: %s. Utilizando prompt bruto.", e)
         
-        # Reporta a falha de comportamento do modelo para o Bandit Policy aprender
         return {
             "output": raw_prompt,
             "improved_prompt": raw_prompt,
@@ -112,4 +123,3 @@ async def run_prompt_improver(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 "cost": 0.0
             }
         }
-
