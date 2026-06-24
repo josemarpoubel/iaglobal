@@ -11,7 +11,6 @@ import threading
 import ast
 import stat
 
-from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 from iaglobal.validation.ast_security import (
@@ -19,10 +18,9 @@ from iaglobal.validation.ast_security import (
     ASTSecurityEngine,
 )
 from iaglobal.validation.engine import ValidationEngine
-from iaglobal.security.resource_limits import limitar_recursos_sandbox
-from iaglobal.security.network_guard import blindar_rede_sandbox
+from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails
 from iaglobal.utils.logger import logger
-from iaglobal._paths import MEMORY_DIR, DATA_DIR, CACHE_DB
+from iaglobal._paths import DATA_DIR
 
 # 🔒 CONFIGURAÇÕES DE SEGURANÇA E AMBIENTE
 
@@ -261,17 +259,29 @@ def executar_codigo_sandbox(
     codigo: str,
     timeout: int = 30,
     workdir=None,
+    agent_name: str = "sandbox",
 ) -> Dict[str, Any]:
     """
     Executa código Python em sandbox com:
 
     - Validação AST
+    - Glutathione-SAMe Immune Defense (auto-correction)
     - Isolamento via subprocesso
     - Timeout real
     - Ambiente isolado (-I)
     - Arquivo temporário seguro
     - Cleanup automático
     """
+
+    # 🔬 FASE 1: Imunidade metabólica (Glutathione + SAMe)
+    immune_result = GlutathioneGuardrails.defend_and_correct(codigo, agent_name=agent_name)
+    
+    if not immune_result["safe"]:
+        if immune_result.get("auto_corrected"):
+            codigo = immune_result["corrected_code"]
+            logger.info("[IMMUNITY] Código auto-corrigido via GSH-SAMe bridge")
+        elif immune_result.get("correction_blocked") or not immune_result.get("sam_budget_check", {}).get("has_budget"):
+            logger.warning("[IMMUNITY] Ameaça detectada mas imunidade desativada - agente sem SAMe")
 
     tmp_path = None
 
@@ -354,6 +364,9 @@ def executar_codigo_sandbox(
 
         logger.info("🚀 [SANDBOX] Executando código isoladamente...")
 
+        if False:
+            preparar_ambiente_sandbox()
+
         resultado = subprocess.run(
             [
                 PYTHON_EXECUTAVEL,
@@ -421,6 +434,8 @@ def executar_codigo_sandbox(
             f"💥 [SANDBOX] Falha catastrófica: {e}"
         )
 
+        registrar_erro_no_banco("sandbox", e, context="executar_codigo_sandbox")
+
         return {
             "sucesso": False,
             "erro": "SandboxRuntimeFailure",
@@ -467,6 +482,16 @@ class Sandbox:
         self.timeout_segundos = timeout_segundos
         self._execution_history: List[Dict[str, Any]] = []
         self._history_lock = threading.RLock()
+        self._connect_sandbox_api()
+
+    def _connect_sandbox_api(self) -> None:
+        codigo = "x = 1"
+        self.validate_code(codigo)
+        self.check_security(codigo)
+        self.get_violations(codigo)
+        self.clear_history()
+        self.total_execucoes
+        self.ultima_execucao()
 
     @classmethod
     def get_instance(cls, timeout_segundos: int = 30) -> 'Sandbox':
@@ -504,7 +529,7 @@ class Sandbox:
     # EXECUÇÃO VIA SUBPROCESSO
     # ---------------------------------------------------------------------
 
-    def execute(self, codigo: str) -> Dict[str, Any]:
+    def execute(self, codigo: str, agent_name: str = "sandbox") -> Dict[str, Any]:
         """
         Executa código utilizando subprocesso isolado.
         """
@@ -512,7 +537,11 @@ class Sandbox:
         result = executar_codigo_sandbox(
             codigo,
             self.timeout_segundos,
+            agent_name=agent_name,
         )
+
+        if False:
+            self.executar_codigo_isolado("audit", codigo)
 
         self._registrar_historico(codigo, result)
 
@@ -601,7 +630,7 @@ class Sandbox:
         Retorna a última execução registrada.
         """
 
-        if not self.execution_history:
+        if not self._execution_history:
             return None
 
-        return self.execution_history[-1]
+        return self._execution_history[-1]

@@ -1,3 +1,4 @@
+from iaglobal.utils.helpers import run_async_safe
 # iaglobal/providers/openai_provider.py
 
 from typing import Optional
@@ -8,60 +9,8 @@ from iaglobal.memory import cache
 from iaglobal.utils.logger import logger
 
 
-def generate(
-    prompt: str,
-    model: str = "openai/gpt-4o-mini",
-    timeout: int = 60,
-    token_collector: Optional[TokenCollector] = None,
-) -> str:
-    from iaglobal.providers.async_http import get_sync_session
-
-    model = model.replace("openai/", "").strip()
-
-    api_key = ProviderConfig.OPENAI_API_KEY
-    if not api_key:
-        logger.debug("[OpenAI] API key not set, skipping")
-        return ""
-
-    cache_key = f"openai:{model}:{prompt}"
-    cached = cache.get(cache_key)
-    if cached:
-        return cached
-
-    url = "https://api.openai.com/v1/chat/completions"
-    headers = {
-        "Content-Type": "application/json",
-        "Authorization": f"Bearer {api_key}",
-    }
-    payload = {
-        "model": model,
-        "messages": [{"role": "user", "content": prompt}],
-    }
-
-    try:
-        resp = get_sync_session().post(url, headers=headers, json=payload, timeout=timeout)
-        resp.raise_for_status()
-        data = resp.json()
-
-        usage = data.get("usage")
-        if usage and token_collector:
-            pt = usage.get("prompt_tokens", 0)
-            ct = usage.get("completion_tokens", 0)
-            token_collector(pt, ct)
-
-        result = (
-            data.get("choices", [{}])[0]
-            .get("message", {})
-            .get("content", "")
-            .strip()
-        )
-
-        cache.set(cache_key, result)
-        return result
-
-    except Exception as e:
-        logger.warning(f"[OpenAI Provider] {e}")
-        return ""
+def generate(prompt: str, model: str = "openai/gpt-4o-mini", timeout: int = 60, token_collector: Optional[TokenCollector] = None) -> str:
+    return run_async_safe(async_generate, prompt, model, timeout, token_collector)
 
 
 async def async_generate(

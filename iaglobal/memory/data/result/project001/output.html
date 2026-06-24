@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinX - Mercado Financeiro & Juros Compostos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: linear-gradient(135deg, #0f0f23 0%, #1a1a2e 100%);
+            color: #e8e8ff;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            min-height: 100vh;
+            padding: 0;
+        }
+        header {
+            background: #16213e;
+            padding: 2rem 1rem;
+            border-bottom: 2px solid #ff6b6b;
+            text-align: center;
+        }
+        h1 { font-size: clamp(1.8rem, 4vw, 2.5rem); color: #ff6b6b; margin-bottom: 0.5rem; }
+        .hero { text-align: center; padding: 3rem 1rem; }
+        .cta-button {
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            margin-top: 1.5rem;
+            transition: transform 0.2s;
+        }
+        .cta-button:hover { transform: scale(1.05); }
+        .compound-calculator {
+            background: #16213e;
+            border: 1px solid #ff6b6b;
+            border-radius: 12px;
+            padding: 2rem;
+            margin: 2rem auto;
+            max-width: 500px;
+        }
+        .input-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.25rem; color: #a8a8c8; }
+        input {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ff6b6b;
+            border-radius: 6px;
+            background: #0f0f23;
+            color: #e8e8ff;
+        }
+        .result { background: #1a1a2e; padding: 1rem; border-radius: 8px; margin-top: 1rem; }
+        .result-value { font-size: 1.5rem; color: #ff6b6b; font-weight: bold; }
+        footer { text-align: center; padding: 2rem; background: #16213e; margin-top: 3rem; }
+        @media (max-width: 600px) { .hero { padding: 2rem 0.5rem; } }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>💰 FinX Pro</h1>
+        <p>Mercado Financeiro Inteligente</p>
+    </header>
+    <main>
+        <section class="hero">
+            <h2>Invista no Futuro</h2>
+            <p>Calculadora de Juros Compostos Diários</p>
+            <a href="#calculator"><button class="cta-button">Calcular Meu Retorno</button></a>
+        </section>
+        <section id="calculator" class="compound-calculator">
+            <h3>📊 Calculadora de Juros Compostos Diários</h3>
+            <div class="input-group">
+                <label for="valor">Valor Inicial (R$):</label>
+                <input type="number" id="valor" value="1000" onchange="calcular()">
+            </div>
+            <div class="input-group">
+                <label for="porcentagem">Porcentagem Diária (%):</label>
+                <input type="number" id="porcentagem" value="0.5" onchange="calcular()">
+            </div>
+            <div class="input-group">
+                <label for="dias">Dias:</label>
+                <input type="number" id="dias" value="30" onchange="calcular()">
+            </div>
+            <div class="result">
+                <p>Valor Final: <span id="resultado" class="result-value">R$ 0.00</span></p>
+            </div>
+            <a href="data:text/html,<html><body><h2>Planilha Juros Compostos</h2><table border=1><tr><td>Valor</td><td id=v></td></tr><tr><td>Porcentagem</td><td id=p></td></tr></table><script>document.getElementById('v').textContent=document.getElementById('valor').value;document.getElementById('p').textContent=document.getElementById('porcentagem').value;</script></body></html>" download="planilha_juros_compostos.html">
+                <button class="cta-button">📥 Baixar Planilha Editable</button>
+            </a>
+        </section>
+        <script>
+            function calcular() {
+                const valor = parseFloat(document.getElementById('valor').value) || 0;
+                const porcentagem = parseFloat(document.getElementById('porcentagem').value) || 0;
+                const dias = parseInt(document.getElementById('dias').value) || 0;
+                let resultado = valor;
+                for (let i = 0; i < dias; i++) {
+                    resultado *= (1 + porcentagem / 100);
+                }
+                document.getElementById('resultado').textContent = 'R$ ' + resultado.toFixed(2);
+            }
+            calcular();
+        </script>
+    </main>
+    <footer>
+        <p>&copy; 2025 FinX Pro - Planilha de Juros Compostos Diários</p>
+    </footer>
+</body>
+</html>

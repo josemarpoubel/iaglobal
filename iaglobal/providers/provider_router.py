@@ -8,7 +8,6 @@ from typing import Callable, List, Optional, Tuple
 
 from iaglobal.providers.provider_config import ProviderConfig
 from iaglobal.providers.provider_state import ProviderState
-from iaglobal.providers.provider_load_balancer import load_balancer as lb
 from iaglobal.providers.provider_scorer import score_provider
 from iaglobal.providers.provider_metrics import metrics, estimate_cost
 from iaglobal.providers.token_usage import TokenCollector
@@ -34,6 +33,10 @@ from iaglobal.providers.hf_router_provider import generate as hf_router_generate
 from iaglobal.providers.hf_router_provider import generate as hf_router_qwen_generate
 from iaglobal.providers.hf_router_provider import async_generate as hf_router_qwen_async_generate
 from iaglobal.providers.hf_inference_provider import async_generate
+from iaglobal.providers.hf_video_provider import (
+    text_to_video_async as hf_video_text_to_video_async,
+    analyze_video_async as hf_video_analyze_video_async,
+)
 
 from iaglobal.providers.ollama_provider import async_generate as ollama_async_generate
 from iaglobal.providers.groq_provider import async_generate as groq_async_generate
@@ -48,8 +51,8 @@ from iaglobal.providers.poe_provider import async_generate as poe_async_generate
 
 # Timeouts por provider
 PROVIDER_TIMEOUT = {
-    "ollama": 60,
-    "groq": 120,
+    "ollama": 120,
+    "groq": 30,
     "openrouter": 60,
     "nvidia": 60,
     "opencode": 60,
@@ -59,6 +62,7 @@ PROVIDER_TIMEOUT = {
     "openai": 60,
     "huggingchat": 60,
     "hf_router": 60,
+    "hf_video": 300,
     "hf_router_qwen": 60,
     "hf_router_qwenext": 60,
     "hf_router_30b": 60,
@@ -139,6 +143,7 @@ ASYNC_PROVIDERS = {
     "openai": openai_async_generate,
     "huggingchat": huggingchat_async_generate,
     "hf_router": hf_router_async_generate,
+    "hf_video": hf_video_text_to_video_async,
     "hf_router_qwen": hf_router_async_generate,
     "hf_router_qwenext": hf_router_async_generate,
     "hf_router_30b": hf_router_async_generate,
@@ -169,14 +174,25 @@ ASYNC_PROVIDERS = {
 }
 
 
-def CREDIT_CANDIDATES():
+def CREDIT_CANDIDATES(task_type: str = "general"):
+    """Retorna modelos candidatos baseados no tipo de tarefa.
+    
+    task_type: "general", "image", "video", "code", etc.
+    """
+    if task_type == "image":
+        return [
+            ("hf_router", "hf_router/stable-diffusion-xl"),
+            ("hf_router", "hf_router/flux-schnell"),
+        ]
+    if task_type == "video":
+        return [
+            ("hf_video", "hf_video/wan2.1"),
+            ("hf_video", "hf_video/ltx"),
+            ("hf_video", "hf_video/hunyuan"),
+        ]
     return [
-        ("nvidia", "nvidia/mistralai/mistral-large-3-675b-instruct-2512"),
-        ("opencode", "opencode/deepseek-v4-flash-free"),
-        ("openrouter", "openrouter/meta-llama/llama-3.2-3b-instruct:free"),
         ("groq", "groq/llama-3.3-70b-versatile"),
-        ("poe", "poe/GLM-5-T"),
-        ("hf_router_glm5f", "hf_router_glm5f/zai-org/GLM-5.2:featherless-ai"),
+        ("nvidia", "nvidia/mistralai/mistral-large-3-675b-instruct-2512"),
         ("ollama", "ollama/qwen2.5:0.5b"),
     ]
 
@@ -187,7 +203,7 @@ BANDIT_NODE = "model_router"
 # Providers com chave de API válida no .env — podem ser desbanidos
 _PROVIDERS_WITH_KEYS = {
     "ollama", "groq", "openrouter", "nvidia", "opencode",
-    "gemini", "openai", "poe", "hf_router", "hf_router_glm5f", "hf_inference",
+    "gemini", "openai", "poe", "hf_router", "hf_video", "hf_router_glm5f", "hf_inference",
 }
 
 _BANS_CLEARED = False
@@ -267,7 +283,6 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
 
         logger.info(f"[ROUTER] Sucesso: {provider} ({latency:.2f}s, {len(result)} chars)")
 
-        lb.report(provider, True, latency)
         cost = estimate_cost(model, prompt_tokens, completion_tokens)
         reward = reward_aggregator.calculate_reward(RewardMetrics(success=True, latency_ms=latency*1000, cost_usd=cost, token_count=total_tokens))
         _credit.record(ExecutionEvent(node=BANDIT_NODE, success=True, latency=latency, model=model, strategy=task_type, reward=reward))
@@ -281,7 +296,6 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
     except asyncio.TimeoutError:
         latency = time.time() - start
         logger.warning(f"[ROUTER] Timeout: {provider} ({latency:.2f}s)")
-        lb.report(provider, False, latency)
         cost = estimate_cost(model, prompt_tokens, completion_tokens)
         reward = reward_aggregator.calculate_reward(RewardMetrics(success=False, latency_ms=latency*1000, cost_usd=cost, error_type="timeout"))
         _credit.record(ExecutionEvent(node=BANDIT_NODE, success=False, latency=latency, model=model, strategy=task_type, error="timeout", reward=reward))
@@ -292,7 +306,6 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
         error_str = str(e)
         logger.warning(f"[ROUTER] Falha: {provider} ({latency:.2f}s). Erro: {error_str[:100]}")
 
-        lb.report(provider, False, latency)
         cost = estimate_cost(model, prompt_tokens, completion_tokens)
         reward = reward_aggregator.calculate_reward(RewardMetrics(success=False, latency_ms=latency*1000, cost_usd=cost, error_type="execution_error"))
         _credit.record(ExecutionEvent(node=BANDIT_NODE, success=False, latency=latency, model=model, strategy=task_type, error=error_str, reward=reward))
@@ -356,11 +369,16 @@ async def async_route_generate_parallel(prompt: str, task_type: str = "general")
     
     bandit = _get_bandit()
     # O BanditPolicy já removeu os modelos em Blacklist (Circuit Breaker)!
-    candidates = CREDIT_CANDIDATES()
+    candidates = CREDIT_CANDIDATES(task_type)
     ranked_models = bandit.rank_models(BANDIT_NODE, task_type, candidates)
     
     if not ranked_models:
         raise RuntimeError("Nenhum provedor sobreviveu ao Circuit Breaker. Abortando.")
+
+    # Skip precoce: se Ollama está offline, nem tenta fallback local
+    _ollama_offline = bandit._is_offline("ollama")
+    if _ollama_offline:
+        logger.warning("[ROUTER] Ollama offline — pulando fallback local")
 
     RACE_SIZE = int(os.environ.get("RACE_SIZE", "3"))
     
@@ -375,6 +393,9 @@ async def async_route_generate_parallel(prompt: str, task_type: str = "general")
             provider, text = result
             logger.info(f"[ROUTER] 🏆 VENCEDOR DA CORRIDA: {provider}!")
             return text
+
+    if _ollama_offline:
+        raise RuntimeError("Todos os provedores falharam e Ollama está offline. Nenhum provedor disponível.")
 
     logger.warning("[ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...")
     enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
@@ -392,9 +413,9 @@ async def route_generate(model: str, prompt: str, task_type: str = "general") ->
     """Roteia para o provider adequado via bandit."""
     return await async_route_generate(model, prompt, task_type=task_type)
 
-def escolher_modelo(prompt: str = "") -> str:
-    """Delegado ao Bandit."""
-    return _get_bandit().select_model(BANDIT_NODE, "general", [m for _, m in CREDIT_CANDIDATES()])
+def escolher_modelo(prompt: str = "", task_type: str = "general") -> str:
+    """Delegado ao Bandit com task_type awareness."""
+    return _get_bandit().select_model(BANDIT_NODE, task_type, [m for _, m in CREDIT_CANDIDATES(task_type)])
 
 
 async def _enrich_prompt_with_learned_knowledge(prompt: str, task_type: str) -> str:
@@ -514,31 +535,4 @@ async def async_route_generate(model: str, prompt: str, task_type: str = "genera
     return await _async_fallback_chain(prompt, exclude=provider, task_type=task_type)
 
 
-def _fallback_chain(prompt: str, exclude: str = None, task_type: str = "general") -> str:
-    _clear_circuit_breaker_bans()
-    if os.environ.get("OLLAMA_ONLY", "").lower() in ("1", "true", "yes"):
-        logger.info("[ROUTER] OLLAMA_ONLY ativo — sync fallback chain direto para ollama")
-        result = _safe_call("ollama", ollama_generate, prompt, "ollama/qwen2.5:0.5b", task_type)
-        if result:
-            return result
-        raise RuntimeError("Ollama falhou mesmo em modo OLLAMA_ONLY.")
-    candidates = _filter_blacklist([c for c in CREDIT_CANDIDATES() if c[0] != exclude])
-    local = [c for c in candidates if c[0] == "ollama"]
-    remote = [c for c in candidates if c[0] != "ollama"]
-    ranked_remote = _get_bandit().rank_models(BANDIT_NODE, task_type, remote)
-    ranked = ranked_remote + local
-    ollama_entry = next((c for c in CREDIT_CANDIDATES() if c[0] == "ollama"), None)
-    if ollama_entry and ollama_entry not in ranked:
-        ranked.append(ollama_entry)
-    logger.info("[ROUTER] _fallback_chain exclude=%s chain=%s", exclude, [p for p, _ in ranked])
-    for provider, model in ranked:
-        func = PROVIDERS.get(provider)
-        if not func:
-            continue
-        result = _safe_call(provider, func, prompt, model, task_type)
-        if result:
-            logger.info("[ROUTER] _fallback_chain succeeded provider=%s", provider)
-            return result
-        logger.info("[ROUTER] _fallback_chain failed provider=%s trying next", provider)
-    raise RuntimeError("Todos os providers falharam.")
 

@@ -93,16 +93,6 @@ def load_errors() -> List[Dict[str, Any]]:
     return _load_db()["learning_errors"]
 
 
-def save_errors(
-    errors: List[Dict[str, Any]]
-) -> None:
-
-    with _lock:
-        db = _load_db()
-        db["learning_errors"] = errors
-        _save_db(db)
-
-
 def store_error(
     prompt: str,
     response: str,

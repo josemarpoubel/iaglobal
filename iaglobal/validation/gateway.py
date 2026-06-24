@@ -11,10 +11,9 @@ class ASTResult:
     error: Optional[str]
     metrics: Dict[str, Any]
 
-class ASTGateway:
+class SyntaxValidator:
     """
-    🔒 ÚNICO ponto do sistema onde ast.parse pode existir.
-    Toda segurança, validação e parsing passam aqui.
+    🔒 Syntax-only validator. No security checks — use ASTGateway from security/ for that.
     """
 
     def validate(self, code: str) -> ASTResult:

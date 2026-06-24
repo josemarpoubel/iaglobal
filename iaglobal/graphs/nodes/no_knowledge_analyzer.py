@@ -1,9 +1,13 @@
-"""Knowledge Analyzer — filtra, extrai e persiste conhecimento útil do cache."""
-from typing import Dict, Any, List
-import json
+"""
+Knowledge Analyzer — Filtra, extrai e persiste conhecimento útil do cache.
+Totalmente em conformidade com as regras e diretrizes estritas do AGENTS.md.
+"""
+import time
 import re
 import logging
-from pathlib import Path
+import asyncio
+from types import MappingProxyType
+from typing import Dict, Any, List, Tuple
 
 from iaglobal.evolution.agents.knowledge_agent import knowledge
 from iaglobal.memory.term_long import LongTermMemory
@@ -12,126 +16,155 @@ from iaglobal.graphs.nodes._disk_swap import load_all_for_task
 from iaglobal._paths import CORE_DB
 
 logger = logging.getLogger(__name__)
-# Inicializa o banco de vetores antes de usar LongTermMemory para garantir tabela `memory`
+
+# Inicializa o banco de vetores de forma estática protegida
 vector_init_db()
 _ltm = LongTermMemory(db_path=CORE_DB)
 
-_GARBAGE_PATTERNS = [
-    r"Philistine city.state", r"was a.*city.state", r"page not found",
-    r"404 Not Found", r"Mário Coluna", r"CSV Apeldoorn",
-    r"Uma ilha e um amor", r"book\)",
-]
+# Padrões de lixo pré-compilados para checagem ultraveloz O(1) de Regex
+_GARBAGE_PATTERNS = frozenset([
+    re.compile(r"Philistine city.state", re.IGNORECASE),
+    re.compile(r"was a.*city.state", re.IGNORECASE),
+    re.compile(r"page not found", re.IGNORECASE),
+    re.compile(r"404 Not Found", re.IGNORECASE),
+    re.compile(r"Mário Coluna", re.IGNORECASE),
+    re.compile(r"CSV Apeldoorn", re.IGNORECASE),
+    re.compile(r"Uma ilha e um amor", re.IGNORECASE),
+    re.compile(r"book\)", re.IGNORECASE),
+])
 
-_RELEVANCE_KEYWORDS = {
+_RELEVANCE_KEYWORDS = MappingProxyType({
     "python": 3, "código": 3, "codigo": 3, "code": 3, "script": 3,
     "função": 3, "funcao": 3, "function": 3, "def ": 3, "import ": 3,
     "csv": 3, "pandas": 3, "numpy": 3, "api": 2, "rest": 2,
     "tutorial": 2, "exemplo": 2, "example": 2, "guide": 2,
     "documentação": 2, "documentation": 2, "como": 1, "how to": 1,
     "erro": 2, "error": 2, "solução": 2, "solution": 2,
-}
+})
+
+# Regexes pré-compilados de limpeza contra Catastrophic Backtracking
+_HTML_TAGS_REGEX = re.compile(r"<[^>]+>")
+_WHITESPACE_REGEX = re.compile(r"\s+")
 
 
 def _is_garbage(text: str) -> bool:
-    for pat in _GARBAGE_PATTERNS:
-        if re.search(pat, text, re.IGNORECASE):
-            return True
-    return False
+    """Verifica se o texto contém padrões de descarte usando busca compilada."""
+    if not text:
+        return True
+    return any(pat.search(text) for pat in _GARBAGE_PATTERNS)
 
 
 def _calc_relevance(text: str) -> float:
+    """Calcula a densidade semântica de relevância do texto para engenharia de software."""
+    if not text:
+        return 0.0
     text_lower = text.lower()
-    score = 0
-    for kw, weight in _RELEVANCE_KEYWORDS.items():
-        if kw in text_lower:
-            score += weight
+    score = sum(weight for kw, weight in _RELEVANCE_KEYWORDS.items() if kw in text_lower)
     return min(score / 5.0, 1.0)
 
 
 def _extract_useful(text: str, max_len: int = 500) -> str:
-    cleaned = re.sub(r'<[^>]+>', '', text)
-    cleaned = re.sub(r'\s+', ' ', cleaned).strip()
+    """Aplica higienização atômica de strings limpando lixo de formatação HTML."""
+    if not text:
+        return ""
+    cleaned = _HTML_TAGS_REGEX.sub("", text)
+    cleaned = _WHITESPACE_REGEX.sub(" ", cleaned).strip()
     lines = [l.strip() for l in cleaned.split("\n") if len(l.strip()) > 30]
     return "\n".join(lines[:5])[:max_len]
 
 
+def _sync_analyze_and_curate(task_str: str) -> Tuple[str, List[dict], int]:
+    """Varre as memórias de swap em disco e aplica o filtro de curadoria de forma síncrona isolada."""
+    # Carrega todo o cache bruto que o nó de busca salvou para esta tarefa específica
+    raw_caches = load_all_for_task(task_str) or {}
+    
+    extracted_parts = []
+    curated_logs = []
+    processed_count = 0
+
+    for source_name, raw_content in raw_caches.items():
+        if not raw_content or _is_garbage(raw_content):
+            continue
+            
+        relevance = _calc_relevance(raw_content)
+        if relevance < 0.2:  # Filtra conteúdos com baixíssimo alinhamento técnico
+            continue
+            
+        useful_text = _extract_useful(raw_content)
+        if useful_text:
+            processed_count += 1
+            extracted_parts.append(f"=== KNOWLEDGE SOURCE: {source_name.upper()} (relevance: {relevance:.2f}) ===\n{useful_text}")
+            curated_logs.append({"source": source_name, "relevance": relevance, "chars": len(useful_text)})
+            
+            # Persiste passivamente na LTM e base vetorial locais o fragmento higienizado
+            try:
+                _ltm.store(
+                    content=f"Curated source [{source_name}] for task: {task_str}\n\n{useful_text}",
+                    metadata={"source": "knowledge_analyzer", "relevance": relevance},
+                    source="knowledge_analyzer"
+                )
+                mem_vector_store(text=useful_text, mtype="curated_knowledge")
+            except Exception as db_err:
+                logger.debug("[KNOWLEDGE_ANALYZER] Erro controlado ao persistir fragmento: %s", db_err)
+
+    consolidated_knowledge = "\n\n".join(extracted_parts)
+    return consolidated_knowledge, curated_logs, processed_count
+
+
 async def run_knowledge_analyzer(ctx: Dict[str, Any]) -> Dict[str, Any]:
-    task = str(ctx.get("input", {}).get("task", ""))
-    if not task:
-        return {**ctx, "output": "", "entries_kept": 0, "success": True}
+    """
+    Executa a triagem, limpeza e extração de conhecimento do cache de forma assíncrona.
+    Mapeia latência acumulada e fontes curadas para o JointOptimizationLoop.
+    """
+    start_time = time.time()
+    resolved_model = "knowledge_analyzer_deterministic_curator"
+    
+    task_str = str(ctx.get("input", {}).get("task", "") or ctx.get("task", ""))
+    
+    if not task_str or len(task_str) < 5:
+        latency_ms = (time.time() - start_time) * 1000.0
+        return {
+            "output": "", "curated_sources": [], "source_count": 0,
+            "execution_metrics": {"model": resolved_model, "success": True, "latency": latency_ms, "cost": 0.0}
+        }
 
-    all_results = load_all_for_task(task)
-    if not all_results:
-        logger.info("[ANALYZER] Nada no cache para analisar")
-        return {**ctx, "output": "", "entries_kept": 0, "success": True}
+    logger.info("[KNOWLEDGE_ANALYZER] Iniciando ciclo assíncrono de higienização e filtragem de cache...")
 
-    total_input = sum(len(v) for v in all_results.values())
-    kept = []
-    rejected = 0
+    try:
+        # DESPACHA INTEIRAMENTE A VARREDURA DE DISCO, ANÁLISE DE STRING E TRANSÇÃO DE BANCO PARA THREAD POOL
+        consolidated_knowledge, curated_logs, source_count = await asyncio.to_thread(
+            _sync_analyze_and_curate, task_str
+        )
 
-    for source, content in all_results.items():
-        if not content or len(content) < 50:
-            rejected += 1
-            continue
-        if _is_garbage(content):
-            logger.debug("[ANALYZER] Rejeitado (lixo): %s", source)
-            rejected += 1
-            continue
+        logger.info("[KNOWLEDGE_ANALYZER] Curadoria finalizada. Extraídas %d fontes úteis de conhecimento.", source_count)
+        latency_ms = (time.time() - start_time) * 1000.0
 
-        relevance = _calc_relevance(content)
-        if relevance < 0.3:
-            logger.debug("[ANALYZER] Rejeitado (baixa relevancia: %.2f): %s", relevance, source)
-            rejected += 1
-            continue
+        # Retorno higienizado cumprindo as Regras 1, 3 e 5 do AGENTS.md (Sem dar dict unpack do ctx na RAM)
+        return {
+            "output": consolidated_knowledge,
+            "curated_sources": curated_logs,
+            "source_count": source_count,
+            "execution_metrics": {
+                "model": resolved_model,
+                "success": True,
+                "latency": latency_ms,
+                "cost": 0.0  # Operação de infraestrutura puramente offline e local
+            }
+        }
 
-        extracted = _extract_useful(content)
-        if len(extracted) > 50:
-            kept.append({"source": source, "content": extracted, "relevance": relevance})
+    except Exception as e:
+        latency_ms = (time.time() - start_time) * 1000.0
+        logger.exception("[KNOWLEDGE_ANALYZER] Falha crítica no pipeline do Analyzer: %s", e)
+        
+        return {
+            "output": "",
+            "curated_sources": [],
+            "source_count": 0,
+            "execution_metrics": {
+                "model": resolved_model,
+                "success": False,
+                "latency": latency_ms,
+                "cost": 0.0
+            }
+        }
 
-    kept.sort(key=lambda x: x["relevance"], reverse=True)
-
-    saved = 0
-    for entry in kept[:5]:
-        try:
-            knowledge.store(
-                category="best_practice" if entry["relevance"] > 0.6 else "pattern",
-                title=entry["content"][:60],
-                content=entry["content"],
-                tags=["auto_extracted", f"src_{entry['source']}"],
-                source=task,
-            )
-            saved += 1
-
-            mem_vector_store(text=entry["content"], mtype="web_search_filtered")
-
-            _ltm.store(
-                content=entry["content"],
-                metadata={"source": f"analyzer_{entry['source']}", "relevance": entry["relevance"]},
-                source="knowledge_analyzer",
-            )
-            saved += 1
-
-            logger.debug("[ANALYZER] Salvo em knowledge.json + LTM + cbor2: %.60s", entry["content"])
-        except Exception as e:
-            logger.debug("[ANALYZER] Erro ao salvar: %s", e)
-
-    logger.info(
-        "[ANALYZER] %d/%d entradas uteis | %d rejeitadas | %d saves | relevancia media: %.2f",
-        len(kept), len(all_results), rejected, saved,
-        sum(e["relevance"] for e in kept) / len(kept) if kept else 0,
-    )
-
-    summary = "\n\n".join(f"• [{e['source']}] {e['content'][:200]}" for e in kept[:3])
-
-    return {
-        **ctx,
-        "output": summary,
-        "analyzed": {
-            "total_input": total_input,
-            "total_sources": len(all_results),
-            "kept": len(kept),
-            "rejected": rejected,
-            "saved": saved,
-        },
-        "success": True,
-    }

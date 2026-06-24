@@ -1,0 +1,1 @@
+{"timestamp": 1782183207.050295, "provider": "ollama", "model": "ollama/qwen2.5:0.5b", "prompt_size": 24, "success": true, "latency_ms": 50.0, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "cost": 0.0, "task_key": "html_generation", "task_type": "html_generation"}

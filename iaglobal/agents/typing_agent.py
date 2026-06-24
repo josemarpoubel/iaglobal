@@ -10,11 +10,11 @@ simulando padrões de digitação realistas:
 
 import time
 import random
-import threading
 from typing import Optional, Callable
 from dataclasses import dataclass
 
 from iaglobal.utils.logger import logger
+from iaglobal.utils.playwright_util import ensure_playwright_browsers
 
 
 @dataclass
@@ -57,15 +57,7 @@ class TypingProfile:
                 "list", "dict", "set", "tuple", "lambda", "yield",
             }
 
-    @property
-    def min_interval(self) -> float:
-        """Intervalo mínimo entre caracteres (segundos)."""
-        return 1.0 / (self.chars_per_second * (1 + self.jitter))
 
-    @property
-    def max_interval(self) -> float:
-        """Intervalo máximo entre caracteres (segundos)."""
-        return 1.0 / (self.chars_per_second * (1 - self.jitter))
 
 
 class TypingAgent:
@@ -139,17 +131,6 @@ class TypingAgent:
                      f"({len(text)/elapsed:.1f} cps)")
         return elapsed
 
-    def simulate_typing_async(self, text: str, on_char: Optional[Callable] = None,
-                               on_complete: Optional[Callable] = None) -> threading.Thread:
-        """Simula digitação em thread separada (não bloqueante)."""
-        thread = threading.Thread(
-            target=self.simulate_typing,
-            args=(text, on_char, on_complete),
-            daemon=True,
-        )
-        thread.start()
-        return thread
-
     def stop(self):
         """Para a simulação em andamento."""
         self._running = False
@@ -219,6 +200,9 @@ class TypingService:
     def web_llm_call(self, prompt: str, model_name: str = "chatgpt_web") -> str:
         """Chama provedor web via Playwright com digitação humanizada."""
         logger.info(f"[TYPING-SERVICE] Chamada web: model={model_name} prompt_len={len(prompt)}")
+
+        if not ensure_playwright_browsers(["firefox"]):
+            return prompt
 
         try:
             from playwright.sync_api import sync_playwright

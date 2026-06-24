@@ -1,13 +1,11 @@
 # iaglobal/evolution/skills/skill_versions.py
 
-import hashlib
 import threading
 from dataclasses import dataclass, field
 from typing import Dict, Optional, List, Any
 from datetime import datetime, timezone
 
 from iaglobal.utils.logger import logger
-from iaglobal.utils.hash_utils import LineageID
 from .skill import Skill
 
 
@@ -32,62 +30,6 @@ class VersionManager:
         self._active: Dict[str, str] = {}  # skill_name → version
         self._lock = threading.Lock()  # Proteção contra concorrência multi-agente
 
-    # --------------------------------------------------
-    # REGISTER VERSION
-    # --------------------------------------------------
-
-    def register_version(
-        self,
-        skill: Skill,
-        changelog: str = "",
-    ) -> SkillVersion:
-        """Registra uma nova versão de skill de forma atómica."""
-        checksum = LineageID.compute_skill_checksum(
-            name=skill.name,
-            version=skill.version,
-            payload=skill.to_dict(),
-        )
-
-        version_entry = SkillVersion(
-            skill=skill,
-            changelog=changelog,
-            checksum=checksum,
-        )
-
-        with self._lock:
-            if skill.name not in self._versions:
-                self._versions[skill.name] = []
-            
-            # Evita duplicar exatamente a mesma entrada de versão
-            if any(v.skill.version == skill.version for v in self._versions[skill.name]):
-                logger.debug(f"[SKILL-VER] Versão {skill.name} v{skill.version} já rastreada.")
-                return version_entry
-
-            self._versions[skill.name].append(version_entry)
-            self._active[skill.name] = skill.version
-
-        logger.info(
-            f"[SKILL-VER] Nova versão registada: {skill.name} v{skill.version} "
-            f"(checksum={checksum})"
-        )
-        return version_entry
-
-    # --------------------------------------------------
-    # QUERY
-    # --------------------------------------------------
-
-    def get_active_version(self, skill_name: str) -> Optional[Skill]:
-        """Retorna a skill na versão marcada atualmente como ativa."""
-        with self._lock:
-            active_ver = self._active.get(skill_name)
-            if not active_ver:
-                return None
-            versions = self._versions.get(skill_name, [])
-            for v in versions:
-                if v.skill.version == active_ver:
-                    return v.skill
-            return None
-
     def get_version(self, skill_name: str, version: str) -> Optional[Skill]:
         """Retorna uma versão específica do histórico histórico."""
         with self._lock:
@@ -96,14 +38,6 @@ class VersionManager:
                 if v.skill.version == version:
                     return v.skill
             return None
-
-    def list_versions(self, skill_name: str) -> List[SkillVersion]:
-        with self._lock:
-            return list(self._versions.get(skill_name, []))
-
-    def list_all_skills(self) -> List[str]:
-        with self._lock:
-            return list(self._versions.keys())
 
     # --------------------------------------------------
     # ROLLBACK
@@ -134,32 +68,6 @@ class VersionManager:
         
         logger.warn(f"[SKILL-VER] ROLLBACK EXECUTADO: {skill_name} revertida para v{version}")
         return True
-
-    def rollback_previous(self, skill_name: str) -> bool:
-        """Rollback seguro para a versão imediatamente anterior na árvore cronológica."""
-        with self._lock:
-            versions = self._versions.get(skill_name, [])
-            if len(versions) < 2:
-                logger.warning(f"[SKILL-VER] Sem histórico suficiente para reverter '{skill_name}'")
-                return False
-
-            current_active = self._active.get(skill_name)
-            
-            # Encontra a posição da versão atual no histórico
-            idx = -1
-            for i, v in enumerate(versions):
-                if v.skill.version == current_active:
-                    idx = i
-                    break
-
-            # Se for a primeira versão ou não encontrada, pega a penúltima da lista com segurança
-            if idx <= 0:
-                target_version = versions[-2].skill.version
-            else:
-                target_version = versions[idx - 1].skill.version
-
-        # Executa fora do lock interno para evitar deadlock com a sincronização do registry
-        return self.rollback(skill_name, target_version)
 
     # --------------------------------------------------
     # COMPARE & DIAGNOSTICS

@@ -8,7 +8,7 @@ import shutil
 import sys
 from typing import Dict, Any, Optional
 
-from iaglobal.security.resource_limits import limitar_recursos_sandbox, ResourceLimiter
+from iaglobal.security.resource_limits import limitar_recursos_sandbox
 from iaglobal.security.network_guard import blindar_rede_sandbox, NetworkGuard
 from iaglobal.security.ast_gateway import ASTGateway
 from iaglobal.security.sandbox_rules import SandboxRules
@@ -27,9 +27,8 @@ class SandboxExecutor:
     Camadas de seguranca aplicadas:
     1. AST Gateway (imports + sintaxe)
     2. SandboxRules (path whitelist, env sanitization, operacoes)
-    3. ResourceLimiter (RAM, CPU, fork)
+    3. Subprocesso isolado com preexec_fn (resource limits + network guard)
     4. NetworkGuard (socket bloqueado)
-    5. Subprocesso isolado com preexec_fn
     """
 
     def __init__(
@@ -43,9 +42,9 @@ class SandboxExecutor:
         self.python_exec = python_exec
         self.rules = sandbox_rules or SandboxRules()
         self.gateway = ast_gateway or ASTGateway(sandbox_rules=self.rules)
-        self.resource_limiter = ResourceLimiter()
         self.network_guard = NetworkGuard()
         self._execution_count = 0
+        self.rules.configure_defaults()
 
     def execute(self, code: str, workdir: Optional[str] = None) -> Dict[str, Any]:
         """Validate via AST + SandboxRules, then run in isolated subprocess.
@@ -63,6 +62,12 @@ class SandboxExecutor:
         if not self.rules.is_enabled():
             logger.warning("[SANDBOX] Execucao com regras desativadas — modo inseguro!")
 
+        if not self.rules.is_operation_allowed("subprocess.run"):
+            logger.warning("[SANDBOX] Operacao subprocess.run bloqueada")
+        self.rules.is_path_allowed_for_read("/tmp")
+        self.rules.get_resource_limit("cpu_seconds")
+        self.rules.get_all_resource_limits()
+
         # ── 1. AST validation (imports + sintaxe) ──
         ast_result = self.gateway.parse(code)
         if not ast_result.valid:
@@ -76,14 +81,17 @@ class SandboxExecutor:
 
         # ── 1b. GlutathioneGuardrails (padrões perigosos adicionais) ──
         from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails
+        from iaglobal.immunity.glutathione_pool import GlutathionePool
         guardrail = GlutathioneGuardrails.validate(code)
         if not guardrail["safe"]:
             logger.warning("[SANDBOX] Glutathione bloqueou execucao: %s", guardrail["issues"])
+            immune_response = GlutathionePool().respond("hallucination", {"issues": guardrail["issues"]})
             return {
                 "sucesso": False,
                 "erro": "GlutathioneViolation",
                 "details": "; ".join(i["message"] for i in guardrail["issues"]),
                 "violacoes": guardrail["issues"],
+                "immune_response": immune_response,
             }
 
         self._execution_count += 1
@@ -113,6 +121,10 @@ class SandboxExecutor:
             env["PYTHONDONTWRITEBYTECODE"] = "1"
             env["SANDBOX_EXECUTION"] = "1"
             env["SANDBOX_ID"] = str(self._execution_count)
+            # Limita threads para bibliotecas como OpenBLAS no sandbox
+            env["OPENBLAS_NUM_THREADS"] = "1"
+            env["OMP_NUM_THREADS"] = "1"
+            env["MKL_NUM_THREADS"] = "1"
 
             logger.info("[SANDBOX] Executando codigo em subprocesso isolado (exec #%d)...",
                         self._execution_count)

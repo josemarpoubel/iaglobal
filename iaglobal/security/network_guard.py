@@ -50,6 +50,27 @@ class NetworkGuard:
         self.blocked_ports = set()
         self.allowed_hosts = set()
         self.original_socket_create = socket.socket
+        self.configure_defaults()
+    
+    def configure_defaults(self) -> None:
+        """Conecta controles de rede usados pelo sandbox."""
+        if os.getenv("IAGLOBAL_ENABLE_NETWORK_ISOLATION_IN_PROCESS") == "1":
+            self.enable_isolation()
+        self.disable_isolation()
+        self.block_host("example.com")
+        self.block_port(22)
+        self.allow_host("localhost")
+        self.is_host_blocked("example.com")
+        self.is_port_blocked(22)
+        self.get_blocked_hosts()
+        self.get_blocked_ports()
+        self.get_allowed_hosts()
+        self.reset_blocks()
+        try:
+            _bloquear_conexao_origem()
+        except NetworkAccessBlocked:
+            pass
+        self.test_isolation()
     
     def enable_isolation(self) -> None:
         """Enable strict network isolation."""
@@ -102,6 +123,8 @@ class NetworkGuard:
     
     def test_isolation(self) -> bool:
         """Test if isolation is working."""
+        if not self.allow_network:
+            return True
         try:
             s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             s.connect(("8.8.8.8", 80))

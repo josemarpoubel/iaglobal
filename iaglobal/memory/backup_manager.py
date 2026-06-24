@@ -86,41 +86,4 @@ class MemoryManager:
     def force_emergency_backup(self) -> None:
         """Método de conveniência para Shutdown Hooks."""
         logger.warning("Executando backup de emergência antes de encerrar.")
-        self.trigger_safe_snapshot(force=True)
-
-    def realizar_backup():
-        """Compacta a pasta de dados inteira com um timestamp."""
-        
-        # Define o nome do arquivo com data e hora
-        timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-        backup_filename = BACKUP_DIR / f"backup_memoria_{timestamp}.tar.gz"
-        
-        try:
-            logger.info(f"📦 Iniciando backup de {DATA_ROOT} para {backup_filename}...")
-            
-            with tarfile.open(backup_filename, "w:gz") as tar:
-                # Adiciona a pasta de dados, excluindo a própria pasta de backups 
-                # para evitar recursão infinita
-                tar.add(DATA_ROOT, arcname=os.path.basename(DATA_ROOT), 
-                        filter=lambda x: None if "memory_backups" in x.name else x)
-            
-            logger.info(f"✅ Backup concluído com sucesso: {backup_filename}")
-            return str(backup_filename)
-            
-        except Exception as e:
-            logger.error(f"💥 Falha ao realizar backup: {e}")
-            return None
-
-    def limpar_backups_antigos(self, dias=30):
-        """Remove backups com mais de X dias para liberar espaço."""
-        limite = datetime.datetime.now() - datetime.timedelta(days=dias)
-        
-        for arquivo in BACKUP_DIR.glob("backup_memoria_*.tar.gz"):
-            # Extrai o timestamp do nome do arquivo
-            data_arquivo = datetime.datetime.strptime(arquivo.name.split('_')[2], "%Y%m%d")
-            if data_arquivo < limite:
-                os.remove(arquivo)
-                logger.info(f"🗑️ Backup antigo removido: {arquivo.name}")
-
-if __name__ == "__main__":
-    realizar_backup()        
+        self.trigger_safe_snapshot(force=True)        

@@ -1,0 +1,15 @@
+{
+  "name": "evo-full-cycle-child-gen1",
+  "lineage_id": "d77c66cd6ef84ad6b64114084ada0a31bc39733c522cfcfa683a88ffef7989d4df9d39f6999abe2137dea541baa42421586cc6fbf36132972ed85bd7dbb5ef6c",
+  "lineage_marker": "e3ab7d26efd53612",
+  "generation": 1,
+  "parent_lineage_id": "e1004983e9ce802f11aa3e83868c3951490329a3142c83b5772649ce5683e453b5c710f8336e0cc969c644335fe6549d6c711540d3f634ebed0fe219369b6867",
+  "nadph_reserve": 0.5,
+  "epigenetic_flags": {
+    "last_mutation": "filho-evo-obsidian"
+  },
+  "failure_patterns": [],
+  "same_balance": 230,
+  "timestamp": 1782262186.6611993,
+  "reason": "test_cleanup"
+}

@@ -54,18 +54,3 @@ class DecisionEngine:
 
         return score
 
-    def decide(self, agents: List[str], models: List[str], memory_score: float, complexity: float) -> Decision:
-        best = None
-
-        for agent in agents:
-            for model in models:
-                score = self.score_option(agent, model, memory_score, complexity)
-                if best is None or score > best.score:
-                    best = Decision(
-                        agent=agent,
-                        model=model,
-                        score=score,
-                        reason=f"score={score:.3f} bandit_weight=0.4"
-                    )
-
-        return best

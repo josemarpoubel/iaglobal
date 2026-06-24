@@ -1,0 +1,39 @@
+{
+  "version": "3.0.0",
+  "timestamp": "2026-06-24T00:37:43.222939+00:00",
+  "execution_id": "test-123",
+  "final_result": {
+    "status": "completed",
+    "artifacts_present": {
+      "documentation": true,
+      "release": true,
+      "metrics": true,
+      "optimization": true,
+      "coder": true,
+      "security_audit": true,
+      "planner": true,
+      "search": true,
+      "review": false,
+      "multi_coder": true,
+      "critic": true,
+      "validator": true,
+      "ast_validator": false,
+      "security": false
+    },
+    "payload": "valid",
+    "checksum": "ec654fac9599f62e79e2706abef23dfb7c07c08185aa86db4d8695f0b718d1b3"
+  },
+  "summary": "Technical documentation generated | Release notes generated (v1.0.0...) | Execution Time: 1.50s | Quality: 8.00/10 | 1 optimization opportunities detected | Code artifact generated [python] | Security audit passed | dados produzidos por str | dados produzidos por str | Code artifact generated [python] | dados produzidos por str | dados produzidos por str",
+  "next_steps": [
+    "Apply recommended CPU optimizations",
+    "Apply recommended memory optimizations",
+    "Generate unit tests",
+    "Validate release notes"
+  ],
+  "health": {
+    "total_agents": 14,
+    "successful_agents": 11,
+    "failed_agents": 3,
+    "success_rate": 78.57
+  }
+}

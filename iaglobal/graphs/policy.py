@@ -2,7 +2,10 @@
 
 from collections import defaultdict
 from typing import Dict, List, Optional, Any
+
 from iaglobal.graphs.bandit import BanditPolicy, _get_bandit
+from iaglobal.evolution.epigenetic import get_max_iterations, adapt_bandit_policy
+
 
 class PolicyRegistry:
     """
@@ -17,7 +20,7 @@ class PolicyRegistry:
         # O BanditPolicy já tem suporte interno para separar histórico por node/contexto
         # através da sua propriedade 'self.context_memory'.
         self._global_bandit = _get_bandit()
-
+    
     def get(self, domain: str) -> BanditPolicy:
         """
         Retorna o motor de política. 
@@ -26,12 +29,16 @@ class PolicyRegistry:
         # Em sistemas avançados, o domain pode ser injetado para logging, 
         # mas a classe motor deve ser a mesma para compartilhar o cache de rede.
         return self._global_bandit
-
+    
     def all_domains(self) -> List[str]:
         """
         Retorna todos os domínios mapeados no histórico global.
         """
         return list(self._global_bandit.context_memory.keys())
+    
+    def apply_epigenetic_adjustments(self):
+        """Apply epigenetic flags to the shared bandit policy."""
+        self._global_bandit._apply_epigenetic_adjustments()
 
     @staticmethod
     def compute_node_policy(node: Any) -> Optional[Dict[str, str]]:

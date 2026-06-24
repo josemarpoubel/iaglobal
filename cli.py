@@ -4,8 +4,9 @@
 import sys
 import asyncio
 
-# Garante que o projeto esteja no path
-sys.path.insert(0, "/home/user/projeto-iaglobal")
+# Garante que o projeto esteja no path (portável)
+from iaglobal._paths import PACKAGE_DIR
+sys.path.insert(0, str(PACKAGE_DIR.parent))
 
 from iaglobal.cli.main import run_cli
 

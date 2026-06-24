@@ -74,35 +74,5 @@ class RewardAggregator:
         # 🔥 Proteção de Hiperparâmetro: Normalização estrita para estabilidade do Bandit
         return max(-1.0, min(2.0, reward))
 
-    def record_reward(self, credit: Any, node: str, model: str, strategy: str, reward: float, actual_success: bool):
-        """
-        Envia de forma correta e sem efeitos colaterais a recompensa ao CreditAssignmentEngine.
-        """
-        try:
-            from iaglobal.graphs.telemetry import ExecutionEvent
-            
-            # NOTA DE ENGENHARIA: Certifique-se de que a classe ExecutionEvent aceita o parâmetro custom_reward
-            # Se a classe ExecutionEvent do seu core não possuir este campo, utilize o dicionário de metadados internos (metadata/tags)
-            event = ExecutionEvent(
-                node=node,
-                success=actual_success,  # 🔥 CORREÇÃO: Sucesso real e fidedigno, independente da nota da reward
-                latency=0.0,  # Zera ou passa a latência real se disponível, nunca o valor mascarado da recompensa
-                model=model,
-                strategy=strategy,
-            )
-            
-            # Injeta de forma explícita e segura a recompensa via atributo dinâmico ou dicionário interno
-            if hasattr(event, "metadata") and isinstance(event.metadata, dict):
-                event.metadata["evolution_reward"] = reward
-            else:
-                object.__setattr__(event, "evolution_reward", reward) if hasattr(event, "__frozen__") else setattr(event, "evolution_reward", reward)
-
-            credit.record(event)
-            logger.debug("[REWARD-AGGREGATOR] Recompensa de %.2f gravada com sucesso para o nó '%s'", reward, node)
-            
-        except Exception as e:
-            logger.error("[REWARD-AGGREGATOR] Falha crítica ao registar recompensa no motor de crédito: %s", e)
-
-
 # Instância global singleton do barramento
 reward_aggregator = RewardAggregator()

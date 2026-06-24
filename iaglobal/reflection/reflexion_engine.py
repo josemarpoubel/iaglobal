@@ -54,12 +54,6 @@ def extract_code_block(text: str) -> str:
     # Fallback: return stripped text if no code block detected
     return text.strip()
 
-# Em reflection/reflexion_engine.py
-def analisar_falha(self, task_id: str, feedback: str) -> Dict:
-    # 1. Busca os logs ou histórico daquela task específica
-    # 2. Pede para um modelo analítico (CriticAgent) revisar o log
-    # 3. Retorna um plano de correção
-    pass
 
 def format_error_type(traceback_err: str) -> str:
     """Extract error type from traceback string safely."""
@@ -244,6 +238,50 @@ def reflexion_loop(
     }, source="reflexion_engine.reflexion_loop")
     
     return f"# ⚠️ Failed to auto-correct after {max_iterations} attempts.\n# Last error: {safe_truncate(traceback_err, 150)}\n# Final code version below:\n\n{current_code}"
+
+
+# =============================================================================
+# LOOP DETECTOR CALLBACK WRAPPER
+# =============================================================================
+
+def reflexion_callback_for_loop(context: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Wrapper para usar como callback do LoopDetector.
+    
+    Recebe contexto no formato usado por check_and_repair e retorna
+    resultado compatível com o esperado pelo LoopDetector.
+    
+    Args:
+        context: Dicionário com input_data, memory, workdir, e eventuais erros
+        
+    Returns:
+        Dict com status "repaired", "failed" ou "error"
+    """
+    from iaglobal.evolution.epigenetic import get_max_iterations
+    
+    input_data = context.get("input", {})
+    prompt = str(input_data.get("task", ""))
+    max_iter = get_max_iterations()
+    
+    try:
+        # Usa fallback_chain síncrona via wrapper
+        from iaglobal.providers.provider_router import _fallback_chain
+        model_fn = _fallback_chain
+        
+        # Executa reflexão com tentativa de auto-correção
+        corrected_code = reflexion_loop(model_fn, prompt, max_iterations=max_iter)
+        
+        return {
+            "status": "repaired",
+            "code": corrected_code,
+            "prompt_preview": safe_truncate(prompt, MAX_PROMPT_TRUNCATE),
+        }
+    except Exception as e:
+        logger.error(f"[REFLEXION-CALLBACK] Falha no loop detector: {e}")
+        return {
+            "status": "failed",
+            "error": str(e),
+        }
 
 
 # =============================================================================
@@ -468,30 +506,4 @@ class ReflexionEngine:
         self.success_count = 0
         self.failure_count = 0
         logger.info("🧹 Execution history cleared")
-
-    def set_max_iterations(self, max_iterations: int) -> None:
-        """Update maximum iterations for future reflexion loops."""
-        if max_iterations < 1:
-            raise ValueError("max_iterations must be at least 1")
-        self.max_iterations = max_iterations
-        logger.info(f"🔧 Updated max_iterations to {max_iterations}")
-
-    def set_model(self, model_fn: Callable[[str], str]) -> None:
-        """Replace the model inference function."""
-        if not callable(model_fn):
-            raise TypeError("model_fn must be a callable")
-        self.model_fn = model_fn
-        logger.info("🔄 Model function updated")
-
-    def export_report(self) -> Dict[str, Any]:
-        """Generate a comprehensive report for monitoring/auditing."""
-        return {
-            'engine_config': {
-                'max_iterations': self.max_iterations,
-                'model_fn': repr(self.model_fn)
-            },
-            'statistics': self.get_statistics(),
-            'recent_executions': self.get_execution_history(limit=10),
-            'recent_failures': self.get_recent_failures(limit=5)
-        }
 

@@ -7,7 +7,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Tuple, List, Optional, Dict, Any
 
-from .ast_security import validate_ast_security
+from .ast_security import validate_ast_security_str
 from .syntax import validar_sintaxe
 from .normalization import normalizar_codigo
 from iaglobal.utils.logger import logger
@@ -93,7 +93,7 @@ class FeedbackEngine:
 
             validar_sintaxe(code)
             tree = ast.parse(code)
-            safe, violations = validate_ast_security(code)
+            safe, violations = validate_ast_security_str(code)
             if not safe:
                 raise ValueError(f"Security violations: {violations}")
 

@@ -4,7 +4,6 @@ import logging
 from typing import Optional
 
 from iaglobal.evolution.metabolism.homocysteine_pool import CandidateSkill, homocysteine_pool
-from iaglobal.feedback.benchmark_runner import BenchmarkRunner
 
 logger = logging.getLogger(__name__)
 
@@ -31,7 +30,4 @@ class MethylationCycle:
                     candidate.skill.name, candidate.score, self.threshold)
         return False
 
-    def run_with_benchmark(self, candidate: CandidateSkill, code: str) -> bool:
-        signal = BenchmarkRunner.run(code, task=candidate.skill.name)
-        candidate.score = signal.score
-        return self.run(candidate)
+

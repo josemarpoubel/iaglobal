@@ -5,7 +5,7 @@ Meta: < 300 linhas usando registry + edges + graph_factory.
 """
 from typing import Any, Optional
 from .execution_graph import ExecutionGraph
-from .edges import EDGES
+from .edges import EDGES, validate_edges
 from .registry import NODE_REGISTRY
 from .nodes import create_skill_node
 from iaglobal.utils.logger import logger
@@ -57,6 +57,7 @@ class GraphBuilder:
         logger.info("[GRAPH-BUILDER-V2] Construindo grafo...")
         self._load_nodes(graph)
         self._load_edges(graph)
+        validate_edges([(src, dst) for src, dst in EDGES if src in graph.nodes and dst in graph.nodes])
         return graph
 
 

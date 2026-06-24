@@ -22,13 +22,6 @@ class DecisionEventDispatcher:
             cls._instance._subscribed = False
         return cls._instance
 
-    def on(self, step: str, handler: HandlerType):
-        if step not in self._handlers:
-            self._handlers[step] = []
-        self._handlers[step].append(handler)
-        # Log de registro de novo listener
-        logger.debug(f"🧩 [DISPATCHER] Handler registrado para o step: {step}")
-
     def _route(self, event):
         try:
             loop = asyncio.get_running_loop()
@@ -79,27 +72,5 @@ class DecisionEventDispatcher:
         bus.unsubscribe(EventType.PIPELINE_STAGE, self._route)
         self._subscribed = False
 
-    def registered_steps(self) -> List[str]:
-        steps = list(self._handlers.keys())
-        logger.debug(f"🔍 [DISPATCHER] Steps registrados atualmente: {steps}")
-        return steps
-
-    def off(self, step: str, handler: HandlerType):
-        if step in self._handlers:
-            original_count = len(self._handlers[step])
-            self._handlers[step] = [h for h in self._handlers[step] if h is not handler]
-            new_count = len(self._handlers[step])
-            
-            if original_count != new_count:
-                logger.info(f"➖ [DISPATCHER] Handler removido do step: {step}. Restam: {new_count}")
-            else:
-                logger.warning(f"⚠️ [DISPATCHER] Handler não encontrado para remoção no step: {step}")
-        else:
-            logger.warning(f"⚠️ [DISPATCHER] Tentativa de remover handler de step inexistente: {step}")
-
-    def handler_count(self, step: str) -> int:
-        count = len(self._handlers.get(step, []))
-        logger.debug(f"📊 [DISPATCHER] Contagem de handlers para '{step}': {count}")
-        return count
 
 dispatcher = DecisionEventDispatcher()

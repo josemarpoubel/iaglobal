@@ -59,31 +59,6 @@ class DataNormalizer:
         codigo_final = "\n".join(line_buffer).strip()
         return codigo_final
 
-    def normalizar_payload_json(self, dados: Dict[str, Any]) -> Dict[str, Any]:
-        """
-        Normalize dictionary structures with standardized keys and trimmed strings.
-        """
-        if not isinstance(dados, dict):
-            return dados
-
-        dados_limpos = {}
-        for chave, valor in dados.items():
-            chave_limpa = str(chave).strip().lower()
-            
-            if isinstance(valor, str):
-                dados_limpos[chave_limpa] = valor.strip()
-            elif isinstance(valor, dict):
-                dados_limpos[chave_limpa] = self.normalizar_payload_json(valor)
-            elif isinstance(valor, list):
-                dados_limpos[chave_limpa] = [
-                    self.normalizar_payload_json(item) if isinstance(item, dict) else item
-                    for item in valor
-                ]
-            else:
-                dados_limpos[chave_limpa] = valor
-
-        return dados_limpos
-
     def normalize_whitespace(self, texto: str) -> str:
         """Normalize excessive whitespace."""
         # Remove multiple spaces
@@ -103,18 +78,4 @@ def normalizar_codigo(texto: str) -> str:
     """Portuguese alias for normalize_code."""
     return _normalizer.limpar_codigo_fonte(texto)
 
-def normalize_data(dados: Dict[str, Any]) -> Dict[str, Any]:
-    """Normalize data structure."""
-    return _normalizer.normalizar_payload_json(dados)
 
-def normalizar_estrutura(dados: Dict[str, Any]) -> Dict[str, Any]:
-    """Portuguese alias for normalize_data."""
-    return _normalizer.normalizar_payload_json(dados)
-
-def normalize_text(texto: str) -> str:
-    """Normalize whitespace in text."""
-    return _normalizer.normalize_whitespace(texto)
-
-def get_normalizer() -> DataNormalizer:
-    """Get the global normalizer instance."""
-    return _normalizer

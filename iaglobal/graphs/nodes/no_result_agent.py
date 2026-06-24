@@ -1,3 +1,4 @@
+import time
 from typing import Dict, Any
 import logging
 from pathlib import Path
@@ -11,6 +12,7 @@ logger = logging.getLogger(__name__)
 
 
 async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    start = time.time()
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
 
@@ -110,8 +112,17 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
             for msg in msgs:
                 logger.info("[RESULT_AGENT] Mensagem tardia recebida de %s: type=%s", msg.sender, msg.type)
 
+    try:
+        from iaglobal.graphs.nodes import Nodes
+
+        rank_result = await Nodes().run_rank(ctx)
+        memory["rank"] = {"output": rank_result.get("output")}
+        logger.info("[RESULT_AGENT] Rank score=%s", rank_result.get("final_score"))
+    except Exception as e:
+        logger.debug("[RESULT_AGENT] Rank fallback: %s", e)
+
     agent = ResultAgent()
-    contract = agent.build_result(ctx=ctx)
+    contract = await agent.build_result(ctx=ctx)
 
     return {
         **ctx,
@@ -127,5 +138,11 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "summary": contract.get("summary", ""),
             "health": contract.get("health", {}),
             "checksum": contract.get("final_result", {}).get("checksum", ""),
+        },
+        "execution_metrics": {
+            "success": bool(output),
+            "latency": time.time() - start,
+            "cost": 0.0,
+            "model": "local",
         },
     }

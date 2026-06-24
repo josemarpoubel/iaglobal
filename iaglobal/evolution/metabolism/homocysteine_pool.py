@@ -1,6 +1,7 @@
 """HomocysteinePool — pool de skills candidatas (não validadas)."""
 
 import logging
+import threading
 from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 from pathlib import Path
@@ -67,24 +68,27 @@ class HomocysteinePool:
     def __init__(self, path: Optional[Path] = None):
         self.path = path or POOL_FILE
         self.candidates: List[CandidateSkill] = []
+        self._io_lock = threading.Lock()
         self._load()
 
     def _load(self):
-        try:
-            if self.path.exists():
-                with open(self.path) as f:
-                    data = json.load(f)
-                    self.candidates = [CandidateSkill.from_dict(d) for d in data]
-        except Exception as e:
-            logger.debug("[HOMOCYSTEINE] Erro ao carregar: %s", e)
+        with self._io_lock:
+            try:
+                if self.path.exists():
+                    with open(self.path) as f:
+                        data = json.load(f)
+                        self.candidates = [CandidateSkill.from_dict(d) for d in data]
+            except Exception as e:
+                logger.debug("[HOMOCYSTEINE] Erro ao carregar: %s", e)
 
     def _save(self):
-        try:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.path, "w") as f:
-                json.dump([c.to_dict() for c in self.candidates], f, indent=2)
-        except Exception as e:
-            logger.debug("[HOMOCYSTEINE] Erro ao salvar: %s", e)
+        with self._io_lock:
+            try:
+                self.path.parent.mkdir(parents=True, exist_ok=True)
+                with open(self.path, "w") as f:
+                    json.dump([c.to_dict() for c in self.candidates], f, indent=2)
+            except Exception as e:
+                logger.debug("[HOMOCYSTEINE] Erro ao salvar: %s", e)
 
     def add(self, candidate: CandidateSkill):
         self.candidates.append(candidate)
@@ -92,6 +96,12 @@ class HomocysteinePool:
         logger.info("[HOMOCYSTEINE] Candidate '%s' adicionada (score=%.2f)", candidate.skill.name, candidate.score)
 
     PROMOTION_THRESHOLD = 85
+
+    def _promotion_threshold(self) -> float:
+        scores = [c.score for c in self.candidates if isinstance(c.score, (int, float))]
+        if scores and max(scores) <= 1.0:
+            return 0.6
+        return float(self.PROMOTION_THRESHOLD)
 
     def route_to_production(self, candidate: CandidateSkill) -> bool:
         try:
@@ -115,12 +125,6 @@ class HomocysteinePool:
         except Exception as e:
             logger.warning("[HOMOCYSTEINE] Falha ao promover '%s': %s", candidate.skill.name, e)
             return False
-
-    def try_promote(self, candidate: CandidateSkill) -> bool:
-        """Promove automaticamente se score >= PROMOTION_THRESHOLD (85)."""
-        if candidate.score >= self.PROMOTION_THRESHOLD:
-            return self.route_to_production(candidate)
-        return False
 
     def route_to_guardrail(self, candidate: CandidateSkill) -> bool:
         try:
@@ -147,6 +151,17 @@ class HomocysteinePool:
 
     def get_pending(self) -> List[CandidateSkill]:
         return [c for c in self.candidates if c.route == "undecided"]
+
+    def get_ready_for_methylation(self) -> List[CandidateSkill]:
+        """Retorna candidatos com score >= threshold e rota indefinida.
+        Chamado pelo no_evolution_homocysteine para estatísticas do pool."""
+        threshold = self._promotion_threshold()
+        return [c for c in self.candidates if c.route == "undecided" and c.score >= threshold]
+
+    def get_candidates_for_methylation(self) -> List[CandidateSkill]:
+        """Retorna os mesmos candidatos prontos para metilação.
+        Chamado pelo no_evolution_methylation para processar a promoção."""
+        return self.get_ready_for_methylation()
 
     def count(self) -> int:
         return len(self.candidates)

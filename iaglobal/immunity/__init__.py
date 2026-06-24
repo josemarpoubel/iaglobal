@@ -3,6 +3,7 @@ from iaglobal.immunity.regression_detector import RegressionDetector
 from iaglobal.immunity.hallucination_detector import HallucinationDetector
 from iaglobal.immunity.emergent_behavior_detector import EmergentBehaviorDetector
 from iaglobal.immunity.glutathione_pool import GlutathionePool, ImmuneResponse
+from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails, COST_VALIDATION_BASIC, COST_VALIDATION_DEEP, COST_AUTO_CORRECTION
 
 __all__ = [
     "LoopDetector",
@@ -11,4 +12,8 @@ __all__ = [
     "EmergentBehaviorDetector",
     "GlutathionePool",
     "ImmuneResponse",
+    "GlutathioneGuardrails",
+    "COST_VALIDATION_BASIC",
+    "COST_VALIDATION_DEEP",
+    "COST_AUTO_CORRECTION",
 ]

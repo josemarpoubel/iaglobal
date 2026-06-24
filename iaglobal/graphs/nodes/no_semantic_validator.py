@@ -1,12 +1,14 @@
+import time
 from typing import Dict, Any
 import logging
 
-from iaglobal.agents.validator import SemanticValidatorAgent
+from iaglobal.agents.semantic_validator import SemanticValidatorAgent
 
 logger = logging.getLogger(__name__)
 
 
 async def run_semantic_validator(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    start = time.time()
     memory = ctx.get("memory", {})
     task_str = str(ctx.get("input", {}).get("task", ""))
     code = ""
@@ -24,11 +26,14 @@ async def run_semantic_validator(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     if not code:
         logger.info("[SEMANTIC] No code to validate")
-        return {**ctx, "output": {"valid": True, "score": 100, "errors": []}, "semantic_score": 100, "errors": []}
+        return {
+            **ctx, "output": {"valid": True, "score": 100, "errors": []}, "semantic_score": 100, "errors": [],
+            "execution_metrics": {"success": True, "latency": time.time() - start, "cost": 0.0, "model": "local"},
+        }
 
     try:
         agent = SemanticValidatorAgent()
-        result = agent.validar(task=task_str, code=code)
+        result = agent.validate(code=code, task=task_str)
         score = result.get("score", 100)
         errors = result.get("errors", [])
         valid = result.get("valid", score >= 50)
@@ -39,7 +44,11 @@ async def run_semantic_validator(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "semantic_score": score,
             "errors": errors,
             "valid": valid,
+            "execution_metrics": {"success": valid, "latency": time.time() - start, "cost": 0.0, "model": "local"},
         }
     except Exception as e:
         logger.exception("[SEMANTIC] Failed: %s", e)
-        return {**ctx, "output": {"valid": True, "score": 100, "errors": []}, "semantic_score": 100, "errors": []}
+        return {
+            **ctx, "output": {"valid": True, "score": 100, "errors": []}, "semantic_score": 100, "errors": [],
+            "execution_metrics": {"success": False, "latency": time.time() - start, "cost": 0.0, "model": "local"},
+        }

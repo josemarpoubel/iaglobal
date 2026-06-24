@@ -39,7 +39,6 @@ sys.stdout = _original_stdout
 mcp = FastMCP("iaglobal")
 
 from iaglobal.providers.provider_metrics import metrics
-from iaglobal.providers.provider_load_balancer import load_balancer
 from iaglobal.graphs.bandit import BanditPolicy
 from iaglobal.graphs.credit import CreditAssignmentEngine
 from iaglobal.core.retry_handler import RetryHandler
@@ -183,15 +182,6 @@ def get_provider_metrics() -> str:
         cost = data.get("total_cost", 0)
         tokens = data.get("avg_tokens", 0)
         lines.append(f"  {prov:<20} {calls:>9} {sr:>7.1%} {lat:>8.0f}ms ${cost:<6.4f} {tokens:>8}")
-    lines.append("")
-    lines.append("── Disponibilidade ──")
-    for prov, state in sorted(load_balancer.state.providers.items()):
-        avail = "🟢" if load_balancer.state.is_available(prov) else "🔴"
-        cooldown = ""
-        if state.cooldown_until > 0:
-            remaining = max(0, state.cooldown_until - __import__("time").time())
-            cooldown = f" (cooldown: {remaining:.0f}s)"
-        lines.append(f"  {avail} {prov:<18} sucesso={state.success} falhas={state.fail}{cooldown}")
     return "\n".join(lines)
 
 

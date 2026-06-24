@@ -28,6 +28,12 @@ def trace_node_completed(trace: Dict, result: Any, ctx: Dict[str, Any]) -> Dict:
         logger.warning("[TRACE] Silent drop detectado em %s - nó sem output válido", node_name)
         trace["silent_drop"] = True
 
+    # Integração com diff_memory: registra diferenças entre estado antes e depois
+    before = trace.get("before", {})
+    after = trace.get("after", {})
+    if before or after:
+        trace["memory_diff"] = diff_memory(before, after)
+
     return trace
 
 def node_has_contract(node_name: str) -> bool:

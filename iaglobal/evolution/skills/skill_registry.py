@@ -120,39 +120,6 @@ class SkillRegistry:
                 return [e.skill for e in self._skills.values() if e.active]
             return [e.skill for e in self._skills.values()]
 
-    def list_by_policy(self, policy: ExecutionPolicy) -> List[Skill]:
-        with self._lock:
-            return [
-                e.skill
-                for e in self._skills.values()
-                if e.active and e.skill.execution_policy == policy
-            ]
-
-    # --------------------------------------------------
-    # ACTIVATION
-    # --------------------------------------------------
-
-    def activate(self, name: str) -> bool:
-        with self._lock:
-            entry = self._skills.get(name)
-            if entry:
-                entry.active = True
-                return True
-            return False
-
-    def deactivate(self, name: str) -> bool:
-        with self._lock:
-            entry = self._skills.get(name)
-            if entry:
-                entry.active = False
-                return True
-            return False
-
-    def is_active(self, name: str) -> bool:
-        with self._lock:
-            entry = self._skills.get(name)
-            return entry is not None and entry.active
-
     # --------------------------------------------------
     # USAGE TRACKING
     # --------------------------------------------------
@@ -167,14 +134,6 @@ class SkillRegistry:
         with self._lock:
             entry = self._skills.get(name)
             return entry.usage_count if entry else 0
-
-    # --------------------------------------------------
-    # VERSION HISTORY
-    # --------------------------------------------------
-
-    def get_version_history(self, name: str) -> List[Skill]:
-        with self._lock:
-            return list(self._version_history.get(name, []))
 
     # --------------------------------------------------
     # ALTERNATIVES (skill routing)

@@ -79,6 +79,9 @@ class EvolutionBacklog:
         item["priority"] = round(freq * impact * reuse, 1)
 
     def should_generate_skill(self, item: Dict[str, Any]) -> bool:
+        # 1ª execução: backlog vazio → aprova sem gates
+        if not self.items or all(i.get("resolved", False) for i in self.items):
+            return True
         return (
             item.get("frequency", 0) >= self.FREQUENCY_THRESHOLD
             and item.get("impact", 0) >= self.IMPACT_THRESHOLD

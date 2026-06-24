@@ -55,9 +55,4 @@ class Membrane:
             logger.error("[MEMBRANE] Falha em '%s' — isolada (erro: %s)", message.target.value, e)
             return None
 
-    def isolate(self, organelle: Organelle) -> bool:
-        if organelle.value in self._routes:
-            del self._routes[organelle.value]
-            logger.info("[MEMBRANE] Organela '%s' isolada (removida)", organelle.value)
-            return True
-        return False
+

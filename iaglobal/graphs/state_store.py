@@ -58,16 +58,6 @@ class SystemStateBuffer:
         self._data.move_to_end(node)
         return entry
 
-    def is_ready(self, node: str, depends_on: list) -> bool:
-        entry = self.get(node)
-        if entry["status"] in (SUCCESS, FAILED):
-            return False
-        for dep in depends_on:
-            dep_status = self.get(dep)["status"]
-            if dep_status != SUCCESS:
-                return False
-        return True
-
     def all(self) -> Dict[str, Dict[str, Any]]:
         return dict(self._data)
 

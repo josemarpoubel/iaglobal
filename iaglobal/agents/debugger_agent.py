@@ -150,7 +150,7 @@ class DebuggerAgent:
             if not self.enable_self_healing:
                 break
 
-            code, last_model = self._repair_code(
+            code, last_model = await self._repair_code(
                 task=task,
                 code=code,
                 error=error,
@@ -169,7 +169,7 @@ class DebuggerAgent:
     # SELF HEALING
     # ==========================================================
 
-    def _repair_code(
+    async def _repair_code(
         self,
         task: Task,
         code: str,
@@ -192,7 +192,7 @@ class DebuggerAgent:
             model,
         )
         try:
-            response = self.bandit.async_execute_model(
+            response = await self.bandit.async_execute_model(
                 model=model, prompt=prompt, task_type="debug",
             )
             fixed_code = self._extract_code(response)
@@ -235,46 +235,14 @@ class DebuggerAgent:
             )
             return code, model
 
-    async def _repair_code_async(
-        self,
-        task: Task,
-        code: str,
-        error: str,
-    ) -> tuple[str, Optional[str]]:
-        prompt = self.build_fix_prompt(task=task, error=error, code=code)
-        model = self.bandit.select_model(node="debugger_agent", strategy="debug")
-        logger.info("[DebuggerAgent] Repair async model=%s", model)
-        try:
-            response = await self.bandit.async_execute_model(
-                model=model, prompt=prompt, task_type="debug"
-            )
-            fixed_code = self._extract_code(response)
-            if not fixed_code:
-                return code, model
-            try:
-                self._validate(fixed_code)
-            except Exception as e:
-                logger.warning("[DebuggerAgent] Generated code rejected: %s", e)
-                return code, model
-            self.bandit.update_policy(
-                node="debugger_agent", model=model, strategy="debug",
-                success=True, latency=0.5, reward=0.75,
-            )
-            return fixed_code, model
-        except Exception as e:
-            logger.exception("Self-healing failure")
-            self.bandit.update_policy(
-                node="debugger_agent", model=model, strategy="debug",
-                success=False, latency=1.0, reward=0.0,
-            )
-            return code, model
-
     # ==========================================================
     # VALIDATION
     # ==========================================================
 
     def _validate(self, code: str) -> None:
-        self.ast_gateway.validate(code)
+        result = self.ast_gateway.parse(code)
+        if not result.valid:
+            raise ValueError("; ".join(result.errors))
 
     # ==========================================================
     # ERROR EXTRACTION
@@ -380,7 +348,7 @@ TAREFA ORIGINAL
     # COMPATIBILITY API
     # ==========================================================
 
-    def corrigir_codigo(
+    async def corrigir_codigo(
         self,
         codigo: str,
         erro: str,
@@ -392,7 +360,7 @@ TAREFA ORIGINAL
             context={"code": codigo},
         )
 
-        repaired_code, _ = self._repair_code(
+        repaired_code, _ = await self._repair_code(
             task=fake_task,
             code=codigo,
             error=erro,
@@ -400,22 +368,4 @@ TAREFA ORIGINAL
 
         return repaired_code
 
-    async def corrigir_codigo_async(
-        self,
-        codigo: str,
-        erro: str,
-        task: str,
-    ) -> str:
 
-        fake_task = Task(
-            objective=task,
-            context={"code": codigo},
-        )
-
-        repaired_code, _ = await self._repair_code_async(
-            task=fake_task,
-            code=codigo,
-            error=erro,
-        )
-
-        return repaired_code

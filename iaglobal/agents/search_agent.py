@@ -3,8 +3,6 @@
 import os
 import re
 import requests
-import urllib.request
-import urllib.parse
 
 from iaglobal.tools.search_tools import SearchTools
 from iaglobal.memory.memory_vector import store
@@ -129,104 +127,4 @@ class SearchAgent:
         return result
 
 
-class DuckDuckGoScraperAgent:
-    def __init__(self):
-        # Endpoint HTML estável que não exige JavaScript e consome o mínimo de dados
-        self.base_url = "https://duckduckgo.com?"
-        self.headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3"
-        }
-
-    def executar_pesquisa(self, query: str, max_resultados: int = 3) -> bool:
-        """Realiza a raspagem no DuckDuckGo e persiste os dados no core.db/cbor2."""
-        import urllib.request
-        import urllib.parse
-        import re
-        
-        # 1. Higienização Avançada da Query para evitar o bloqueio anti-bot do DuckDuckGo
-        query_limpa = query.lower()
-        comandos_remover = [
-            "crie uma função que", "crie uma", "função de", "criar função de", 
-            "escreva um", "desenvolva", "faça um algoritmo", "script em python"
-        ]
-        for comando in comandos_remover:
-            query_limpa = query_limpa.replace(comando, "")
-        
-        # Remove caracteres especiais mantendo apenas palavras e espaços simples
-        query_limpa = re.sub(r'[^\w\s]', ' ', query_limpa)
-        query_limpa = " ".join(query_limpa.split())
-        
-        logger.info(f"🛰️ [SEARCH AGENT]: Query higienizada para busca: '{query_limpa}'")
-        
-        try:
-            # 2. Prepara a requisição HTTP com os parâmetros codificados de forma limpa
-            params = urllib.parse.urlencode({"q": query_limpa})
-            req = urllib.request.Request(self.base_url + params, headers=self.headers)
-            
-            # 3. Faz o download do HTML estruturado da página
-            with urllib.request.urlopen(req, timeout=10) as response:
-                html = response.read().decode("utf-8")
-
-            # 4. Captura os blocos de resultados completos do layout HTML clássico
-            # No DuckDuckGo HTML, cada resultado fica envelopado em uma div de classe links_main
-            blocos_resultados = re.findall(r'<div class="[^"]*results_links_deep.*?">.*?</div>\s*</div>\s*</div>', html, re.DOTALL)
-
-            if not blocos_resultados:
-                # Fallback alternativo caso o layout simplificado de tabelas esteja ativo
-                blocos_resultados = re.findall(r'<td class="result-snippet">.*?</td>', html, re.DOTALL)
-                if not blocos_resultados:
-                    logger.warning("⚠️ [SEARCH AGENT]: Nenhum resultado retornado na raspagem do DuckDuckGo.")
-                    return False
-
-            resultados_processados = 0
-            for bloco in blocos_resultados[:max_resultados]:
-                # Extração cirúrgica de Links, Títulos e Snippets usando regex resilientes
-                match_url = re.search(r'href="([^"]*?uddg=[^"]*?)"', bloco)
-                if not match_url:
-                    match_url = re.search(r'href="([^"]*?)"', bloco)
-                    
-                match_title = re.search(r'class="result__url"[^>]*>(.*?)</a>', bloco, re.DOTALL)
-                if not match_title:
-                    match_title = re.search(r'<a class="result-link"[^>]*>(.*?)</a>', bloco, re.DOTALL)
-                    
-                match_snippet = re.search(r'class="result__snippet"[^>]*>(.*?)</a>', bloco, re.DOTALL)
-                if not match_snippet:
-                    match_snippet = re.search(r'<td class="result-snippet"[^>]*>(.*?)</td>', bloco, re.DOTALL)
-
-                # Limpeza final de tags remanescentes no texto extraído
-                url_bruta = match_url.group(1) if match_url else "Sem URL"
-                if "uddg=" in url_bruta:
-                    # Decodifica redirecionamentos internos do DuckDuckGo para obter a URL limpa de destino
-                    url_bruta = url_bruta.split("uddg=")[1].split("&")[0]
-                
-                url = urllib.parse.unquote(url_bruta)
-                title = re.sub(r'<[^>]+>', '', match_title.group(1)).strip() if match_title else "Sem título"
-                snippet = re.sub(r'<[^>]+>', '', match_snippet.group(1)).strip() if match_snippet else "Sem conteúdo"
-
-                if snippet == "Sem conteúdo" or len(snippet) < 10:
-                    continue
-
-                # Formatação padronizada para a memória semântica
-                conhecimento_formatado = (
-                    f"FONTE WEB ({url})\n"
-                    f"TÍTULO: {title}\n"
-                    f"CONTEÚDO: {snippet}"
-                )
-
-                # 5. Injeta na memória semântica do projeto (core.db + sincronização .cbor2)
-                store(text=conhecimento_formatado, mtype="web_search")
-                resultados_processados += 1
-
-            if resultados_processados == 0:
-                logger.warning("⚠️ [SEARCH AGENT]: Blocos encontrados, mas nenhum continha dados válidos.")
-                return False
-
-            logger.info(f"✅ [SEARCH AGENT]: Sincronizados {resultados_processados} novos contextos da web no cbor2.")
-            return True
-
-        except Exception as e:
-            logger.error(f"❌ [SEARCH AGENT]: Falha crítica ao raspar o DuckDuckGo: {e}")
-            return False
 

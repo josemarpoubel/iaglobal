@@ -8,6 +8,7 @@ Camadas:
 - L2: SQLite persistente para durability
 """
 
+import math
 import sqlite3
 import json
 import time
@@ -47,6 +48,11 @@ class SemanticCache:
         self._ram_embeddings: Dict[str, list] = {}
         self._init_table()
 
+    @staticmethod
+    def _normalize(v: list) -> list:
+        norm = math.sqrt(sum(x * x for x in v))
+        return [x / norm for x in v] if norm > 0 else v
+
     def _init_table(self):
         conn = sqlite3.connect(self.db_path)
         try:
@@ -57,7 +63,7 @@ class SemanticCache:
                     query_text TEXT NOT NULL,
                     response TEXT NOT NULL,
                     embedding BLOB,
-                    model TEXT DEFAULT 'all-MiniLM-L6-v2',
+                    model TEXT DEFAULT 'BAAI/bge-small-en-v1.5',
                     score REAL DEFAULT 0.0,
                     access_count INTEGER DEFAULT 1,
                     created_at TIMESTAMP,
@@ -93,7 +99,7 @@ class SemanticCache:
                     del self._ram[best_key]
                     del self._ram_embeddings[best_key]
                 else:
-                    self._update_access(best_key)
+                    self._update_access(entry["query"])
                     elapsed = time.time() - start
                     logger.info(f"[SEM-CACHE] RAM HIT: score={best_score:.3f} "
                                 f"query={query[:40]}... elapsed={elapsed:.3f}s")
@@ -117,10 +123,11 @@ class SemanticCache:
             if not emb_blob:
                 continue
             v = list(struct.unpack(f'{len(emb_blob)//4}f', emb_blob))
-            if len(v) != len(qvec):
-                logger.debug(f"[SEM-CACHE] Shape mismatch: expected {len(v)}, got {len(qvec)}")
+            vn = self._normalize(v)
+            if len(vn) != len(qvec):
+                logger.debug(f"[SEM-CACHE] Shape mismatch: expected {len(vn)}, got {len(qvec)}")
                 continue
-            score = sum(a * b for a, b in zip(qvec, v))
+            score = sum(a * b for a, b in zip(qvec, vn))
             if score > best_l2_score:
                 best_l2_score = score
                 best_l2 = (qtext, resp, emb_blob, created, acc, cid)
@@ -133,8 +140,8 @@ class SemanticCache:
                 return None
             # Populate L1
             key = f"sem:{qtext}"
-            self._ram[key] = {"response": resp, "created_at": created}
-            self._ram_embeddings[key] = list(struct.unpack(f'{len(emb_blob)//4}f', emb_blob))
+            self._ram[key] = {"response": resp, "created_at": created, "query": qtext}
+            self._ram_embeddings[key] = self._normalize(list(struct.unpack(f'{len(emb_blob)//4}f', emb_blob)))
             self._update_access_sql(cid)
             elapsed = time.time() - start
             logger.info(f"[SEM-CACHE] L2 HIT: score={best_l2_score:.3f} "
@@ -153,7 +160,7 @@ class SemanticCache:
         key = f"sem:{query}"
         now = datetime.now(timezone.utc).isoformat()
 
-        self._ram[key] = {"response": response, "created_at": now}
+        self._ram[key] = {"response": response, "created_at": now, "query": query}
         self._ram_embeddings[key] = qvec
 
         qhash = hashlib.sha256(query.encode()).hexdigest()
@@ -212,9 +219,9 @@ class SemanticCache:
             conn.close()
 
     def _embed(self, text: str) -> list:
-        """Gera embedding para o texto."""
         from iaglobal.memory.memory_vector import _get_model
-        return list(_get_model().embed(text))[0]
+        emb = list(_get_model().embed(text))[0]
+        return self._normalize(emb)
 
     def _is_expired(self, entry: Dict) -> bool:
         if self.ttl_seconds is None:
@@ -234,12 +241,13 @@ class SemanticCache:
         except Exception:
             return False
 
-    def _update_access(self, key: str):
+    def _update_access(self, query: str):
+        qhash = hashlib.sha256(query.encode()).hexdigest()
         conn = sqlite3.connect(self.db_path)
         try:
             conn.execute(
                 "UPDATE semantic_cache SET access_count = access_count + 1, last_access = ? WHERE query_hash = ?",
-                (datetime.now(timezone.utc).isoformat(), key)
+                (datetime.now(timezone.utc).isoformat(), qhash)
             )
             conn.commit()
         finally:

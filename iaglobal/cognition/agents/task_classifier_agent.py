@@ -14,6 +14,8 @@ class TaskClassifierAgent:
         "data": ["analise", "dados", "dataset", "csv", "sql", "query", "banco", "tabela", "pandas"],
         "ai": ["ia", "machine learning", "neural", "gpt", "treinamento", "modelo", "predicao"],
         "infra": ["deploy", "docker", "kubernetes", "servidor", "nginx", "cloud", "aws", "devops"],
+        "image": ["imagem", "png", "jpg", "foto", "stable diffusion", "flux", "upscale", "editar imagem"],
+        "video": ["video", "mp4", "edição", "render", "animação", "clip", "wan", "wav2vid"],
     }
 
     LANGUAGE_KEYWORDS = {

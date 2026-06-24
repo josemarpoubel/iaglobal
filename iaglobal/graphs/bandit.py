@@ -1,5 +1,6 @@
 import asyncio
 import secrets
+import threading
 import time
 import os
 from typing import List, Optional, Tuple, Dict
@@ -8,19 +9,24 @@ from collections import defaultdict
 from iaglobal.graphs.credit import CreditAssignmentEngine
 from iaglobal.providers.provider_metrics import metrics
 from iaglobal.utils.logger import logger
+from iaglobal.evolution.epigenetic import adapt_bandit_policy
+from iaglobal.evolution.homeostasis_controller import homeostasis_controller
+from iaglobal.providers.ollama_provider import OLLAMA_CPU_LOCK
 
 PROBE_TIMEOUT_SECONDS: float = float(os.environ.get("IAGLOBAL_PROBE_TIMEOUT", "6.0"))
 PROBE_PROMPT: str = "ping"
 PROBE_TASK_TYPE: str = "probe"
 
-# FIX CRÍTICO 1: Proteção da CPU (4 núcleos). Apenas 1 inferência local por vez.
-_OLLAMA_CPU_LOCK = asyncio.Semaphore(1)
+# Lock compartilhado com ollama_provider.py — apenas 1 inferência local por vez.
+_OLLAMA_CPU_LOCK = OLLAMA_CPU_LOCK
 
 class BanditPolicy:
     """
     🧠 Motor de Decisão Híbrido (ε-greedy / Thompson Sampling).
     Agora com Circuit Breaker nativo e Proteção de Inanição de CPU.
     """
+
+    _DEBOUNCE_MS: float = 50.0
 
     def __init__(self, credit: CreditAssignmentEngine, probe_timeout: float = PROBE_TIMEOUT_SECONDS):
         self.credit = credit
@@ -29,9 +35,52 @@ class BanditPolicy:
         self._probe_cache: Dict[str, Tuple[Optional[float], float]] = {}
         self._probe_cache_ttl: float = 120.0  
         self._error_counts: Dict[str, int] = {}
+        self._epsilon = float(os.getenv("BANDIT_EPSILON", "0.2"))  # Epigenetic: configurable
         
         # FIX CRÍTICO 2: Circuit Breaker Permanente (Amnésia resolvida)
         self._banned_providers: Dict[str, float] = {}
+
+        # FIX BURST: debounce cache para select_model
+        self._select_debounce: Dict[str, Tuple[float, str]] = {}
+
+        # FIX OLLAMA OFFLINE: cache de endpoints offline com TTL curto
+        self._offline_endpoints: Dict[str, float] = {}
+        self._offline_ttl: float = 30.0  # 30s de exclusão temporária
+    
+    def _is_offline(self, endpoint: str) -> bool:
+        """Verifica se endpoint está marcado como offline."""
+        expiry = self._offline_endpoints.get(endpoint)
+        if expiry and time.monotonic() < expiry:
+            return True
+        if expiry:
+            del self._offline_endpoints[endpoint]
+        return False
+    
+    def _mark_offline(self, endpoint: str):
+        """Marca endpoint como offline por _offline_ttl segundos."""
+        self._offline_endpoints[endpoint] = time.monotonic() + self._offline_ttl
+        logger.warning("[BANDIT] Endpoint offline por %.1fs: %s", self._offline_ttl, endpoint)
+    
+    def _check_homeostasis(self):
+        """Periodicamente verifica SLA e ajusta flags epigeneticas."""
+        try:
+            execs = homeostasis_controller.metrics.total_executions
+            if execs > 0 and execs % 5 == 0:
+                sla = homeostasis_controller.check_sla()
+                if not sla["in_compliance"]:
+                    adj = homeostasis_controller.apply_adjustments(sla)
+                    if adj["adjusted"] and adj["epsilon_before"] != adj["epsilon_after"]:
+                        logger.info("[BANDIT-HOMEOSTASIS] SLA violado — epsilon %.3f→%.3f (%d violacoes)",
+                                    adj["epsilon_before"], adj["epsilon_after"], adj["violations"])
+        except Exception as e:
+            logger.debug("[BANDIT-HOMEOSTASIS] Erro no check: %s", e)
+
+    def _apply_epigenetic_adjustments(self):
+        """Apply epigenetic flag adjustments to bandit configuration."""
+        adjustments = adapt_bandit_policy()
+        if "epsilon" in adjustments:
+            self._epsilon = adjustments["epsilon"]
+            logger.debug(f"[EPIGENETIC-BANDIT] Epsilon adjusted to {self._epsilon}")
 
     def record_error(self, provider: str, error_code: int):
         """Registra erro e aplica punição drástica no Circuit Breaker."""
@@ -47,7 +96,7 @@ class BanditPolicy:
             logger.warning(f"⚠️ [CIRCUIT BREAKER] {provider} em Cooldown por 2m (Erro {error_code}).")
             
     def _filter_candidates(self, candidates: List[str]) -> List[str]:
-        """Remove os provedores banidos antes de enviar para seleção."""
+        """Remove os provedores banidos e offline antes de enviar para seleção."""
         now = time.monotonic()
         valid = []
         for c in candidates:
@@ -55,6 +104,8 @@ class BanditPolicy:
             ban_expiry = self._banned_providers.get(provider_domain)
             if ban_expiry and now < ban_expiry:
                 continue # Pula os banidos (evita spam de 402)
+            if self._is_offline(provider_domain):
+                continue # Pula endpoints offline
             valid.append(c)
         return valid
 
@@ -78,13 +129,15 @@ class BanditPolicy:
 
         async def _probe_single(model: str) -> Tuple[str, Optional[float]]:
             start = time.monotonic()
+            provider_domain = model.split("/")[0] if "/" in model else model
+
+            # Skip probe se endpoint estiver marcado como offline
+            if self._is_offline(provider_domain):
+                self._probe_cache[model] = (None, time.monotonic())
+                return model, None
+
             try:
-                # Se for local, entra na fila da CPU. Se for cloud, vai em paralelo.
-                if model.startswith("ollama/"):
-                    async with _OLLAMA_CPU_LOCK:
-                        await asyncio.wait_for(self.async_execute_model(model, PROBE_PROMPT, PROBE_TASK_TYPE), timeout=effective_timeout)
-                else:
-                    await asyncio.wait_for(self.async_execute_model(model, PROBE_PROMPT, PROBE_TASK_TYPE), timeout=effective_timeout)
+                await asyncio.wait_for(self.async_execute_model(model, PROBE_PROMPT, PROBE_TASK_TYPE), timeout=effective_timeout)
                     
                 latency_ms = (time.monotonic() - start) * 1000
                 return model, latency_ms
@@ -92,6 +145,9 @@ class BanditPolicy:
                 self.record_error(model.split("/")[0], 504) # Punição automática
                 return model, None
             except Exception as exc:
+                exc_str = str(exc).lower()
+                if "connectorror" in exc_str.replace(" ", "") or "refused" in exc_str or "cannot connect" in exc_str:
+                    self._mark_offline(provider_domain)
                 return model, None
 
         results = await asyncio.gather(*[_probe_single(m) for m in to_probe])
@@ -103,7 +159,8 @@ class BanditPolicy:
     def _probe_latency_score(self, model: str) -> float:
         cached = self._probe_cache.get(model)
         if not cached or cached[0] is None:
-            return 0.0
+            # Sem probe: assume latência boa para cloud, ruim para ollama
+            return 0.8 if not model.startswith("ollama/") else 0.0
         latency = cached[0]
         excellent_ms = 800.0
         if latency <= excellent_ms:
@@ -133,23 +190,49 @@ class BanditPolicy:
         return remote + ollama
 
     def select_model(self, node: str, strategy: str, candidates: Optional[List[str]] = None) -> str:
+        # FIX BURST: debounce de 50ms — retorna cache se chamado no mesmo frame de tempo
+        now = time.monotonic()
+        cache_key = f"{node}:{strategy}"
+        last = self._select_debounce.get(cache_key)
+        if last and (now - last[0]) * 1000 < self._DEBOUNCE_MS:
+            return last[1]
+
         base_candidates = candidates or BanditPolicy.default_candidates()
         valid_candidates = self._filter_candidates(base_candidates)
+
+        # Prioriza cloud providers sobre ollama SEMPRE (latência melhor)
+        remote_candidates = [m for m in valid_candidates if not m.startswith("ollama/")]
+        if remote_candidates:
+            valid_candidates = remote_candidates + [m for m in valid_candidates if m.startswith("ollama/")]
 
         if not valid_candidates:
             logger.critical("🚨 NENHUM MODELO DISPONÍVEL! Circuit Breaker bloqueou todos. Tentando forçar Ollama.")
             return next((m for m in base_candidates if "ollama" in m), base_candidates[0])
 
-        if self._should_fallback_local(base_candidates) and any(m.startswith("ollama/") for m in valid_candidates):
-            logger.warning("🔄 [BANDIT] Fallback de Emergência Ativado: Roteando para Ollama Local.")
-            return next(m for m in valid_candidates if m.startswith("ollama/"))
-
         scored = self._calculate_scores(node, strategy, valid_candidates)
         scored.sort(reverse=True)
 
-        if secrets.randbelow(100) < 80 and scored: # 80% Exploit
-            return scored[0][1]
-        return secrets.choice(valid_candidates) # 20% Explore
+        # Homeostasis: check SLA periodically e ajusta flags epigeneticas
+        self._check_homeostasis()
+
+        # Epigenetic: apply epsilon from config
+        self._apply_epigenetic_adjustments()
+        # epsilon=0.2 = 20% exploit (usar melhor), 80% explore (random)
+        exploit_pct = int(self._epsilon * 100) if self._epsilon <= 1 else 80
+        
+        if secrets.randbelow(100) < exploit_pct and scored: # epsilon Exploit
+            result = scored[0][1]
+        else:
+            logger.debug(f"[BANDIT] Exploring with epsilon={self._epsilon}")
+            # Prioriza cloud também no exploration
+            if remote_candidates:
+                result = secrets.choice(remote_candidates)
+            else:
+                result = secrets.choice(valid_candidates) # epsilon Explore
+
+        # FIX BURST: atualiza cache de debounce
+        self._select_debounce[cache_key] = (time.monotonic(), result)
+        return result
 
     def select_top_n(self, node: str, strategy: str, n: int = 7, candidates: Optional[List[str]] = None) -> List[str]:
         base_candidates = candidates or BanditPolicy.default_candidates()
@@ -221,11 +304,16 @@ class BanditPolicy:
 
     def _metrics_score(self, model: str) -> float:
         stats = metrics.get_model_stats()
-        if model not in stats: return 0.0
+        if model not in stats:
+            return 0.3 if not model.startswith("ollama/") else 0.2
         s = stats[model]
-        latency_penalty = min(s.get("avg_latency", 1000) / 2000, 1.0)
-        cost_penalty = min(s.get("avg_cost", 0) * 10, 1.0)
-        return (s.get("success_rate", 0) * 0.7) - (latency_penalty * 0.2) - (cost_penalty * 0.1)
+        success = s.get("success_rate", 0)
+        latency = s.get("avg_latency", 1000)
+        cost = s.get("avg_cost", 0)
+        # Normalize latency (0-5s = score 1, 5s+ = score 0)
+        latency_score = max(0, 1 - (latency / 5000))
+        cost_score = max(0, 1 - (cost * 100))
+        return (success * 0.5) + (latency_score * 0.3) + (cost_score * 0.2)
 
     def _task_aware_score(self, model: str, task_type: str) -> float:
         task_stats = metrics.get_task_model_stats().get(model, {}).get(task_type)
@@ -273,15 +361,19 @@ class BanditPolicy:
 # No final do seu bandit.py
 
 _bandit_singleton = None
-_bandit_lock = asyncio.Lock()
+_bandit_init_lock = asyncio.Lock()
+_bandit_singleton_lock = threading.Lock()
 
 def _get_bandit():
     """Sync accessor for the bandit singleton (backward compat).
-    Auto-initializes with a default credit engine if not yet initialized."""
+    Auto-initializes with a default credit engine if not yet initialized.
+    Thread-safe via threading.Lock."""
     global _bandit_singleton
     if _bandit_singleton is None:
-        from iaglobal.graphs.credit import CreditAssignmentEngine
-        _bandit_singleton = BanditPolicy(credit=CreditAssignmentEngine())
+        with _bandit_singleton_lock:
+            if _bandit_singleton is None:
+                from iaglobal.graphs.credit import CreditAssignmentEngine
+                _bandit_singleton = BanditPolicy(credit=CreditAssignmentEngine())
     return _bandit_singleton
 
 async def get_bandit(credit_engine: CreditAssignmentEngine) -> BanditPolicy:
@@ -289,7 +381,7 @@ async def get_bandit(credit_engine: CreditAssignmentEngine) -> BanditPolicy:
     global _bandit_singleton
     
     if _bandit_singleton is None:
-        async with _bandit_lock:
+        async with _bandit_init_lock:
             # Verifica novamente após adquirir o lock (Double-Checked Locking)
             if _bandit_singleton is None:
                 logger.info("[BANDIT] Inicializando motor de decisão assíncrono...")

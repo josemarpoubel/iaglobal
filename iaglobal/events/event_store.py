@@ -74,6 +74,13 @@ class DecisionEventStore:
         print(f"DEBUG: Tentando conectar no SQLite em: {self.db_path}")
         self.conn = sqlite3.connect(self.db_path, timeout=10)
 
+        # Inscreve-se no EventBus para persistir PIPELINE_STAGE events
+        if not self._subscribed:
+            from iaglobal.models.event_bus import bus, EventType
+            bus.subscribe(EventType.PIPELINE_STAGE, self._on_pipeline_event)
+            self._subscribed = True
+            logger.info("[DECISION_STORE] Inscrito em PIPELINE_STAGE para persistência de eventos")
+
     def stop(self):
         if not self._subscribed:
             return

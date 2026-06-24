@@ -21,22 +21,6 @@ class CodeScorer:
             "ESTRUTURA": 20.0,
         }
 
-    def _checar_importacoes_inseguras(self, tree) -> list:
-        proibidos = {"os", "subprocess", "shutil", "socket", "ctypes"}
-        inseguros = []
-
-        for node in ast.walk(tree):
-            if isinstance(node, ast.Import):
-                for alias in node.names:
-                    if alias.name in proibidos:
-                        inseguros.append(alias.name)
-
-            elif isinstance(node, ast.ImportFrom):
-                if node.module in proibidos:
-                    inseguros.append(node.module)
-
-        return inseguros
-
     def _analisar_tree(self, tree) -> Dict[str, Any]:
         metrics = {
             "total_funcoes": 0,
@@ -120,12 +104,5 @@ class CodeScorer:
 _scorer = CodeScorer()
 
 
-def score_code(codigo: str) -> Dict[str, Any]:
-    return _scorer.analyze_code(codigo)
-
-
 def calculate_score(codigo: str) -> float:
     return _scorer.analyze_code(codigo).get("score", 0.0)
-
-
-CodeScorer.calcular_nota_estatica = lambda self, codigo: self.analyze_code(codigo).get("score", 0.0)

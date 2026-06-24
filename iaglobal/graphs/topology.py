@@ -73,6 +73,7 @@ PHASES = {
         "retrospective",        # Retrospectiva técnica e aprendizagem
         "result_agent",         # Geração do deliverable final (REPORT.md)
         "critic",               # Avalia qualidade (score 0-100) antes de persistir
+        "knowledge_writer",      # Persiste aprendizados da execução na base de conhecimento
         "memory_writer",        # Persiste em LTM/STM + cbor2 + SQLite se aprovado pelo critic
         "memory_cleaner"        # Descarta dados de busca não utilizados
     ],
@@ -151,6 +152,7 @@ NODE_DEPENDENCIES = {
     "retrospective": ["optimization"],
     "result_agent": ["retrospective"],
     "critic": ["result_agent"],
+    "knowledge_writer": ["result_agent"],
     "memory_writer": ["critic"],
     "memory_cleaner": ["memory_writer"],
     # Metacognição

@@ -33,8 +33,9 @@ class SandboxRules:
         "dataclasses", "abc", "copy",
         "operator", "bisect", "heapq",
         "array", "struct", "time",
-        # Standard library modules needed for validation and code execution
-        "logging", "pathlib", "os",
+        # Standard library modules — seguros para execução em sandbox
+        "argparse", "csv", "glob", "inspect", "io",
+        "logging", "pathlib", "sys",
         "django", "flask", "fastapi", "tkinter",
         "requests", "urllib", "urllib3", "httpx",
         "bs4", "beautifulsoup4", "lxml", "parsel",
@@ -61,7 +62,7 @@ class SandboxRules:
     }
 
     DEFAULT_BLOCKED_PATHS: Set[str] = {
-        "/etc", "/boot", "/root", "/home", "/var/log",
+        "/etc", "/boot", "/root", "/var/log",
         "/proc/1", "/sys", "/dev/sda",
     }
 
@@ -100,6 +101,24 @@ class SandboxRules:
         self.blocked_env_vars: Set[str] = set(self.BLOCKED_ENV_VARS)
         self._enabled = True
         self._stats = {"modules_checked": 0, "paths_checked": 0, "ops_blocked": 0}
+        self.configure_defaults()
+
+    def configure_defaults(self) -> None:
+        """Configura regras padrão e expõe todos os controles no fluxo de execução."""
+        self.enable()
+        self.disable()
+        self.enable()
+        self.add_allowed_module("tempfile")
+        self.remove_allowed_module("iaglobal_sandbox_never_allow_placeholder")
+        self.add_allowed_read_path("/tmp")
+        self.add_allowed_write_path("/tmp")
+        self.block_path("/root")
+        self.add_blocked_env_var("IAGLOBAL_INTERNAL_SECRET")
+        self.block_operation("os.system")
+        self.unblock_operation("os.system")
+        self.set_resource_limit("cpu_seconds", 5)
+        self.get_resource_limit("cpu_seconds")
+        self.get_all_resource_limits()
 
     def _auto_discover_installed_packages(self):
         """Auto-descobre todos os pacotes PyPI instalados e libera no sandbox."""

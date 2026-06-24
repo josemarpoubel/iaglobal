@@ -7,13 +7,12 @@ from datetime import datetime
 from iaglobal._paths import CACHE_DB
 conn = sqlite3.connect(CACHE_DB)
 
-def inspecionar_cache():
+if __name__ == "__main__":
     try:
         from iaglobal._paths import CACHE_DB
         conn = sqlite3.connect(CACHE_DB)
         cursor = conn.cursor()
         
-        # Busca todos os registros
         cursor.execute("SELECT id, task_hash, data FROM success_registry ORDER BY id DESC")
         registros = cursor.fetchall()
         
@@ -28,13 +27,10 @@ def inspecionar_cache():
             print(f"Modelo: {dados.get('modelo')}")
             print(f"Agente: {dados.get('agente')}")
             print(f"Iterações: {dados.get('iteracoes')}")
-            print(f"Código: {dados.get('codigo', '')[:50]}...") # Resumo do código
+            print(f"Código: {dados.get('codigo', '')[:50]}...")
             print("-" * 30 + "\n")
             
         conn.close()
         
     except Exception as e:
         print(f"Erro ao ler o banco: {e}")
-
-if __name__ == "__main__":
-    inspecionar_cache()

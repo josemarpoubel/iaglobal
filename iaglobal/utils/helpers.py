@@ -1,6 +1,7 @@
 """Helper functions for common operations."""
 
 from typing import Any, Dict, List, Callable, TypeVar
+from concurrent.futures import ThreadPoolExecutor
 import json
 import asyncio
 
@@ -8,24 +9,21 @@ T = TypeVar('T')
 
 
 def run_async_safe(coro: Callable[..., T], *args, **kwargs) -> T:
-    """Executa corrotina de forma segura tanto em contexto sync quanto async.
-    
-    Se já estiver em um event loop, cria uma task e aguarda.
-    Se não, usa asyncio.run().
-    """
+    """Executa corrotina de forma segura tanto em contexto sync quanto async."""
+
+    def _runner() -> T:
+        return asyncio.run(coro(*args, **kwargs))
+
     try:
         loop = asyncio.get_running_loop()
     except RuntimeError:
-        loop = None
-    
-    if loop and loop.is_running():
-        # Já em event loop - criar task e aguardar
-        async def _runner():
-            return await coro(*args, **kwargs)
-        return asyncio.run_coroutine_threadsafe(_runner(), loop).result()
-    else:
-        # Sem event loop - usar asyncio.run
-        return asyncio.run(coro(*args, **kwargs))
+        return _runner()
+
+    if loop.is_running():
+        with ThreadPoolExecutor(max_workers=1) as executor:
+            return executor.submit(_runner).result()
+
+    return _runner()
 
 
 def format_output(data: Any, pretty: bool = True) -> str:

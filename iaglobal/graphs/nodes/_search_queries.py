@@ -1,47 +1,61 @@
-"""Query expansion — gera múltiplas queries focadas a partir de uma task."""
-import re
-from typing import List
+# iaglobal/graphs/nodes/_search_queries.py
 
-_TECH_KEYWORDS = [
+"""
+Query expansion — gera múltiplas queries focadas a partir de uma task.
+Otimizado para imutabilidade total, tokenização resiliente e alta performance local.
+"""
+import re
+from types import MappingProxyType
+from typing import Dict, List, Set
+
+# Coleções estáticas congeladas em memória para máxima performance de hash lookup
+_TECH_KEYWORDS = frozenset([
     "tutorial", "how to", "guide", "documentation", "docs", "reference",
     "api", "library", "framework", "example", "using", "implementation",
     "best practice", "patterns", "getting started",
-]
+])
 
-_CONCEPT_KEYWORDS = [
+_CONCEPT_KEYWORDS = frozenset([
     "what is", "definition", "concept", "overview", "introduction",
     "architecture", "design", "theory", "fundamentals", "principles",
-]
+])
 
-_CODE_KEYWORDS = [
+_CODE_KEYWORDS = frozenset([
     "example", "code", "snippet", "github", "source", "implementation",
     "demo", "sample", "repository", "gist",
-]
+])
 
-_LANG_MAP = {
+_LANG_MAP = MappingProxyType({
     "python": "python", "js": "javascript", "ts": "typescript",
     "react": "react", "vue": "vue", "angular": "angular",
     "java": "java", "php": "php", "ruby": "ruby", "go": "golang",
     "rust": "rust", "cpp": "c++", "csharp": "c#", "sql": "sql",
-}
+})
 
-_STOP_WORDS = {
+_STOP_WORDS = frozenset([
     "criar", "função", "funcao", "como", "fazer", "gerar", "código",
     "codigo", "algoritmo", "programa", "para", "com", "uma", "um",
     "de", "em", "que", "é", "e", "do", "da", "dos", "das",
     "no", "na", "os", "as", "se", "mais", "mas", "por", "ser",
     "create", "function", "how", "to", "make", "generate", "code",
     "using", "with", "the", "a", "an", "in", "of", "for",
-}
+])
+
+# Regex pré-compilado para extrair palavras puras ignorando pontuações
+_WORD_REGEX = re.compile(r"\b\w+\b")
 
 
 def _clean_query(task: str) -> str:
-    words = task.lower().split()
+    """Extrai palavras puras via regex e remove stop-words com performance O(1)."""
+    if not task:
+        return ""
+    words = _WORD_REGEX.findall(task.lower())
     cleaned = " ".join(w for w in words if w not in _STOP_WORDS and len(w) > 1)
     return cleaned if cleaned else task
 
 
 def _detect_language(task: str) -> str:
+    """Detecta a linguagem de programação de forma resiliente."""
     task_lower = task.lower()
     for name, eng in _LANG_MAP.items():
         if name in task_lower:
@@ -50,11 +64,12 @@ def _detect_language(task: str) -> str:
 
 
 def _detect_domain(task: str) -> str:
+    """Detecta o domínio técnico da tarefa aplicando casamento de padrões em loops otimizados."""
     domains = {
-        "web": ["web", "html", "css", "frontend", "backend", "site", "pagina", "api", "rest"],
-        "data": ["data", "database", "sql", "nosql", "analytics", "etl", "pipeline", "query"],
-        "automation": ["script", "automation", "bot", "crawler", "scraper", "cli", "batch"],
-        "ml": ["machine learning", "deep learning", "neural", "train", "model", "ai", "ia"],
+        "web": ("web", "html", "css", "frontend", "backend", "site", "pagina", "api", "rest"),
+        "data": ("data", "database", "sql", "nosql", "analytics", "etl", "pipeline", "query"),
+        "automation": ("script", "automation", "bot", "crawler", "scraper", "cli", "batch"),
+        "ml": ("machine learning", "deep learning", "neural", "train", "model", "ai", "ia"),
     }
     task_lower = task.lower()
     for domain, keywords in domains.items():
@@ -63,8 +78,11 @@ def _detect_domain(task: str) -> str:
     return "general"
 
 
-def generate_queries(task: str) -> dict:
-    """Generate 4 focused queries from a task string."""
+def generate_queries(task: str) -> MappingProxyType:
+    """
+    Gera 4 queries estruturadas e segmentadas a partir da string da tarefa.
+    Retorna uma estrutura de visualização imutável (Read-Only) para segurança do grafo.
+    """
     base = _clean_query(task)
     lang = _detect_language(task)
     domain = _detect_domain(task)
@@ -93,7 +111,9 @@ def generate_queries(task: str) -> dict:
         queries["technical"] = f"{base} script automation tutorial{lang_tag}"
         queries["practical"] = f"{base} script example automation{lang_tag}"
 
-    return queries
+    # Congela o dicionário de saída em modo Read-Only prevenindo mutações colaterais
+    return MappingProxyType(queries)
 
 
 __all__ = ["generate_queries"]
+

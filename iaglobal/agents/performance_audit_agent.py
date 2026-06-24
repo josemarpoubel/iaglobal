@@ -285,10 +285,6 @@ class PatternRegistry:
     def all_rules(self) -> list[AuditRule]:
         return list(self._rules.values())
 
-    def by_category(self, category: Category) -> list[AuditRule]:
-        return [r for r in self._rules.values() if r.category == category]
-
-
 # ---------------------------------------------------------------------------
 # RecidivismTracker — memória estrutural de padrões
 # ---------------------------------------------------------------------------
@@ -535,10 +531,6 @@ class PerformanceAuditAgent:
         self._recidivism = RecidivismTracker()
 
     # ── Public API ──────────────────────────────────────────────────────────
-
-    def register_rule(self, rule: AuditRule) -> None:
-        """Extensão em runtime — adicione regras sem reinicializar o agente."""
-        self._registry.register(rule)
 
     def audit(
         self,

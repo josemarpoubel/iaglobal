@@ -4,10 +4,8 @@ import ast
 import copy
 import hashlib
 import logging
-import os
 import re
 import secrets
-import textwrap
 import traceback
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
@@ -24,16 +22,7 @@ MAX_HYBRIDS_PER_CYCLE = 7
 _log = logging.getLogger(__name__)
 
 
-# ---------------------------------------------------------------------------
-# AST utilities
-# ---------------------------------------------------------------------------
 
-def _source_of(node: ast.AST) -> str:
-    return ast.unparse(node)
-
-
-def _indent(text: str, level: int = 1) -> str:
-    return textwrap.indent(text, "    " * level)
 
 
 # ---------------------------------------------------------------------------
@@ -361,7 +350,7 @@ class HandlerEvolver:
         _log.info("[HANDLER-EVO] Mutado %s → %s [%s]", name, new_name, ",".join(applied))
 
         # Replace the run function name
-        old_fn = f"run_{name}"
+        old_fn = _extract_run_fn_name(new_source) or f"run_{name}"
         new_fn = f"run_{new_name}"
         new_source = new_source.replace(old_fn, new_fn)
 
@@ -393,7 +382,7 @@ class HandlerEvolver:
             new_src = _ThresholdCrossover.apply(new_src, src_b)
 
         new_name = self._new_name(name_a, [name_b[:6]], "cx")
-        old_fn = f"run_{name_a}"
+        old_fn = _extract_run_fn_name(new_src) or f"run_{name_a}"
         new_fn = f"run_{new_name}"
         new_src = new_src.replace(old_fn, new_fn)
 

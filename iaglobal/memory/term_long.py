@@ -52,10 +52,6 @@ class LongTermMemory:
             self._prune()
         self._save_entry(memory)
 
-    @property
-    def memories(self) -> List[Dict]:
-        return self._memories
-
     def retrieve(self, query: str, top_k: int = 5) -> List[Dict]:
         query_lower = query.lower()
         results = []
@@ -90,12 +86,6 @@ class LongTermMemory:
                 return True
         self.store(new_content, metadata)
         return False
-
-    def update_importance(self, index: int, importance: float) -> None:
-        if 0 <= index < len(self._memories):
-            self._memories[index]["importance"] = max(0.0, min(1.0, importance))
-            if self.db_path:
-                self._update_entry(self._memories[index])
 
     def get_stats(self) -> Dict:
         if not self._memories:

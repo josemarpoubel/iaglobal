@@ -175,22 +175,6 @@ class MemoryVector:
         except Exception:
             pass
 
-    def add_to_memory(self, text: str, metadata: str):
-        """Transforma texto em vetor e salva no banco."""
-        vector = list(self.model.embed(text))[0]
-        blob = struct.pack(f'{len(vector)}f', *vector)
-        
-        conn = sqlite3.connect(self.db_path)
-        try:
-            with conn:
-                conn.execute(
-                    "INSERT INTO vector_store (embedding, metadata) VALUES (?, ?)",
-                    (blob, metadata)
-                )
-                conn.commit()
-        finally:
-            conn.close()
-
     def add(self, text: str, mtype: str = "fact", metadata: Optional[Dict] = None) -> None:
         store(text, mtype)
         self.embeddings.append(list(self.model.embed(text))[0])
@@ -199,17 +183,8 @@ class MemoryVector:
     def query(self, query: str, top_k: int = 5) -> List[Tuple[float, Dict[str, Any]]]:
         return search(query, top_k)
 
-    def get_embedding(self, text: str) -> list:
-        return list(self.model.embed(text))[0]
-
-    def similarity(self, text1: str, text2: str) -> float:
-        emb1 = list(self.model.embed(text1))[0]
-        emb2 = list(self.model.embed(text2))[0]
-        return float(sum(a * b for a, b in zip(emb1, emb2)))
-
-    def batch_add(self, texts: List[str], mtype: str = "fact") -> None:
-        for text in texts:
-            self.add(text, mtype)
+    def search(self, query: str, top_k: int = 5) -> List[Tuple[float, Dict[str, Any]]]:
+        return self.query(query, top_k)
 
     def clear(self) -> None:
         self.embeddings = []

@@ -154,6 +154,14 @@ class KnowledgeAgent:
 
         return top
 
+    def query(
+        self,
+        query: str,
+        limit: int = 5,
+        category: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        return self.retrieve(query=query, category=category, max_results=limit)
+
     def retrieve_relevant(self, task: str, max_results: int = 3) -> List[Dict[str, Any]]:
         """
         Busca conhecimento relevante para a task atual.

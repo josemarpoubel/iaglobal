@@ -1,10 +1,11 @@
 # iaglobal/memory/db_manager.py
 
+import asyncio
 import sqlite3
 import threading
 
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Any, Optional
 from iaglobal.utils.logger import logger
 from iaglobal import _paths
 
@@ -23,13 +24,6 @@ class DatabaseManager:
                     cls._instance = super().__new__(cls)
                     cls._initialized = False
         return cls._instance
-
-    @classmethod
-    def _reset_instance(cls):
-        """Reset singleton (uso exclusivo em testes com path temporário)."""
-        with cls._lock:
-            cls._instance = None
-            cls._initialized = False
 
     def __init__(self):
         if self._initialized:
@@ -344,54 +338,28 @@ class DatabaseManager:
         finally:
             conn.close()
 
-    def get_execution_state(self, execution_id: str) -> Dict[str, dict]:
-        """Retorna dict {node_id: {status, result_data, retry_count, error_message}}."""
+    def get_checkpoint(self, execution_id: str) -> Optional[dict]:
+        """Recupera o estado completo de uma execução (checkpoint)."""
         conn = self._get_conn()
         try:
             cursor = conn.execute(
-                """SELECT node_id, status, result_data, retry_count, error_message
-                   FROM execution_states WHERE execution_id = ?""",
+                "SELECT node_id, status, result_data, error_message FROM execution_states WHERE execution_id = ?",
                 (execution_id,)
             )
             rows = cursor.fetchall()
-            result = {}
-            for row in rows:
-                result[row[0]] = {
-                    "status": row[1],
-                    "result_data": row[2],
-                    "retry_count": row[3],
-                    "error_message": row[4],
+            if not rows:
+                return None
+            checkpoint = {}
+            for node_id, status, result_data, error_message in rows:
+                checkpoint[node_id] = {
+                    "status": status,
+                    "result_data": result_data,
+                    "error_message": error_message,
                 }
-            return result
-        except sqlite3.Error as e:
-            logger.error(f"❌ Erro ao get_execution_state {execution_id}: {e}")
-            return {}
-        finally:
-            conn.close()
-
-    def get_checkpoint(self, execution_id: str) -> Dict[str, Dict[str, Any]]:
-        """Retorna dicionário com todos os nós concluídos de uma execução."""
-        conn = self._get_conn()
-        try:
-            cursor = conn.execute(
-                """SELECT node_id, status, result_data, retry_count, error_message
-                   FROM execution_states
-                   WHERE execution_id = ? AND status = 'COMPLETED'""",
-                (execution_id,)
-            )
-            rows = cursor.fetchall()
-            result = {}
-            for row in rows:
-                result[row[0]] = {
-                    "status": row[1],
-                    "result_data": row[2],
-                    "retry_count": row[3],
-                    "error_message": row[4],
-                }
-            return result
+            return checkpoint
         except sqlite3.Error as e:
             logger.error(f"❌ Erro ao get_checkpoint {execution_id}: {e}")
-            return {}
+            return None
         finally:
             conn.close()
 
@@ -400,49 +368,51 @@ class DatabaseManager:
         execution_id: str,
         node_id: str,
         status: str,
-        result_data: Optional[bytes] = None,
+        result_data: Any = None,
         error_message: Optional[str] = None,
     ) -> None:
-        """Atualiza o status de um nó na execução."""
+        """Atualiza o status de um nó na tabela execution_states."""
         conn = self._get_conn()
         try:
             with conn:
-                if status == "FAILED":
+                if result_data is not None:
+                    import pickle
+                    result_blob = pickle.dumps(result_data)
                     conn.execute(
                         """UPDATE execution_states
-                           SET status = ?, result_data = ?, error_message = ?,
-                               retry_count = retry_count + 1, updated_at = CURRENT_TIMESTAMP
+                           SET status = ?, result_data = ?, error_message = ?, updated_at = CURRENT_TIMESTAMP
                            WHERE execution_id = ? AND node_id = ?""",
-                        (status, result_data, error_message, execution_id, node_id)
+                        (status, result_blob, error_message, execution_id, node_id)
                     )
                 else:
                     conn.execute(
-                        """INSERT OR REPLACE INTO execution_states
-                           (execution_id, node_id, status, result_data, retry_count, error_message, updated_at)
-                           VALUES (?, ?, ?, ?, COALESCE((SELECT retry_count FROM execution_states
-                             WHERE execution_id = ? AND node_id = ?), 0), ?, CURRENT_TIMESTAMP)""",
-                        (execution_id, node_id, status, result_data, execution_id, node_id, error_message)
+                        """UPDATE execution_states
+                           SET status = ?, error_message = ?, updated_at = CURRENT_TIMESTAMP
+                           WHERE execution_id = ? AND node_id = ?""",
+                        (status, error_message, execution_id, node_id)
                     )
         except sqlite3.Error as e:
             logger.error(f"❌ Erro ao update_node_status {execution_id}/{node_id}: {e}")
         finally:
             conn.close()
 
-    def get_node_retry_count(self, execution_id: str, node_id: str) -> int:
-        """Retorna o retry_count atual de um nó."""
-        conn = self._get_conn()
-        try:
-            cursor = conn.execute(
-                "SELECT retry_count FROM execution_states WHERE execution_id = ? AND node_id = ?",
-                (execution_id, node_id)
-            )
-            row = cursor.fetchone()
-            return row[0] if row else 0
-        except sqlite3.Error as e:
-            logger.error(f"❌ Erro ao get_node_retry_count {execution_id}/{node_id}: {e}")
-            return 0
-        finally:
-            conn.close()
+    async def update_node_status_async(
+        self,
+        execution_id: str,
+        node_id: str,
+        status: str,
+        result_data: Any = None,
+        error_message: Optional[str] = None,
+    ) -> None:
+        """Versão assíncrona de update_node_status."""
+        await asyncio.to_thread(
+            self.update_node_status,
+            execution_id,
+            node_id,
+            status,
+            result_data,
+            error_message,
+        )
 
     def reset_failed_node(self, execution_id: str, node_id: str) -> None:
         """Reseta o status de um nó falho para PENDING (permite re-execução)."""
@@ -552,17 +522,6 @@ class DatabaseManager:
             return 0
         finally:
             conn.close()
-
-    def delete_execution_events(self, execution_id: str) -> None:
-        conn = self._get_conn()
-        try:
-            with conn:
-                conn.execute("DELETE FROM decision_events WHERE execution_id = ?", (execution_id,))
-        except sqlite3.Error as e:
-            logger.error(f"❌ Erro ao delete_execution_events {execution_id}: {e}")
-        finally:
-            conn.close()
-
 
 # Instância Global para importação direta pelos agentes
 db = DatabaseManager()

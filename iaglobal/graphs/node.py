@@ -7,7 +7,7 @@ import hashlib
 from dataclasses import dataclass, field
 from typing import Callable, Optional, List
 
-from iaglobal.utils.hash_utils import LineageID
+
 
 
 @dataclass
@@ -93,6 +93,17 @@ class Node:
     # Lock de execução (anti race condition)
     _lock: bool = False
 
+    def acquire(self) -> bool:
+        """Try to acquire execution lock. Returns True if successful."""
+        if self._lock:
+            return False
+        self._lock = True
+        return True
+
+    def release(self) -> None:
+        """Release execution lock."""
+        self._lock = False
+
     # -----------------------------
     # RECORD EXECUTION
     # -----------------------------
@@ -140,34 +151,10 @@ class Node:
         )
 
     @property
-    def current_lineage_id(self) -> str:
-        """Retorna o lineage_id SHA3-512 mais recente deste nó."""
-        return self.lineage[-1].lineage_id if self.lineage else ""
-
-    @property
     def current_lineage_marker(self) -> str:
         """Retorna o marcador hereditário de linhagem."""
         return self.lineage[-1].lineage_marker if self.lineage else ""
 
-    # -----------------------------
-    # LOCK (anti race condition)
-    # -----------------------------
-    def acquire(self) -> bool:
-        if self._lock:
-            return False
-        self._lock = True
-        return True
-
-    def release(self):
-        self._lock = False
-
-    @property
-    def locked(self) -> bool:
-        return self._lock
-
-    # -----------------------------
-    # DERIVED METRICS (SAFE)
-    # -----------------------------
     @property
     def success_rate(self) -> float:
         return self.success_count / self.executions if self.executions > 0 else 0.5
@@ -191,25 +178,4 @@ class Node:
             exploration
         )
 
-    def lineage_chain(self) -> list[str]:
-        """Retorna a cadeia completa de lineage_ids, da raiz até o atual."""
-        return [e.lineage_id for e in self.lineage if e.lineage_id]
 
-    def same_lineage_as(self, other: 'Node') -> bool:
-        """Verifica se este nó compartilha linhagem com outro nó via marcador hereditário."""
-        return LineageID.same_lineage(
-            self.current_lineage_marker, other.current_lineage_marker
-        )
-
-    # -----------------------------
-    # RESET EVOLUTION
-    # -----------------------------
-    def reset(self):
-        self.success_count = 0
-        self.fail_count = 0
-        self.executions = 0
-        self.total_latency = 0.0
-        self.last_error = None
-        self.last_execution_ts = None
-        self.metrics.clear()
-        self.lineage.clear()

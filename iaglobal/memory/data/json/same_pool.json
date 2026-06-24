@@ -1,0 +1,50 @@
+[
+  {
+    "agent_name": "unknown",
+    "balance": 0,
+    "total_earned": 0,
+    "total_spent": 100
+  },
+  {
+    "agent_name": "test_agent",
+    "balance": 0,
+    "total_earned": 0,
+    "total_spent": 100
+  },
+  {
+    "agent_name": "test",
+    "balance": 100,
+    "total_earned": 0,
+    "total_spent": 0
+  },
+  {
+    "agent_name": "evo-obsidian-test",
+    "balance": 20,
+    "total_earned": 675,
+    "total_spent": 755
+  },
+  {
+    "agent_name": "evo-obsidian-test-child-gen1",
+    "balance": 235,
+    "total_earned": 135,
+    "total_spent": 0
+  },
+  {
+    "agent_name": "evo-full-cycle",
+    "balance": 10,
+    "total_earned": 135,
+    "total_spent": 225
+  },
+  {
+    "agent_name": "evo-full-cycle-child-gen1",
+    "balance": 235,
+    "total_earned": 135,
+    "total_spent": 0
+  },
+  {
+    "agent_name": "evolution_trigger",
+    "balance": 680,
+    "total_earned": 580,
+    "total_spent": 0
+  }
+]

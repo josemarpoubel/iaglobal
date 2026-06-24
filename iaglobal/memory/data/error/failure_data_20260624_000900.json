@@ -1,0 +1,202 @@
+{
+  "errors": {
+    "total": 17,
+    "by_component": {
+      "test_component": 17
+    },
+    "entries": [
+      {
+        "timestamp": "2026-06-23T14:34:02.815402+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T14:42:13.426290+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T14:59:21.412218+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T15:10:29.836274+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T15:20:04.726819+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T15:55:54.613273+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T16:13:50.479621+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T16:20:36.436502+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T22:41:22.574960+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T23:47:25.997734+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T23:49:04.992705+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T23:52:48.497877+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-23T23:57:14.509907+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-24T00:01:40.992770+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-24T00:03:30.293753+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-24T00:05:13.319376+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-24T00:08:54.184378+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      }
+    ],
+    "path": "/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/json/errors.json"
+  },
+  "metrics": {
+    "total_calls": 1,
+    "by_provider": {
+      "ollama": {
+        "calls": 1,
+        "success": 1,
+        "failures": 0,
+        "total_latency_ms": 50.0,
+        "avg_latency_ms": 50.0,
+        "success_rate": 100.0
+      }
+    },
+    "path": "/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/provider_metrics/metrics.jsonl"
+  },
+  "logs": {
+    "lines": 20456,
+    "tail_lines": 50,
+    "content": "2026-06-23 21:09:00,761 [INFO] [iaglobal] [SKILL] Registrada: api_builder vv1\n2026-06-23 21:09:00,761 [INFO] [iaglobal] [SKILL] Registrada: test_generator vv1\n2026-06-23 21:09:00,761 [INFO] [iaglobal] [SKILL] Registrada: tester vv1\n2026-06-23 21:09:00,761 [INFO] [iaglobal] [SKILL] Registrada: debugger vv1\n2026-06-23 21:09:00,761 [INFO] [iaglobal] [SKILL] Registrada: reviewer vv1\n2026-06-23 21:09:00,761 [INFO] [iaglobal] [SKILL] Registrada: critic vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: validator vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: qa vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: debug_coder vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: fix_validator vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: security vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: performance vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: dependency vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: documentation vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: release vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: deployment_plan vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: metrics vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: optimization vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: knowledge vv1\n2026-06-23 21:09:00,762 [INFO] [iaglobal] [SKILL] Registrada: artifact_writer vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: reflexion vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: retrospective vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: result_agent vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: genesis_builder vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: web_classifier vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: search vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: evaluator vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: gap_analyzer vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: skill_generator vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: sandbox_validator vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: evolution_committee vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: pipeline_updater vv1\n2026-06-23 21:09:00,763 [INFO] [iaglobal] [SKILL] Registrada: evolution_trigger vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: integrator vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: semantic_validator vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: local_knowledge vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: knowledge_analyzer vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: memory_writer vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: memory_cleaner vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: agentmailbox vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: code_executor vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: multi_coder vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: prompt_builder vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: prompt_improver vv1\n2026-06-23 21:09:00,764 [INFO] [iaglobal] [SKILL] Registrada: failure_analysis vv1\n2026-06-23 21:09:00,765 [INFO] [iaglobal] [SKILL] Registrada: knowledge_writer vv1\n2026-06-23 21:09:00,765 [INFO] [iaglobal] [SKILL] Registrada: multi_agent vv1\n2026-06-23 21:09:00,765 [INFO] [iaglobal] [SKILL] Registrada: typing_agent vv1\n2026-06-23 21:09:00,897 [INFO] [iaglobal.omnimind] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 10 principios | 0 agentes registrados\n2026-06-23 21:09:00,902 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/projeto-iaglobal/.env",
+    "path": "/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/logs/app.log"
+  },
+  "collected_at": "2026-06-24T00:09:00.933653"
+}

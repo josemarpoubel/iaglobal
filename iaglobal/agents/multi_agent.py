@@ -92,12 +92,6 @@ def run_multi_agent_delegation(task: Union[str, Task], context: str = "", plan: 
 
 # ─── API de compatibilidade (wrappers legados) ─────────────────────────────
 
-def critique(code: str, task: Union[str, Task]) -> str:
-    """Compatibilidade: delega para nó 'critic' via grafo."""
-    logger.warning("[MULTI_AGENT] critique() chamado - deve usar nó 'critic' no grafo")
-    return f"[DELEGATE_TO_GRAPH] critic task={task} code_len={len(code)}"
-
-
 def debug(code: str, error: str, task: Union[str, Task]) -> str:
     """Compatibilidade: delega para nó 'debugger' via grafo."""
     logger.warning("[MULTI_AGENT] debug() chamado - deve usar nó 'debugger' no grafo")
@@ -144,21 +138,13 @@ def resolver(task: Union[str, Task], max_iters: int = 3) -> str:
     return _default_orchestrator().resolve(task, max_iters)
 
 
-def gerar_solucoes(task: Any, conhecimento: Optional[Dict] = None) -> Dict[str, str]:
-    """Compatibilidade: delega para nó 'coder'/'multi_coder' via grafo."""
-    logger.warning("[MULTI_AGENT] gerar_solucoes() chamado - deve usar nós 'coder'/'multi_coder' no grafo")
-    return {"delegated_to_graph": "true", "task": str(task)[:80]}
-
-
 __all__ = [
     "MultiAgentConfig",
     "build_multi_agent_prompt", 
     "run_multi_agent_delegation",
-    "critique",
     "debug", 
     "reflect",
     "resolver",
-    "gerar_solucoes",
     "PipelineOrchestrator",
     "Multi_Agent",
     "_default_orchestrator",

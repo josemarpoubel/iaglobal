@@ -21,13 +21,6 @@ class Persistence:
         """Adapter: Recupera dados do banco central."""
         return self.db.retrieve(name)
 
-    def salvar_insight(self, agent: str, task_id: str, content: str, score: float):
-        """Método estendido para fluxos de aprendizagem."""
-        # Delega para a lógica de armazenamento centralizada
-        metadata = {"agent": agent, "task_id": task_id, "score": score}
-        self.db.store(task_id, content, metadata)
-        logger.info(f"💾 Insight registrado: Agente={agent} | Task={task_id}")
-
     @staticmethod
     def validar_integridade_memoria(dados: Any) -> bool:
         """Validação de compatibilidade legada."""

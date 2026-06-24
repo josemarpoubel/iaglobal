@@ -10,8 +10,14 @@ Otimizado para evitar vazamentos de memória (OOM) e travamento de CPU.
 
 import copy
 from dataclasses import dataclass, field, asdict
-from typing import Dict, List, Optional, Tuple, Set
+from typing import Dict, List, Optional, Tuple, Set, Any
 from iaglobal.utils.logger import logger
+
+
+CORE_NODE_NAMES = {
+    "prompt_intake", "requirements", "pm", "architect", "planner",
+    "execution_plan", "coder", "reviewer", "validator", "tester",
+}
 
 
 @dataclass(frozen=True)  # Tornar imutável previne mutações colaterais e dispensa deepcopy profundo
@@ -142,51 +148,4 @@ class EvolutionReplay:
 
         return GenerationDiff(gen_a, gen_b, added, removed, mutated)
 
-    def extract_fitness_curve(self, max_gen: int) -> List[Tuple[int, float]]:
-        """Extrai as coordenadas brutas da curva de aprendizado para renderização de gráficos."""
-        snaps = self.reconstruct_snapshots(max_gen)
-        return [(gen, snap.mean_fitness) for gen, snap in sorted(snaps.items())]
 
-    def render_ascii_dashboard(self, max_gen: int) -> str:
-        """Gera um painel visual em texto no console auditando toda a jornada evolucionária."""
-        snaps_dict = self.reconstruct_snapshots(max_gen)
-        snaps = sorted(snaps_dict.values(), key=lambda s: s.generation)
-        
-        if not snaps:
-            return "❌ [REPLAY] Nenhum dado de linhagem disponível para exibição."
-
-        lines = [
-            "==========================================================================",
-            "📊 PAINEL OPERACIONAL DE TELEMETRIA REVOLUCIONÁRIA — iaglobal",
-            "==========================================================================",
-            f"Janela Histórica Analisada: Geração 1 ➔ Geração {max_gen}",
-            ""
-        ]
-
-        # Desenha a curva de fitness em formato ASCII Sparkline
-        lines.append("  📈 Curva de Progresso de Fitness Médio:")
-        for snap in snaps:
-            bar_length = max(0, min(40, int(snap.mean_fitness * 20)))  # Escala proporcional para o console
-            bar = "█" * bar_length
-            lines.append(f"    Gen {snap.generation:03d} [{snap.mean_fitness:.4f}]: {bar}")
-
-        lines.append("\n  📋 Resumo de Alterações por Era:")
-        for snap in snaps:
-            lines.append(
-                f"    🧬 [Gen {snap.generation:02d}] "
-                f"Agentes Ativos: {snap.evo_count} | Core: {snap.core_count} | "
-                f"Diversidade de Prompts: {snap.strategy_diversity:.2%}"
-            )
-
-        # Calcula e exibe os Diffs acumulados entre as eras
-        lines.append("\n  🔄 Detalhes de Mutações Genéticas de Agentes (Diffs):")
-        for i in range(len(snaps) - 1):
-            d = self.diff(snaps[i].generation, snaps[i + 1].generation)
-            delta = snaps[i + 1].mean_fitness - snaps[i].mean_fitness
-            indicator = "🔼" if delta > 0 else "🔻" if delta < 0 else "⏹️"
-            lines.append(
-                f"    Mudança Era {d.gen_a}➔{d.gen_b}: {indicator} Fitness Δ={delta:+.4f} | "
-                f"Nascidos: +{len(d.added)} | Mortos: -{len(d.removed)} | Mutados: *{len(d.mutated)}"
-            )
-
-        return "\n".join(lines)

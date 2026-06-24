@@ -422,20 +422,39 @@ def cmd_status(args: argparse.Namespace):
 
 # ── Storage helpers ──────────────────────────────────────────────────────
 
-_GRAPH_CACHE = None
-_ENGINE_CACHE = None
+
+class _EvolutionLabCache:
+    """Cache thread-safe para EvolutionEngine e ExecutionGraph.
+
+    Substitui globais de módulo (_GRAPH_CACHE, _ENGINE_CACHE) por
+    uma classe com escopo controlado, evitando vazamento de memória
+    e permitindo concorrência.
+    """
+    def __init__(self):
+        self.graph = None
+        self.engine = None
+
+    def store(self, graph, engine):
+        self.graph = graph
+        self.engine = engine
+
+    def load(self, args):
+        if self.graph is not None and self.engine is not None:
+            return self.graph, self.engine
+        return None
+
+
+_LAB_CACHE = _EvolutionLabCache()
 
 
 def _store_engine(graph, engine):
-    global _GRAPH_CACHE, _ENGINE_CACHE
-    _GRAPH_CACHE = graph
-    _ENGINE_CACHE = engine
+    _LAB_CACHE.store(graph, engine)
 
 
 def _load_or_init(args) -> tuple:
-    global _GRAPH_CACHE, _ENGINE_CACHE
-    if _GRAPH_CACHE is not None and _ENGINE_CACHE is not None:
-        return _GRAPH_CACHE, _ENGINE_CACHE
+    cached = _LAB_CACHE.load(args)
+    if cached is not None:
+        return cached
     graph, engine = cmd_init(args)
     return graph, engine
 
@@ -555,7 +574,30 @@ def run_evolution_lab():
     # Execução protegida por log
     logger.debug(f"⚙️ [LAB] Executando comando: {args.subcommand}")
     try:
-        args.func(args)
+        if args.subcommand == "init":
+            cmd_init(args)
+        elif args.subcommand == "evolve":
+            cmd_evolve(args)
+        elif args.subcommand == "snapshots":
+            cmd_snapshots(args)
+        elif args.subcommand == "report":
+            cmd_report(args)
+        elif args.subcommand == "diff":
+            cmd_diff(args)
+        elif args.subcommand == "patch-sequence":
+            cmd_patch_sequence(args)
+        elif args.subcommand == "detect-collapse":
+            cmd_detect_collapse(args)
+        elif args.subcommand == "lineage":
+            cmd_lineage(args)
+        elif args.subcommand == "fitness-curve":
+            cmd_fitness_curve(args)
+        elif args.subcommand == "export-json":
+            cmd_export_json(args)
+        elif args.subcommand == "status":
+            cmd_status(args)
+        elif hasattr(args, "func"):
+            args.func(args)
         logger.info(f"✅ [LAB] Comando '{args.subcommand}' finalizado com sucesso.")
     except Exception as e:
         logger.error(f"❌ [LAB] Falha crítica ao executar '{args.subcommand}': {str(e)}", exc_info=True)

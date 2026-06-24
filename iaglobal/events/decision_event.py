@@ -61,28 +61,4 @@ class DecisionLock:
         data.pop("locked_at", None)
         return cls(**data)
 
-async def resolve_locked_model_async(ctx: Dict[str, Any], fallback: str = "") -> str:
-    """Versão assíncrona com log de auditoria de resolução."""
-    metadata = ctx.get("input", {}).get("metadata", {})
-    lock_data = metadata.get("decision_lock")
-    
-    if isinstance(lock_data, dict):
-        model = lock_data.get("selected_model")
-        if model:
-            logger.debug(f"🔑 [RESOLVER] Modelo resolvido via lock: {model}")
-            return model
-            
-    res = metadata.get("model", fallback)
-    logger.debug(f"🔑 [RESOLVER] Modelo resolvido via fallback: {res}")
-    return res
 
-def resolve_locked_model(ctx: Dict[str, Any], fallback: str = "") -> str:
-    """Versão síncrona com log de auditoria."""
-    metadata = ctx.get("input", {}).get("metadata", {})
-    lock_data = metadata.get("decision_lock")
-    
-    if isinstance(lock_data, dict):
-        model = lock_data.get("selected_model")
-        if model:
-            return model
-    return metadata.get("model", fallback)

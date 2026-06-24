@@ -7,9 +7,10 @@ import re
 import time
 from typing import Optional, List, Dict, Union, Any, Callable
 from threading import Lock
+from iaglobal.utils.helpers import run_async_safe
 
 # FIX: Importamos AsyncOpenAI para não travar o Event Loop da corrida paralela
-from openai import OpenAI, AsyncOpenAI 
+from openai import AsyncOpenAI
 
 from iaglobal.providers.provider_config import ProviderConfig
 from iaglobal.utils.logger import get_logger
@@ -33,7 +34,6 @@ def get_api_key() -> str:
     return key or ""
 
 _async_client: Optional[AsyncOpenAI] = None
-_sync_client: Optional[OpenAI] = None
 _client_lock = Lock()
 
 def get_async_client() -> AsyncOpenAI:
@@ -43,14 +43,6 @@ def get_async_client() -> AsyncOpenAI:
             if not _async_client:
                 _async_client = AsyncOpenAI(api_key=get_api_key(), base_url="https://router.huggingface.co/v1")
     return _async_client
-
-def get_sync_client() -> OpenAI:
-    global _sync_client
-    if not _sync_client:
-        with _client_lock:
-            if not _sync_client:
-                _sync_client = OpenAI(api_key=get_api_key(), base_url="https://router.huggingface.co/v1")
-    return _sync_client
 
 # ==========================================================
 # MULTIMODAL (Processamento de Imagens no Prompt)
@@ -77,6 +69,10 @@ def build_multimodal_messages(prompt: str) -> List[Dict[str, Any]]:
 # ==========================================================
 # EXECUÇÃO ASSÍNCRONA (A Corrida Paralela)
 # ==========================================================
+
+def generate(prompt: str, model: str = DEFAULT_MODEL, timeout: int = 30, token_collector: Optional[Callable] = None, **kwargs) -> str:
+    return run_async_safe(async_generate, prompt, model, timeout, token_collector, **kwargs)
+
 
 async def async_generate(
     prompt: str, 
@@ -126,38 +122,3 @@ async def async_generate(
     except Exception as e:
         logger.error(f"[HF_Router ASYNC] Erro ao chamar {clean_model}: {e}")
         raise # Joga o erro pro Router registrar no Circuit Breaker
-
-# ==========================================================
-# EXECUÇÃO SÍNCRONA (Legacy / Fallback)
-# ==========================================================
-
-def generate(
-    prompt: str, 
-    model: str = DEFAULT_MODEL, 
-    timeout: int = 30, 
-    token_collector: Optional[Callable] = None,
-    **kwargs
-) -> str:
-    """Modo Síncrono (bloqueante). Mantido para retrocompatibilidade."""
-    if not get_api_key(): return ""
-    
-    import re
-    clean_model = re.sub(r'^hf_router_\w+/', '', model)
-    clean_model = clean_model.replace("hf_router/", "", 1).strip() or DEFAULT_MODEL
-    messages = build_multimodal_messages(prompt) if isinstance(prompt, str) else prompt
-    client = get_sync_client()
-
-    try:
-        completion = client.chat.completions.create(
-            model=clean_model, messages=messages, timeout=float(timeout), max_tokens=MAX_TOKENS
-        )
-        
-        if hasattr(completion, 'usage') and completion.usage:
-            pt = completion.usage.prompt_tokens or 0
-            ct = completion.usage.completion_tokens or 0
-            if token_collector: token_collector(pt, ct)
-
-        return (completion.choices[0].message.content or "").strip()
-    except Exception as e:
-        logger.error(f"[HF_Router SYNC] Erro: {e}")
-        raise

@@ -1,10 +1,12 @@
 import httpx
+
 from ddgs import DDGS
+
 
 class SearchTools:
 
     @staticmethod
-    def search_and_fetch_code(query: str, max_results: int = 1) -> str:
+    async def search_and_fetch_code(query: str, max_results: int = 1) -> str:
         with DDGS() as ddgs:
             res = list(ddgs.text(f"{query} github", max_results=max_results))
             if not res:
@@ -14,7 +16,8 @@ class SearchTools:
             if "github.com" in url:
                 url = url.replace("github.com/", "raw.githubusercontent.com/").replace("/blob/", "/")
 
-            response = httpx.get(url, timeout=10)
+            async with httpx.AsyncClient() as client:
+                response = await client.get(url, timeout=10)
             return response.text if response.status_code == 200 else "Erro ao extrair código."
 
     @staticmethod

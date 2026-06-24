@@ -224,9 +224,6 @@ class CognitiveProxy:
             logger.error(f"[COGNITIVE-PROXY] Erro: {e} elapsed={elapsed:.2f}s")
             return ProxyResult(success=False, output="", error=str(e))
 
-    def _build_fingerprint(self, query: str):
-        return self.task_classifier.classify(query)
-
     # =========================================================================
     # 1. NORMALIZADOR DE INTENÇÃO (ANTI-AMBIGUIDADE)
     # =========================================================================

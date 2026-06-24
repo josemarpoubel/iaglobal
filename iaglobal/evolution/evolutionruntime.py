@@ -3,46 +3,8 @@
 import asyncio
 import time
 import traceback
-from typing import Optional, Protocol, Dict, Any, List
-from abc import ABC, abstractmethod
+from typing import Optional, Dict, Any
 from iaglobal.utils.logger import logger
-
-# ==============================================================================
-# 🎯 SKILLS FLEXÍVEIS: INTERFACE DE ESTRATÉGIA DE EVOLUÇÃO (Strategy Pattern)
-# ==============================================================================
-class EvolutionStrategy(ABC):
-    """Interface abstrata para definir estratégias flexíveis de evolução."""
-    
-    @abstractmethod
-    async def execute_evolution(self, registry: Any, context: Any) -> Dict[str, Any]:
-        """Executa o ciclo evolutivo de forma 100% assíncrona."""
-        pass
-
-
-class FastEvolutionStrategy(EvolutionStrategy):
-    """Estratégia Focada em Velocidade: Muta apenas os nós críticos que falharam."""
-    async def execute_evolution(self, registry: Any, context: Any) -> Dict[str, Any]:
-        logger.info("[STRATEGY] Ejecutando evolução rápida assíncrona...")
-        # Aqui dispararíamos tasks assíncronas concorrentes via asyncio.gather()
-        await asyncio.sleep(0.5)  # Simulação de I/O de rede leve
-        return {"mutations_count": 1, "strategy": "fast"}
-
-
-class DeepEvolutionStrategy(EvolutionStrategy):
-    """Estratégia Focada em Qualidade: Realiza Crossover e Fine-Tuning massivo."""
-    async def execute_evolution(self, registry: Any, context: Any) -> Dict[str, Any]:
-        logger.info("[STRATEGY] Executando evolução profunda e massiva...")
-        # Simula processamento pesado e concorrência de múltiplas LLMs paralelas
-        await asyncio.sleep(2.0) 
-        return {"mutations_count": 5, "strategy": "deep"}
-
-# ==============================================================================
-# 🚀 PROTOCOLO ASYNC EVOLVER
-# ==============================================================================
-class AsyncEvolver(Protocol):
-    """O Evolver agora fala a língua nativa do Asyncio."""
-    async def evolve_async(self, strategy: EvolutionStrategy) -> Dict[str, Any]:
-        ...
 
 # ==============================================================================
 # 🏗️ MOTOR CORE: EVOLUTION RUNTIME FLEXÍVEL
@@ -50,10 +12,18 @@ class AsyncEvolver(Protocol):
 
 import asyncio
 import logging
-from typing import Optional
+from typing import Optional, Dict, Any
 
 # Definimos a variável global no topo do módulo
 _runtime_instance: Optional['EvolutionRuntime'] = None
+
+
+def get_runtime() -> 'EvolutionRuntime':
+    """Retorna a instância Singleton do EvolutionRuntime, criando se necessário."""
+    global _runtime_instance
+    if _runtime_instance is None:
+        _runtime_instance = EvolutionRuntime()
+    return _runtime_instance
 
 class EvolutionRuntime:
     """
@@ -81,6 +51,7 @@ class EvolutionRuntime:
         # Estratégias e estados
 
         self.current_strategy = FastEvolutionStrategy()
+        self.interval = self.current_strategy.interval
         
         self.cycles = 0
         self.failures = 0
@@ -91,17 +62,21 @@ class EvolutionRuntime:
         self._initialized = True
         logging.getLogger("iaglobal.evolution").info("🚀 EvolutionRuntime inicializado.")
 
-# Função de acesso recomendada para evitar erros de escopo
-def get_runtime(evolver=None, interval=60) -> 'EvolutionRuntime':
-    global _runtime_instance
-    if _runtime_instance is None:
-        _runtime_instance = EvolutionRuntime(evolver, interval)
-    return _runtime_instance
-
-    def set_strategy(self, strategy: EvolutionStrategy):
-        """Altera dinamicamente a estratégia de evolução sem derrubar o servidor."""
-        logger.info(f"🔄 [RUNTIME] Alterando estratégia de evolução para: {strategy.__class__.__name__}")
+    def set_strategy(self, strategy) -> None:
+        """Altera a estratégia de evolução em tempo de execução."""
         self.current_strategy = strategy
+        self.interval = strategy.interval
+        logger.info(f"[RUNTIME] Estratégia alterada para {strategy.__class__.__name__} (intervalo={strategy.interval}s)")
+
+    def status(self) -> Dict[str, Any]:
+        """Retorna métricas em tempo real do runtime."""
+        return {
+            "cycles": self.cycles,
+            "failures": self.failures,
+            "interval": self.interval,
+            "strategy": self.current_strategy.__class__.__name__,
+            "running": self._running,
+        }
 
     def start(self, loop: Optional[asyncio.AbstractEventLoop] = None):
         """Inicia o loop evolutivo em background de forma não-bloqueante."""
@@ -134,8 +109,9 @@ def get_runtime(evolver=None, interval=60) -> 'EvolutionRuntime':
                     self.failures = 0
                     self._consecutive_stable += 1
                     
-                    # Log dinâmico baseado no retorno da estratégia flexível
-                    logger.info(f"[CICLO #{self.cycles}] Sucesso via {result.get('strategy')}. Mutações: {result.get('mutations_count')}")
+                    strategy_name = self.current_strategy.name
+                    mut_count = result.get('mutations_count', 0) if isinstance(result, dict) else 0
+                    logger.info(f"[CICLO #{self.cycles}] Sucesso via {strategy_name}. Mutações: {mut_count}")
 
                     # Backoff dinâmico descendente se estiver estável
                     if self._consecutive_stable >= 3:
@@ -179,3 +155,56 @@ def get_runtime(evolver=None, interval=60) -> 'EvolutionRuntime':
                 )
         except Exception:
             pass
+
+
+class EvolutionStrategy:
+    """Classe base para estratégias de evolução."""
+
+    name: str = "base"
+    mutation_rate: float = 0.1
+    crossover_rate: float = 0.3
+    selection_pressure: float = 0.5
+    interval: int = 60
+    exploration_rate: float = 0.2
+    description: str = "Estratégia base"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "name": self.name,
+            "mutation_rate": self.mutation_rate,
+            "crossover_rate": self.crossover_rate,
+            "selection_pressure": self.selection_pressure,
+            "interval": self.interval,
+            "exploration_rate": self.exploration_rate,
+            "description": self.description,
+        }
+
+
+class FastEvolutionStrategy(EvolutionStrategy):
+    """
+    Estratégia rápida: ciclos curtos (30s), mutações agressivas (30%),
+    alta pressão seletiva (top 30% sobrevivem), alta exploração (40%).
+    Ideal para descoberta inicial de variantes.
+    """
+    name = "fast"
+    mutation_rate = 0.3
+    crossover_rate = 0.5
+    selection_pressure = 0.3
+    interval = 30
+    exploration_rate = 0.4
+    description = "Ciclos curtos, mutações agressivas, alta frequência."
+
+
+class DeepEvolutionStrategy(EvolutionStrategy):
+    """
+    Estratégia profunda: ciclos longos (120s), mutações cirúrgicas (5%),
+    baixa pressão seletiva (top 70% sobrevivem), baixa exploração (5%).
+    Ideal para refinamento e estabilização.
+    """
+    name = "deep"
+    mutation_rate = 0.05
+    crossover_rate = 0.1
+    selection_pressure = 0.7
+    interval = 120
+    exploration_rate = 0.05
+    description = "Ciclos longos, mutações cirúrgicas, baixa frequência."

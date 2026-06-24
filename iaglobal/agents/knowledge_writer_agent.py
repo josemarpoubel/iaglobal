@@ -93,6 +93,13 @@ class KnowledgeWriterAgent:
         concepts = self.kg.extract_and_store(combined, source)
         results["concepts"] = concepts
         logger.debug(f"[KB-WRITER] Conceitos extraídos: {len(concepts)} ({', '.join(concepts[:3])})")
+        # Auto-inicializa vector store se necessário (fix: evita "no such table: memory")
+        try:
+            from iaglobal.memory.memory_vector import init_db
+            init_db()
+        except Exception:
+            pass
+
 
         if self._is_definition_query(prompt_lower):
             defn = self._write_definition(prompt, response, source)

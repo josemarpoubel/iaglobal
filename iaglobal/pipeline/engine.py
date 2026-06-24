@@ -168,20 +168,6 @@ class PipelineEngine:
         if ingested_context:
             prompt = f"{state.prompt}\n\n[ARQUIVOS INGERIDOS]\n{ingested_context}"
 
-        def _is_valid_code(code: str) -> bool:
-            if not code or len(code) < 50:
-                return False
-            stripped = code.strip()
-            if stripped.startswith("{"):
-                try:
-                    import json
-                    obj = json.loads(stripped[:500])
-                    if isinstance(obj, dict) and any(k in obj for k in ("epics", "enhanced_task", "approach", "stories")):
-                        return False
-                except json.JSONDecodeError:
-                    pass
-            return True
-
         # Escolha do modelo via Bandit (NÃO sobrescrever depois!)
         candidates = [m for _, m in credit_candidates_fn()]
         chosen_model = None
@@ -272,86 +258,6 @@ class PipelineEngine:
         logger.warning("⚠️ [ASYNC PIPELINE] DAG finalizada sem produzir saída válida. nodes_executed=%s, final_output_len=%d",
                        graph_result.get("nodes_executed"), len(str(final_output)))
         raise RuntimeError("Nenhum dos nós da DAG produziu código válido.")
-
-    def _generation_stage(self, state: PipelineState):
-
-        state.current_stage = PipelineStage.GENERATION.name
-
-        logger.info("⚙️ processando sua solicitação ...")
-
-        candidates = [m for _, m in credit_candidates_fn()]
-        try:
-            chosen_model = self.orchestrator.bandit.select_model(
-                node="cognitive_dag_root",
-                strategy="dev_fast",
-                candidates=candidates,
-            )
-            logger.info("🎯 BANDIT selecionou: %s", chosen_model)
-        except Exception:
-            cand = credit_candidates_fn()
-            chosen_model = cand[0][1] if cand else None
-            logger.info("🎯 BANDIT indisponível, fallback: %s", chosen_model)
-
-        chosen_model = ""
-
-        try:
-            graph_result = self.orchestrator.run_graph_task(state.prompt, chosen_model=chosen_model)
-            raw_results = graph_result.get("raw_results", {})
-
-            artifact_writer_result = raw_results.get("artifact_writer", {})
-            if isinstance(artifact_writer_result, dict) and artifact_writer_result.get("persisted"):
-                state.generated_code = artifact_writer_result.get("artifact_code", "")
-                state.script_path = artifact_writer_result.get("path")
-                state.score = artifact_writer_result.get("score", 0)
-                artifact_obj = artifact_writer_result.get("artifact")
-                if artifact_obj and hasattr(artifact_obj, "metadata"):
-                    state.metadata["artifact"] = artifact_obj
-                logger.info("✅ [PIPELINE] Artifact persisted at %s", state.script_path)
-                return
-
-            final_artifact = None
-            for node_name in ["final_gatekeeper", "debugger", "tester"]:
-                node_result = raw_results.get(node_name, {})
-                output = node_result.get("output") if isinstance(node_result, dict) else None
-                if output and hasattr(output, "code") and output.code:
-                    final_artifact = output
-                    break
-
-            if final_artifact and final_artifact.code:
-                state.generated_code = final_artifact.code
-                state.score = final_artifact.score if final_artifact.score else 0.0
-                return
-
-            final_output = graph_result.get("final_output", "")
-            if final_output:
-                state.generated_code = str(final_output) if not isinstance(final_output, str) else final_output
-                return
-
-            raise RuntimeError("DAG pipeline não produziu código")
-
-        except Exception as e:
-            logger.error("❌ DAG pipeline falhou: %s", e)
-
-            _default_ollama = ProviderConfig.DEFAULT_OLLAMA_MODEL or "qwen2.5:0.5b"
-            fallback_models = [
-                f"ollama/{_default_ollama}",
-            ]
-
-            last_error = None
-            for modelo in fallback_models:
-                try:
-                    resposta = run_async_safe(async_route_generate,
-                        model=modelo,
-                        prompt=state.prompt,
-                        task_type="general",
-                    )
-                    if resposta:
-                        state.generated_code = resposta
-                        return
-                except Exception as e2:
-                    last_error = str(e2)
-
-            raise RuntimeError(last_error or "No model produced output.")
 
     def _validation_stage(self, state):
 
@@ -451,30 +357,18 @@ class PipelineEngine:
             from iaglobal.memory.term_long import LongTermMemory
             from iaglobal.memory.semantic_cache import SemanticCache
 
-            stm = ShortTermMemory(db_path=MEMORIES_DB)
-            ltm = LongTermMemory(db_path=MEMORIES_DB)
-            cache = SemanticCache()
+            def _learn_sync():
+                stm = ShortTermMemory(db_path=MEMORIES_DB)
+                ltm = LongTermMemory(db_path=MEMORIES_DB)
+                cache = SemanticCache()
+                stm.add(f"Q: {state.prompt}", {"type": "query", "source": "pipeline"})
+                stm.add(f"A: {state.generated_code[:200]}", {"type": "response", "source": "pipeline"})
+                ltm.store(state.generated_code[:500], {"prompt": state.prompt, "source": "pipeline"}, source="pipeline")
+                cache.set(state.prompt, state.generated_code)
 
-            stm.add(f"Q: {state.prompt}", {"type": "query", "source": "pipeline"})
-            stm.add(f"A: {state.generated_code[:200]}", {"type": "response", "source": "pipeline"})
-            ltm.store(state.generated_code[:500], {"prompt": state.prompt, "source": "pipeline"}, source="pipeline")
-            cache.set(state.prompt, state.generated_code)
+            await asyncio.to_thread(_learn_sync)
             logger.info("[LEARN] STM/LTM/cache atualizados: %s", state.prompt[:60])
         except Exception as e:
             logger.debug("[LEARN] Erro: %s", e)
 
-    def _persistence_stage(self, state: PipelineState):
 
-        state.current_stage = PipelineStage.PERSISTENCE.name
-
-        logger.info("📝 archivando aprendizado ...")
-
-        self.orchestrator.memory.store(
-            state.prompt,
-            state.generated_code or "",
-            {"ts": time.time(), "score": state.score,
-             "script_path": str(state.script_path) if state.script_path else "",
-             "path": str(state.script_path) if state.script_path else ""},
-        )
-
-        logger.info("✅ tudo ok, aprendi mais uma lição!")

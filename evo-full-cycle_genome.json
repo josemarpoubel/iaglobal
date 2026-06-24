@@ -1,0 +1,16 @@
+{
+  "name": "evo-full-cycle",
+  "lineage_id": "e1004983e9ce802f11aa3e83868c3951490329a3142c83b5772649ce5683e453b5c710f8336e0cc969c644335fe6549d6c711540d3f634ebed0fe219369b6867",
+  "lineage_marker": "e3ab7d26efd53612",
+  "generation": 0,
+  "parent_lineage_id": "",
+  "nadph_reserve": 0.75,
+  "epigenetic_flags": {},
+  "failure_patterns": [
+    "RuntimeError",
+    "RuntimeError"
+  ],
+  "same_balance": 5,
+  "timestamp": 1782262186.662337,
+  "reason": "test_cleanup"
+}

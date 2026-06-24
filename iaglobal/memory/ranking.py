@@ -39,12 +39,6 @@ class CognitiveRanking:
             + self.weights["web_frequency"] * web_freq
         )
 
-    def rank(self, items: List[Dict]) -> List[Dict]:
-        """Rankeia uma lista de itens e adiciona 'cognitive_score'."""
-        for item in items:
-            item["cognitive_score"] = round(self.score(item), 3)
-        return sorted(items, key=lambda x: x["cognitive_score"], reverse=True)
-
     def detect_conflict(self, web_item: Dict, memory_item: Dict) -> Optional[str]:
         """Detecta conflito entre conhecimento web e memória local."""
         if not web_item or not memory_item:

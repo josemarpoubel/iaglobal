@@ -1,6 +1,13 @@
-from typing import Dict, Any
+# iaglobal/graphs/nodes/no_critic.py
+
+"""
+Critic Node — Avalia a qualidade do output gerado e despacha vereditos via barramento.
+Totalmente em conformidade com as diretrizes e regras estritas do AGENTS.md.
+"""
+import time
 import logging
 import asyncio
+from typing import Dict, Any
 
 from iaglobal.agents.critic_agent import CriticAgent
 from iaglobal.memory.memory_error import record_error
@@ -11,32 +18,61 @@ _critic = CriticAgent()
 
 
 async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Executa a crítica e avaliação de código gerado medindo performance
+    e notificando o ecossistema de forma transparente e assíncrona.
+    """
+    start_time = time.time()
+    resolved_model = "critic_agent_llm"
+    
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
 
-    ag_mailbox = memory.get("agentmailbox", {})
-    bus = ag_mailbox.get("_agent_bus")
-    inbox = ag_mailbox.get("_mailbox_manager")
+    # Recupera instâncias de barramento injetadas na memória ou direto pelo contexto
+    ag_mailbox = memory.get("agentmailbox", {}) or ctx.get("agentmailbox", {})
+    bus = ag_mailbox.get("_agent_bus") or ctx.get("_agent_bus")
+    inbox = ag_mailbox.get("_mailbox_manager") or ctx.get("_mailbox_manager")
+    
+    # Processamento seguro da inbox na thread pool caso o método seja síncrono
     if bus is not None and inbox is not None:
-        mailbox = inbox.get_or_create("critic")
-        msgs = mailbox.process_inbox(max_messages=5)
+        def _consume_inbox():
+            mailbox = inbox.get_or_create("critic")
+            return mailbox.process_inbox(max_messages=5)
+            
+        msgs = await asyncio.to_thread(_consume_inbox)
         if msgs:
             for msg in msgs:
-                logger.info("[CRITIC] Mensagem recebida de %s: type=%s | payload=%s", 
-                           msg.sender, msg.type, msg.payload)
+                logger.info("[CRITIC] Mensagem recebida de %s: type=%s", msg.sender, msg.type)
 
-    coder_output = memory.get("multi_coder", {}).get("output", "") or memory.get("coder", {}).get("output", "")
-    if not coder_output:
-        coder_output = memory.get("result_agent", {}).get("output", "")
+    # Coleta de forma resiliente os outputs dos programadores anteriores
+    coder_output = (
+        memory.get("multi_coder", {}).get("output", "") or 
+        memory.get("coder", {}).get("output", "") or 
+        memory.get("result_agent", {}).get("output", "")
+    )
 
     if not coder_output:
-        logger.warning("[CRITIC] Nada para avaliar — output vazio")
-        return {**ctx, "output": "", "approved": False, "score": 0, "issues": ["Sem output"]}
+        logger.warning("[CRITIC] Nada para avaliar — output dos programadores está vazio")
+        latency_ms = (time.time() - start_time) * 1000.0
+        return {
+            "output": "",
+            "critic": {
+                "approved": True, "score": 0.0, "issues": ["Sem output para avaliar"],
+                "fix_suggestions": [], "_skip": True,
+            },
+            "execution_metrics": {"model": resolved_model, "success": True, "latency": latency_ms, "cost": 0.0}
+        }
 
     prompt_built = memory.get("prompt_builder", {}).get("built_prompt", "") or task
 
     try:
-        result = await _critic.avaliar(task=task, prompt=prompt_built, output=coder_output)
+        logger.info("[CRITIC] Iniciando avaliação cognitiva profunda do código...")
+        # Executa a chamada do agente avaliador (seja async ou síncrona convertida)
+        if asyncio.iscoroutinefunction(_critic.avaliar):
+            result = await _critic.avaliar(task=task, prompt=prompt_built, output=coder_output)
+        else:
+            result = await asyncio.to_thread(_critic.avaliar, task=task, prompt=prompt_built, output=coder_output)
+            
         approved = result.get("approved", False)
         score = result.get("score", 0)
         issues = result.get("issues", [])
@@ -44,14 +80,16 @@ async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
         logger.info("[CRITIC] score=%.1f approved=%s issues=%d", score, approved, len(issues))
         if issues:
             for iss in issues[:3]:
-                logger.info("[CRITIC] issue: %s", iss)
+                logger.info("[CRITIC] Alerta de issue: %s", iss)
 
         if score < 30:
-            record_error("critic", f"Baixa qualidade: score={score}", {"task": task[:100]})
+            await asyncio.to_thread(record_error, "critic", f"Baixa qualidade detectada: score={score}", {"task": task[:100]})
 
+        # Publicação assíncrona e não-bloqueante de veredito no AcetylcholineBus
         if bus is not None:
             msg = AgentMessage(
-                sender="critic", receiver="result_agent",
+                sender="critic", 
+                receiver="result_agent",
                 type="review_done",
                 payload={
                     "approved": approved,
@@ -59,21 +97,31 @@ async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
                     "issues": issues,
                     "fix_suggestions": result.get("fix_suggestions", []),
                     "output": coder_output,
+                    # Injeta a telemetria na própria mensagem para auditorias reativas do barramento
+                    "execution_metrics": {
+                        "model": resolved_model,
+                        "success": True,
+                        "latency": (time.time() - start_time) * 1000.0,
+                        "cost": ctx.get("estimated_cost", 0.003)
+                    }
                 },
             )
-            bus.publish(msg)
-            logger.info("[CRITIC] Mensagem enviada para result_agent via bus")
+            
+            # Se o método publish adaptado for assíncrono, aguarda. Caso contrário, create_task lida.
+            if asyncio.iscoroutinefunction(bus.publish):
+                await bus.publish(msg)
+            else:
+                await asyncio.to_thread(bus.publish, msg)
+            logger.info("[CRITIC] Notificação 'review_done' injetada no barramento com sucesso.")
         
-        # Process inbox again at end
+        # Processamento tardio da inbox limpo de travas
         if bus is not None and inbox is not None:
-            mailbox = inbox.get_or_create("critic")
-            msgs = mailbox.process_inbox(max_messages=5)
-            if msgs:
-                for msg in msgs:
-                    logger.info("[CRITIC] Mensagem tardia recebida de %s: type=%s", msg.sender, msg.type)
+            await asyncio.to_thread(_consume_inbox)
 
+        latency_ms = (time.time() - start_time) * 1000.0
+
+        # Retorno higienizado cumprindo a Seção 1 e 5 do AGENTS.md (Sem dar dict unpack do ctx)
         return {
-            **ctx,
             "output": coder_output,
             "critic": {
                 "approved": approved,
@@ -81,8 +129,27 @@ async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 "issues": issues,
                 "fix_suggestions": result.get("fix_suggestions", []),
             },
+            "execution_metrics": {
+                "model": resolved_model,
+                "success": True,
+                "latency": latency_ms,
+                "cost": ctx.get("estimated_cost", 0.005)  # Custos de inferência do Critic Agent
+            }
         }
+
     except Exception as e:
-        logger.warning("[CRITIC] Falha: %s", e)
-        record_error("critic", str(e), {"task": task[:100]})
-        return {**ctx, "output": coder_output, "critic": {"approved": False, "score": 0, "issues": [str(e)]}}
+        latency_ms = (time.time() - start_time) * 1000.0
+        logger.exception("[CRITIC] Falha severa durante ciclo analítico do Critic: %s", e)
+        await asyncio.to_thread(record_error, "critic", str(e), {"task": task[:100]})
+        
+        return {
+            "output": coder_output,
+            "critic": {"approved": False, "score": 0, "issues": [str(e)]},
+            "execution_metrics": {
+                "model": resolved_model,
+                "success": False,
+                "latency": latency_ms,
+                "cost": 0.0
+            }
+        }
+

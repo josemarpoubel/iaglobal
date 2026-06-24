@@ -4,6 +4,7 @@ from typing import Any, Dict
 
 from iaglobal.evolution.evolutionengine import EvolutionEngine
 from iaglobal.cognition.outcome_tracker import outcome_tracker, ExecutionOutcome
+from iaglobal.cognition.reputation_engine import reputation_engine
 from iaglobal.evolution.same_engine import same_pool, same_inhibitor, COST_CREATE_SKILL, RECHARGE_RATE
 
 logger = logging.getLogger(__name__)
@@ -40,9 +41,13 @@ class EvolutionTrigger:
                 same_pool.spend("evolution_trigger", COST_CREATE_SKILL)
                 same_used = COST_CREATE_SKILL
                 try:
-                    engine = EvolutionEngine()
-                    engine.set_task(task)
-                    engine.evolve()
+                    graph = ctx.get("graph")
+                    if graph is None:
+                        from iaglobal.graphs.builder import build_pipeline_from_nodes
+                        graph = build_pipeline_from_nodes()
+                    engine = EvolutionEngine(graph=graph)
+                    await engine.set_task_async(task)
+                    await engine.evolve()
                     logger.info("[EVO-TRIGGER] Ciclo evolutivo disparado: %s (SAMe restante: %d)",
                                reason, same_pool.balance("evolution_trigger"))
                     from iaglobal.evolution.metacognition.evaluator import PipelineEvaluator
@@ -88,6 +93,7 @@ class EvolutionTrigger:
                 retries=0,
                 timestamp=time.time(),
             ))
+            reputation_engine.invalidate_cache()
         except Exception as e:
             logger.debug("[EVO-TRIGGER] Falha ao registrar outcome: %s", e)
 

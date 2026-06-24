@@ -36,10 +36,10 @@ import textwrap
 import logging
 from dataclasses import dataclass, field
 from enum import Enum, auto
-from typing import Callable, List, Optional, Protocol, Union
+from typing import List, Optional, Protocol, Union
 
 from iaglobal.models.task import Task
-from iaglobal.reflection.reflexion_engine import reflexion_loop, extract_code_block
+from iaglobal.reflection.reflexion_engine import extract_code_block
 from iaglobal.utils.logger import logger as _base_logger
 from iaglobal.providers.provider_router import route_generate
 
@@ -169,10 +169,6 @@ class ImprovementResult:
     original_code: str
     status: ReflexionStatus
     elapsed_ms: float = 0.0
-
-    @property
-    def changed(self) -> bool:
-        return self.improved_code.strip() != self.original_code.strip()
 
     @property
     def is_fallback(self) -> bool:
@@ -378,39 +374,6 @@ class ReflexionAgent:
         self._templates = templates or PromptTemplates
         self._log = log.bind(config=type(self._config).__name__)
 
-    # ─── Ciclo de auto-reflexão ───────────────────────────────────────────
-
-    def executar_com_reflexao(
-        self,
-        model_fn: Callable[[str], str],
-        prompt: str,
-        max_iterations: int | None = None,
-    ) -> str:
-        """
-        Executa o ciclo de auto-reflexão via reflexion_loop.
-
-        Args:
-            model_fn: callable que recebe um prompt e retorna resposta LLM
-            prompt: prompt inicial do ciclo
-            max_iterations: limita iterações (default: config.max_reflexion_iterations)
-
-        Returns:
-            Melhor resposta produzida pelo ciclo de reflexão
-        """
-        iterations = max_iterations or self._config.max_reflexion_iterations
-        self._log.info("Iniciando ciclo de auto-reflexão", max_iterations=iterations)
-
-        t0 = time.perf_counter()
-        result = reflexion_loop(model_fn, prompt, iterations)
-        elapsed = (time.perf_counter() - t0) * 1000
-
-        self._log.info(
-            "Ciclo de reflexão concluído",
-            elapsed_ms=round(elapsed, 1),
-            result_chars=len(result),
-        )
-        return result
-
     # ─── Análise de resultado ─────────────────────────────────────────────
 
     async def analisar_resultado(
@@ -488,21 +451,6 @@ class ReflexionAgent:
 
     # ─── Sugestão de melhoria ─────────────────────────────────────────────
 
-    async def sugerir_melhoria(
-        self,
-        codigo: str,
-        analise: str,
-        task: Union[str, Task],
-    ) -> str:
-        """
-        Sugere código melhorado com base na análise.
-
-        Retrocompatibilidade: retorna str (código melhorado ou original).
-        Use `sugerir_melhoria_rich` para o resultado tipado completo.
-        """
-        result = await self.sugerir_melhoria_rich(codigo, analise, task)
-        return result.as_str
-
     async def sugerir_melhoria_rich(
         self,
         codigo: str,
@@ -563,31 +511,6 @@ class ReflexionAgent:
             return self._fallback_improvement(codigo, elapsed_ms)
 
     # ─── Pipeline completo: análise → melhoria ────────────────────────────
-
-    async def refletir_e_melhorar(
-        self,
-        codigo: str,
-        resultado_sandbox: dict,
-        task: Union[str, Task],
-    ) -> ImprovementResult:
-        """
-        Pipeline completo: analisa o resultado e imediatamente gera melhoria.
-
-        Convenience method que compõe analisar_resultado_rich + sugerir_melhoria_rich.
-        Evita que o chamador tenha que orquestrar as duas operações.
-
-        Returns:
-            ImprovementResult com código melhorado e contexto completo
-        """
-        analysis_result = await self.analisar_resultado_rich(codigo, resultado_sandbox, task)
-        if analysis_result.is_fallback:
-            self._log.warning("Análise em fallback, pulando melhoria")
-            return ImprovementResult(
-                improved_code=codigo,
-                original_code=codigo,
-                status=ReflexionStatus.FALLBACK,
-            )
-        return await self.sugerir_melhoria_rich(codigo, analysis_result.as_str, task)
 
     # ─── Fallbacks internos ───────────────────────────────────────────────
 

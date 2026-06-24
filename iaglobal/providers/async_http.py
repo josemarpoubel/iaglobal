@@ -5,11 +5,9 @@ import json
 import logging
 import threading
 import time
-from typing import Dict
+from typing import Callable, Dict, Optional, Tuple
 
 import aiohttp
-import requests
-from requests.adapters import HTTPAdapter
 
 logger = logging.getLogger(__name__)
 
@@ -71,44 +69,6 @@ async def get_session() -> aiohttp.ClientSession:
     return session
 
 
-async def close_session():
-    """Fecha APENAS a sessão do event loop atual."""
-    global _sessions
-    try:
-        current_loop = asyncio.get_running_loop()
-        loop_id = id(current_loop)
-    except RuntimeError:
-        # Sem loop rodando — fecha todas
-        with _lock:
-            for lid, session in _sessions.items():
-                if session and not session.closed:
-                    await session.close()
-            _sessions.clear()
-        return
-
-    with _lock:
-        session = _sessions.pop(loop_id, None)
-        if session and not session.closed:
-            await session.close()
-
-
-_sync_session = None
-_sync_session_lock = threading.Lock()
-
-
-def get_sync_session() -> requests.Session:
-    global _sync_session
-    if _sync_session is None:
-        with _sync_session_lock:
-            if _sync_session is None:
-                _sync_session = requests.Session()
-                _sync_session.headers.update({"Content-Type": "application/json"})
-                adapter = HTTPAdapter(pool_connections=10, pool_maxsize=30, max_retries=0)
-                _sync_session.mount("https://", adapter)
-                _sync_session.mount("http://", adapter)
-    return _sync_session
-
-
 async def close_all_sessions():
     """Fecha todas as sessões de todos os event loops.
 
@@ -119,9 +79,7 @@ async def close_all_sessions():
         for lid, session in _sessions.items():
             if session and not session.closed:
                 try:
-                    # Fecha o connector TCP subjacente
-                    if session.connector and not session.connector.closed:
-                        session.connector.close()
+                    # Fecha a sessão com await
                     await session.close()
                 except Exception:
                     pass
@@ -134,6 +92,7 @@ async def async_post(
     headers: dict | None = None,
     timeout: int = 60,
     provider: str = "",
+    token_collector: Optional[Callable[[int, int], None]] = None,
 ) -> str:
     # PATCH 3: BANNED_DOMAINS - aborta ANTES do request
     from urllib.parse import urlparse
@@ -164,6 +123,16 @@ async def async_post(
                 logger.warning("[ASYNC-HTTP] %s -> %d: %.200s", url, resp.status, text)
                 return ""
             data = json.loads(text)
+
+            # Extrair token usage de respostas OpenAI-compatíveis
+            if token_collector:
+                usage = data.get("usage")
+                if usage:
+                    pt = usage.get("prompt_tokens", 0)
+                    ct = usage.get("completion_tokens", 0)
+                    if pt or ct:
+                        token_collector(pt, ct)
+
             choices = data.get("choices", [])
             if choices:
                 return choices[0].get("message", {}).get("content", "") or ""

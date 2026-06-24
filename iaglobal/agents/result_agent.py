@@ -3,7 +3,8 @@
 from __future__ import annotations
 
 import hashlib
-
+import json
+import asyncio
 import logging
 
 from dataclasses import dataclass, asdict
@@ -68,25 +69,32 @@ class ResultAgent:
 
     def __init__(self):
 
-        self._summary_extractors = {
-            "documentation": self._extract_docs_summary,
-            "release": self._extract_release_summary,
-            "metrics": self._extract_metrics_summary,
-            "optimization": self._extract_optimization_summary,
-            "coder": self._extract_code_summary,
-            "security_audit": self._extract_security_summary,
-        }
+        self._summary_extractors = {}
+        self._register_default_extractors()
 
-        self._summary_extractors.update({
-            "planner": self._extract_generic_summary,
-            "search": self._extract_generic_summary,
-            "review": self._extract_generic_summary,
-            "multi_coder": self._extract_code_summary,
-            "critic": self._extract_generic_summary,
-            "validator": self._extract_generic_summary,
-            "ast_validator": self._extract_generic_summary,
-            "security": self._extract_security_summary,
-        })
+    def _register_default_extractors(self):
+        self.register_extractor("documentation", self._extract_docs_summary)
+        self.register_extractor("release", self._extract_release_summary)
+        self.register_extractor("metrics", self._extract_metrics_summary)
+        self.register_extractor("optimization", self._extract_optimization_summary)
+        self.register_extractor("coder", self._extract_code_summary)
+        self.register_extractor("security_audit", self._extract_security_summary)
+        self.register_extractor("planner", self._extract_generic_summary)
+        self.register_extractor("search", self._extract_generic_summary)
+        self.register_extractor("review", self._extract_generic_summary)
+        self.register_extractor("multi_coder", self._extract_code_summary)
+        self.register_extractor("critic", self._extract_generic_summary)
+        self.register_extractor("validator", self._extract_generic_summary)
+        self.register_extractor("ast_validator", self._extract_generic_summary)
+        self.register_extractor("security", self._extract_security_summary)
+
+    async def _call_summary_extractor(self, agent_name: str, data: Any) -> Tuple[Optional[str], List[str]]:
+        extractor = self._summary_extractors.get(agent_name)
+        if extractor:
+            if asyncio.iscoroutinefunction(extractor):
+                return await extractor(data)
+            return extractor(data)
+        return self._extract_generic_summary(data)
 
     def _extract_generic_summary(
         self,
@@ -118,11 +126,20 @@ class ResultAgent:
                 []
             )
 
+    async def _persist_contract(self, result: dict) -> Path:
+        from iaglobal._paths import RESULTS_DIR
+        ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S_%f")
+        path = RESULTS_DIR / f"contract_{ts}.json"
+        RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+        async with asyncio.Lock():
+            path.write_text(json.dumps(result, indent=2, ensure_ascii=False), encoding="utf-8")
+        return path
+
     # ========================================================
     # PUBLIC API
     # ========================================================
 
-    def build_result(
+    async def build_result(
         self,
         ctx: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -144,7 +161,7 @@ class ResultAgent:
         # SAFE EXTRACTION LOOP
         # ====================================================
 
-        for agent_name, extractor in self._summary_extractors.items():
+        for agent_name in self._summary_extractors:
 
             agent_data = ctx.get(agent_name)
 
@@ -158,7 +175,7 @@ class ResultAgent:
 
             try:
 
-                summary, next_steps = extractor(agent_data)
+                summary, next_steps = await self._call_summary_extractor(agent_name, agent_data)
 
                 successful_agents += 1
 
@@ -254,7 +271,12 @@ class ResultAgent:
             "[RESULT_AGENT] Contract generated successfully"
         )
 
-        return asdict(result)
+        contract = asdict(result)
+        try:
+            await self._persist_contract(contract)
+        except Exception as e:
+            logger.warning("[RESULT_AGENT] Failed to persist contract: %s", e)
+        return contract
 
     # ========================================================
     # PAYLOAD RESOLUTION
@@ -289,6 +311,9 @@ class ResultAgent:
                 artifact = data.get("output")
 
                 if artifact:
+
+                    if isinstance(artifact, str):
+                        return artifact
 
                     code = getattr(artifact, "code", None)
 
@@ -331,7 +356,7 @@ class ResultAgent:
     # EXTRACTORS
     # ========================================================
 
-    def _extract_docs_summary(
+    async def _extract_docs_summary(
         self,
         data: Any
     ) -> Tuple[Optional[str], List[str]]:
@@ -349,7 +374,7 @@ class ResultAgent:
             ["Review generated documentation"]
         )
 
-    def _extract_release_summary(
+    async def _extract_release_summary(
         self,
         data: Any
     ) -> Tuple[Optional[str], List[str]]:
@@ -371,7 +396,7 @@ class ResultAgent:
             []
         )
 
-    def _extract_metrics_summary(
+    async def _extract_metrics_summary(
         self,
         data: Any
     ) -> Tuple[Optional[str], List[str]]:
@@ -418,7 +443,7 @@ class ResultAgent:
             []
         )
 
-    def _extract_optimization_summary(
+    async def _extract_optimization_summary(
         self,
         data: Any
     ) -> Tuple[Optional[str], List[str]]:
@@ -443,7 +468,7 @@ class ResultAgent:
 
         return None, []
 
-    def _extract_code_summary(
+    async def _extract_code_summary(
         self,
         data: Any
     ) -> Tuple[Optional[str], List[str]]:
@@ -470,7 +495,7 @@ class ResultAgent:
             )
         )
 
-    def _extract_security_summary(
+    async def _extract_security_summary(
         self,
         data: Any
     ) -> Tuple[Optional[str], List[str]]:

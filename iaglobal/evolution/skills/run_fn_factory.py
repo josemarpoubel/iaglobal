@@ -121,5 +121,73 @@ def _make_llm_run_fn(
     return run_fn
 
 def _make_deterministic_run_fn(skill_name: str, template_prompt: str) -> Callable:
-    """Cria run_fn assíncrona e determinística para scripts interpretados."""
-    pass
+    """
+    Cria run_fn assíncrona e determinística para scripts interpretados.
+    
+    O template_prompt é processado como:
+    1. Substitui placeholders {key} pelos valores do contexto
+    2. Se for uma expressão lambda, avalia com eval seguro
+    3. Caso contrário, retorna o template processado como string
+    
+    Segurança: apenas builtins limitados (dict, list, str, int, float, bool, len, sum, min, max, sorted, reversed, enumerate, zip, range, map, filter, any, all, isinstance, hasattr, getattr, setattr, type)
+    """
+    import ast
+    
+    _SAFE_BUILTINS = {
+        "dict": dict, "list": list, "str": str, "int": int,
+        "float": float, "bool": bool, "len": len, "sum": sum,
+        "min": min, "max": max, "sorted": sorted, "reversed": reversed,
+        "enumerate": enumerate, "zip": zip, "range": range,
+        "map": map, "filter": filter, "any": any, "all": all,
+        "isinstance": isinstance, "type": type,
+    }
+    
+    async def run_fn(ctx: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            if not template_prompt:
+                return {"output": "", "success": True, "strategy_used": "deterministic_empty"}
+            
+            processed = template_prompt
+            for key, value in ctx.items():
+                if isinstance(value, dict):
+                    for subkey, subvalue in value.items():
+                        placeholder = "{" + key + "." + subkey + "}"
+                        if placeholder in processed:
+                            processed = processed.replace(placeholder, str(subvalue))
+                placeholder = "{" + key + "}"
+                if placeholder in processed:
+                    processed = processed.replace(placeholder, str(value))
+            
+            result = None
+            
+            # Tenta avaliar como expressão Python segura
+            stripped = processed.strip()
+            if stripped.startswith("lambda") or ("(" in stripped and ")" in stripped and ":" in stripped):
+                try:
+                    tree = ast.parse(stripped, mode="eval")
+                    for node in ast.walk(tree):
+                        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name):
+                            if node.func.id not in _SAFE_BUILTINS:
+                                raise ValueError(f"Função não permitida: {node.func.id}")
+                    code = compile(tree, "<string>", "eval")
+                    eval_ctx = {**_SAFE_BUILTINS, **ctx}
+                    result = eval(code, {"__builtins__": {}}, eval_ctx)
+                except (SyntaxError, ValueError, NameError, TypeError):
+                    result = processed
+            else:
+                result = processed
+            
+            return {
+                "output": str(result) if result is not None else "",
+                "success": True,
+                "strategy_used": "deterministic",
+            }
+        except Exception as e:
+            logger.error(f"[DETERMINISTIC-RUN] Falha na skill '{skill_name}': {e}")
+            return {
+                "output": "",
+                "success": False,
+                "error": str(e),
+                "strategy_used": "deterministic_failed",
+            }
+    return run_fn

@@ -1,63 +1,61 @@
-# ✅  iaglobal/agents/tester_agent.py
+# iaglobal/agents/tester_agent.py
 
-import os
-import re
-import hashlib
-import subprocess
-import tempfile
-from typing import Union, Dict, Any, List
-
+import asyncio
+from dataclasses import dataclass
+from typing import Union, Dict, Any, List, Optional
 from iaglobal.models.task import Task
-
 from iaglobal.utils.logger import logger
-
 from iaglobal.providers.provider_router import route_generate
 from iaglobal.providers.task_router import detect_task_type
 
-# Caminho da pasta de testes do projeto
-TESTS_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "tests")
+# Timeout padrão para geração de testes (suítes de teste podem ser longas)
+_DEFAULT_TIMEOUT = 180.0
+
+@dataclass
+class TestGenerationResult:
+    """Contrato de dados rígido para o retorno do agente."""
+    success: bool
+    test_code: str = ""
+    error_message: Optional[str] = None
+    language_detected: str = "unknown"
+
+    def to_dict(self) -> Dict[str, Any]:
+        return {
+            "success": self.success,
+            "test_code": self.test_code,
+            "error_message": self.error_message,
+            "language_detected": self.language_detected,
+        }
 
 
 class TesterAgent:
     __test__ = False
     """
-    Agente responsável por gerar testes, avaliar soluções e ranquear respostas.
-
-    Agora 100% desacoplado do executor antigo.
-    Toda inferência LLM é feita via provider_router.
+    Agente responsável por gerar testes unitários robustos.
+    Desacoplado, poliglota e com contratos de dados rígidos.
     """
 
-    def __init__(self, workdir=None):
-
+    def __init__(self, workdir: Optional[str] = None):
         self.history: List[Dict[str, Any]] = []
         self.workdir = workdir
 
-    # =========================================================
-    # UTIL: extrair código puro de resposta LLM
-    # =========================================================
-
-    @staticmethod
-    def _extrair_codigo_puro(texto: str) -> str:
-        if not texto:
-            return ""
-        texto = texto.strip()
-        texto = re.sub(r"^```(?:python|py)?", "", texto, flags=re.IGNORECASE)
-        texto = re.sub(r"```$", "", texto)
-        return texto.strip()
-
-    # =========================================================
-    # GERAR TESTES
-    # =========================================================
-
-    async def gerar_testes(self, codigo: str, task: Union[str, Task]) -> str:
+    async def gerar_testes(
+        self, 
+        codigo: str, 
+        task: Union[str, Task], 
+        timeout: float = _DEFAULT_TIMEOUT
+    ) -> TestGenerationResult:
         logger.info("🧪 [TESTER AGENT]: Gerando testes...")
 
+        # 1. Validação de entrada (Fail-fast para economizar tokens)
+        if not codigo or not str(codigo).strip():
+            return TestGenerationResult(success=False, error_message="Código vazio ou nulo fornecido.")
+
         task_text = str(task)
-
-        prompt = f"""
-Você é um engenheiro de QA especializado em Python.
-
-Gere testes unitários para validar o código abaixo.
+        lang_hint = self._detect_language(codigo)
+        
+        # 2. Prompt Engenharia Avançado (Poliglota e Focado em Qualidade)
+        prompt = f"""Você é um Engenheiro de QA Sênior. Gere testes unitários robustos para o código abaixo.
 
 ==================== TAREFA ====================
 {task_text}
@@ -66,221 +64,71 @@ Gere testes unitários para validar o código abaixo.
 {codigo}
 
 ==================== REGRAS ====================
-
-* Use pytest
-* Crie testes realistas
-* Não explique nada
-* Retorne apenas código Python
-  """
+- Linguagem/Framework alvo: {lang_hint}
+- Cubra happy path, edge cases (casos de borda) e tratamento de erros.
+- Use mocks/stubs para isolar dependências externas (banco de dados, APIs, arquivos).
+- Garanta que os testes sejam independentes.
+- Retorne APENAS o código dos testes. NÃO inclua explicações, texto ou blocos markdown (```).
+"""
 
         try:
-
             task_type = detect_task_type(task_text)
-            resposta = await route_generate("", prompt, task_type=task_type)
-
-            if not resposta:
-                return ""
-
-            return str(resposta)
-
-        except Exception as e:
-            logger.warning(f"⚠️ [TESTER AGENT]: Erro ao gerar testes: {e} — retornando vazio.")
-            return ""
-
-    def amalgamar_codigo_e_teste(self, codigo: str, teste: str) -> str:
-        return f"""CÓDIGO DO DESENVOLVEDOR:
-{codigo}
-
-SUITE DE TESTES:
-{teste}"""
-
-    async def gerar_bateria_testes(self, tarefa: str, codigo: str) -> str:
-        return await self.gerar_testes(codigo, tarefa)
-
-    # =========================================================
-    # SALVAR E EXECUTAR TESTE EM ARQUIVO .py
-    # =========================================================
-
-    async def gerar_salvar_e_executar(
-        self, codigo: str, task: Union[str, Task]
-    ) -> dict:
-        """
-        Gera teste via LLM, salva em tests/test_gen_<hash>.py,
-        executa com pytest e retorna resultado.
-        """
-        task_text = str(task)
-
-        # 1. Gera o código de teste
-        raw = await self.gerar_testes(codigo, task)
-        if not raw:
-            return {"sucesso": False, "output": "Nenhum teste gerado", "arquivo": ""}
-
-        teste_limpo = self._extrair_codigo_puro(raw)
-        if not teste_limpo:
-            return {"sucesso": False, "output": "Teste vazio após extração", "arquivo": ""}
-
-        # 2. Gera nome único baseado no hash da task + código
-        task_hash = hashlib.md5(f"{task_text}{codigo}".encode()).hexdigest()[:12]
-        nome_arquivo = f"test_gen_{task_hash}.py"
-
-        # Usa workdir se disponível, senão cai no diretório global de testes
-        if self.workdir:
-            self.workdir.ensure()
-            caminho = str(self.workdir.tests / nome_arquivo)
-        else:
-            caminho = os.path.join(TESTS_DIR, nome_arquivo)
-
-        # 3. Monta o arquivo com código + teste
-        #    O código do desenvolvedor precisa ser importável, então
-        #    escrevemos o código como um módulo inline + os testes
-        linhas = [
-            "# Teste gerado automaticamente pelo TesterAgent",
-            "# pylint: skip-file",
-            "",
-            codigo.strip() if not codigo.strip().startswith("import") else "",
-            "",
-            teste_limpo,
-            "",
-        ]
-        conteudo = "\n".join(linhas)
-
-        try:
-            with open(caminho, "w", encoding="utf-8") as f:
-                f.write(conteudo)
-            logger.info(f"💾 Teste salvo: {caminho}")
-        except Exception as e:
-            logger.error(f"❌ Erro ao salvar teste: {e}")
-            return {"sucesso": False, "output": str(e), "arquivo": ""}
-
-        # 4. Executa o teste com pytest
-        try:
-            resultado = subprocess.run(
-                ["python", "-m", "pytest", caminho, "-v", "--tb=short"],
-                capture_output=True,
-                text=True,
-                timeout=60,
+            
+            # 3. Timeout e System Prompt adequado
+            resposta = await asyncio.wait_for(
+                route_generate(
+                    "Você é um especialista em testes automatizados e qualidade de software.", 
+                    prompt, 
+                    task_type=task_type
+                ),
+                timeout=timeout
             )
 
-            output = resultado.stdout + resultado.stderr
-            sucesso = resultado.returncode == 0
+            if not resposta:
+                err_msg = "LLM retornou resposta vazia."
+                logger.warning("⚠️ [TESTER AGENT]: %s", err_msg)
+                return TestGenerationResult(success=False, error_message=err_msg, language_detected=lang_hint)
 
-            logger.info(
-                f"{'✅' if sucesso else '❌'} Teste {nome_arquivo}: "
-                f"{'PASSOU' if sucesso else 'FALHOU'}"
+            test_code = str(resposta).strip()
+            
+            # 4. Limpeza de Markdown (Defesa em profundidade)
+            if test_code.startswith("```"):
+                test_code = test_code.split("\n", 1)[-1]
+            if test_code.endswith("```"):
+                test_code = test_code.rsplit("```", 1)[0]
+            test_code = test_code.strip()
+
+            result = TestGenerationResult(
+                success=True,
+                test_code=test_code,
+                language_detected=lang_hint
             )
+            
+            # 5. Histórico (Útil para auditoria ou retentativas)
+            self.history.append(result.to_dict())
+            
+            logger.info("✅ [TESTER AGENT]: Testes gerados com sucesso (%d chars).", len(test_code))
+            return result
 
-            return {
-                "sucesso": sucesso,
-                "output": output[:2000],
-                "arquivo": caminho,
-                "returncode": resultado.returncode,
-            }
-
-        except subprocess.TimeoutExpired:
-            logger.warning(f"⏰ Teste {nome_arquivo} excedeu timeout de 60s")
-            return {"sucesso": False, "output": "Timeout", "arquivo": caminho}
-
+        except asyncio.TimeoutError:
+            err_msg = f"Timeout ao gerar testes após {timeout}s."
+            logger.warning("⚠️ [TESTER AGENT]: %s", err_msg)
+            return TestGenerationResult(success=False, error_message=err_msg, language_detected=lang_hint)
         except Exception as e:
-            logger.error(f"❌ Erro ao executar pytest: {e}")
-            return {"sucesso": False, "output": str(e), "arquivo": caminho}
+            err_msg = f"Erro inesperado ao gerar testes: {str(e)}"
+            logger.warning("⚠️ [TESTER AGENT]: %s", err_msg, exc_info=True)
+            return TestGenerationResult(success=False, error_message=err_msg, language_detected=lang_hint)
 
-    # =========================================================
-    # EXECUTAR AVALIAÇÃO DE SOLUÇÕES
-    # =========================================================
-
-    async def avaliar_solucao(
-        self,
-        codigo: str,
-        resultado_execucao: Dict[str, Any],
-        task: Union[str, Task]
-    ) -> str:
-        logger.info("📊 [TESTER AGENT]: Avaliando solução...")
-
-        task_text = str(task)
-
-        prompt = f"""
-
-    Você é um avaliador técnico de código Python.
-
-    Avalie a solução com base no código e no resultado da execução.
-
-    ==================== TAREFA ====================
-    {task_text}
-
-    ==================== CÓDIGO ====================
-
-    {codigo}
-
-    ==================== RESULTADO EXECUÇÃO ====================
-    Sucesso: {resultado_execucao.get("success", False)}
-    Output: {resultado_execucao.get("stdout", "vazio")}
-    Erro: {resultado_execucao.get("stderr", "nenhum")}
-    Traceback: {resultado_execucao.get("traceback", "nenhum")}
-
-    ==================== INSTRUÇÃO ====================
-    Dê uma avaliação técnica com:
-
-    * qualidade do código
-    * bugs encontrados
-    * confiabilidade
-    * melhorias possíveis
-      """
-
-        try:
-            task_type = detect_task_type(task_text)
-            resposta = await route_generate("", prompt, task_type=task_type)
-
-            if not resposta:
-                return "Avaliação indisponível (resposta vazia)."
-
-            return str(resposta)
-
-        except Exception as e:
-            logger.error(f"❌ [TESTER AGENT]: Falha na avaliação: {e}")
-            return "Avaliação indisponível devido a erro de comunicação."
-
-    # =========================================================
-    # RANQUEAMENTO DE SOLUÇÕES
-    # =========================================================
-
-    async def rankear_solucoes(
-        self,
-        solucoes: List[str],
-        task: Union[str, Task]
-    ) -> str:
-        logger.info("🏁 [TESTER AGENT]: Ranqueando soluções...")
-
-        task_text = str(task)
-
-        blocos = "\n\n".join(
-            f"SOLUÇÃO #{i+1}\n{sol}"
-            for i, sol in enumerate(solucoes)
-        )
-
-        prompt = f"""
-
-    Você é um arquiteto de software responsável por ranquear soluções.
-
-    ==================== TAREFA ====================
-    {task_text}
-
-    ==================== SOLUÇÕES ====================
-    {blocos}
-
-    ==================== INSTRUÇÃO ====================
-    Classifique as soluções da melhor para pior com justificativa técnica.
-    Retorne em formato estruturado.
-    """
-
-        try:
-            task_type = detect_task_type(task_text)
-            resposta = await route_generate("", prompt, task_type=task_type)
-
-            if not resposta:
-                return "Ranking indisponível."
-
-            return str(resposta)
-
-        except Exception as e:
-            logger.error(f"❌ [TESTER AGENT]: Erro ao ranquear soluções: {e}")
-            return "Ranking indisponível devido a erro de comunicação."
+    @staticmethod
+    def _detect_language(code: str) -> str:
+        """Heurística simples para identificar a linguagem e guiar o LLM."""
+        code_lower = code.lower()
+        if "def " in code or "import " in code or "pytest" in code_lower:
+            return "Python (pytest)"
+        if "function " in code or "const " in code or "require(" in code:
+            return "JavaScript/TypeScript (Jest/Vitest)"
+        if "public class " in code or "@Test" in code:
+            return "Java (JUnit)"
+        if "func " in code and "package " in code:
+            return "Go (testing)"
+        return "Desconhecida (use o framework padrão da linguagem)"

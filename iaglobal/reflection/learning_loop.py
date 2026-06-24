@@ -31,15 +31,4 @@ class LearningLoop:
         
         return improvement
     
-    def get_best_result(self) -> Any:
-        """Get the best result so far."""
-        if not self.improvements:
-            return None
-        best = max(self.improvements, key=lambda x: x['score'])
-        return best['result']
-    
-    def get_average_score(self) -> float:
-        """Get average score across all iterations."""
-        if not self.scores:
-            return 0.0
-        return sum(self.scores) / len(self.scores)
+

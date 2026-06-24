@@ -6,11 +6,12 @@ import secrets
 import logging
 import time
 import asyncio
-from typing import Dict, Optional, List, Tuple
+from typing import Dict, Optional, List, Tuple, Any
 
 from iaglobal.graphs.node import Node, LineageEntry
 from iaglobal.graphs.workdir import WorkDir
 from iaglobal.graphs.execution_graph import ExecutionGraph
+from iaglobal.evolution import darwin_harness as darwin
 from iaglobal.evolution.canonical_graph import canonicalize, compute_graph_hash
 from iaglobal.evolution.execution_registry import registry as exec_registry
 from iaglobal.evolution.skills.skill_executor import skill_executor
@@ -22,6 +23,8 @@ from iaglobal.models.event_bus import bus, EventType
 from iaglobal.evolution.execution_context import ExecutionContext
 from iaglobal.events import dispatcher
 from iaglobal.utils.hash_utils import LineageID
+from iaglobal.utils.helpers import run_async_safe
+from iaglobal.evolution.evolutionruntime import EvolutionStrategy, FastEvolutionStrategy
 
 logger = logging.getLogger(__name__)
 
@@ -91,6 +94,9 @@ class EvolutionEngine:
             meta_designer: Optional[MetaAgentDesigner] = None # ⬅️ ADICIONADO PARA TESTABILIDADE
         ):
             self.graph = graph
+            self.adversarial = darwin.DynamicAdversarialEnvironment(seed=secrets.randbelow(2**32))
+            self.evolution_metrics = darwin.EvolutionMetrics()
+            self.simulation_recorder = darwin.SimulationRecorder()
             self.generation = graph.generation
             self._last_graph_hash = getattr(graph, '_graph_hash', "")
 
@@ -194,6 +200,10 @@ class EvolutionEngine:
             # Aqui, ao invés de fallback síncrono, talvez disparar um evento no bus
             bus.publish(EventType.TASK_INIT_FAILED, {"error": str(e)})
 
+    def set_task(self, task: str):
+        """Sync wrapper for set_task_async - called via asyncio.to_thread."""
+        return run_async_safe(lambda: self.set_task_async(task))
+
     # --------------------------------------------------
     # SYNC WRAPPERS (called via asyncio.to_thread from evolve_async)
     # --------------------------------------------------
@@ -204,12 +214,7 @@ class EvolutionEngine:
         if result is not None:
             import asyncio
             if asyncio.iscoroutine(result):
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                try:
-                    loop.run_until_complete(result)
-                finally:
-                    loop.close()
+                return run_async_safe(lambda: result)
 
     def _perform_canonicalize(self):
         """Canonicaliza o grafo (dedup, ordenação, consolidação)."""
@@ -239,30 +244,15 @@ class EvolutionEngine:
 
     def _seed_evo_population(self):
         """Sync wrapper para seed_evo_population_async."""
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            loop.run_until_complete(self.seed_evo_population_async())
-        finally:
-            loop.close()
+        return run_async_safe(lambda: self.seed_evo_population_async())
 
     def _mutate_nodes(self):
         """Sync wrapper para mutate_nodes_async."""
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            loop.run_until_complete(self.mutate_nodes_async())
-        finally:
-            loop.close()
+        return run_async_safe(lambda: self.mutate_nodes_async())
 
     def _crossover_phase(self):
         """Sync wrapper para _crossover_phase_async."""
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            loop.run_until_complete(self._crossover_phase_async())
-        finally:
-            loop.close()
+        return run_async_safe(lambda: self._crossover_phase_async())
 
     def _finalize_evolution_step(self):
         """Finaliza o passo evolutivo — consolida e gera relatório."""
@@ -334,30 +324,147 @@ class EvolutionEngine:
     # ASYNC EVOLUTION CYCLE
     # --------------------------------------------------
 
-    async def evolve_async(self):
-        """Versão assíncrona do ciclo evolutivo."""
-        logger.info("🧬 [ASYNC] Iniciando ciclo de evolução: gen=%d", self.generation)
+    async def evolve_async(self, strategy: Optional[EvolutionStrategy] = None):
+        """Versão assíncrona do ciclo evolutivo.
+        
+        Args:
+            strategy: Estratégia de evolução (Fast, Deep, etc).
+                      Se None, usa FastEvolutionStrategy como padrão.
+        """
+        return await self._evolve_impl(strategy=strategy)
+
+    async def evolve(self, strategy: Optional[EvolutionStrategy] = None):
+        """Alias para evolve_async — compatibilidade."""
+        return await self._evolve_impl(strategy=strategy)
+
+    async def _evolve_impl(self, strategy: Optional[EvolutionStrategy] = None):
+        """Implementação compartilhada do ciclo evolutivo.
+        
+        Args:
+            strategy: Estratégia de evolução que controla mutation_rate,
+                     crossover_rate, selection_pressure e exploration_rate.
+        """
+        strategy = strategy or FastEvolutionStrategy()
+        logger.info("🧬 [ASYNC] Iniciando ciclo de evolução: gen=%d, strategy=%s",
+                    self.generation, strategy.name)
+        
+        # Ajusta mutation_rate com base na estratégia
+        original_mutation_rate = self.mutation_rate
+        self.mutation_rate = strategy.mutation_rate
         
         # 1. Canonicalização (CPU Bound - roda em thread para não travar o loop)
-        await asyncio.to_thread(self._run_evolution_step, self._perform_canonicalize)
+        self._perform_canonicalize()
+        self._run_evolution_step(lambda: None)
         
         # 2. Seed e População (I/O + CPU)
-        await asyncio.to_thread(self._seed_evo_population)
-        await asyncio.to_thread(self._create_task_agents)
+        await self.set_task_async(self.current_task)
+        self._seed_evo_population()
+        self._create_task_agents()
         
-        # 3. Seleção, Mutação e Crossover
-        # Essas fases de IA devem rodar isoladas do loop principal
-        await asyncio.to_thread(self._select_survivors)
-        await asyncio.to_thread(self._mutate_nodes)
-        await asyncio.to_thread(self._crossover_phase)
+        # 3. Seleção, Mutação e Crossover com parâmetros da estratégia
+        self._select_survivors(pressure=strategy.selection_pressure)
+        self._mutate_nodes()
+        self._crossover_phase()
+        await self.run_darwin_harness_async()
         
         # 3b. Evolução de handlers (geração de código via AST)
         await self._evolve_handlers()
         
         # 4. Finalização
-        await asyncio.to_thread(self._finalize_evolution_step)
+        self._finalize_evolution_step()
         
-        logger.info("✅ [ASYNC] Ciclo evolutivo concluído com sucesso.")
+        # Restaura mutation_rate original
+        self.mutation_rate = original_mutation_rate
+        
+        logger.info("✅ [ASYNC] Ciclo evolutivo concluído com sucesso (strategy=%s).", strategy.name)
+
+    async def run_darwin_harness_async(self) -> Dict[str, Any]:
+        """Executa o harness Darwin de métricas, adversidade e invariantes."""
+        snapshot = darwin.snapshot_graph(self.graph)
+        previous = getattr(self, "_last_darwin_snapshot", snapshot)
+        distance = darwin.structural_distance(previous, snapshot)
+        task_info = self.adversarial.next_generation()
+        task = darwin.generate_adversarial_task(
+            min(1.0, self.adversarial.adversarial_pressure),
+        )
+        hard_violations = darwin.check_hard_invariants(self.graph)
+        soft_warnings = darwin.check_soft_invariants(self.graph)
+        survivor_ok = darwin.check_survivor_fitness_invariant(self, [], [])
+        crossover_ok, crossover_issues = darwin.check_crossover_invariant(self.graph)
+        diversity_ok = darwin.check_diversity_invariant(self.graph)
+        trend_scores = [s.mean_fitness for s in self.evolution_metrics.snapshots]
+        trend_ok = darwin.check_trend_invariant(trend_scores)
+        strict_trend = self.evolution_metrics.is_strictly_improving()
+        cumulative = self.evolution_metrics.cumulative_gain()
+        convergence = self.evolution_metrics.convergence_rate()
+        collapsed = self.evolution_metrics.diversity_collapsed()
+        task_has_constraints = task_info.has_adversarial
+        output_eval = darwin.evaluate_output("", "")
+        fitness_values = [
+            node.fitness()
+            for node in self.graph.nodes.values()
+            if node.name not in self.CORE_NODE_NAMES
+        ]
+        first_evo = next(
+            (node for node in self.graph.nodes.values() if node.name not in self.CORE_NODE_NAMES),
+            None,
+        )
+        core_node_count = len(self.core_nodes)
+        lineage_history = self.fitness_history(first_evo.name) if first_evo else []
+        lineage_text = self.lineage_report(first_evo.name) if first_evo else ""
+        if first_evo and first_evo.lineage:
+            self.register_lineage(
+                first_evo,
+                "evolution_cycle",
+                parent_name=first_evo.name,
+                parent_fitness=first_evo.fitness(),
+            )
+        if fitness_values:
+            self.evolution_metrics.record(
+                darwin.GenerationSnapshot(
+                    gen=self.generation,
+                    fitness_values=fitness_values,
+                    population_size=len(self.graph.nodes),
+                    diversity=distance,
+                    error_count=len(hard_violations) + len(soft_warnings),
+                )
+            )
+        recorder_snapshot = self.simulation_recorder.record(
+            self.graph,
+            self,
+            fitness_values,
+        )
+        reference = getattr(self, "_last_darwin_reference", {})
+        regressions = self.simulation_recorder.detect_regression(reference)
+        self._last_darwin_snapshot = snapshot
+        self._last_darwin_reference = self.simulation_recorder.snapshot()
+        return {
+            "generation": self.generation,
+            "task": task_info.prompt,
+            "adversarial_task": task,
+            "adversarial_pressure": self.adversarial.adversarial_pressure,
+            "structural_distance": distance,
+            "snapshot": snapshot,
+            "hard_violations": hard_violations,
+            "soft_warnings": soft_warnings,
+            "survivor_ok": survivor_ok,
+            "crossover_ok": crossover_ok,
+            "crossover_issues": crossover_issues,
+            "diversity_ok": diversity_ok,
+            "trend_ok": trend_ok,
+            "strict_trend": strict_trend,
+            "cumulative_gain": cumulative,
+            "convergence_rate": convergence,
+            "task_has_constraints": task_has_constraints,
+            "diversity_collapsed": collapsed,
+            "output_eval": output_eval,
+            "regressions": regressions,
+            "recorder_snapshot": recorder_snapshot,
+            "core_node_count": core_node_count,
+            "lineage_history": lineage_history,
+            "lineage_report_text": lineage_text,
+            "metrics_generations": self.evolution_metrics.generations,
+        }
 
     def _is_evo_cloneable(self, name: str) -> bool:
         """
@@ -431,7 +538,7 @@ class EvolutionEngine:
             )
             
             # O I/O de disco é delegada para o threadpool
-            await asyncio.to_thread(self._initialize_seed_workdir, seed_name, skill_name)
+            self._initialize_seed_workdir(seed_name, skill_name)
             
             seeds[seed_name] = seed
 
@@ -440,7 +547,7 @@ class EvolutionEngine:
             self.graph.nodes.update(seeds)
             logger.info("🌱 %d novo(s) agente(s) adicionados ao grafo.", len(seeds))
         else:
-            await asyncio.to_thread(self._create_synthetic_evo_seeds)
+            self._create_synthetic_evo_seeds()
 
     def _initialize_seed_workdir(self, name: str, skill: str):
         """Helper isolado para I/O síncrono com tratamento de erros."""
@@ -454,14 +561,9 @@ class EvolutionEngine:
             logger.error("[EVO] Falha ao inicializar WorkDir para '%s': %s", name, str(e))
             # O sistema continua, pois a falta de log não deve abortar a criação do agente
 
-    async     def _create_synthetic_evo_seeds(self):
-        """Sync wrapper para _create_synthetic_evo_seeds_async."""
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        try:
-            loop.run_until_complete(self._create_synthetic_evo_seeds_async())
-        finally:
-            loop.close()
+    def _create_synthetic_evo_seeds(self):
+        """Wrapper compatível para _create_synthetic_evo_seeds_async."""
+        return run_async_safe(lambda: self._create_synthetic_evo_seeds_async())
 
     async def _create_synthetic_evo_seeds_async(self):
         """Versão assíncrona para criação de seeds sintéticos."""
@@ -509,6 +611,7 @@ class EvolutionEngine:
             if not skill_executor.can_execute(seed_name):
                 await asyncio.to_thread(skill_registry.register, Skill(
                     name=seed_name,
+                    version="v1",
                     description=f"Evolvable synthetic seed ({strategy})"
                 ))
             
@@ -525,7 +628,15 @@ class EvolutionEngine:
     @property
     def core_nodes(self):
         """Referência dinâmica aos nós core registrados no grafo."""
-        return self.graph.core_nodes_registry
+        return getattr(
+            self.graph,
+            "core_nodes_registry",
+            {
+                name: node
+                for name, node in self.graph.nodes.items()
+                if name in self.CORE_NODE_NAMES
+            },
+        )
 
     def _record_lineage(self, node: Node, event_type: str, *,
                         parent_name: str = "",
@@ -566,10 +677,16 @@ class EvolutionEngine:
         
         logger.debug("[LINEAGE] Registrado: %s → %s (marker=%s)", node.name, event_type, lineage_marker[:8])
 
-    def _select_survivors(self):
+    def _select_survivors(self, pressure: Optional[float] = None):
         """
-        Seleção por Truncamento (50% de taxa de sobrevivência).
+        Seleção por Truncamento. A taxa de sobrevivência é controlada
+        pela estratégia (pressure = fração que sobrevive).
+        
+        Args:
+            pressure: Fração de sobreviventes (ex: 0.3 = top 30%).
+                      Se None, usa 0.5 (50% padrão).
         """
+        pressure = pressure if pressure is not None else 0.5
         # Separação eficiente
         core_nodes = {}
         evo_nodes = []
@@ -586,16 +703,15 @@ class EvolutionEngine:
             return
 
         # Ordenação por fitness
-        # DICA: Se node.fitness() for caro, cacheie o valor antes em um dict: {n.name: n.fitness()}
         evo_sorted = sorted(evo_nodes, key=lambda n: n.fitness(), reverse=True)
         
-        # Seleção
-        cutoff = max(1, len(evo_sorted) // 2)
+        # Seleção baseada na pressão da estratégia
+        cutoff = max(1, int(len(evo_sorted) * pressure))
         survivors = evo_sorted[:cutoff]
         eliminated = evo_sorted[cutoff:]
 
-        logger.info("🧬 Seleção: %d candidatos | %d sobreviventes | %d eliminados.",
-                    len(evo_nodes), len(survivors), len(eliminated))
+        logger.info("🧬 Seleção (pressure=%.1f): %d candidatos | %d sobreviventes | %d eliminados.",
+                    pressure, len(evo_nodes), len(survivors), len(eliminated))
 
         # Reconstrução atômica
         survivors_dict = {n.name: n for n in survivors}
@@ -611,7 +727,7 @@ class EvolutionEngine:
         # Processa cada mutação em thread separada para não travar o loop
         for node in evo_targets:
             # _mutate_node deve ser uma função pura (ou delegada)
-            new_node, stats = await asyncio.to_thread(self._mutate_node, node)
+            new_node, stats = self._mutate_node(node)
             
             # Lógica de prevenção de extinção (mantida em thread)
             if not (stats.get("strategy_shifted") or stats.get("model_drifted")) and len(evo_targets) <= 2:
@@ -650,8 +766,9 @@ class EvolutionEngine:
             new_node.strategy = secrets.choice(candidates)
             stats["strategy_shifted"] = True
 
-        # 2. Model Drift
-        if secrets.randbelow(1000000) < int(base_rate * 1000000):
+        # 2. Model Drift (usa self.mutation_rate que foi ajustado pela estratégia)
+        effective_rate = self.strategy_mutation_rates.get(node.strategy, self.mutation_rate)
+        if secrets.randbelow(1000000) < int(effective_rate * 1000000):
             from iaglobal.providers.provider_config import ProviderConfig
             new_node.model_hint = ProviderConfig.DEFAULT_OLLAMA_MODEL or "qwen2.5:0.5b"
             stats["model_drifted"] = True
@@ -663,18 +780,17 @@ class EvolutionEngine:
         evo_nodes = [node for node in self.graph.nodes.values() if node.name not in self.CORE_NODE_NAMES]
         logger.info("🧬 Iniciando fase de Crossover para %d agentes...", len(evo_nodes))
 
-        # Gerar híbridos em paralelo (CPU-bound via threadpool)
-        tasks = []
+        results = []
         for i in range(len(evo_nodes)):
-            if len(tasks) >= MAX_HYBRIDS_PER_GENERATION:
+            if len(results) >= MAX_HYBRIDS_PER_GENERATION:
                 break
             for j in range(i + 1, len(evo_nodes)):
                 if len(evo_nodes) > 2 and secrets.randbelow(100) > 30:
                     continue
-                # Delegamos a criação pesada para threads
-                tasks.append(asyncio.to_thread(self._crossover, evo_nodes[i], evo_nodes[j]))
-        
-        results = await asyncio.gather(*tasks)
+                child, stats = self._crossover(evo_nodes[i], evo_nodes[j])
+                results.append((child, stats))
+                if len(results) >= MAX_HYBRIDS_PER_GENERATION:
+                    break
         
         # Atualização atômica do Grafo
         new_nodes = {child.name: child for child, stats in results if child.name not in self.graph.nodes}

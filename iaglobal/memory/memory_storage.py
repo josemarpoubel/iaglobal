@@ -83,12 +83,6 @@ def store_success(task: str, codigo: str, metadata: Optional[Dict[str, Any]] = N
 def get_success_by_task(task: str):
     return storage.retrieve(task)
 
-def get_task_hash(task: str) -> str:
-    return MemoryStorage._get_task_hash(task)
-
-def delete_success(task: str) -> None:
-    return storage.delete(task)
-
 def init_storage(clear: bool = False) -> None:
     if clear:
         with storage._lock:

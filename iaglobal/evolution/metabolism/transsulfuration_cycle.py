@@ -38,11 +38,4 @@ class TranssulfurationCycle:
                     candidate.skill.name, max_freq, self.frequency_threshold)
         return False
 
-    def evaluate_and_route(self, candidate: CandidateSkill) -> str:
-        if candidate.score >= 0.6:
-            homocysteine_pool.route_to_production(candidate)
-            return "production"
-        elif self.run(candidate):
-            return "guardrail"
-        else:
-            return "undecided"
+

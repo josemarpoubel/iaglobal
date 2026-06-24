@@ -115,9 +115,6 @@ class SkillGeneratorAgent:
         logger.warning(f"[SKILL-GEN] Falha ao registrar skill: {name} (já existe?)")
         return None
 
-    def get_generated_count(self) -> int:
-        return self._generated_count
-
     def get_stats(self) -> Dict:
         skills = dynamic_registry.list_dynamic_skills()
         return {

@@ -226,10 +226,6 @@ class RuleRegistry:
         self.rules.append(rule)
         return self
 
-    def deregister(self, name: str) -> "RuleRegistry":
-        self.rules = [r for r in self.rules if r.name != name]
-        return self
-
     @classmethod
     def default(cls) -> "RuleRegistry":
         registry = cls()
@@ -293,7 +289,10 @@ class SemanticValidatorAgent:
         self.pass_threshold = pass_threshold
 
     def validate(self, code: str, task: str = "") -> Dict[str, Any]:
-        return run_async_safe(self.validate_async, code, task)
+        result = run_async_safe(self.validate_async, code, task)
+        if hasattr(result, "to_legacy_dict"):
+            return result.to_legacy_dict()
+        return result
 
     async def validate_async(self, code: str, task: str = "") -> ValidationResult:
         start_time = asyncio.get_event_loop().time()
@@ -302,9 +301,12 @@ class SemanticValidatorAgent:
         rule_results = []
 
         for rule in self.registry.rules:
-            result = await rule.evaluate(code, task, language)
-            if result is not None:
-                rule_results.append(result)
+            try:
+                result = await rule.evaluate(code, task, language)
+                if result is not None:
+                    rule_results.append(result)
+            except Exception as e:
+                rule_results.append(RuleResult(rule.name, str(e), False, rule.weight or 100.0, "error"))
 
         score, score_by_category, errors, suggestions = ScoreAggregator.aggregate(rule_results)
         valid = score >= self.pass_threshold and len(errors) == 0

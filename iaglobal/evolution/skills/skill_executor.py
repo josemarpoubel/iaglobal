@@ -18,20 +18,6 @@ class SkillExecutionError(Exception):
     """Erro customizado para falhas de execução."""
     pass
 
-def executar_skill(skill: 'Skill', ctx: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Executa uma skill de forma isolada, quebrando o ciclo de importação.
-    """
-    # Importação local (Lazy Import): resolve o Circular Import Hell
-    from .skill import Skill, ExecutionPolicy
-    
-    # Validação de segurança antes da execução
-    if not isinstance(skill, Skill):
-        raise SkillExecutionError(f"Objeto inválido: esperava Skill, recebeu {type(skill)}")
-        
-    # ... aqui você continua com a lógica que já existia ...
-    return skill.run(ctx)
-
 class SkillExecutor:
     """
     Executor de skills com gestão concorrente e suporte a fallback dinâmico.
@@ -198,18 +184,8 @@ class SkillExecutor:
             logger.debug("[SKILL] Nenhuma alternativa viável para '%s' — lançando exceção primária", skill_name)
             raise
 
-    def validate_contract(self, skill_name: str, context: Dict[str, Any]) -> bool:
-        skill = self.registry.get(skill_name)
-        if not skill:
-            return False
-        return skill.can_execute(context)
-
     def can_execute(self, skill_name: str) -> bool:
         return self.registry.get(skill_name) is not None
-
-    def get_execution_count(self, skill_name: str) -> int:
-        return self.registry.get_usage_count(skill_name)
-
 
 # Instância global coordenada
 skill_executor = SkillExecutor()

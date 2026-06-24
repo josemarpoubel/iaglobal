@@ -5,7 +5,7 @@ from iaglobal.evolution.metacognition.pipeline_updater import PipelineUpdater
 from iaglobal.evolution.metacognition.evolution_trigger import EvolutionTrigger
 from iaglobal.evolution.metacognition.sandbox_validator import SandboxValidator
 from iaglobal.evolution.metacognition.evolution_committee import EvolutionCommittee
-from iaglobal.evolution.metacognition.failure_taxonomy import classify_error, classify_errors, filter_skill_gaps
+from iaglobal.evolution.metacognition.failure_taxonomy import classify_error, classify_errors
 from iaglobal.evolution.metacognition.evolution_backlog import EvolutionBacklog
 
 __all__ = [
@@ -18,6 +18,6 @@ __all__ = [
     "EvolutionCommittee",
     "classify_error",
     "classify_errors",
-    "filter_skill_gaps",
+
     "EvolutionBacklog",
 ]

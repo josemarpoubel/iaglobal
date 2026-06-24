@@ -95,67 +95,6 @@ class DecisionReplaySystem:
         }
 
     @staticmethod
-    def compare(
-        execution_id: str,
-        model_a: str,
-        model_b: str,
-    ) -> Dict[str, Any]:
-        a = DecisionReplaySystem.what_if(execution_id, model_a)
-        b = DecisionReplaySystem.what_if(execution_id, model_b)
-
-        if not a or not b:
-            return {"error": "execution_id nao encontrado"}
-
-        return {
-            "execution_id": execution_id,
-            "model_a": {"model": model_a, **a},
-            "model_b": {"model": model_b, **b},
-            "recommendation": model_a if a["estimated_reward"] > b["estimated_reward"] else model_b,
-        }
-
-    @staticmethod
-    def analyze_execution_gap(
-        execution_id: str,
-        credit: CreditAssignmentEngine,
-        prompt: str,
-        task_type: str = "general"
-    ) -> Dict[str, Any]:
-        """
-        Gera uma análise baseada na decisão inteligente da BanditPolicy,
-        removendo qualquer acoplamento direto com o provider_router.
-        """
-        summary = DecisionReplaySystem.summary(execution_id) or {}
-        
-        try:
-            # 1. Instancia a política localmente usando o motor de créditos injetado
-            bandit = BanditPolicy(credit=credit)
-            
-            # 2. Pergunta ao bandit qual string de modelo usar agora baseado no histórico
-            chosen_model = bandit.select_model(
-                node="analisador", 
-                strategy="general"
-            )
-
-            # 3. Executa a geração de forma encapsulada pelo bandit
-            analysis = bandit.execute_model(
-                model=chosen_model,
-                prompt=prompt,
-                task_type=task_type
-            )
-            analysis = (analysis or "").strip().strip("\"'")
-            
-        except Exception as e:
-            logger.error(f"[REPLAY] Falha ao processar gap de execução: {e}")
-            failed_model = summary.get('model') or (locals().get('chosen_model') or "desconhecido")
-            analysis = f"[fallback] Execução {execution_id}: modelo {failed_model}, recompensa {summary.get('reward_signal')}, latência {summary.get('latency_ms')}ms."
-
-        return {
-            "execution_id": execution_id,
-            "analysis": analysis,
-            "summary": summary,
-        }
-
-    @staticmethod
     def batch_compare_what_if(
         execution_ids: List[str],
         alternative_model: str

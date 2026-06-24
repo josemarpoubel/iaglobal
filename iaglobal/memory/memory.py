@@ -95,25 +95,4 @@ class Memory:
     def clear(self) -> None:
         """Clear memory."""
         self.content = ""
-        self.history = []
-        # Limpa o arquivo físico para reiniciar o ciclo semântico
-        if os.path.exists(_paths.EVOLUTION_DOC):
-            with open(_paths.EVOLUTION_DOC, "w", encoding="utf-8") as f:
-                f.write("")
-    
-    def get_content(self) -> str:
-        """Get current memory content."""
-        return self.content
-    
-    def get_history(self) -> List[str]:
-        """Get memory history."""
-        return self.history
-    
-    def set_metadata(self, key: str, value: Any) -> None:
-        """Set metadata."""
-        self.metadata[key] = value
-    
-    def get_metadata(self, key: str) -> Optional[Any]:
-        """Get metadata."""
-        return self.metadata.get(key)
 

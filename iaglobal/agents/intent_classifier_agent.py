@@ -1,5 +1,18 @@
+# intent_classifier_agent.py
+
+import re
+import unicodedata
+from typing import Dict, List, TypedDict
 from iaglobal.utils.logger import logger
 
+# --- 1. Contrato de Dados Rígido (Essencial para Pipelines) ---
+class ClassificationResult(TypedDict):
+    intents: List[str]
+    entities: Dict[str, List[str]]
+    domain: str
+    confidence: float
+
+# --- 2. Dicionários de Padrões ---
 _INTENT_PATTERNS = {
     "web": ["site", "web", "html", "css", "frontend", "pagina", "website", "http", "browser"],
     "api": ["api", "rest", "endpoint", "graphql", "webservice", "microservice"],
@@ -29,46 +42,78 @@ _ENTITY_PATTERNS = {
     "protocolo": ["http", "https", "grpc", "websocket", "mqtt", "tcp", "udp"],
 }
 
+# --- 3. Compilação de Regex (Performance e Precisão) ---
+def _build_pattern(keywords: List[str]) -> re.Pattern:
+    """
+    Cria uma regex robusta:
+    1. Ordena por tamanho (decrescente) para que 'react native' seja testado antes de 'react'.
+    2. Usa lookarounds customizados para funcionar como word boundary, 
+       mesmo com símbolos como 'c#' ou 'ci/cd'.
+    3. Permite plurais opcionais '(?:s|es)?' no final.
+    """
+    escaped = sorted([re.escape(k) for k in keywords], key=len, reverse=True)
+    pattern_str = r'(?<![a-zA-Z0-9_])(' + '|'.join(escaped) + r')(?:s|es)?(?![a-zA-Z0-9_])'
+    return re.compile(pattern_str, re.IGNORECASE)
+
+# Pré-compila todos os padrões uma única vez no carregamento do módulo
+_INTENT_COMPILED = {k: _build_pattern(v) for k, v in _INTENT_PATTERNS.items()}
+_ENTITY_COMPILED = {k: _build_pattern(v) for k, v in _ENTITY_PATTERNS.items()}
+
+# Regex para detectar código (substitui o check frágil de substrings)
+_CODE_MARKERS = re.compile(r'\b(?:def|class|function|import|include)\b|=>')
+
 
 class IntentClassifierAgent:
-    def classify(self, raw_text: str) -> dict:
-        if not raw_text or not isinstance(raw_text, str):
-            return {"intents": ["unknown"], "entities": {}, "domain": "unknown", "confidence": 0.0}
+    @staticmethod
+    def _normalize(text: str) -> str:
+        """Remove acentos e normaliza para lower case (segurança == seguranca)."""
+        nfkd = unicodedata.normalize('NFD', text)
+        return nfkd.encode('ascii', 'ignore').decode('utf-8').lower()
 
-        text_lower = raw_text.lower()
+    def classify(self, raw_text: str) -> ClassificationResult:
+        if not raw_text or not isinstance(raw_text, str):
+            return {
+                "intents": ["unknown"],
+                "entities": {},
+                "domain": "geral",
+                "confidence": 0.0
+            }
+
+        text_norm = self._normalize(raw_text)
+        
+        # --- 4. Extração de Intents com Regex ---
         intents = set()
         scores = {}
-
-        for intent, keywords in _INTENT_PATTERNS.items():
-            score = sum(1 for kw in keywords if kw in text_lower)
-            if score > 0:
+        for intent, pattern in _INTENT_COMPILED.items():
+            matches = pattern.findall(text_norm)
+            if matches:
                 intents.add(intent)
-                scores[intent] = score
+                scores[intent] = len(matches)
 
         if not intents:
             intents.add("unknown")
+            scores["unknown"] = 0
 
+        # --- 5. Extração Universal de Entidades ---
         entities = {}
-        for ent_type, patterns in _ENTITY_PATTERNS.items():
-            found = [p for p in patterns if p in text_lower]
-            if found:
-                entities[ent_type] = found
+        for ent_type, pattern in _ENTITY_COMPILED.items():
+            matches = pattern.findall(text_norm)
+            if matches:
+                # Usa set para remover duplicatas (ex: "python" citado 2 vezes)
+                entities[ent_type] = list(set(matches))
 
+        # --- 6. Cálculo de Confiança e Domínio ---
         sorted_intents = sorted(intents, key=lambda i: scores.get(i, 0), reverse=True)
-        max_score = max(scores.values()) if scores else 1
-        confidence = min(max_score / 3, 1.0)
-
-        domain = sorted_intents[0] if sorted_intents[0] != "unknown" else "geral"
-
-        has_code = any(c in raw_text for c in ["def ", "class ", "function", "=>", "import ", "#include"])
-        if has_code and "linguagem" not in entities:
-            for lang in _ENTITY_PATTERNS["linguagem"]:
-                if lang in text_lower:
-                    entities.setdefault("linguagem", []).append(lang)
+        top_intent = sorted_intents[0]
+        max_score = scores.get(top_intent, 0)
+        
+        # Heurística de confiança: 1 match = 0.4, 2 = 0.7, 3+ = 1.0
+        confidence = min(0.4 + (max_score - 1) * 0.3, 1.0) if max_score > 0 else 0.0
+        domain = top_intent if top_intent != "unknown" else "geral"
 
         logger.info(
             "[INTENT CLASSIFIER] intents=%s domain=%s confidence=%.2f entities=%d",
-            sorted_intents, domain, confidence, sum(len(v) for v in entities.values()),
+            sorted_intents, domain, confidence, sum(len(v) for v in entities.values())
         )
 
         return {

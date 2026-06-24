@@ -196,6 +196,9 @@ class RetryHandler:
         self.escalator = ModelEscalator()
         self._history: List[Dict] = []
 
+    def fix_prompt(self, prompt: str, error: str, error_type: str) -> str:
+        return self.fixer.fix(prompt, error, error_type)
+
     def execute(self, prompt: str, model: str = "auto") -> RetryResult:
         """Executa com retry inteligente."""
         start_time = time.time()
@@ -278,7 +281,9 @@ class RetryHandler:
 
             # Fix prompt based on error
             self.escalator.record(current_level, False)
-            current_prompt = self.fixer.fix(current_prompt, last_error or output[:200], error_type)
+            if not self.detector.needs_retry(error_type):
+                logger.debug("[RETRY] Sem retry para erro_type=%s", error_type)
+            current_prompt = self.fix_prompt(current_prompt, last_error or output[:200], error_type)
             last_error = f"attempt {attempt}: {error_type}"
             logger.debug(f"[RETRY] Prompt corrigido para attempt {attempt + 1}: "
                          f"error_type={error_type} new_prompt_len={len(current_prompt)}")
@@ -318,12 +323,13 @@ class RetryHandler:
         by_error = Counter(h.get("error_type", "?") for h in self._history)
         logger.debug(f"[RETRY] Stats: total={total} success_rate={success/total:.2f} "
                      f"errors={dict(by_error.most_common(3))}")
+        history = self.get_history()
         return {
             "total_attempts": total,
             "success_rate": f"{success/total:.2f}" if total else "N/A",
             "by_level": self.escalator.get_stats(),
             "by_error": dict(by_error.most_common(5)),
-            "history": self._history[-5:],
+            "history": history[-5:],
         }
 
     def get_history(self) -> List[Dict]:

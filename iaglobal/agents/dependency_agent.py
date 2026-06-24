@@ -1,12 +1,108 @@
+# /iaglobal/agents/dependency_agent.py
+"""DependencyAgent — Filtra templates de dependências com base na arquitetura definida."""
+
 import json
 import re
 import subprocess
 import sys
+
 from pathlib import Path
-from typing import Dict, Any, List
+
+from typing import Dict, List, Set, Any
+
+from dataclasses import dataclass, field
 
 from iaglobal.utils.logger import logger
 
+@dataclass
+class DependencyResult:
+    """Contrato de dados rígido para as dependências finais."""
+    requirements_txt: str
+    packages: List[str] = field(default_factory=list)
+    excluded_sections: List[str] = field(default_factory=list)
+
+class DependencyAgent:
+    # Regex para capturar o nome da seção e as dependências abaixo dela
+    # Ex: Captura "BASE CORE" e as linhas seguintes até o próximo comentário ou fim do arquivo
+    _SECTION_REGEX = re.compile(
+        r"#\s*=+\s*\n#\s*(?P<name>[^\n]+?)\s*\n#\s*=+\s*\n(?P<deps>.*?)(?=\n#\s*=+|\Z)", 
+        re.DOTALL | re.IGNORECASE
+    )
+
+    # Mapeamento de palavras-chave de arquitetura para as seções do template
+    # Se o Architect decidir por "django", a seção "BASE CORE" é incluída.
+    _ARCH_TO_SECTION_MAP = {
+        "django": ["BASE CORE"],
+        "fastapi": ["BASE MICROSERVICE / FASTAPI"],
+        "websocket": ["EXTRAS PARA PRODUÇÃO AVANÇADA"],
+        "redis": ["EXTRAS PARA PRODUÇÃO AVANÇADA"],
+    }
+
+    @staticmethod
+    def _normalize_section_name(name: str) -> str:
+        """Remove descrições parentéticas do nome da seção para matching."""
+        idx = name.find("(")
+        return name[:idx].strip() if idx > 0 else name.strip()
+
+    def resolve_dependencies(self, template_content: str, architecture_context: Dict) -> DependencyResult:
+        """
+        Lê o template de dependências e filtra apenas as seções necessárias 
+        com base no contexto da arquitetura (vindo do ArchitectAgent/IntentClassifier).
+        """
+        logger.info("📦 [DEPENDENCY AGENT] Resolvendo dependências do template...")
+        
+        # 1. Extrai o framework principal escolhido pela arquitetura
+        frameworks = architecture_context.get("entities", {}).get("framework", [])
+        tech_stack = architecture_context.get("tech_stack", [])
+        
+        # Normaliza para lower case para matching
+        context_keywords = set([f.lower() for f in frameworks] + [t.lower() for t in tech_stack])
+        
+        # 2. Identifica quais seções do template devem ser incluídas
+        sections_to_include: Set[str] = set()
+        for keyword in context_keywords:
+            for arch_key, sections in self._ARCH_TO_SECTION_MAP.items():
+                if arch_key in keyword:
+                    sections_to_include.update(sections)
+                    
+        # Fallback: Se não detectou nada específico, inclui a base core por segurança
+        if not sections_to_include:
+            sections_to_include.add("BASE CORE")
+            logger.warning("[DEPENDENCY AGENT] Nenhum framework específico detectado. Usando BASE CORE como fallback.")
+
+        # 3. Parseia o template e filtra as seções
+        final_packages = []
+        excluded_sections = []
+        
+        for match in self._SECTION_REGEX.finditer(template_content):
+            raw_section_name = match.group("name").strip()
+            section_name = self._normalize_section_name(raw_section_name)
+            deps_block = match.group("deps").strip()
+            
+            # Extrai apenas os nomes dos pacotes (ignora linhas vazias ou comentários dentro do bloco)
+            packages = [line.strip() for line in deps_block.split('\n') if line.strip() and not line.strip().startswith('#')]
+            
+            if section_name in sections_to_include:
+                final_packages.extend(packages)
+                logger.info("📦 [DEPENDENCY AGENT] Incluindo seção: %s (%d pacotes)", raw_section_name, len(packages))
+            else:
+                excluded_sections.append(raw_section_name)
+                logger.debug("📦 [DEPENDENCY AGENT] Excluindo seção: %s", raw_section_name)
+
+        # 4. Remove duplicatas e ordena alfabeticamente (Boas práticas de requirements.txt)
+        final_packages = sorted(list(set(final_packages)))
+        requirements_txt = "\n".join(final_packages)
+
+        logger.info(
+            "📦 [DEPENDENCY AGENT] Concluído | total_packages=%d | excluded_sections=%d",
+            len(final_packages), len(excluded_sections)
+        )
+
+        return DependencyResult(
+            requirements_txt=requirements_txt,
+            packages=final_packages,
+            excluded_sections=excluded_sections
+        )
 
 def verify_dependencies(context: str, db_path: str = "") -> Dict[str, Any]:
     """

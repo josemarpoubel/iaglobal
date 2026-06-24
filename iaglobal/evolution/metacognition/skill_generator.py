@@ -44,6 +44,13 @@ class MetaSkillGenerator:
                 continue
 
             skill_name = f"auto_fix_{hash(gap_desc) % 10000:04d}"
+            severity_scores = {
+                "critical": 0.95,
+                "high": 0.85,
+                "medium": 0.70,
+                "low": 0.55,
+            }
+            candidate_score = severity_scores.get(gap_severity, 0.55)
             skill = Skill(
                 name=skill_name,
                 description=f"Correção automática para: {gap_desc[:200]}",
@@ -60,7 +67,7 @@ class MetaSkillGenerator:
                 skill_registry.register_or_update(skill)
                 candidate = CandidateSkill(
                     skill=skill,
-                    score=0.5,
+                    score=candidate_score,
                     source_gap=gap_desc,
                 )
                 homocysteine_pool.add(candidate)
@@ -68,6 +75,7 @@ class MetaSkillGenerator:
                     "skill_name": skill_name,
                     "gap_type": gap_type,
                     "severity": gap_severity,
+                    "score": candidate_score,
                 })
                 backlog.mark_resolved(gap_desc)
                 logger.info("[SKILL-GEN] Skill '%s' registrada para gap: %s", skill_name, gap_desc[:80])

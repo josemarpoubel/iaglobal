@@ -7,7 +7,31 @@ class SelfCritique:
     
     def __init__(self):
         self.critique_history = []
-        self.improvement_suggestions = []
+    
+    def evaluate(self, output: str) -> Dict[str, Any]:
+        """Evaluate output quality and return scored critique.
+
+        Args:
+            output: Text output to evaluate.
+
+        Returns:
+            Dict with score (0-1) and analysis fields.
+        """
+        lines = output.strip().splitlines() if output else []
+        score = min(1.0, len(lines) / 20) if lines else 0.0
+        critique = {
+            "output": output,
+            "score": score,
+            "line_count": len(lines),
+            "strengths": ["non-empty"] if output else [],
+            "weaknesses": [],
+        }
+        if not output or len(output.strip()) < 10:
+            critique["weaknesses"].append("too_short")
+            score = max(0.0, score - 0.3)
+        critique["score"] = round(score, 2)
+        self.critique_history.append(critique)
+        return critique
     
     def critique(self, output: Any, criteria: List[str]) -> Dict:
         """Generate a critique of output based on criteria."""
@@ -21,14 +45,4 @@ class SelfCritique:
         self.critique_history.append(critique)
         return critique
     
-    def add_improvement(self, suggestion: str) -> None:
-        """Add an improvement suggestion."""
-        self.improvement_suggestions.append(suggestion)
-    
-    def get_critique_summary(self) -> Dict:
-        """Get summary of all critiques."""
-        return {
-            'total_critiques': len(self.critique_history),
-            'improvements_suggested': len(self.improvement_suggestions),
-            'history': self.critique_history
-        }
+

@@ -1,0 +1,3 @@
+MONTE UM PASSO A PASSO PARA RESOLVER ESSES PROBLEMAS em /home/kitohamachi/projeto-iaglobal/iaglobal:
+RESUMO DOS LOGS...
+

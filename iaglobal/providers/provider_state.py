@@ -427,62 +427,6 @@ class ProviderState:
             5 * failures,
         )
 
-    # -------------------------------------------------------------------------
-
-    def best_provider(self) -> Optional[str]:
-
-        with self._lock:
-
-            candidates = {
-                provider: stats.score()
-                for provider, stats in self.providers.items()
-                if self.is_available(provider)
-            }
-
-            if not candidates:
-                return None
-
-            return max(
-                candidates,
-                key=candidates.get,
-            )
-
-    # -------------------------------------------------------------------------
-
-    def health_report(self) -> Dict:
-
-        with self._lock:
-
-            report = {}
-
-            for provider, stats in self.providers.items():
-
-                report[provider] = {
-                    "score": round(
-                        stats.score(),
-                        3,
-                    ),
-                    "success": stats.success,
-                    "fail": stats.fail,
-                    "success_rate": round(
-                        stats.success_rate(),
-                        3,
-                    ),
-                    "avg_latency": round(
-                        stats.avg_latency(),
-                        3,
-                    ),
-                    "consecutive_failures":
-                        stats.consecutive_failures,
-                    "available":
-                        self.is_available(provider),
-                    "last_error":
-                        stats.last_error,
-                    "last_error_code":
-                        stats.last_error_code,
-                }
-
-            return report
 
 
 # =============================================================================

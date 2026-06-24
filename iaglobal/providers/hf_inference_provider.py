@@ -11,6 +11,7 @@ from huggingface_hub import InferenceClient
 from iaglobal.providers.provider_config import ProviderConfig
 from iaglobal.providers.token_usage import TokenCollector
 from iaglobal.utils.logger import logger
+from iaglobal.utils.helpers import run_async_safe
 
 
 # =============================================================================
@@ -135,6 +136,10 @@ def _estimate_max_tokens(prompt: str) -> int:
 # =============================================================================
 # Main API
 # =============================================================================
+
+def generate(prompt: str, model: str = "hf_inference/openai/gpt-oss-20b:groq", timeout: int = 60, token_collector: Optional[TokenCollector] = None) -> str:
+    return run_async_safe(async_generate, prompt, model, timeout, token_collector)
+
 
 async def async_generate(
     prompt: str,

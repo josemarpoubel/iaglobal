@@ -29,20 +29,12 @@ class WorkDir:
         self.tests.mkdir(parents=True, exist_ok=True)
         return self
 
-    def write_code(self, code: str):
-        self.code.write_text(code, encoding="utf-8")
-        return self
-
     async def async_write_code(self, code: str):
         await asyncio.to_thread(self.code.write_text, code, encoding="utf-8")
         return self
 
     def write_output(self, text: str):
         self.output.write_text(text, encoding="utf-8")
-        return self
-
-    async def async_write_output(self, text: str):
-        await asyncio.to_thread(self.output.write_text, text, encoding="utf-8")
         return self
 
     def append_log(self, line: str):
@@ -54,18 +46,6 @@ class WorkDir:
         def _write():
             with self.logs.open("a", encoding="utf-8") as f:
                 f.write("[%s] %s\n" % (time.strftime("%H:%M:%S"), line))
-        await asyncio.to_thread(_write)
-        return self
-
-    def write_test(self, name: str, content: str):
-        path = self.tests / name
-        path.write_text(content, encoding="utf-8")
-        return self
-
-    async def async_write_test(self, name: str, content: str):
-        def _write():
-            path = self.tests / name
-            path.write_text(content, encoding="utf-8")
         await asyncio.to_thread(_write)
         return self
 
@@ -81,44 +61,4 @@ def make_workdir(agent_name: str, execution_id: str, task: str = "") -> WorkDir:
     return WorkDir(agent_name, eid).ensure()
 
 
-def clean_workdir(agent_name: str, execution_id: str):
-    safe_agent = agent_name.replace("/", "_").replace(" ", "_")
-    safe_eid = execution_id.replace("/", "_").replace(" ", "_")
-    path = WORK_DIR / safe_agent / safe_eid
-    import shutil
-    if path.exists():
-        shutil.rmtree(path)
 
-
-def clean_all_workdirs(max_age_hours: int = 24):
-    import shutil
-    now = time.time()
-    for agent_dir in WORK_DIR.iterdir():
-        if not agent_dir.is_dir():
-            continue
-        for exec_dir in agent_dir.iterdir():
-            if exec_dir.is_dir():
-                age = now - exec_dir.stat().st_mtime
-                if age > max_age_hours * 3600:
-                    shutil.rmtree(exec_dir, ignore_errors=True)
-
-
-def list_workdirs() -> list[dict]:
-    result = []
-    for agent_dir in sorted(WORK_DIR.iterdir()):
-        if not agent_dir.is_dir():
-            continue
-        for exec_dir in sorted(agent_dir.iterdir()):
-            has_code = (exec_dir / "code.py").exists()
-            has_output = (exec_dir / "output.txt").exists()
-            has_tests = (exec_dir / "tests").exists() and any((exec_dir / "tests").iterdir())
-            result.append({
-                "agent": agent_dir.name,
-                "execution": exec_dir.name,
-                "path": str(exec_dir),
-                "has_code": has_code,
-                "has_output": has_output,
-                "has_tests": has_tests,
-                "mtime": exec_dir.stat().st_mtime,
-            })
-    return result

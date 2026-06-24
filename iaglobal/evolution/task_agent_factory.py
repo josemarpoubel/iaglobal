@@ -142,6 +142,4 @@ class TaskAgentFactory:
         return node
 
 
-def create_task_specialists(graph: ExecutionGraph, prompt: str, task_type: str = "default") -> bool:
-    """Função atalho exposta para o barramento orquestrador do ecossistema."""
-    return TaskAgentFactory.inject_specialists(graph, prompt, task_type)
+

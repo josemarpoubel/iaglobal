@@ -1,0 +1,14 @@
+[
+  {
+    "id": "k_1782262186712_0",
+    "category": "best_practice",
+    "title": "Duplicate Test",
+    "content": "Same content",
+    "tags": [
+      "test"
+    ],
+    "source": "pytest",
+    "timestamp": 1782262186.712502,
+    "hits": 0
+  }
+]

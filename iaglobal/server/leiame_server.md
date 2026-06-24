@@ -1,4 +1,4 @@
-**Sim, exatamente! Com essa arquitetura, você pode transformar o `iaglobal` em um microsserviço vivo.**
+**arquitetura `iaglobal` ... um microsserviço vivo.**
 
 Ao expor esses componentes através de uma API (usando frameworks rápidos e assíncronos como o **FastAPI**), você cria um servidor onde os agentes trabalham nas tarefas dos usuários em segundo plano, enquanto o motor assíncrono e flexível altera seus DNAs (prompts e códigos). Você poderá abrir o navegador e assistir à evolução acontecendo em tempo real.
 
@@ -174,7 +174,7 @@ Quando o seu `server.py` estiver rodando, o ciclo de vida do ecossistema funcion
 │       │    └─► Dispara Métricas para RewardAggregator  │
 │       │                                                │
 │       └─► [EvolutionRuntime Loop] (Metrônomo Eterno)   │
-│            └─► Executa estratégia ativa (Deep/Fast)   │
+│            └─► Executa estratégia ativa (Deep/Fast)    │
 │            └─► Muta mentes de agentes no SQLite        │
 └────────────────────────────────────────────────────────┘
 

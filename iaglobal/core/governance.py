@@ -11,9 +11,7 @@ Decisão final pertence ao CognitiveProxy.
 """
 
 import re
-import json
-import time
-from typing import Dict, Any, List, Optional, Callable, Set
+from typing import Dict, Any, List, Optional
 from dataclasses import dataclass, field
 from enum import Enum
 
@@ -62,21 +60,6 @@ class AgentContract:
 
     # Se pode chamar outros agentes
     can_delegate: bool = False
-
-    def validate_input(self, inputs: Dict) -> List[str]:
-        """Valida inputs contra o contrato. Retorna lista de erros."""
-        errors = []
-        for req in self.required_inputs:
-            if req not in inputs or inputs[req] is None:
-                errors.append(f"[{self.agent_name}] Input obrigatório ausente: {req}")
-        return errors
-
-    def validate_authority(self, action: str) -> bool:
-        """Verifica se ação está dentro da autoridade do agente."""
-        for forbidden in self.forbidden_actions:
-            if re.search(forbidden, action, re.IGNORECASE):
-                return False
-        return True
 
     def to_dict(self) -> Dict:
         return {
@@ -234,15 +217,11 @@ CONTRACT_TESTER = AgentContract(
 # =========================================================================
 
 class GovernanceLayer:
-    """Camada de governança que valida contratos e aplica limites de autoridade."""
-
     def __init__(self, contracts: Optional[Dict[str, AgentContract]] = None):
         self.contracts: Dict[str, AgentContract] = {}
         if contracts:
             for c in contracts:
                 self.contracts[c.agent_name] = c
-
-        # Registra contratos padrão
         self._register_defaults()
 
     def _register_defaults(self):
@@ -254,89 +233,5 @@ class GovernanceLayer:
             if c.agent_name not in self.contracts:
                 self.contracts[c.agent_name] = c
 
-    def register_contract(self, contract: AgentContract):
-        """Registra ou atualiza contrato de um agente."""
-        self.contracts[contract.agent_name] = contract
-        logger.info(f"[GOVERNANCE] Contrato registrado: {contract.agent_name}")
 
-    def get_contract(self, agent_name: str) -> Optional[AgentContract]:
-        """Retorna contrato de um agente."""
-        return self.contracts.get(agent_name)
-
-    def validate_call(self, agent_name: str, inputs: Dict,
-                      action: Optional[str] = None) -> Dict:
-        """Valida chamada a um agente contra seu contrato.
-
-        Returns:
-            Dict com {"valid": bool, "errors": [str]}
-        """
-        contract = self.contracts.get(agent_name)
-        if not contract:
-            logger.warning(f"[GOVERNANCE] Agente '{agent_name}' sem contrato registrado")
-            return {"valid": True, "errors": [], "contract_missing": True}
-
-        errors = []
-
-        # Valida inputs obrigatórios
-        input_errors = contract.validate_input(inputs)
-        errors.extend(input_errors)
-
-        # Valida autoridade
-        if action:
-            if not contract.validate_authority(action):
-                errors.append(
-                    f"[{agent_name}] Ação '{action[:60]}' viola contrato: "
-                    f"proibido para este agente"
-                )
-
-        if errors:
-            logger.warning(f"[GOVERNANCE] Violação de contrato: {'; '.join(errors)}")
-
-        return {
-            "valid": len(errors) == 0,
-            "errors": errors,
-            "contract": contract.to_dict(),
-        }
-
-    def enforce_timeout(self, agent_name: str) -> Optional[int]:
-        """Retorna timeout configurado para o agente."""
-        contract = self.contracts.get(agent_name)
-        return contract.timeout_seconds if contract else None
-
-    def list_contracts(self) -> List[Dict]:
-        """Lista todos os contratos registrados."""
-        return [
-            c.to_dict() for c in sorted(self.contracts.values(), key=lambda x: x.agent_name)
-        ]
-
-    def check_violations(self, agent_name: str, action: str) -> List[str]:
-        """Verifica se uma ação específica viola o contrato."""
-        contract = self.contracts.get(agent_name)
-        if not contract:
-            return []
-
-        violations = []
-        for forbidden in contract.forbidden_actions:
-            if re.search(forbidden, action, re.IGNORECASE):
-                violations.append(f"Ação viola '{forbidden}'")
-        return violations
-
-    def get_authority_summary(self, agent_name: str) -> Dict:
-        """Resumo legível da autoridade de um agente."""
-        contract = self.contracts.get(agent_name)
-        if not contract:
-            return {"agent": agent_name, "status": "sem contrato"}
-
-        return {
-            "agent": agent_name,
-            "description": contract.description,
-            "pode": [a.value for a in contract.allowed_authorities],
-            "nao_pode": contract.forbidden_actions[:5],
-            "inputs_obrigatorios": contract.required_inputs,
-            "outputs": contract.outputs,
-            "timeout": contract.timeout_seconds,
-        }
-
-
-# Instância global
 governance = GovernanceLayer()

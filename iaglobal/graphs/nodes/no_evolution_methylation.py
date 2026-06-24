@@ -1,37 +1,103 @@
-"""Evolution Methylation Cycle — Valida e promove skills candidatas a production."""
-from typing import Dict, Any
+# iaglobal/graphs/nodes/no_evolution_methylation.py
+
+"""
+Evolution Methylation Cycle — Valida e promove skills candidatas a production.
+Totalmente em conformidade com as seções 2, 3 e 4 do AGENTS.md com telemetria ativa.
+"""
+import time
 import logging
+import asyncio
+from typing import Dict, Any
 
 from iaglobal.evolution.metabolism.methylation_cycle import MethylationCycle
-from iaglobal.evolution.metabolism.homocysteine_pool import homocysteine_pool, CandidateSkill
+from iaglobal.evolution.metabolism.homocysteine_pool import homocysteine_pool
 
 logger = logging.getLogger(__name__)
+
+# Instanciação única controlada do ciclo de metilação
 _methylation = MethylationCycle()
 
 
+def _execute_sync_methylation(candidates: list) -> int:
+    """Função enclausurada para executar as validações e promoções em disco de forma não-bloqueante."""
+    promoted_count = 0
+    for candidate in candidates:
+        if candidate is not None:
+            # Executa o ciclo biológico de metilação estrutural
+            if _methylation.run(candidate):
+                promoted_count += 1
+    return promoted_count
+
+
 async def run_evolution_methylation(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Avalia e promove skills mutadas para produção de forma assíncrona.
+    Mapeia latência, candidatos e sucesso operacional para o JointOptimizationLoop.
+    """
+    start_time = time.time()
+    resolved_model = "methylation_cycle_deterministic_infrastructure"
+    
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
 
-    # Obtém skills candidatas do pool
-    candidates = homocysteine_pool.get_candidates_for_methylation()
+    logger.info("[EVOLUTION_METHYLATION] Iniciando varredura assíncrona por skills candidatas no pool...")
 
-    if not candidates:
-        logger.info("[EVOLUTION_METHYLATION] Nenhuma skill candidata para avaliar")
-        return {**ctx, "output": "Nenhuma skill candidata", "evolution_methylation": {"promoted": 0}}
+    try:
+        # Recupera os candidatos de forma segura desviando para thread se varrer o pool for custoso
+        candidates = await asyncio.to_thread(homocysteine_pool.get_candidates_for_methylation)
+        candidates = candidates or []
 
-    promoted = 0
-    for candidate in candidates:
-        if _methylation.run(candidate):
-            promoted += 1
+        if not candidates:
+            logger.info("[EVOLUTION_METHYLATION] Nenhuma skill candidata qualificada para avaliação. Ciclo pulado.")
+            latency_ms = (time.time() - start_time) * 1000.0
+            return {
+                "output": "Nenhuma skill candidata",
+                "evolution_methylation": {"total_candidates": 0, "promoted": 0},
+                "execution_metrics": {
+                    "model": resolved_model, "success": True, "latency": latency_ms, "cost": 0.0
+                }
+            }
 
-    logger.info("[EVOLUTION_METHYLATION] %d skills promovidas a production", promoted)
+        logger.info("[EVOLUTION_METHYLATION] Detectadas %d skills em triagem. Iniciando testes de promoção...", len(candidates))
 
-    return {
-        **ctx,
-        "output": f"{promoted} skills promovidas a production",
-        "evolution_methylation": {
-            "total_candidates": len(candidates),
-            "promoted": promoted,
-        },
-    }
+        # DESPACHA TODO O LAÇO DE VALIDAÇÃO E ESCRITA EM DISCO PARA A THREAD POOL ISOLADA
+        promoted = await asyncio.to_thread(_execute_sync_methylation, candidates)
+
+        logger.info("[EVOLUTION_METHYLATION] Ciclo concluído com sucesso: %d/%d skills promovidas a production.", 
+                    promoted, len(candidates))
+
+        latency_ms = (time.time() - start_time) * 1000.0
+
+        # Retorno higienizado cumprindo as Regras 1, 3 e 5 do AGENTS.md (Sem desestruturar o ctx na RAM)
+        return {
+            "output": f"{promoted} skills promovidas a production",
+            "evolution_methylation": {
+                "total_candidates": len(candidates),
+                "promoted": promoted,
+            },
+            "execution_metrics": {
+                "model": resolved_model,
+                "success": True,
+                "latency": latency_ms,
+                "cost": 0.0  # Transações de infraestrutura e persistência locais
+            }
+        }
+
+    except Exception as e:
+        latency_ms = (time.time() - start_time) * 1000.0
+        logger.exception("[EVOLUTION_METHYLATION] Falha crítica no pipeline do Methylation Cycle Node: %s", e)
+        
+        return {
+            "output": "0 skills promovidas a production",
+            "evolution_methylation": {
+                "total_candidates": 0,
+                "promoted": 0
+            },
+            "execution_metrics": {
+                "model": resolved_model,
+                "success": False,
+                "latency": latency_ms,
+                "cost": 0.0
+            }
+        }
+

@@ -108,15 +108,6 @@ class CriticAgent:
                 "_critic_degraded": True,
             }
 
-    async def avaliar_solucao(self, task: str, codigo: str) -> str:
-        """Wrapper compatibilidade — retorna string JSON."""
-        result = await self.avaliar(task, "", codigo)
-        return json.dumps(result)
-
-    async def avaliar_com_scores(self, task: str, codigo: str) -> Dict[str, Any]:
-        """Wrapper compatibilidade — retorna dict."""
-        return await self.avaliar(task, "", codigo)
-
     # =========================================================================
     # MÉTODOS INTERNOS (APENAS AVALIAÇÃO, SEM DECISÃO)
     # =========================================================================

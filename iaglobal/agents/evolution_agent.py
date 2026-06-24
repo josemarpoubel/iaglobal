@@ -1,9 +1,21 @@
-"""Evolution agentes — committee, trigger e pipeline updater."""
+"""Evolution agentes — committee, trigger e pipeline updater.
+
+⚠️ DEPRECATED — substituído pelo módulo iaglobal/evolution/metacognition/.
+Manter apenas para compatibilidade reversa.
+"""
 
 import logging
+import warnings
 from typing import Any, Dict, List
 
 logger = logging.getLogger(__name__)
+
+warnings.warn(
+    "iaglobal.agents.evolution_agent está obsoleto. "
+    "Use iaglobal.evolution.metacognition no lugar.",
+    DeprecationWarning,
+    stacklevel=2,
+)
 
 
 class EvolutionCommitteeAgent:

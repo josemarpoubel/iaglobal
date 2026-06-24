@@ -26,7 +26,6 @@ async def run_cli():
                 break
         
         print("DEBUG: Iniciando execução do CLI (Async)...")
-        # Aguardamos a implementação assíncrona
         await _run_cli_impl()
         print("DEBUG: Execução do CLI concluída com sucesso.")
         
@@ -37,6 +36,23 @@ async def run_cli():
         traceback.print_exc()
         
     finally:
+        # Flush de métricas antes do shutdown (garante persistência)
+        try:
+            from iaglobal.providers.provider_metrics import metrics
+            metrics.flush()
+        except Exception:
+            pass
+        # Fecha sessões aiohttp antes do shutdown
+        try:
+            from iaglobal.providers.async_http import close_all_sessions
+            try:
+                loop = asyncio.get_running_loop()
+                if loop.is_running():
+                    await close_all_sessions()
+            except RuntimeError:
+                asyncio.run(close_all_sessions())
+        except Exception:
+            pass
         print(f"\n📝 Log detalhado em: {log_path}")
         stop_session_log()
 
@@ -214,7 +230,7 @@ async def _run_cli_impl():
             
         sys.argv = ["evolution-lab"] + unknown + rest
         # Executamos o lab em uma thread dedicada para não travar o loop async da CLI
-        await asyncio.to_thread(run_evolution_lab)
+        await asyncio.to_thread(lambda: run_evolution_lab())
         return
 
     # ── Comandos que dependem do orquestrador ──
@@ -329,8 +345,6 @@ def _show_history_list():
         print(f"\n  ❌ Erro ao acessar histórico: {e}\n")
 
 #====================================================================================
-
-import asyncio
 
 # ... no lugar da chamada atual run_cli() ...
 

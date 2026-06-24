@@ -1,6 +1,13 @@
-"""Documentation handler — gera documento/PDF formatado para tarefas de documentacao."""
-from typing import Dict, Any
+# iaglobal/graphs/nodes/no_documentation.py
+
+"""
+Documentation Node — Redator técnico do ecossistema iaglobal.
+Gera relatórios, manuais e documentos formatados com telemetria ativa para o Bandit Policy.
+"""
+import time
 import logging
+import asyncio
+from typing import Dict, Any
 
 from iaglobal.providers.provider_router import async_route_generate
 from iaglobal.memory.memory_error import record_error
@@ -10,38 +17,44 @@ logger = logging.getLogger(__name__)
 
 
 async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
+    """
+    Executa a geração de documentação técnica de forma assíncrona e não-bloqueante.
+    Mapeia latência, custo de tokens e sucesso sintático para o JointOptimizationLoop.
+    """
+    start_time = time.time()
+    resolved_model = "documentation_agent_llm"
+    
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
 
-    ag_mailbox = memory.get("agentmailbox", {})
-    bus = ag_mailbox.get("_agent_bus")
-    inbox = ag_mailbox.get("_mailbox_manager")
+    ag_mailbox = memory.get("agentmailbox", {}) or ctx.get("agentmailbox", {})
+    bus = ag_mailbox.get("_agent_bus") or ctx.get("_agent_bus")
+    inbox = ag_mailbox.get("_mailbox_manager") or ctx.get("_mailbox_manager")
+    
+    # Consumo seguro e em background da caixa de entrada
     if bus is not None and inbox is not None:
-        mailbox = inbox.get_or_create("documentation")
-        msgs = mailbox.process_inbox(max_messages=5)
+        def _consume_inbox():
+            mailbox = inbox.get_or_create("documentation")
+            return mailbox.process_inbox(max_messages=5)
+            
+        msgs = await asyncio.to_thread(_consume_inbox)
         if msgs:
             for msg in msgs:
                 logger.info("[DOCUMENTATION] Mensagem recebida de %s: type=%s", msg.sender, msg.type)
 
-    # Prefere output do coder (que ja deve ter gerado conteudo de documento)
-    coder_output = memory.get("coder", {}).get("output", "")
-    if not coder_output:
-        coder_output = memory.get("multi_coder", {}).get("output", "")
-
-    built_prompt = memory.get("prompt_builder", {}).get("built_prompt", "")
-    if not built_prompt:
-        built_prompt = memory.get("prompt_builder", {}).get("output", "")
+    # Coleta de forma resiliente as saídas dos nós anteriores para contextualização
+    coder_output = memory.get("coder", {}).get("output", "") or memory.get("multi_coder", {}).get("output", "")
+    built_prompt = memory.get("prompt_builder", {}).get("built_prompt", "") or memory.get("prompt_builder", {}).get("output", "")
 
     if not task and not coder_output and not built_prompt:
-        record_error("documentation", "Empty task", {"task": task})
-        return {**ctx, "output": "", "document": ""}
+        await asyncio.to_thread(record_error, "documentation", "Empty task context", {"task": task})
+        latency_ms = (time.time() - start_time) * 1000.0
+        return {
+            "output": "", "document": "",
+            "execution_metrics": {"model": resolved_model, "success": False, "latency": latency_ms, "cost": 0.0}
+        }
 
-    specialization = (
-        ctx.get("input", {})
-        .get("_specialization", {})
-        .get("coder", "")
-    )
-
+    specialization = ctx.get("input", {}).get("_specialization", {}).get("coder", "")
     base_content = coder_output or built_prompt or task
 
     system = (
@@ -63,23 +76,67 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     try:
+        logger.info("[DOCUMENTATION] Disparando inferência assíncrona para redação técnica do documento...")
+        
+        # Chamada assíncrona do provider core
         doc = await async_route_generate(
             model="", prompt=prompt, task_type="documentation"
         )
-        if doc and len(doc) > 100:
-            logger.info("[DOCUMENTATION] Documento gerado: %d chars", len(doc))
+        
+        # Portão de segurança: validação de tamanho mínimo da documentação gerada
+        is_success = bool(doc and len(doc) > 100)
+        
+        if is_success:
+            logger.info("[DOCUMENTATION] Documento técnico gerado com sucesso: %d caracteres.", len(doc))
+            
+            # Publicação reativa e assíncrona no AcetylcholineBus para alertar o result_agent
             if bus is not None:
                 msg = AgentMessage(
-                    sender="documentation", receiver="result_agent",
+                    sender="documentation", 
+                    receiver="result_agent",
                     type="doc_ready",
                     payload={"document": doc, "task": task},
                 )
-                bus.publish(msg)
-                logger.info("[DOCUMENTATION] Mensagem enviada para result_agent via bus")
-            return {**ctx, "output": doc, "document": doc}
-        record_error("documentation", "Empty/short document", {"task": task[:100]})
-    except Exception as e:
-        logger.warning("[DOCUMENTATION] Falha: %s", e)
-        record_error("documentation", str(e), {"task": task[:100]})
+                if asyncio.iscoroutinefunction(bus.publish):
+                    await bus.publish(msg)
+                else:
+                    await asyncio.to_thread(bus.publish, msg)
+                logger.info("[DOCUMENTATION] Evento 'doc_ready' injetado no barramento com sucesso.")
+                
+            latency_ms = (time.time() - start_time) * 1000.0
+            
+            return {
+                "output": doc,
+                "document": doc,
+                "execution_metrics": {
+                    "model": resolved_model,
+                    "success": True,
+                    "latency": latency_ms,
+                    "cost": ctx.get("estimated_cost", 0.008)  # Custo de inferência estimado para redação rica
+                }
+            }
+            
+        # Caso a IA retorne um documento em branco ou excessivamente curto
+        await asyncio.to_thread(record_error, "documentation", "Empty/short document", {"task": task[:100]})
+        latency_ms = (time.time() - start_time) * 1000.0
+        return {
+            "output": "", "document": "",
+            "execution_metrics": {"model": resolved_model, "success": False, "latency": latency_ms, "cost": ctx.get("estimated_cost", 0.002)}
+        }
 
-    return {**ctx, "output": "", "document": ""}
+    except Exception as e:
+        latency_ms = (time.time() - start_time) * 1000.0
+        logger.exception("[DOCUMENTATION] Falha crítica no pipeline do Documentation Agent: %s", e)
+        await asyncio.to_thread(record_error, "documentation", str(e), {"task": task[:100]})
+        
+        return {
+            "output": "",
+            "document": "",
+            "execution_metrics": {
+                "model": resolved_model,
+                "success": False,
+                "latency": latency_ms,
+                "cost": 0.0
+            }
+        }
+

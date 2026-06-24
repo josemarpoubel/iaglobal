@@ -8,9 +8,33 @@ from typing import List, Dict, Any, Optional
 from collections import deque
 from datetime import datetime, timezone
 
+from iaglobal._paths import MEMORY_SWAP_DIR
+
+
+def _get_memory_percent() -> float:
+    """Get system memory usage percentage."""
+    try:
+        with open("/proc/meminfo", "r") as f:
+            meminfo = f.read()
+        available = total = 0
+        for line in meminfo.split("\n"):
+            if line.startswith("MemAvailable:"):
+                available = int(line.split()[1])
+            elif line.startswith("MemTotal:"):
+                total = int(line.split()[1])
+        if total > 0:
+            return (total - available) / total * 100
+    except Exception:
+        pass
+    return 0.0
+
 
 class ShortTermMemory:
     """Manages short-term memory with limited capacity and auto-expire."""
+
+    MAX_SWAP_SIZE_MB = 500
+    _USED_SWAP_SIZE = 0
+    RAM_THRESHOLD_PERCENT = 50
 
     def __init__(self, max_size: int = 100, ttl_seconds: Optional[int] = 3600, db_path: Optional[Path] = None):
         self.max_size = max_size
@@ -19,9 +43,33 @@ class ShortTermMemory:
         self._lock = threading.Lock()
         self._buffer: deque = deque(maxlen=max_size)
         self._timestamps: deque = deque(maxlen=max_size)
+        self._swap_dir = MEMORY_SWAP_DIR
+        self._swap_dir.mkdir(parents=True, exist_ok=True)
+        self._swap_index: Dict[int, Path] = {}
+        self._swap_seq = 0
         if self.db_path:
             self._init_db()
             self._load()
+
+    def _should_swap_to_disk(self, content: Any) -> bool:
+        ram_percent = _get_memory_percent()
+        if ram_percent > self.RAM_THRESHOLD_PERCENT:
+            return True
+        if not self.is_full():
+            return False
+        estimated_size = len(str(content).encode("utf-8"))
+        return estimated_size > 1000
+
+    def _swap_to_disk(self, entry: dict) -> None:
+        self._swap_seq += 1
+        swap_file = self._swap_dir / f"stm_{self._swap_seq}.cbor2"
+        try:
+            swap_file.write_bytes(cbor2.dumps(entry))
+            entry_size = swap_file.stat().st_size
+            ShortTermMemory._USED_SWAP_SIZE += entry_size
+            self._swap_index[id(entry)] = swap_file
+        except Exception:
+            pass
 
     def _init_db(self) -> None:
         self.db_path.parent.mkdir(parents=True, exist_ok=True)
@@ -45,6 +93,8 @@ class ShortTermMemory:
         }
         self._buffer.append(entry)
         self._timestamps.append(datetime.now(timezone.utc))
+        if self._should_swap_to_disk(item):
+            self._swap_to_disk(entry)
         self._save_entry(entry)
 
     def get_recent(self, n: int = 10) -> List[Any]:
@@ -132,3 +182,28 @@ class ShortTermMemory:
                     self._timestamps.append(ts)
             except Exception:
                 pass
+
+    def clear_swap(self) -> int:
+        removed = 0
+        with self._lock:
+            for f in self._swap_dir.glob("stm_*.cbor2"):
+                try:
+                    f.unlink()
+                    removed += 1
+                except Exception:
+                    pass
+            ShortTermMemory._USED_SWAP_SIZE = 0
+            self._swap_index.clear()
+            self._swap_seq = 0
+        return removed
+
+    def swap_status(self) -> Dict[str, Any]:
+        total_files = len(list(self._swap_dir.glob("stm_*.cbor2")))
+        total_kb = sum(f.stat().st_size for f in self._swap_dir.glob("stm_*.cbor2")) / 1024
+        return {
+            "files": total_files,
+            "size_kb": round(total_kb, 1),
+            "max_size_mb": self.MAX_SWAP_SIZE_MB,
+            "used_size_bytes": ShortTermMemory._USED_SWAP_SIZE,
+            "ram_threshold_percent": self.RAM_THRESHOLD_PERCENT
+        }

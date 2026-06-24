@@ -72,7 +72,7 @@ evolution-lab = "iaglobal.cli.evolution_lab:run_evolution_lab"
 
 [tool.pytest.ini_options]
 # Ignora tudo que não esteja na pasta de testes
-testpaths = ["iaglobal/tests"]
+testpaths = ["tests"]
 # Só considera classes que começam com 'Test'
 python_classes = ["Test*"]
 # Só considera funções que começam com 'test_'

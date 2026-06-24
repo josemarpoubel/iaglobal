@@ -34,6 +34,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.utils.helpers import run_async_safe
 logger = get_logger(__name__)
 
 # Integrações biológicas opcionais
@@ -209,16 +210,6 @@ def _has(tokens: Set[str], *keywords: str) -> bool:
     return any(k in tokens for k in keywords)
 
 
-def _has_all(tokens: Set[str], *keywords: str) -> bool:
-    """True se TODAS as keywords estiverem nos tokens."""
-    return all(k in tokens for k in keywords)
-
-
-def _missing(tokens: Set[str], *keywords: str) -> bool:
-    """True se NENHUMA keyword estiver nos tokens."""
-    return not any(k in tokens for k in keywords)
-
-
 # ---------------------------------------------------------------------------
 # Detectores de Perfil de Carga e Rendering
 # ---------------------------------------------------------------------------
@@ -262,7 +253,7 @@ class BackendRules:
     """
 
     @staticmethod
-    def check_n_plus_one(
+    async def check_n_plus_one(
         tokens: Set[str], error_tokens: Set[str], profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_orm = _has(tokens, "orm", "sqlalchemy", "django", "sequelize", "prisma", "hibernate")
@@ -310,7 +301,7 @@ class BackendRules:
         return issue, rec
 
     @staticmethod
-    def check_cache_strategy(
+    async def check_cache_strategy(
         tokens: Set[str], error_tokens: Set[str], profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_cache = _has(tokens, "cache", "redis", "memcached", "varnish",
@@ -363,7 +354,7 @@ class BackendRules:
         return issue, rec
 
     @staticmethod
-    def check_async_io(
+    async def check_async_io(
         tokens: Set[str], error_tokens: Set[str], profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_async = _has(tokens, "async", "asyncio", "await", "aiohttp",
@@ -411,7 +402,7 @@ class BackendRules:
         return issue, rec
 
     @staticmethod
-    def check_pagination(
+    async def check_pagination(
         tokens: Set[str], error_tokens: Set[str], profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_list = _has(tokens, "listar", "listing", "listagem", "buscar todos",
@@ -461,7 +452,7 @@ class BackendRules:
         return issue, rec
 
     @staticmethod
-    def check_db_indexes(
+    async def check_db_indexes(
         tokens: Set[str], error_tokens: Set[str], profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_db = _has(tokens, "banco", "database", "db", "sql", "postgres",
@@ -518,7 +509,7 @@ class BackendRules:
         return issue, rec
 
     @staticmethod
-    def check_connection_pool(
+    async def check_connection_pool(
         tokens: Set[str], error_tokens: Set[str], profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_db = _has(tokens, "banco", "database", "postgres", "mysql", "mongodb")
@@ -573,7 +564,7 @@ class BackendRules:
         return issue, rec
 
     @staticmethod
-    def check_circuit_breaker(
+    async def check_circuit_breaker(
         tokens: Set[str], error_tokens: Set[str], profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_external = _has(tokens, "api externa", "external service", "terceiro",
@@ -629,7 +620,7 @@ class BackendRules:
         return issue, rec
 
     @staticmethod
-    def check_batch_processing(
+    async def check_batch_processing(
         tokens: Set[str], error_tokens: Set[str], profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_volume = _has(tokens, "muitos registros", "large volume", "bulk",
@@ -696,7 +687,7 @@ class FrontendRules:
     """
 
     @staticmethod
-    def check_lcp(
+    async def check_lcp(
         tokens: Set[str], rendering: RenderingStrategy
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_images = _has(tokens, "imagem", "image", "img", "hero", "banner", "foto")
@@ -746,7 +737,7 @@ class FrontendRules:
         return issue, rec
 
     @staticmethod
-    def check_cls(
+    async def check_cls(
         tokens: Set[str], rendering: RenderingStrategy
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_dynamic = _has(tokens, "anuncio", "ad", "banner dinamico", "dynamic content",
@@ -804,7 +795,7 @@ class FrontendRules:
         return issue, rec
 
     @staticmethod
-    def check_bundle_size(
+    async def check_bundle_size(
         tokens: Set[str], rendering: RenderingStrategy
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_framework = _has(tokens, "react", "vue", "angular", "next", "nuxt",
@@ -861,7 +852,7 @@ class FrontendRules:
         return issue, rec
 
     @staticmethod
-    def check_rendering_strategy(
+    async def check_rendering_strategy(
         tokens: Set[str], rendering: RenderingStrategy, profile: LoadProfile
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_seo = _has(tokens, "seo", "search engine", "google", "indexacao",
@@ -916,7 +907,7 @@ class FrontendRules:
         return issue, rec
 
     @staticmethod
-    def check_react_rerenders(
+    async def check_react_rerenders(
         tokens: Set[str], rendering: RenderingStrategy
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_react = _has(tokens, "react", "jsx", "tsx", "componente react")
@@ -977,7 +968,7 @@ class FrontendRules:
         return issue, rec
 
     @staticmethod
-    def check_css_performance(
+    async def check_css_performance(
         tokens: Set[str], rendering: RenderingStrategy
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_css = _has(tokens, "css", "estilo", "animacao", "animation",
@@ -1037,7 +1028,7 @@ class FrontendRules:
         return issue, rec
 
     @staticmethod
-    def check_font_performance(
+    async def check_font_performance(
         tokens: Set[str], rendering: RenderingStrategy
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_fonts = _has(tokens, "fonte", "font", "tipografia", "typography",
@@ -1090,7 +1081,7 @@ class FrontendRules:
         return issue, rec
 
     @staticmethod
-    def check_image_optimization(
+    async def check_image_optimization(
         tokens: Set[str], rendering: RenderingStrategy
     ) -> Optional[Tuple[PerformanceIssue, PerformanceRecommendation]]:
         has_images = _has(tokens, "imagem", "image", "img", "foto", "photo",
@@ -1201,6 +1192,21 @@ class PerformanceDesignAgent:
         error_context: str = "",
         **kwargs,
     ) -> Dict[str, Any]:
+        return run_async_safe(
+            self.analyze_async,
+            design_context,
+            knowledge_context,
+            error_context,
+            **kwargs,
+        )
+
+    async def analyze_async(
+        self,
+        design_context: Dict[str, Any],
+        knowledge_context: str = "",
+        error_context: str = "",
+        **kwargs,
+    ) -> Dict[str, Any]:
 
         logger.info("⚡ [PERF-DESIGN] Iniciando análise full-stack de performance...")
 
@@ -1229,33 +1235,31 @@ class PerformanceDesignAgent:
         recs:    List[PerformanceRecommendation] = []
         score    = PerformanceScore()
 
-        for rule in self._backend_rules:
-            try:
-                result = rule(tokens, error_tokens, profile)
-                if result:
-                    issue, rec = result
-                    # Filtra por load profile se restrito
-                    if issue.load_profiles and profile not in issue.load_profiles:
-                        continue
-                    issues.append(issue)
-                    recs.append(rec)
-                    self._apply_score_deduction(score, issue)
-            except Exception as exc:
-                logger.warning("⚡ [PERF-DESIGN] Regra backend falhou: %s", exc)
+        backend_results = [
+            BackendRules.check_n_plus_one(tokens, error_tokens, profile),
+            BackendRules.check_cache_strategy(tokens, error_tokens, profile),
+            BackendRules.check_async_io(tokens, error_tokens, profile),
+            BackendRules.check_pagination(tokens, error_tokens, profile),
+            BackendRules.check_db_indexes(tokens, error_tokens, profile),
+            BackendRules.check_connection_pool(tokens, error_tokens, profile),
+            BackendRules.check_circuit_breaker(tokens, error_tokens, profile),
+            BackendRules.check_batch_processing(tokens, error_tokens, profile),
+        ]
+        for result_coro in backend_results:
+            await self._collect_rule_result(issues, recs, score, await result_coro, profile)
 
-        for rule in self._frontend_rules:
-            try:
-                if rule == FrontendRules.check_rendering_strategy:
-                    result = rule(tokens, rendering, profile)
-                else:
-                    result = rule(tokens, rendering)
-                if result:
-                    issue, rec = result
-                    issues.append(issue)
-                    recs.append(rec)
-                    self._apply_score_deduction(score, issue)
-            except Exception as exc:
-                logger.warning("⚡ [PERF-DESIGN] Regra frontend falhou: %s", exc)
+        frontend_results = [
+            FrontendRules.check_lcp(tokens, rendering),
+            FrontendRules.check_cls(tokens, rendering),
+            FrontendRules.check_bundle_size(tokens, rendering),
+            FrontendRules.check_rendering_strategy(tokens, rendering, profile),
+            FrontendRules.check_react_rerenders(tokens, rendering),
+            FrontendRules.check_css_performance(tokens, rendering),
+            FrontendRules.check_font_performance(tokens, rendering),
+            FrontendRules.check_image_optimization(tokens, rendering),
+        ]
+        for result_coro in frontend_results:
+            await self._collect_rule_result(issues, recs, score, await result_coro)
 
         # ── Core Web Vitals ──────────────────────────────────────────────────
         cwv = self._analyze_cwv(issues)
@@ -1334,6 +1338,23 @@ class PerformanceDesignAgent:
             "score": score.overall,
             "cwv": asdict(cwv),
         }
+
+    async def _collect_rule_result(
+        self,
+        issues: List[PerformanceIssue],
+        recs: List[PerformanceRecommendation],
+        score: PerformanceScore,
+        result,
+        profile: Optional[LoadProfile] = None,
+    ) -> None:
+        if not result:
+            return
+        issue, rec = result
+        if profile is not None and issue.load_profiles and profile not in issue.load_profiles:
+            return
+        issues.append(issue)
+        recs.append(rec)
+        self._apply_score_deduction(score, issue)
 
     def _apply_score_deduction(self, score: PerformanceScore, issue: PerformanceIssue):
         deductions = {

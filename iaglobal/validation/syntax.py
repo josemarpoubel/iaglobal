@@ -1,11 +1,9 @@
 # syntax.py (Syntax validation module for Python code.)
 
 import ast
-from typing import Tuple, Dict, Any, Optional
+from typing import Tuple, Optional
 import builtins
 from iaglobal.utils.logger import logger
-
-import ast
 
 
 def validar_sintaxe(code: str) -> None:
@@ -105,67 +103,5 @@ def validate_syntax(codigo: str) -> Tuple[bool, Optional[str]]:
         return False, error_msg
 
 
-def codigo_python_valido(codigo: str) -> bool:
-    """Check if code has valid Python syntax and scope."""
-    valid, _ = validate_syntax(codigo)
-    return valid
 
-
-def is_compilable(codigo: str) -> bool:
-    """Check if code can be compiled and is valid."""
-    return codigo_python_valido(codigo)
-
-
-def get_syntax_report(codigo: str) -> Dict[str, Any]:
-    """Get detailed syntax validation report."""
-    valid, error = validate_syntax(codigo)
-    
-    report = {
-        'valid': valid,
-        'error': error,
-        'line_count': len(codigo.splitlines()) if codigo else 0,
-        'char_count': len(codigo) if codigo else 0
-    }
-    
-    if valid:
-        try:
-            tree = ast.parse(codigo)
-            
-            node_count = sum(1 for _ in ast.walk(tree))
-            report['ast_nodes'] = node_count
-            
-            functions = sum(1 for node in ast.walk(tree) if isinstance(node, ast.FunctionDef))
-            classes = sum(1 for node in ast.walk(tree) if isinstance(node, ast.ClassDef))
-            report['functions'] = functions
-            report['classes'] = classes
-        except:
-            pass
-    
-    return report
-
-
-def validar_saida(saida: str) -> bool:
-    if not saida or not saida.strip():
-        return False
-    if len(saida.strip()) < 2:
-        return False
-    return True
-
-
-def check_indentation(codigo: str) -> bool:
-    """Check if code has proper indentation."""
-    if not codigo:
-        return True
-    
-    lines = codigo.splitlines()
-    for line in lines:
-        if not line.strip():
-            continue
-        
-        indent = len(line) - len(line.lstrip())
-        if indent % 4 != 0:
-            logger.warning(f"INDENTATION: Non-4-space indentation detected")
-            return False
-            
-    return True
 

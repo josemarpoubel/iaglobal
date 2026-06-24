@@ -60,11 +60,5 @@ def classify_errors(errors: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
     return classified
 
 
-def filter_skill_gaps(errors: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
-    """Filtra apenas gaps classificados como skill_ausente."""
-    classified = classify_errors(errors)
-    return [e for e in classified if e["taxonomy"]["category"] == "skill_ausente"]
-
-
 def _count_matches(text: str, keywords: List[str]) -> int:
     return sum(1 for kw in keywords if kw.lower() in text)

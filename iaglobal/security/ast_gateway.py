@@ -51,6 +51,9 @@ class ASTGateway:
             logger.error(f"Syntax error: {e}")
             return ASTResult(False, None, [str(e)])
 
+    def validate(self, code: str) -> ASTResult:
+        return self.parse(code)
+
     def _scan(self, tree: ast.AST) -> List[str]:
         errors = []
 
@@ -60,7 +63,7 @@ class ASTGateway:
             if isinstance(node, ast.Import):
                 for alias in node.names:
                     module_name = alias.name.split(".")[0]
-                    if module_name not in self.sandbox_rules.allowed_modules:
+                    if not self.sandbox_rules.is_module_allowed(module_name):
                         errors.append(
                             f"Module '{alias.name}' is not in allowed_modules"
                         )
@@ -68,7 +71,7 @@ class ASTGateway:
             if isinstance(node, ast.ImportFrom):
                 if node.module:
                     module_name = node.module.split(".")[0]
-                    if module_name not in self.sandbox_rules.allowed_modules:
+                    if not self.sandbox_rules.is_module_allowed(module_name):
                         errors.append(
                             f"Module '{node.module}' is not in allowed_modules"
                         )

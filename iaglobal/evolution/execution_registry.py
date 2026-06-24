@@ -70,12 +70,6 @@ class ExecutionRegistry:
                         status=NodeStatus.PENDING
                     )
 
-    def was_executed(self, execution_id: str, node_id: str) -> bool:
-        """Verifica se o nó já foi processado."""
-        if not hasattr(self, '_executed_nodes'):
-            self._executed_nodes = set()
-        return (execution_id, node_id) in self._executed_nodes
-
     def claim(self, execution_id: str, node_id: str) -> bool:
         """Reserva a execução de um nó para evitar concorrência."""
         if not hasattr(self, '_executed_nodes'):
@@ -88,67 +82,6 @@ class ExecutionRegistry:
         self._executed_nodes.add(key)
         return True # Reivindicação bem-sucedida
 
-    def start_node(self, execution_id: str, node_id: str) -> bool:
-        """Marca o nó como RUNNING se ele puder ser executado. Retorna Falso se violar a barreira."""
-        with self._lock:
-            # Se já está registrado como executado, barra imediatamente (Idempotência ativa)
-            if execution_id in self._executed and node_id in self._executed[execution_id]:
-                logger.warning("[REGISTRY] Bloqueio de Idempotência: Nó '%s' já foi rodado na execução '%s'.", node_id, execution_id)
-                return False
-
-            if execution_id in self._entries and node_id in self._entries[execution_id]:
-                entry = self._entries[execution_id][node_id]
-                if entry.status in (NodeStatus.RUNNING, NodeStatus.COMPLETED):
-                    return False
-                entry.status = NodeStatus.RUNNING
-                return True
-            
-            # Fallback seguro caso o nó não tenha sido pré-inicializado no init_execution
-            if execution_id not in self._entries:
-                self._executed[execution_id] = set()
-                self._entries[execution_id] = {}
-                if execution_id not in self._execution_order:
-                    self._execution_order.append(execution_id)
-
-            self._entries[execution_id][node_id] = ExecutionEntry(
-                node_id=node_id, execution_id=execution_id, status=NodeStatus.RUNNING
-            )
-            return True
-
-    def complete_node(self, execution_id: str, node_id: str, result: Optional[str] = None):
-        """Salva a conclusão bem-sucedida do nó e tranca a barreira de re-execução."""
-        with self._lock:
-            if execution_id not in self._executed:
-                self._executed[execution_id] = set()
-            self._executed[execution_id].add(node_id)
-
-            if execution_id in self._entries and node_id in self._entries[execution_id]:
-                entry = self._entries[execution_id][node_id]
-                entry.status = NodeStatus.COMPLETED
-                entry.result = result
-
-    def fail_node(self, execution_id: str, node_id: str, error: Optional[str] = None):
-        """Regista a falha de processamento de um nó para fins de auditoria genética."""
-        with self._lock:
-            if execution_id not in self._executed:
-                self._executed[execution_id] = set()
-            # NOTA DE DESIGN: Adicionar ao _executed impede que o grafo entre em loop infinito tentando rodar o nó quebrado
-            self._executed[execution_id].add(node_id)
-
-            if execution_id in self._entries and node_id in self._entries[execution_id]:
-                entry = self._entries[execution_id][node_id]
-                entry.status = NodeStatus.FAILED
-                entry.error = error
-
-    def skip_node(self, execution_id: str, node_id: str):
-        """Ignora formalmente o nó (Barreira de segurança para caminhos condicionais)."""
-        with self._lock:
-            if execution_id not in self._executed:
-                self._executed[execution_id] = set()
-            self._executed[execution_id].add(node_id)
-            if execution_id in self._entries and node_id in self._entries[execution_id]:
-                self._entries[execution_id][node_id].status = NodeStatus.SKIPPED
-
     def get_status(self, execution_id: str, node_id: str) -> Optional[str]:
         """Retorna o valor string do status de um nó na execução."""
         with self._lock:
@@ -156,18 +89,25 @@ class ExecutionRegistry:
                 return self._entries[execution_id][node_id].status.value
             return None
 
-    def get_executed_nodes(self, execution_id: str) -> Set[str]:
-        """Retorna o conjunto imutável de cópia dos nós executados para segurança de iteração."""
+    def was_executed(self, execution_id: str, node_id: str) -> bool:
+        """Verifica se um nó já foi executado com sucesso."""
         with self._lock:
-            return set(self._executed.get(execution_id, set()))
+            entry = self._entries.get(execution_id, {}).get(node_id)
+            if entry is None:
+                return False
+            return entry.status in (NodeStatus.COMPLETED, NodeStatus.FAILED, NodeStatus.SKIPPED)
 
-    def reset_execution(self, execution_id: str):
-        """Remove explicitamente todos os registros de uma execução do mapa."""
+    def complete_node(self, execution_id: str, node_id: str, result: Optional[str] = None):
+        """Marca um nó como COMPLETED."""
         with self._lock:
-            self._executed.pop(execution_id, None)
-            self._entries.pop(execution_id, None)
-            if execution_id in self._execution_order:
-                self._execution_order.remove(execution_id)
+            if execution_id in self._entries and node_id in self._entries[execution_id]:
+                self._entries[execution_id][node_id].status = NodeStatus.COMPLETED
+                self._entries[execution_id][node_id].result = result
+                self._executed.setdefault(execution_id, set()).add(node_id)
+
+    def complete(self, execution_id: str, node_id: str):
+        """Alias para complete_node."""
+        self.complete_node(execution_id, node_id)
 
     def clear(self):
         """Limpa de forma total e absoluta o barramento (Uso exclusivo para resets de testes unitários)."""

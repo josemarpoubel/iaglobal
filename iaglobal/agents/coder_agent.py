@@ -9,7 +9,6 @@ from dataclasses import dataclass, field
 from typing import Union, Dict, List, Optional
 
 from iaglobal.models.task import Task
-from iaglobal.validation.engine import ValidationEngine
 from iaglobal.observability.tracing import Tracer
 from iaglobal.graphs.bandit import BanditPolicy, _get_bandit
 from iaglobal.graphs.credit import CreditAssignmentEngine
@@ -32,6 +31,7 @@ EXTENSION_HINTS = {
     "html": ".html", "css": ".css", "yaml": ".yaml", "yml": ".yaml",
     "json": ".json", "xml": ".xml", "markdown": ".md", "md": ".md",
     "php": ".php", "sql": ".sql",
+    "reactpy": ".py", "reactpy-django": ".py",  # ReactPy components são Python
 }
 
 @dataclass
@@ -77,13 +77,19 @@ class CoderAgent:
 
     def _build_prompt(self, task: str, contexto: str = "", erros_contexto: str = "", security_feedback: str = "") -> str:
         security_section = f"\nALERTA DE SEGURANÇA: {security_feedback}\n" if security_feedback else ""
-        return f"""Você é um Engenheiro de Software Sênior e Arquiteto de Sistemas.
+        pdf_dark_hint = ""
+        reactpy_hint = ""
+        task_lower = task.lower()
+        if ("pdf" in task_lower or "documento" in task_lower) and ("escuro" in task_lower or "dark" in task_lower):
+            pdf_dark_hint = "\nDICA PDF TEMA ESCURO: Use set_fill_color(30,30,30) E rect(0,0,210,297,'F') APÓS cada add_page() para aplicar tema escuro em TODAS as páginas."
+        if "reactpy" in task_lower:
+            reactpy_hint = "\nDICA REACTPY: Use @component, html.* tags, hooks (use_state, use_effect). Design: dark theme (#0f0f23 bg, #ff6b6b accent)."
+        return f"""Você é um Engenheiro de Software Sênior e Arquiteto Supremo de Sistemas Vivos Que Se Auto-Evoluem. Você é Um Criador de Tecnologias de Alto Nivel.
 Estilo: {self.estilo}.
 Contexto: {contexto or "Nenhum."}
 Erros a reparar: {erros_contexto or "Nenhum."}
-{security_section}
+{security_section}{pdf_dark_hint}{reactpy_hint}
 Tarefa: {task}
-
 DIRETRIZES DE LOGGING (OBRIGATÓRIO):
 - NÃO utilize `print()`.
 - Sempre use o módulo nativo `logging`.
@@ -98,9 +104,10 @@ DIRETRIZES DE ARQUITETURA:
 - Garanta compatibilidade com execução em sandbox e respeite restrições de segurança.
 
 DIRETRIZES DE SEGURANÇA:
-- NÃO utilize imports inseguros ou bibliotecas não autorizadas.
+- NÃO utilize imports inseguros.
+- NÃO utilize bibliotecas imcompativeis.
 - Evite chamadas diretas ao sistema operacional que possam comprometer o ambiente.
-- Todo acesso a modelos deve passar pela BanditPolicy para garantir conformidade e otimização.
+- Todo acesso a modelos de IA deve passar pela BanditPolicy para garantir conformidade e otimização.
 - Corrija imediatamente qualquer violação de sandbox ou policy.
 
 DIRETRIZES DE QUALIDADE:
@@ -108,6 +115,8 @@ DIRETRIZES DE QUALIDADE:
 - Sempre valide entradas e trate exceções de forma robusta.
 - Inclua comentários apenas quando agregarem clareza arquitetural.
 - Garanta que o código seja sintaticamente válido e pronto para execução.
+- Sempre teste o resultado final para certificar que não há erros.
+- Sempre verifique se o resultado final é compativel com o prompt inicial.
 
 REGRAS DE RETORNO:
 - Retorne ESTRITAMENTE o código dentro de um bloco markdown da linguagem correspondente (ex: ```python ... ```).
@@ -160,19 +169,6 @@ REGRAS DE RETORNO:
             return codigo
         return self._extrair_por_ast(resposta)
 
-    def _sintaxe_valida(self, codigo: str) -> bool:
-        if not codigo or not codigo.strip():
-            return False
-        try:
-            ast.parse(codigo)
-        except SyntaxError:
-            return False
-        try:
-            result = ValidationEngine().validate(codigo)
-            return result.valid
-        except Exception:
-            return True
-
     def _calcular_qualidade(self, codigo: str, task: str) -> float:
         score = 50.0
         if not codigo:
@@ -220,12 +216,9 @@ REGRAS DE RETORNO:
         ))
 
     def _modelos_candidatos(self, count: int = 3) -> List[str]:
-        modelos = set()
-        for _ in range(count * 2):
-            m = self.bandit.select_model(node="coder_agent", strategy="code_generation")
-            modelos.add(m)
-            if len(modelos) >= count:
-                break
+        modelos = self.bandit.select_top_n(
+            node="coder_agent", strategy="code_generation", n=count
+        )
         modelos_ordenados = sorted(modelos, key=lambda m: (
             sum(self._quality_scores.get(m, [50])) / max(len(self._quality_scores.get(m, [1])), 1)
         ), reverse=True)
@@ -296,25 +289,5 @@ REGRAS DE RETORNO:
         Tracer.trace_event("CoderFailed", {"task": task_str[:80]})
         return CodeArtifact(code="", files={})
 
-    async def run_async(self, task) -> CodeArtifact:
-        artifact = await self.generate(task)
-        if not artifact.code:
-            return artifact
-        if artifact.code and not self._sintaxe_valida(artifact.code):
-            extraido = self._extrair_por_ast(artifact.code)
-            if extraido:
-                artifact.code = extraido
-                artifact.files = {"output.py": extraido}
-        return artifact
-
-    def gerar_codigo(self, task="", contexto="", erros_contexto="", security_feedback="") -> CodeArtifact:
-        try:
-            return run_async_safe(self.generate, task, contexto, erros_contexto, security_feedback)
-        except Exception:
-            return CodeArtifact(code="", files={})
-
-    async def gerar_codigo_async(self, task="", contexto="", erros_contexto="", security_feedback="") -> CodeArtifact:
-        return await self.generate(task, contexto, erros_contexto, security_feedback)
-
     def run(self, task) -> CodeArtifact:
-        return run_async_safe(self.run_async, task)
+        return run_async_safe(self.generate, task)

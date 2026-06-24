@@ -2,7 +2,7 @@ import logging
 from typing import Any, Dict, List
 
 from iaglobal.memory.memory_error import query_relevant_errors
-from iaglobal.evolution.metacognition.failure_taxonomy import classify_errors, filter_skill_gaps
+from iaglobal.evolution.metacognition.failure_taxonomy import classify_errors
 
 logger = logging.getLogger(__name__)
 

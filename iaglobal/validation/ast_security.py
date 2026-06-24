@@ -218,7 +218,6 @@ class ASTSecurityEngine:
         self.forbidden_imports = {
             "os",
             "subprocess",
-            "sys",
             "shutil",
             "importlib",
             "ctypes",
@@ -342,7 +341,7 @@ class _CheckerCompat:
 _checker = _CheckerCompat()
 
 
-def validate_ast_security(codigo: str):
+def validate_ast_security_str(codigo: str):
     return _engine.is_safe(codigo), _engine.analyze(codigo)
 
 

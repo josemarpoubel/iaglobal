@@ -4,9 +4,9 @@ from typing import Optional
 
 @dataclass(frozen=True)
 class TaskFingerprint:
-    domain: str                 # web, data, ai, infra
+    domain: str                 # web, data, ai, infra, image, video
     subdomain: str             # backend, frontend, ml, devops
-    language: Optional[str]    # python, php, js...
+    language: Optional[str]    # python, php, js, image, video...
     intent: str                # generate, debug, explain, refactor
     complexity: str            # low, medium, high
     risk: str                  # low, medium, high

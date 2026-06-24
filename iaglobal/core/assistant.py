@@ -161,14 +161,6 @@ class Assistant:
         except Exception:
             return "", []
 
-    def _limpar_query(self, text: str) -> str:
-        text = text.lower()
-        stop = ["explique", "o que é", "me diga", "sobre", "conceito de"]
-        for s in stop:
-            text = text.replace(s, "")
-        text = re.sub(r"[^\w\s]", " ", text)
-        return " ".join(text.split()).strip()
-
     # =========================================================
     # MEMÓRIA LOCAL (VETORIAL + LTM + STM)
     # =========================================================
@@ -254,15 +246,13 @@ class Assistant:
     # MODEL ROUTER WRAPPER
     # =========================================================
     def _criar_funcao_modelo(self, modelo: str):
-
-        def executar_modelo(prompt: str) -> str:
+        def _inner(prompt: str) -> str:
             try:
                 return self._dispatch_modelo(modelo, prompt)
             except Exception as e:
                 print(f"⚠️ [MODEL ERROR] {e}")
                 return blackjack_executar_local("iaglobal-coder-9b", prompt)
-
-        return executar_modelo
+        return _inner
 
     def _dispatch_modelo(self, modelo: str, prompt: str) -> str:
         model_name = modelo.lower().strip()
@@ -388,7 +378,3 @@ class Assistant:
                     self._store_ltm(s["content"], "consolidated")
         except Exception as e:
             print(f"⚠️ [CONSOLIDATION ERROR] {e}")
-
-
-def processar_assistente(prompt: Union[str, Task]) -> str:
-    return Assistant()(prompt)

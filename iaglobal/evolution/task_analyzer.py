@@ -74,6 +74,60 @@ class TaskAnalyzer:
         "slow": ["performance"],
         "cache": ["performance"],
         "memory leak": ["performance"],
+
+        # Coding / Programação Geral
+        "python": ["web_development", "api_design"],
+        "codigo": ["web_development"],
+        "código": ["web_development"],
+        "programar": ["coding"],
+        "programação": ["coding"],
+        "programacao": ["coding"],
+
+        # Blockchain / Web3 / Cripto
+        "blockchain": ["blockchain"],
+        "bloco genesis": ["blockchain"],
+        "bloco": ["blockchain"],
+        "genesis": ["blockchain"],
+        "web3": ["blockchain"],
+        "solidity": ["blockchain"],
+        "smart contract": ["blockchain"],
+        "contrato inteligente": ["blockchain"],
+        "crypto": ["blockchain"],
+        "criptomoeda": ["blockchain"],
+        "token nft": ["blockchain"],
+        "nft": ["blockchain"],
+        "defi": ["blockchain"],
+
+        # Comandos em Português
+        "criar": ["web_development"],
+        "crie": ["web_development"],
+        "faça": ["web_development"],
+        "faca": ["web_development"],
+        "gere": ["web_development"],
+        "gerar": ["web_development"],
+        "desenvolva": ["web_development"],
+        "desenvolver": ["web_development"],
+        "implemente": ["web_development"],
+        "implementar": ["web_development"],
+        "construa": ["web_development"],
+        "construir": ["web_development"],
+    }
+
+    # 🔄 Normalização de typos comuns antes da análise
+    _COMMON_TYPOS = {
+        "pythom": "python",
+        "pythno": "python",
+        "pythn": "python",
+        "javascrip": "javascript",
+        "javascritp": "javascript",
+        "typescritp": "typescript",
+        "djanjo": "django",
+        "flaks": "flask",
+        "fastapy": "fastapi",
+        "blockhain": "blockchain",
+        "blockain": "blockchain",
+        "solidty": "solidity",
+        "solidit": "solidity",
     }
 
     # 🔥 RESOLUÇÃO DO BUG 2 (Otimização ReDoS): Pré-compilação do dicionário de busca em Regex
@@ -83,12 +137,23 @@ class TaskAnalyzer:
     }
 
     @classmethod
+    def _normalize(cls, prompt: str) -> str:
+        """Normaliza typos comuns no prompt antes da análise."""
+        p = prompt
+        for typo, correction in cls._COMMON_TYPOS.items():
+            p = re.sub(rf"\b{re.escape(typo)}\b", correction, p, flags=re.IGNORECASE)
+        return p
+
+    @classmethod
     def analyze(cls, prompt: str) -> Dict[str, Any]:
         """
         Executa a varredura do prompt e extrai estratégias e tecnologias.
+        Typos comuns (pythom→python) são normalizados antes da análise.
         """
         if not prompt:
             return {"strategies": set(), "technologies": set()}
+
+        prompt = cls._normalize(prompt)
 
         strategies: Set[str] = set()
         technologies: Set[str] = set()
@@ -189,8 +254,4 @@ class TaskAnalyzer:
 
         return agentes
 
-    @classmethod
-    def extract_technologies_summary(cls, technologies: Set[str]) -> str:
-        if not technologies:
-            return "tecnologia indefinida"
-        return ", ".join(sorted(technologies))
+

@@ -108,10 +108,6 @@ class SelfOptimizingAgentSystem:
         }
         return data
 
-    def resolve_skill(self, skill_name: str) -> Optional[Skill]:
-        """Resolve uma skill de forma segura pelo nome através da fachada."""
-        return self.skill_registry.get(skill_name)
-
     def run_task(self, input_data: Dict[str, Any]) -> Dict[str, Any]:
         """
         Executa a tarefa no DAG de produção de forma síncrona.

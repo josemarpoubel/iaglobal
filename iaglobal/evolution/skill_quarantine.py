@@ -96,26 +96,5 @@ class SkillQuarantine:
                 return True
             return False
 
-    def release_from_quarantine(self, skill_name: str) -> bool:
-        """
-        Remove uma skill da lista de isolamento (Limpeza de quarentena).
-        """
-        with self._rlock:
-            if skill_name not in self._quarantined:
-                return False
-            del self._quarantined[skill_name]
-            logger.info(f"✅ [QUARANTINE] Skill '{skill_name}' foi libertada com sucesso.")
-            return True
-
-    def get_quarantine_status(self, skill_name: str) -> Optional[QuarantinedSkill]:
-        """Devolve uma cópia segura dos metadados de falha da skill."""
-        with self._rlock:
-            q = self._quarantined.get(skill_name)
-            if q:
-                import copy
-                return copy.deepcopy(q)
-            return None
-
-
 # Instância global atómica para exportação do barramento
 quarantine = SkillQuarantine()

@@ -2,21 +2,9 @@
 
 import json
 import os
+import fcntl
 
 from pathlib import Path
-
-#/iaglobal/memory/data$ tree
-#.
-#├── cache
-#├── logs
-#├── memory_backups
-#├── provider_metrics
-#├── result
-#├── script
-#├── snapshots
-#├── storage
-#├── temp
-#└── work
 
 # =========================================================
 # ROOT DO SISTEMA (SOURCE OF TRUTH)
@@ -36,21 +24,15 @@ DATA_ROOT = PACKAGE_DIR / "memory" / "data"
 
 # Subdiretórios organizados
 JSON_DIR = DATA_ROOT / "json"
-
 DB_DIR = DATA_ROOT / "db"
-
 CBOR2_DIR = DATA_ROOT / "cbor2"
-
 MEMORY_DIR = DATA_ROOT
-
 BACKUP_DIR = DATA_ROOT / "memory_backups"
-
 CACHE_DIR = DATA_ROOT / "cache"
-
+MEMORY_SWAP_DIR = CACHE_DIR / "memory_swap"
+SEARCH_SWAP_DIR = CACHE_DIR / "search_swap"
 LOG_DIR = DATA_ROOT / "logs"
-
 SCRIPTS_DIR = DATA_ROOT / "script"
-
 TEMP_DIR = DATA_ROOT / "temp"
 
 # =========================================================
@@ -58,15 +40,14 @@ TEMP_DIR = DATA_ROOT / "temp"
 # =========================================================
 
 RESULTS_DIR = DATA_ROOT / "result"
-
 _RESULT_COUNTER_FILE = RESULTS_DIR / ".counter.json"
+_RESULT_LOCK_FILE = RESULTS_DIR / ".counter.lock"
 
 # =========================================================
 # COMPATIBILITY LAYER
 # =========================================================
 
 DATA_DIR = MEMORY_DIR
-
 BACKUP_DIR_LEGACY = BACKUP_DIR
 
 # =========================================================
@@ -74,45 +55,25 @@ BACKUP_DIR_LEGACY = BACKUP_DIR
 # =========================================================
 
 CORE_DB = DB_DIR / "core.db"
-
 CACHE_DB = DB_DIR / "cache.db"
-
 MEMORIES_DB = DB_DIR / "memories.db"
-
 SNAPSHOTS_DIR = DATA_ROOT / "snapshots"
-
 WORK_DIR = MEMORY_DIR / "work"
-
 PROVIDER_METRICS_DIR = DATA_ROOT / "provider_metrics"
-
 PROVIDER_EVENTS_DB = DB_DIR / "provider_events.db"
-
 IMAGES_DIR = DATA_ROOT / "generated_images"
-
 MONITORED_DIR = DATA_ROOT / "storage"
-
 KNOWLEDGE_FILE = JSON_DIR / "knowledge.json"
-
 DOCS_TEMP_DIR = TEMP_DIR / "documentation"
-
 SANDBOX_DIR = TEMP_DIR / "sandbox_exec"
-
 META_EVOLUTION_FILE = JSON_DIR / "meta_evolution.json"
-
 EVOLUTION_BACKLOG_FILE = JSON_DIR / "evolution_backlog.json"
-
 SAME_POOL_FILE = JSON_DIR / "same_pool.json"
-
 HOMOCYSTEINE_POOL_FILE = JSON_DIR / "homocysteine_pool.json"
-
 GLUTATHIONE_POOL_FILE = JSON_DIR / "glutathione_pool.json"
-
 CHOLINE_POOL_FILE = TEMP_DIR / "choline_pool.json"
-
 MTA_POOL_FILE = TEMP_DIR / "mta_pool.json"
-
 ERROR_LOG = JSON_DIR / "errors.json"
-
 ERROR_DIR = DATA_ROOT / "error"
 
 # =========================================================
@@ -126,7 +87,6 @@ EMBEDDINGS_DB = CBOR2_DIR / "embeddings.cbor2"
 # =========================================================
 
 DOCS_DIR = PROJECT_ROOT / "docs"
-
 EVOLUTION_DOC = DOCS_DIR / "evolucao_cerebral.md"
 
 # =========================================================
@@ -134,27 +94,28 @@ EVOLUTION_DOC = DOCS_DIR / "evolucao_cerebral.md"
 # =========================================================
 
 def _ensure_dirs():
-    """
-    Garante estrutura mínima do sistema antes de qualquer execução.
-    Isso elimina erro de path em runtime.
-    """
+    """Garante estrutura mínima do sistema antes de qualquer execução."""
+    import json
     critical_dirs = [
-        DATA_ROOT, MEMORY_DIR, JSON_DIR, DB_DIR, CBOR2_DIR, 
-        BACKUP_DIR, CACHE_DIR, LOG_DIR, DOCS_DIR, SCRIPTS_DIR, 
-        TEMP_DIR, RESULTS_DIR, SNAPSHOTS_DIR, WORK_DIR, 
-        PROVIDER_METRICS_DIR, IMAGES_DIR, MONITORED_DIR, 
+        DATA_ROOT, MEMORY_DIR, JSON_DIR, DB_DIR, CBOR2_DIR,
+        BACKUP_DIR, CACHE_DIR, MEMORY_SWAP_DIR, SEARCH_SWAP_DIR, LOG_DIR, DOCS_DIR, SCRIPTS_DIR,
+        TEMP_DIR, RESULTS_DIR, SNAPSHOTS_DIR, WORK_DIR,
+        PROVIDER_METRICS_DIR, IMAGES_DIR, MONITORED_DIR,
         DOCS_TEMP_DIR, SANDBOX_DIR, ERROR_DIR,
     ]
-
     for d in critical_dirs:
         d.mkdir(parents=True, exist_ok=True)
+    
+    # Garante arquivos JSON iniciais vazios para evitar logs de "não persistido"
+    for f in (KNOWLEDGE_FILE, HOMOCYSTEINE_POOL_FILE, GLUTATHIONE_POOL_FILE,
+              SAME_POOL_FILE, ERROR_LOG, META_EVOLUTION_FILE, EVOLUTION_BACKLOG_FILE):
+        if not f.exists():
+            f.parent.mkdir(parents=True, exist_ok=True)
+            f.write_text("[]")
 
-# bootstrap automático com proteção para evitar falhas silenciosas na importação
 try:
     _ensure_dirs()
 except Exception as e:
-    # Registra o erro, mas permite que o fluxo de execução prossiga 
-    # para que o Bootstrap possa tratar a falha de forma adequada
     print(f"⚠️ [SYSTEM] Aviso: A estrutura de diretórios não pôde ser verificada automaticamente: {e}")
 
 # =========================================================
@@ -162,34 +123,31 @@ except Exception as e:
 # =========================================================
 
 def get_db_connection(db_path: Path) -> str:
-    """
-    Normaliza caminhos para SQLite e engines externas.
-    """
     return str(db_path.resolve())
-
-
-def resolve_path(path: Path | str) -> str:
-    """
-    Resolve qualquer path para absoluto seguro.
-    """
-    return str(Path(path).expanduser().resolve())
 
 
 def next_project_dir() -> Path:
     """Retorna o próximo diretório de projeto (project01, project02, ...)."""
-    import json
     RESULTS_DIR.mkdir(parents=True, exist_ok=True)
+    _RESULT_LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
+    
     counter = 0
-    if _RESULT_COUNTER_FILE.exists():
+    with open(_RESULT_LOCK_FILE, "w") as lockf:
+        fcntl.flock(lockf.fileno(), fcntl.LOCK_EX)
         try:
-            with open(_RESULT_COUNTER_FILE) as f:
-                data = json.load(f)
-                counter = data.get("counter", 0)
-        except Exception:
-            counter = 0
-    counter += 1
-    with open(_RESULT_COUNTER_FILE, "w") as f:
-        json.dump({"counter": counter}, f)
+            if _RESULT_COUNTER_FILE.exists():
+                try:
+                    with open(_RESULT_COUNTER_FILE) as f:
+                        data = json.load(f)
+                        counter = data.get("counter", 0)
+                except Exception:
+                    counter = 0
+            counter += 1
+            with open(_RESULT_COUNTER_FILE, "w") as f:
+                json.dump({"counter": counter}, f)
+        finally:
+            fcntl.flock(lockf.fileno(), fcntl.LOCK_UN)
+    
     project_name = f"project{counter:03d}"
     project_dir = RESULTS_DIR / project_name
     project_dir.mkdir(parents=True, exist_ok=True)
@@ -230,54 +188,34 @@ _LANG_EXT = {
 def _detect_extension(code: str, task: str = "") -> str:
     code_stripped = code.strip()
     task_lower = task.lower()
-    # Remove markdown fences antes de detectar
     if code_stripped.startswith("```"):
         first_line = code_stripped.split("\n")[0].lstrip("`").strip()
-        if first_line in ("python", "py"):
-            return ".py"
-        if first_line in ("html",):
-            return ".html"
-        if first_line in ("css",):
-            return ".css"
-        if first_line in ("javascript", "js"):
-            return ".js"
-        if first_line in ("php",):
-            return ".php"
+        if first_line in ("python", "py"): return ".py"
+        if first_line in ("html",): return ".html"
+        if first_line in ("css",): return ".css"
+        if first_line in ("javascript", "js"): return ".js"
+        if first_line in ("php",): return ".php"
         code_stripped = "\n".join(code_stripped.split("\n")[1:])
-        if code_stripped.endswith("```"):
-            code_stripped = code_stripped[:-3]
+        if code_stripped.endswith("```"): code_stripped = code_stripped[:-3]
         code_stripped = code_stripped.strip()
-    if "<?php" in code_stripped:
-        return ".php"
-    if "<%@ Page" in code_stripped or "<%@" in code_stripped[:200]:
-        return ".aspx"
-    if code_stripped.startswith("<!DOCTYPE") or code_stripped.startswith("<html"):
-        return ".html"
-    if code_stripped.startswith("<?xml"):
-        return ".xml"
-    if code_stripped.startswith("{") and ":" in code_stripped[:100]:
-        return ".json"
-    if code_stripped.startswith("body {") or (code_stripped.startswith(".") and "{" in code_stripped[:100]):
-        return ".css"
-    if code_stripped.startswith("def ") or code_stripped.startswith("import ") or code_stripped.startswith("from "):
-        return ".py"
-    if code_stripped.startswith("function ") or code_stripped.startswith("const ") or code_stripped.startswith("let ") or code_stripped.startswith("var "):
-        return ".js"
-    if code_stripped.startswith("#include") or code_stripped.startswith("#ifndef"):
-        return ".c"
+    if "<?php" in code_stripped: return ".php"
+    if "<%@ Page" in code_stripped or "<%@" in code_stripped[:200]: return ".aspx"
+    if code_stripped.startswith("<!DOCTYPE") or code_stripped.startswith("<html"): return ".html"
+    if code_stripped.startswith("<?xml"): return ".xml"
+    if code_stripped.startswith("{") and ":" in code_stripped[:100]: return ".json"
+    if code_stripped.startswith("body {") or (code_stripped.startswith(".") and "{" in code_stripped[:100]): return ".css"
+    # PYTHON must be detected BEFORE pdf since fpdf code needs execution to generate binary PDF
+    if code_stripped.startswith("def ") or code_stripped.startswith("import ") or code_stripped.startswith("from "): return ".py"
+    # PDF only if NOT executable code (documentation/markdown content)
+    if "pdf" in task_lower or "documento" in task_lower: return ".pdf"
+    if code_stripped.startswith("function ") or code_stripped.startswith("const ") or code_stripped.startswith("let ") or code_stripped.startswith("var "): return ".js"
+    if code_stripped.startswith("#include") or code_stripped.startswith("#ifndef"): return ".c"
     if code_stripped.startswith("#!/"):
         ext = code_stripped.split("\n")[0].rsplit("/", 1)[-1] if "/" in code_stripped.split("\n")[0] else ""
         return {"bash": ".sh", "python": ".py", "node": ".js", "php": ".php"}.get(ext, ".sh")
-
-    if "pdf" in task_lower or "documento" in task_lower:
-        return ".pdf"
-
-    # Fallback: palavras-chave da task
     task_words = set(task_lower.split())
     for lang, ext in _LANG_EXT.items():
-        if lang in task_words:
-            return ext
-
+        if lang in task_words: return ext
     return ".txt"
 
 
@@ -293,15 +231,33 @@ def save_result_artifact(task: str, files: dict, code: str = "") -> Path:
     for filepath, content in files.items():
         full_path = project_dir / filepath
         full_path.parent.mkdir(parents=True, exist_ok=True)
-        with open(full_path, "w") as f:
-            f.write(content)
+        with open(full_path, "w") as f: f.write(content)
     if code and not files:
         ext = _detect_extension(code, task)
         output_name = f"output{ext}"
-        with open(project_dir / output_name, "w") as f:
-            f.write(code)
+        with open(project_dir / output_name, "w") as f: f.write(code)
     return project_dir
 
-# iaglobal/_paths.py
-# Função pública ensure_structure — delega para _ensure_dirs completa
-ensure_structure = _ensure_dirs
+
+def ensure_structure() -> None:
+    """Garante que todos os diretórios críticos existam e coleta falhas em background."""
+    _ensure_dirs()
+    _run_failure_collection_in_background()
+
+
+def _run_failure_collection_in_background():
+    """Dispara coleta de falhas em thread separada para não travar o bootstrap."""
+    import threading
+
+    def _collect():
+        try:
+            from iaglobal.agents.failure_analysis_agent import FailureAnalysisAgent
+            system_data = FailureAnalysisAgent.collect_system_data()
+            if system_data.get("errors", {}).get("total", 0) > 0 or system_data.get("metrics", {}).get("total_calls", 0) > 0:
+                report = FailureAnalysisAgent.generate_report(system_data)
+                FailureAnalysisAgent.persist_report(system_data, report)
+        except Exception:
+            pass
+
+    t = threading.Thread(target=_collect, daemon=True, name="failure-collector")
+    t.start()

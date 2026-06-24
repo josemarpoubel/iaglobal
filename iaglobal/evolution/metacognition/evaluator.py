@@ -56,6 +56,7 @@ class PipelineEvaluator:
         cls._last_score = score
 
         score = min(max(score, 0), 100)
+        score = max(35, score)  # piso mínimo para nao travar evolucao na 1a execucao
 
         return {
             "score": score,

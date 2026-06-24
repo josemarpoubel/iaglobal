@@ -187,39 +187,3 @@ def text_to_image(
         return None
 
 
-# =============================================================================
-# Rich API
-# =============================================================================
-
-def text_to_image_metadata(
-    prompt: str,
-    model: str = "black-forest-labs/FLUX.1-schnell",
-    provider: str = "nscale",
-    timeout: int = 60,
-) -> Optional[dict]:
-
-    path = text_to_image(
-        prompt=prompt,
-        model=model,
-        provider=provider,
-        timeout=timeout,
-    )
-
-    if not path:
-        return None
-
-    try:
-
-        size_bytes = Path(path).stat().st_size
-
-    except Exception:
-
-        size_bytes = 0
-
-    return {
-        "path": path,
-        "model": model,
-        "provider": provider,
-        "prompt": prompt,
-        "size_bytes": size_bytes,
-    }

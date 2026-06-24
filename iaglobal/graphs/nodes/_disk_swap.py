@@ -5,9 +5,9 @@ import hashlib
 from pathlib import Path
 from typing import Optional
 
-from iaglobal._paths import CACHE_DIR
+from iaglobal._paths import SEARCH_SWAP_DIR
 
-_SEARCH_SWAP_DIR = CACHE_DIR / "search_swap"
+_SEARCH_SWAP_DIR = SEARCH_SWAP_DIR
 _SEARCH_SWAP_DIR.mkdir(parents=True, exist_ok=True)
 
 _MAX_ENTRIES = 200

@@ -150,11 +150,6 @@ class SAMeBudgetTracker:
             self._cycle_start[agent_name] = now
             self._cycle_spent[agent_name] = 0
 
-    def can_spend(self, agent_name: str, cost: int) -> bool:
-        with self._tracker_lock:
-            self._check_cycle(agent_name)
-            return self._cycle_spent.get(agent_name, 0) + cost <= self.CYCLE_BUDGET
-
     def spend(self, agent_name: str, cost: int) -> bool:
         with self._tracker_lock:
             self._check_cycle(agent_name)
@@ -163,10 +158,6 @@ class SAMeBudgetTracker:
             self._cycle_spent[agent_name] = self._cycle_spent.get(agent_name, 0) + cost
             return True
 
-    def remaining(self, agent_name: str) -> int:
-        with self._tracker_lock:
-            self._check_cycle(agent_name)
-            return max(0, self.CYCLE_BUDGET - self._cycle_spent.get(agent_name, 0))
 
 
 def rewrite_prompt(agent_name: str, current_prompt: str, error_history: str = "") -> Optional[str]:
@@ -181,16 +172,6 @@ def rewrite_prompt(agent_name: str, current_prompt: str, error_history: str = ""
     improved = f"{current_prompt}\n\n[CONTEXTO DE APRENDIZADO]\n{sanitized_history[:500]}"
     logger.info("[SAME-MUTATE] rewrite_prompt: '%s' — prompt melhorado (+%d chars)", agent_name, len(sanitized_history[:500]))
     return improved
-
-
-def merge_skills(target_name: str, source_skills: list) -> Optional[str]:
-    """Merge de múltiplas skills em uma, consumindo SAMe."""
-    cost = COST_MERGE_SKILLS * len(source_skills)
-    if not same_pool.spend(target_name, cost):
-        logger.warning("[SAME-MUTATE] SAMe insuficiente para merge_skills em '%s' (custo=%d)", target_name, cost)
-        return None
-    logger.info("[SAME-MUTATE] merge_skills: '%s' ← %d skills (custo=%d)", target_name, len(source_skills), cost)
-    return target_name
 
 
 # Instâncias globais coordenadas

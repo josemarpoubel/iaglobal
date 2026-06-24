@@ -28,9 +28,9 @@ from iaglobal.evolution.skills.skill_executor import skill_executor, SkillExecut
 from iaglobal.graphs.artifact import Artifact, SolutionArtifact
 from iaglobal.graphs.credit import CreditAssignmentEngine
 from iaglobal.graphs.instrumentation import trace_node_execution, trace_node_completed
-from iaglobal.graphs.node_result import NodeResult
 from iaglobal.execution.cpu_affinity import cpu_affinity
 from iaglobal.immunity.loop_detector import LoopDetector
+from iaglobal.evolution.homeostasis_controller import homeostasis_controller
 from iaglobal.graphs.communication.acetylcholine_bus import AcetylcholineBus, AgentMessage
 
 
@@ -50,7 +50,14 @@ class ExecutionGraph:
         self.credit = CreditAssignmentEngine()
         self._loop_detector = LoopDetector()
         self.bus = AcetylcholineBus()
-    
+        self._homeostasis = homeostasis_controller  # Import singleton
+        # Inject reflexion function into loop detector for auto-repair
+        try:
+            from iaglobal.reflection.reflexion_engine import reflexion_callback_for_loop
+            self._loop_detector.set_reflexion_fn(reflexion_callback_for_loop)
+        except ImportError:
+            logger.warning("[IMMUNITY] ReflexionEngine não disponível - loop repair desativado")
+        
     @staticmethod
     def generate_node_id(strategy: str, code_payload: str, generation: int = 0) -> str:
         """Cria a identidade única SHA3-512 baseada em DNA (conteúdo + geração)."""
@@ -103,7 +110,7 @@ class ExecutionGraph:
         # 1. Afinidade Determinística baseada no DNA (Hash) do nó
         cpu_affinity.pin_to_hash(node.name)
         
-        self.bus.publish(AgentMessage(
+        await self.bus.publish(AgentMessage(
             sender="execution_graph", receiver=node.name,
             type="node_start", payload={"node": node.name, "time": time.time()},
         ))
@@ -232,18 +239,22 @@ class ExecutionGraph:
         # Gravação de métricas do nó (Node.record é síncrono)
         await asyncio.to_thread(node.record, success, latency, last_error)
 
-        # Publicação no barramento de eventos (AcetylcholineBus.publish é síncrono)
-        await asyncio.to_thread(self.bus.publish, AgentMessage(
+        # Publicação no barramento de eventos (AcetylcholineBus.publish é async)
+        await self.bus.publish(AgentMessage(
             sender=node.name, receiver="execution_graph",
             type="node_complete",
             payload={"node": node.name, "success": success, "latency": latency},
         ))
 
-        # Check de imunidade (LoopDetector.check é síncrono)
-        loop_check = await asyncio.to_thread(self._loop_detector.check, node.name, success)
+        # Check de imunidade (LoopDetector.check_and_repair é síncrono)
+        loop_check = await asyncio.to_thread(
+            self._loop_detector.check_and_repair, node.name, success, ctx
+        )
         if loop_check.get("in_loop"):
             logger.warning("🛡️ [IMMUNITY-ASYNC] Loop detectado no nó '%s' (%d execuções)",
-                           node.name, loop_check.get("executions", 0))
+                         node.name, loop_check.get("executions", 0))
+            if loop_check.get("repair_triggered"):
+                logger.info("🛡️ [IMMUNITY-ASYNC] Reparação auto-triggered: %s", loop_check.get("repair_result", {}).get("status", "unknown"))
 
         # Tracing final
         trace = trace_node_completed(trace, {
@@ -252,6 +263,10 @@ class ExecutionGraph:
             "success": success
         }, ctx)
         
+        # Registro de homeostase (SLA metrics)
+        cost_usd = extra_fields.get("cost", 0.0)
+        self._homeostasis.record_execution(success, latency * 1000, cost_usd)
+
         logger.debug("[TRACE] node=%s duration=%.1fms", node.name, trace.get("duration_ms", 0))
 
         return {

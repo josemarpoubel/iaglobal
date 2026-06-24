@@ -3,11 +3,39 @@ import time
 import random
 import asyncio
 import logging
+import urllib.parse
+import aiohttp
 from typing import Callable, Optional
 
 from iaglobal.graphs.nodes._disk_swap import load_search, save_search
 
 logger = logging.getLogger(__name__)
+
+
+async def wikipedia_search(query: str) -> str:
+    """Busca centralizada na Wikipedia para nós de busca conceitual."""
+    params = urllib.parse.urlencode({
+        "action": "query", "list": "search", "srsearch": query,
+        "format": "json", "srlimit": 3
+    })
+    url = f"https://en.wikipedia.org/w/api.php?{params}"
+    headers = {"User-Agent": "IAGlobal/1.0"}
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, headers=headers, timeout=aiohttp.ClientTimeout(total=10)) as resp:
+            if resp.status != 200:
+                return ""
+            data = await resp.json()
+    results = []
+    for item in data.get("query", {}).get("search", []):
+        results.append({
+            "title": item.get("title", ""),
+            "snippet": item.get("snippet", "").replace("<span class=\"searchmatch\">", "").replace("</span>", ""),
+            "url": f"https://en.wikipedia.org/wiki/{urllib.parse.quote(item.get('title', ''))}",
+        })
+    if not results:
+        return ""
+    lines = [f"• {r['title']}\n  {r['url']}\n  {r['snippet']}" for r in results]
+    return "\n\n".join(lines)
 
 
 async def retry_call(fn: Callable, task: str, max_retries: int = 2, base_delay: float = 1.0, stagger: float = 0.0) -> str:

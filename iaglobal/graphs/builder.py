@@ -49,7 +49,7 @@ RUN_NODE_NAMES: List[str] = [
     "qa", "tester", "debugger", "validator", "fix_validator", "debug_coder",
     # Delivery (7)
     "documentation", "deployment_plan", "release", "metrics", "optimization",
-    "retrospective", "result_agent", "critic", "memory_writer", "memory_cleaner",
+    "retrospective", "result_agent", "critic", "knowledge_writer", "memory_writer", "memory_cleaner",
     # Metacognition (7)
     "evaluator", "gap_analyzer", "skill_generator", "sandbox_validator",
     "evolution_committee", "pipeline_updater", "evolution_trigger",
@@ -68,18 +68,19 @@ def _try_import_handler(name: str) -> Callable:
     """
     try:
         mod = importlib.import_module(f"iaglobal.graphs.nodes.no_{name}")
-        fn = getattr(mod, f"run_node_{name.split('_')[0]}", None)
-        if fn is None:
-            fn = getattr(mod, f"run_{name}", None)
+        fn = getattr(mod, f"run_{name}", None)
         if callable(fn):
             return fn  # type: ignore
     except Exception:
         pass
-    # Fallback to noop for pipeline integrity
-    async def _noop(ctx: Dict[str, Any]) -> Dict[str, Any]:
-        return ctx
     record_error("builder", f"Handler not found for node: {name}", {"node": name})
-    return _noop  # type: ignore
+    return _noop_fn()  # type: ignore
+
+
+def _noop_fn():
+    async def _inner(ctx: Dict[str, Any]) -> Dict[str, Any]:
+        return {"output": "", "success": True}
+    return _inner
 
 
 def build_pipeline_from_nodes(topology_spec: Any = None) -> ExecutionGraph:
@@ -92,7 +93,7 @@ def build_pipeline_from_nodes(topology_spec: Any = None) -> ExecutionGraph:
 
     # Add all 55 nodes
     def _wrap_handler(name: str, h: Callable) -> Callable:
-        async def _run(ctx: Dict[str, Any]) -> Dict[str, Any]:
+        async def _run_handler(ctx: Dict[str, Any]) -> Dict[str, Any]:
             try:
                 result = h(ctx)
                 if asyncio.iscoroutine(result):
@@ -102,7 +103,7 @@ def build_pipeline_from_nodes(topology_spec: Any = None) -> ExecutionGraph:
                 tb = traceback.format_exc()
                 record_error(name, str(e), {"traceback": tb[-500:]})
                 return {**ctx, "output": ""}
-        return _run
+        return _run_handler
 
     for node_name in RUN_NODE_NAMES:
         handler = _try_import_handler(node_name)

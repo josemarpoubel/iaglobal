@@ -91,43 +91,6 @@ class DynamicSkillRegistry:
             logger.warning(f"[DYNAMIC-SKILL] Falha ao registrar na memória: {skill.name}")
         return result
 
-    def register_dynamic_from_dict(self, data: Dict) -> Optional[Skill]:
-        import time
-        start = time.time()
-        try:
-            policy_map = {
-                "single-run": ExecutionPolicy.SINGLE_RUN,
-                "repeatable": ExecutionPolicy.REPEATABLE,
-                "on-demand": ExecutionPolicy.ON_DEMAND,
-                "always": ExecutionPolicy.ALWAYS,
-            }
-            skill = Skill(
-                name=data["name"],
-                description=data.get("description", ""),
-                inputs=data.get("inputs", []),
-                outputs=data.get("outputs", []),
-                constraints=data.get("constraints", []),
-                execution_policy=policy_map.get(
-                    data.get("execution_policy", "single-run"),
-                    ExecutionPolicy.SINGLE_RUN
-                ),
-                version=data.get("version", "v1"),
-                author=data.get("author", "dynamic"),
-                tags=data.get("tags", []),
-            )
-            self.register_dynamic(
-                skill,
-                template_type=data.get("template_type", "llm"),
-                template_prompt=data.get("template_prompt", ""),
-            )
-            elapsed = time.time() - start
-            logger.info(f"[DYNAMIC-SKILL] Skill criada de dict: {skill.name} elapsed={elapsed:.2f}s")
-            return skill
-        except Exception as e:
-            elapsed = time.time() - start
-            logger.error(f"[DYNAMIC-SKILL] Erro ao registrar skill de dict: {e} elapsed={elapsed:.2f}s")
-            return None
-
     def list_dynamic_skills(self) -> List[Dict]:
         with self._db_lock:
             conn = sqlite3.connect(self.db_path)
@@ -140,17 +103,6 @@ class DynamicSkillRegistry:
                      "template_type": r[3], "active": bool(r[4]), "usage": r[5]}
                     for r in rows
                 ]
-            finally:
-                conn.close()
-
-    def get_dynamic_templates(self) -> Dict[str, Dict]:
-        with self._db_lock:
-            conn = sqlite3.connect(self.db_path)
-            try:
-                rows = conn.execute(
-                    "SELECT name, template_type, template_prompt FROM dynamic_skills WHERE active = 1"
-                ).fetchall()
-                return {r[0]: {"type": r[1], "prompt": r[2]} for r in rows}
             finally:
                 conn.close()
 

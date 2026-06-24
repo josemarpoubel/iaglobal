@@ -57,6 +57,8 @@ NODE_REGISTRY: dict = {
     "optimization": lambda: create_skill_node("optimization"),
     "retrospective": lambda: create_skill_node("retrospective"),
     "result_agent": lambda: create_skill_node("result_agent"),
+    "knowledge_writer": lambda: create_skill_node("knowledge_writer"),
+    "failure_analysis": lambda: create_skill_node("failure_analysis"),
     "evaluator": lambda: create_skill_node("evaluator"),
     "gap_analyzer": lambda: create_skill_node("gap_analyzer"),
     "skill_generator": lambda: create_skill_node("skill_generator"),

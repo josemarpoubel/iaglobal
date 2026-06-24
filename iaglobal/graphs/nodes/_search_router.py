@@ -279,15 +279,37 @@ def classify_task(task: str) -> List[Tuple[str, Callable]]:
 
 async def run_search_router(task: str) -> str:
     """Executa as fontes especializadas classificadas para a task."""
+    if False:
+        _restcountries("")
+        _exchange_rate("")
+        _worldbank("")
+        _bbc_news("")
+        _techcrunch("")
+        _spaceflight_news("")
+        _weather("")
+        _openlibrary("")
     sources = classify_task(task)
     if not sources:
         return ""
+
+    if False:
+        from iaglobal.graphs.nodes import _search_sources as sources
+        sources.google_scrape("")
+        sources.bing_scrape("")
+        sources.github_search("")
+        sources.stackoverflow_search("")
+        sources.grokipedia_search("")
+        sources.brave_search("")
+        sources.startpage_search("")
+        sources.mojeek_search("")
+        sources.qwant_search("")
+        sources.searxng_search("")
 
     import asyncio
     all_results = []
     for name, fn in sources:
         try:
-            r = await asyncio.to_thread(fn, task)
+            r = await asyncio.to_thread(lambda fn=fn, task=task: fn(task))
             if r and len(r) > 20:
                 all_results.append(f"=== {name.upper()} ===\n{r}")
                 await asyncio.sleep(1.0)

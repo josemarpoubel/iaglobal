@@ -39,7 +39,7 @@ class CreditAssignmentEngine:
         total = s["success"] + s["fail"]
 
         if total == 0:
-            return 0.5
+            return 0.0  # Sem histórico = score baixo para forçar exploração
 
         success_rate = s["success"] / total
 
@@ -49,20 +49,3 @@ class CreditAssignmentEngine:
             return (success_rate * 0.7) + (avg_reward * 0.3)
 
         return success_rate
-
-
-class ContextualCreditMemory:
-    def __init__(self):
-        # context_key → model → stats
-        self.data = defaultdict(lambda: defaultdict(list))
-
-    def record(self, context: str, model: str, reward: float):
-        self.data[context][model].append(reward)
-
-    def get_expected_reward(self, context: str, model: str) -> float:
-        values = self.data[context][model]
-
-        if not values:
-            return 0.0
-
-        return sum(values) / len(values)

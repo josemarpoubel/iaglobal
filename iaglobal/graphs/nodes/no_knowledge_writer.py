@@ -28,7 +28,13 @@ async def run_knowledge_writer(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         agent = KnowledgeWriterAgent()
-        result = agent.learn_from_conversation(prompt=task_str, response=code, source="pipeline")
+        if code:
+            result = agent.learn_from_conversation(prompt=task_str, response=code, source="pipeline")
+        else:
+            result = agent.learn_from_text(task_str, source="pipeline")
+        consolidation = agent.consolidate_session()
+        if consolidation.get("status") == "consolidated":
+            logger.info("[KNOWLEDGE_WRITER] Session consolidated: %d entries", consolidation["entries"])
         logger.info("[KNOWLEDGE_WRITER] concepts=%d defs=%d faqs=%d",
                     len(result.get("concepts", [])),
                     len(result.get("definitions", [])),

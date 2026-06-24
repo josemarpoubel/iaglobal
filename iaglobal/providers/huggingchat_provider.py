@@ -7,6 +7,8 @@ import asyncio
 from typing import Optional
 
 from iaglobal.utils.logger import logger
+from iaglobal.utils.helpers import run_async_safe
+from iaglobal.utils.playwright_util import ensure_playwright_browsers
 
 _PLAYWRIGHT = None
 _BROWSER = None
@@ -30,6 +32,8 @@ async def _ensure_browser():
 
         if _BROWSER is not None:
             return _BROWSER
+
+        ensure_playwright_browsers(["firefox"])
 
         from playwright.async_api import async_playwright
 
@@ -71,6 +75,10 @@ async def _new_page():
 # =============================================================================
 # Main API
 # =============================================================================
+
+def generate(prompt: str, model: str = "huggingchat/default", timeout: int = 90, token_collector: Optional[callable] = None) -> str:
+    return run_async_safe(async_generate, prompt, model, timeout, token_collector)
+
 
 async def async_generate(
     prompt: str,
@@ -299,38 +307,3 @@ async def async_generate(
             pass
 
 
-# =============================================================================
-# Shutdown
-# =============================================================================
-
-async def shutdown_browser():
-
-    global _PLAYWRIGHT
-    global _BROWSER
-
-    async with _BROWSER_LOCK:
-
-        try:
-
-            if _BROWSER:
-
-                await _BROWSER.close()
-
-        except Exception:
-            pass
-
-        try:
-
-            if _PLAYWRIGHT:
-
-                await _PLAYWRIGHT.stop()
-
-        except Exception:
-            pass
-
-        _BROWSER = None
-        _PLAYWRIGHT = None
-
-        logger.info(
-            "[HUGGINGCHAT] Navegador encerrado"
-        )
