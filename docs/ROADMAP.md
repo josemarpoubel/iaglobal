@@ -885,6 +885,7 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 | 64. SelfCritique.evaluate fix | ✅ Concluído | método evaluate() adicionado; evo_agent agora usa crítica real | 2026-06-23 |
 | 65. Providers cleanup | ✅ Concluído | 11 funções órfãs removidas em 10 arquivos de providers | 2026-06-23 |
 | 66. Core/Events cleanup | ✅ Concluído | 11 funções órfãs removidas em 7 arquivos | 2026-06-23 |
+| 67. Audit final | ✅ Concluído | 68 órfãos (de 123, -45%) · 2477 funções · 586/586 testes ✓ | 2026-06-24 |
 
 ---
 

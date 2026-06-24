@@ -1,6 +1,6 @@
 Pasta analisada : /home/kitohamachi/projeto-iaglobal
-Total de funções: 2490
-Total de órfãs  : 80
+Total de funções: 2477
+Total de órfãs  : 68
 
 === FILTROS APLICADOS ===
   FP-1  Colisão de nomes: múltiplas funções homônimas tratadas corretamente
@@ -602,7 +602,6 @@ FUNCAO: iaglobal/agents/multi_agent.py::debug
     - iaglobal/core/cognitive_proxy.py::_store_result
     - iaglobal/core/cognitive_proxy.py::_validate
     - iaglobal/core/cognitive_proxy.py::run
-    - iaglobal/core/evolution_controller.py::reset
     - iaglobal/core/neuro_orchestrator.py::_run_one
     - iaglobal/core/orchestrator.py::__init__
     - iaglobal/core/orchestrator.py::_async_process
@@ -612,11 +611,7 @@ FUNCAO: iaglobal/agents/multi_agent.py::debug
     - iaglobal/core/retry_handler.py::execute
     - iaglobal/core/retry_handler.py::get_stats
     - iaglobal/events/decision_event.py::__post_init__
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_route
-    - iaglobal/events/event_dispatcher.py::handler_count
-    - iaglobal/events/event_dispatcher.py::on
-    - iaglobal/events/event_dispatcher.py::registered_steps
     - iaglobal/evolution/agents/knowledge_agent.py::store
     - iaglobal/evolution/canonical_graph.py::_consolidate_edges
     - iaglobal/evolution/canonical_graph.py::_topological_sort
@@ -1388,7 +1383,6 @@ FUNCAO: iaglobal/agents/reflexion_agent.py::debug
     - iaglobal/core/cognitive_proxy.py::_store_result
     - iaglobal/core/cognitive_proxy.py::_validate
     - iaglobal/core/cognitive_proxy.py::run
-    - iaglobal/core/evolution_controller.py::reset
     - iaglobal/core/neuro_orchestrator.py::_run_one
     - iaglobal/core/orchestrator.py::__init__
     - iaglobal/core/orchestrator.py::_async_process
@@ -1398,11 +1392,7 @@ FUNCAO: iaglobal/agents/reflexion_agent.py::debug
     - iaglobal/core/retry_handler.py::execute
     - iaglobal/core/retry_handler.py::get_stats
     - iaglobal/events/decision_event.py::__post_init__
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_route
-    - iaglobal/events/event_dispatcher.py::handler_count
-    - iaglobal/events/event_dispatcher.py::on
-    - iaglobal/events/event_dispatcher.py::registered_steps
     - iaglobal/evolution/agents/knowledge_agent.py::store
     - iaglobal/evolution/canonical_graph.py::_consolidate_edges
     - iaglobal/evolution/canonical_graph.py::_topological_sort
@@ -1726,7 +1716,6 @@ FUNCAO: iaglobal/agents/reflexion_agent.py::info
     - iaglobal/core/orchestrator.py::run_graph_task
     - iaglobal/core/retry_handler.py::execute
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::off
     - iaglobal/events/event_dispatcher.py::start
     - iaglobal/events/event_store.py::start
     - iaglobal/evolution/agents/gap_analyzer.py::detect_gaps
@@ -2055,8 +2044,6 @@ FUNCAO: iaglobal/agents/reflexion_agent.py::warning
     - iaglobal/core/cognitive_proxy.py::_route
     - iaglobal/core/cognitive_proxy.py::_validate
     - iaglobal/core/env_loader.py::load_env
-    - iaglobal/core/evolution_controller.py::spend_call
-    - iaglobal/core/evolution_controller.py::spend_tokens
     - iaglobal/core/orchestrator.py::_async_process
     - iaglobal/core/orchestrator.py::_execute_search
     - iaglobal/core/orchestrator.py::_on_critical_node_failed
@@ -2067,7 +2054,6 @@ FUNCAO: iaglobal/agents/reflexion_agent.py::warning
     - iaglobal/core/orchestrator.py::async_run_graph_task
     - iaglobal/core/orchestrator.py::run_graph_task
     - iaglobal/core/retry_handler.py::execute
-    - iaglobal/events/event_dispatcher.py::off
     - iaglobal/evolution/agents/knowledge_agent.py::_load
     - iaglobal/evolution/agents/knowledge_agent.py::_save
     - iaglobal/evolution/agents/knowledge_agent.py::store
@@ -2958,10 +2944,7 @@ FUNCAO: iaglobal/cli/bootstrap_engine.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -3855,11 +3838,14 @@ FUNCAO: iaglobal/core/assistant.py::_criar_funcao_modelo
 
 FUNCAO: iaglobal/core/assistant.py::_dispatch_modelo
   CHAMADA POR:
-    - iaglobal/core/assistant.py::executar_modelo
+    - iaglobal/core/assistant.py::_inner
 
 FUNCAO: iaglobal/core/assistant.py::_eh_teorico
   CHAMADA POR:
     - iaglobal/core/assistant.py::_processar_assistente
+
+FUNCAO: iaglobal/core/assistant.py::_inner
+  CHAMADA POR: NINGUÉM
 
 FUNCAO: iaglobal/core/assistant.py::_montar_prompt_cognitivo
   CHAMADA POR:
@@ -3889,9 +3875,6 @@ FUNCAO: iaglobal/core/assistant.py::_store_ltm
 FUNCAO: iaglobal/core/assistant.py::_verificar_consistencia
   CHAMADA POR:
     - iaglobal/core/assistant.py::_processar_assistente
-
-FUNCAO: iaglobal/core/assistant.py::executar_modelo
-  CHAMADA POR: NINGUÉM
 
 FUNCAO: iaglobal/core/assistant.py::process
   CHAMADA POR:
@@ -4050,12 +4033,8 @@ FUNCAO: iaglobal/core/decision_engine.py::__init__
     - tests/test_evolution_engine.py::test_set_strategy_updates_name
     - tests/test_evolution_engine.py::test_status_includes_strategy_name
 
-FUNCAO: iaglobal/core/decision_engine.py::decide
-  CHAMADA POR: NINGUÉM
-
 FUNCAO: iaglobal/core/decision_engine.py::score_option
-  CHAMADA POR:
-    - iaglobal/core/decision_engine.py::decide
+  CHAMADA POR: NINGUÉM
 
 FUNCAO: iaglobal/core/diagnostico.py::diagnosticar
   CHAMADA POR: NINGUÉM (excluída: decorador/padrão de nome externo)
@@ -4103,15 +4082,6 @@ FUNCAO: iaglobal/core/evolution_controller.py::remaining_tokens
   CHAMADA POR:
     - iaglobal/core/evolution_controller.py::is_exhausted
 
-FUNCAO: iaglobal/core/evolution_controller.py::reset
-  CHAMADA POR: NINGUÉM
-
-FUNCAO: iaglobal/core/evolution_controller.py::spend_call
-  CHAMADA POR: NINGUÉM
-
-FUNCAO: iaglobal/core/evolution_controller.py::spend_tokens
-  CHAMADA POR: NINGUÉM
-
 FUNCAO: iaglobal/core/governance.py::__init__
   CHAMADA POR:
     - iaglobal/agents/semantic_validator.py::__init__
@@ -4153,12 +4123,6 @@ FUNCAO: iaglobal/core/governance.py::to_dict
     - iaglobal/graphs/nodes/no_prompt_improver.py::run_prompt_improver
     - tests/test_evolution_engine.py::test_strategy_to_dict
 
-FUNCAO: iaglobal/core/governance.py::validate_authority
-  CHAMADA POR: NINGUÉM
-
-FUNCAO: iaglobal/core/governance.py::validate_input
-  CHAMADA POR: NINGUÉM
-
 FUNCAO: iaglobal/core/graceful_shutdown.py::__init__
   CHAMADA POR:
     - iaglobal/agents/semantic_validator.py::__init__
@@ -4195,9 +4159,6 @@ FUNCAO: iaglobal/core/graceful_shutdown.py::add_callback
     - iaglobal/core/orchestrator.py::__init__
     - tests/test_full_metabolism.py::test_add_callback
     - tests/test_full_metabolism.py::test_sync_cleanup_executes_callbacks
-
-FUNCAO: iaglobal/core/graceful_shutdown.py::async_cleanup
-  CHAMADA POR: NINGUÉM
 
 FUNCAO: iaglobal/core/graceful_shutdown.py::sync_cleanup
   CHAMADA POR:
@@ -4654,12 +4615,6 @@ FUNCAO: iaglobal/events/decision_event.py::from_dict
     - iaglobal/evolution/meta_evolver.py::from_dict
     - iaglobal/evolution/metabolism/homocysteine_pool.py::_load
 
-FUNCAO: iaglobal/events/decision_event.py::resolve_locked_model
-  CHAMADA POR: NINGUÉM
-
-FUNCAO: iaglobal/events/decision_event.py::resolve_locked_model_async
-  CHAMADA POR: NINGUÉM
-
 FUNCAO: iaglobal/events/decision_event.py::to_dict
   CHAMADA POR:
     - iaglobal/agents/performance_design_agent.py::analyze_async
@@ -4716,18 +4671,6 @@ FUNCAO: iaglobal/events/event_dispatcher.py::_route
     - iaglobal/core/cognitive_proxy.py::run
     - iaglobal/core/cognitive_proxy.py::run_with_custom_prompt
     - iaglobal/graphs/communication/acetylcholine_bus.py::publish
-
-FUNCAO: iaglobal/events/event_dispatcher.py::handler_count
-  CHAMADA POR: NINGUÉM
-
-FUNCAO: iaglobal/events/event_dispatcher.py::off
-  CHAMADA POR: NINGUÉM
-
-FUNCAO: iaglobal/events/event_dispatcher.py::on
-  CHAMADA POR: NINGUÉM
-
-FUNCAO: iaglobal/events/event_dispatcher.py::registered_steps
-  CHAMADA POR: NINGUÉM
 
 FUNCAO: iaglobal/events/event_dispatcher.py::start
   CHAMADA POR:
@@ -7166,10 +7109,7 @@ FUNCAO: iaglobal/evolution/skills/dynamic_registry.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -8184,10 +8124,7 @@ FUNCAO: iaglobal/evolution/skills/skill_registry.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -9005,7 +8942,7 @@ FUNCAO: iaglobal/execution/cpu_affinity.py::uptime
 FUNCAO: iaglobal/execution/executor.py::blackjack_executar_local
   CHAMADA POR:
     - iaglobal/core/assistant.py::_dispatch_modelo
-    - iaglobal/core/assistant.py::executar_modelo
+    - iaglobal/core/assistant.py::_inner
     - iaglobal/core/cognitive_proxy.py::_route
     - iaglobal/execution/executor.py::executar
 
@@ -10916,10 +10853,7 @@ FUNCAO: iaglobal/graphs/policy.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -11570,10 +11504,7 @@ FUNCAO: iaglobal/graphs/state_store.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -11978,7 +11909,6 @@ FUNCAO: iaglobal/graphs/state_store.py::keys
     - iaglobal/agents/coder_agent.py::generate
     - iaglobal/agents/knowledge_writer_agent.py::_generate_session_summary
     - iaglobal/core/orchestrator.py::async_run_graph_task
-    - iaglobal/events/event_dispatcher.py::registered_steps
     - iaglobal/evolution/canonical_graph.py::_topological_sort
     - iaglobal/evolution/darwin_harness.py::record
     - iaglobal/evolution/darwin_harness.py::snapshot_graph
@@ -12715,10 +12645,7 @@ FUNCAO: iaglobal/memory/cache.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -13385,10 +13312,7 @@ FUNCAO: iaglobal/memory/cognitive_cache.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -14396,10 +14320,7 @@ FUNCAO: iaglobal/memory/fusion_engine.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -14873,7 +14794,6 @@ FUNCAO: iaglobal/memory/fusion_engine.py::search
     - iaglobal/core/assistant.py::_consolidate_knowledge
     - iaglobal/core/assistant.py::_eh_teorico
     - iaglobal/core/cognitive_proxy.py::_build_context
-    - iaglobal/core/governance.py::validate_authority
     - iaglobal/core/retry_handler.py::detect
     - iaglobal/evolution/handler_evolution.py::_extract_run_fn_name
     - iaglobal/evolution/handler_evolution.py::visit_Call
@@ -15112,13 +15032,11 @@ FUNCAO: iaglobal/memory/memory.py::append
     - iaglobal/core/cognitive_proxy.py::_fmt_ltm
     - iaglobal/core/cognitive_proxy.py::_fmt_memory
     - iaglobal/core/cognitive_proxy.py::_fmt_web
-    - iaglobal/core/governance.py::validate_input
     - iaglobal/core/graceful_shutdown.py::add_async_callback
     - iaglobal/core/graceful_shutdown.py::add_callback
     - iaglobal/core/orchestrator.py::_process
     - iaglobal/core/retry_handler.py::execute
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/event_dispatcher.py::on
     - iaglobal/events/replay.py::explain
     - iaglobal/evolution/agents/gap_analyzer.py::detect_gaps
     - iaglobal/evolution/agents/knowledge_agent.py::retrieve_relevant
@@ -15782,7 +15700,6 @@ FUNCAO: iaglobal/memory/memory_vector.py::search
     - iaglobal/core/assistant.py::_consolidate_knowledge
     - iaglobal/core/assistant.py::_eh_teorico
     - iaglobal/core/cognitive_proxy.py::_build_context
-    - iaglobal/core/governance.py::validate_authority
     - iaglobal/core/retry_handler.py::detect
     - iaglobal/evolution/handler_evolution.py::_extract_run_fn_name
     - iaglobal/evolution/handler_evolution.py::visit_Call
@@ -16326,10 +16243,7 @@ FUNCAO: iaglobal/memory/semantic_cache.py::get
     - iaglobal/core/retry_handler.py::get_success_rate
     - iaglobal/debug/node_timing.py::_execute_node_async
     - iaglobal/debug/node_timing.py::report
-    - iaglobal/events/decision_event.py::resolve_locked_model
-    - iaglobal/events/decision_event.py::resolve_locked_model_async
     - iaglobal/events/event_dispatcher.py::_process_event
-    - iaglobal/events/event_dispatcher.py::handler_count
     - iaglobal/events/event_store.py::_async_handle_event
     - iaglobal/events/event_store.py::_on_pipeline_event_sync
     - iaglobal/events/replay.py::batch_compare_what_if
@@ -17301,7 +17215,6 @@ FUNCAO: iaglobal/memory/term_short.py::search
     - iaglobal/core/assistant.py::_consolidate_knowledge
     - iaglobal/core/assistant.py::_eh_teorico
     - iaglobal/core/cognitive_proxy.py::_build_context
-    - iaglobal/core/governance.py::validate_authority
     - iaglobal/core/retry_handler.py::detect
     - iaglobal/evolution/handler_evolution.py::_extract_run_fn_name
     - iaglobal/evolution/handler_evolution.py::visit_Call
@@ -19757,7 +19670,6 @@ FUNCAO: iaglobal/tools/web_brain.py::search
     - iaglobal/core/assistant.py::_consolidate_knowledge
     - iaglobal/core/assistant.py::_eh_teorico
     - iaglobal/core/cognitive_proxy.py::_build_context
-    - iaglobal/core/governance.py::validate_authority
     - iaglobal/core/retry_handler.py::detect
     - iaglobal/evolution/handler_evolution.py::_extract_run_fn_name
     - iaglobal/evolution/handler_evolution.py::visit_Call
@@ -22191,13 +22103,13 @@ iaglobal/providers/provider_config.py::__getattr__
 iaglobal/agents/intent_classifier_agent.py::_build_pattern
 iaglobal/evolution/skills/reactpy_skill_registry.py::_create_agent_card
 iaglobal/evolution/skills/reactpy_skill_registry.py::_create_dashboard
+iaglobal/core/assistant.py::_inner
 iaglobal/graphs/builder.py::_inner
 iaglobal/immunity/glutathione_pool.py::add_guardrail
 iaglobal/feedback/reward_aggregator.py::aggregate_by_source
 iaglobal/graphs/policy.py::all_domains
 iaglobal/providers/hf_video_provider.py::analyze_video
 iaglobal/graphs/policy.py::apply_epigenetic_adjustments
-iaglobal/core/graceful_shutdown.py::async_cleanup
 iaglobal/reflection/reflexion_engine.py::batch_reflect
 iaglobal/cli/bootstrap_engine.py::boot
 iaglobal/graphs/graph_builder_v2.py::build_graph_minimal
@@ -22208,11 +22120,9 @@ iaglobal/memory/fusion_engine.py::clear_expired
 iaglobal/memory/term_short.py::clear_swap
 iaglobal/cognition/task_fingerprint.py::context_key
 iaglobal/graphs/node.py::current_lineage_marker
-iaglobal/core/decision_engine.py::decide
 iaglobal/obsidian/error_capture.py::decorator
 iaglobal/evolution/evo_agent.py::demo
 iaglobal/recycling/embedding_pruner.py::estimate_bytes_saved
-iaglobal/core/assistant.py::executar_modelo
 iaglobal/recycling/mta_pool.py::generate_negative_instruction
 iaglobal/api/mcp_server.py::get_bandit_scores
 iaglobal/security/sandbox_rules.py::get_config_snapshot
@@ -22223,7 +22133,6 @@ iaglobal/reflection/reflexion_engine.py::get_recent_failures
 iaglobal/evolution/evolutionruntime.py::get_runtime
 iaglobal/validation/ast_security.py::get_security_report
 iaglobal/reflection/reflexion_engine.py::get_statistics
-iaglobal/events/event_dispatcher.py::handler_count
 iaglobal/utils/hash_utils.py::hash_file
 iaglobal/agents/prompt_improver.py::improve
 iaglobal/graphs/task.py::is_done
@@ -22234,8 +22143,6 @@ iaglobal/feedback/reward_signal.py::is_positive
 iaglobal/obsidian/omnimind.py::limpar_memoria_coletiva
 iaglobal/validation/normalization.py::normalize_whitespace
 iaglobal/execution/cpu_affinity.py::obter_prioridade
-iaglobal/events/event_dispatcher.py::off
-iaglobal/events/event_dispatcher.py::on
 iaglobal/graphs/communication/agent_mailbox.py::pending_received
 iaglobal/graphs/nodes/_search_enhanced.py::playwright_screenshot
 iaglobal/storage/snapshotter.py::prune_old_snapshots
@@ -22243,27 +22150,20 @@ iaglobal/api/__init__.py::read_script
 iaglobal/immunity/regression_detector.py::recent_regressions
 iaglobal/ui/reactpy_components.py::refresh_metrics
 iaglobal/graphs/nodes/no_integrator.py::register_all
-iaglobal/events/event_dispatcher.py::registered_steps
-iaglobal/core/evolution_controller.py::reset
 iaglobal/immunity/loop_detector.py::reset
 iaglobal/models/event_bus.py::reset
-iaglobal/events/decision_event.py::resolve_locked_model
-iaglobal/events/decision_event.py::resolve_locked_model_async
 iaglobal/providers/provider_router.py::resolve_model
 iaglobal/graphs/execution_graph.py::restart_node_async
 iaglobal/evolution/same_engine.py::rewrite_prompt
 iaglobal/graphs/communication/agent_mailbox.py::route_to_mailbox
+iaglobal/core/decision_engine.py::score_option
 iaglobal/providers/provider_metrics.py::score_provider
 iaglobal/providers/provider_scorer.py::score_provider
 iaglobal/graphs/bandit.py::select_model_thompson
 iaglobal/agents/evolution_agent.py::should_evolve
-iaglobal/core/evolution_controller.py::spend_call
-iaglobal/core/evolution_controller.py::spend_tokens
 iaglobal/agents/reflexion_agent.py::sugerir_melhoria_rich
 iaglobal/graphs/bandit.py::update_context
 iaglobal/validation/engine.py::validate_and_apply
-iaglobal/core/governance.py::validate_authority
 iaglobal/validation/ast_security.py::validate_code_real
-iaglobal/core/governance.py::validate_input
 iaglobal/validation/ast_security.py::verificar_codigo
 iaglobal/obsidian/error_capture.py::wrapper
