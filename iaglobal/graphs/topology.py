@@ -95,7 +95,8 @@ PHASES = {
         "metabolic_pruning",  
         "immune_exchange",   # Recepção de vacinas imunológicas
         "immune_monitor",   
-        "apoptosis_kill"    
+        "apoptosis_kill",
+        "meta_director"     # Propósito macro autônomo
     ]    
     ]
 }
@@ -175,7 +176,8 @@ NODE_DEPENDENCIES = {
     "metabolic_pruning": ["auditor_sentinel"],
     "immune_exchange": ["metabolic_pruning"],
     "immune_monitor": ["immune_exchange"],
-    "apoptosis_kill": ["immune_monitor"]
+    "apoptosis_kill": ["immune_monitor"],
+    "meta_director": ["apoptosis_kill"]
 }
 
 def get_node_phase(node_name: str) -> str:

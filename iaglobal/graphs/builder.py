@@ -67,7 +67,8 @@ RUN_NODE_NAMES: List[str] = [
      "metabolic_pruning",  
      "immune_exchange",   # Recepção de vacinas imunológicas
      "immune_monitor",   
-     "apoptosis_kill"
+     "apoptosis_kill",
+     "meta_director"     # Propósito macro autônomo
     "evolution_knowledge", "evolution_homocysteine", "evolution_methylation",
     "evolution_skill_executor", "evolution_dynamic_registry",
     "multi_coder",  # Special construction node
