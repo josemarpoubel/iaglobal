@@ -7,15 +7,15 @@
   },
   {
     "agent_name": "clean_skill",
-    "balance": 45,
+    "balance": 35,
     "total_earned": 0,
-    "total_spent": 55
+    "total_spent": 65
   },
   {
     "agent_name": "spike_skill",
-    "balance": 40,
+    "balance": 30,
     "total_earned": 0,
-    "total_spent": 60
+    "total_spent": 70
   },
   {
     "agent_name": "unknown",
@@ -55,15 +55,15 @@
   },
   {
     "agent_name": "mutant_1",
-    "balance": 90,
+    "balance": 85,
     "total_earned": 0,
-    "total_spent": 10
+    "total_spent": 15
   },
   {
     "agent_name": "mutant_2",
-    "balance": 90,
+    "balance": 85,
     "total_earned": 0,
-    "total_spent": 10
+    "total_spent": 15
   },
   {
     "agent_name": "malicious_skill",
@@ -73,8 +73,8 @@
   },
   {
     "agent_name": "random_agent",
-    "balance": 90,
+    "balance": 85,
     "total_earned": 0,
-    "total_spent": 10
+    "total_spent": 15
   }
 ]

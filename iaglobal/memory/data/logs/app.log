@@ -2287,3 +2287,129 @@
 2026-06-24 22:30:38,852 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
 2026-06-24 22:30:38,856 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
 2026-06-24 22:30:38,963 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-06-24 22:35:56,533 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em injection_test: [{'type': 'suspicious_imports', 'modules': ['os', 'subprocess'], 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.Popen\\s*\\(', 'context': 'injection_test'}, {'type': 'non_genesis_derivative', 'context': 'injection_test'}]
+2026-06-24 22:35:56,535 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
+2026-06-24 22:35:56,539 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em test: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'test'}]
+2026-06-24 22:35:56,539 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] hacker negado a core_db
+2026-06-24 22:35:56,545 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:35:56,545 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:35:56,545 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:35:56,545 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:35:56,545 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:35:56,545 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:35:56,546 [WARNING] [iaglobal.evolution.skill_quarantine] 🚫 [QUARANTINE] Skill 'anomalous_skill' foi colocada em quarentena! Falhas: 3, Impacto Máximo: 3. Motivo: MHC anomaly score 1.00
+2026-06-24 22:35:56,546 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:35:56,546 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:35:56,546 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:35:56,546 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:35:56,546 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:35:56,546 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:35:56,552 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for spike_skill: 20.0s
+2026-06-24 22:35:56,553 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:35:56,554 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
+2026-06-24 22:35:56,555 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
+2026-06-24 22:35:56,558 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
+2026-06-24 22:35:56,664 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-06-24 22:35:57,130 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em mutant_1: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'mutant_1'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'mutant_1'}]
+2026-06-24 22:35:57,130 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_1: 26.500164028018702s
+2026-06-24 22:35:57,131 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_1: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:35:57,158 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_2: 28.968816640379334s
+2026-06-24 22:35:57,159 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_2: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:44:21,845 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/projeto-iaglobal/.env
+2026-06-24 22:44:21,865 [INFO] [iaglobal] [SKILL] Registrada: planner vv1
+2026-06-24 22:44:21,865 [INFO] [iaglobal] [SKILL] Registrada: ingestion vv1
+2026-06-24 22:44:21,865 [INFO] [iaglobal] [SKILL] Registrada: domain_analysis vv1
+2026-06-24 22:44:21,865 [INFO] [iaglobal] [SKILL] Registrada: business_rules vv1
+2026-06-24 22:44:21,865 [INFO] [iaglobal] [SKILL] Registrada: technology_selection vv1
+2026-06-24 22:44:21,865 [INFO] [iaglobal] [SKILL] Registrada: system_design vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: api_design vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: database_design vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: threat_modeling vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: observability_design vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: compliance_audit vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: architecture_validator vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: task_breakdown vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: execution_plan vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: requirements vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: pm vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: architect vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: interpreter vv1
+2026-06-24 22:44:21,866 [INFO] [iaglobal] [SKILL] Registrada: prompt_intake vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: enhancement vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: orchestrator_agent vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: risk_analysis vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: security_design vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: security_audit vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: performance_design vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: performance_audit vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: coder vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: frontend_builder vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: backend_builder vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: database_builder vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: api_builder vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: test_generator vv1
+2026-06-24 22:44:21,867 [INFO] [iaglobal] [SKILL] Registrada: tester vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: debugger vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: reviewer vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: critic vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: validator vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: qa vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: debug_coder vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: fix_validator vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: security vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: performance vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: dependency vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: documentation vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: release vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: deployment_plan vv1
+2026-06-24 22:44:21,868 [INFO] [iaglobal] [SKILL] Registrada: metrics vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: optimization vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: knowledge vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: artifact_writer vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: reflexion vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: retrospective vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: result_agent vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: genesis_builder vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: web_classifier vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: search vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: evaluator vv1
+2026-06-24 22:44:21,869 [INFO] [iaglobal] [SKILL] Registrada: gap_analyzer vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: skill_generator vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: sandbox_validator vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: evolution_committee vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: pipeline_updater vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: evolution_trigger vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: integrator vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: semantic_validator vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: local_knowledge vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: knowledge_analyzer vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: memory_writer vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: memory_cleaner vv1
+2026-06-24 22:44:21,870 [INFO] [iaglobal] [SKILL] Registrada: agentmailbox vv1
+2026-06-24 22:44:21,871 [INFO] [iaglobal] [SKILL] Registrada: code_executor vv1
+2026-06-24 22:44:21,871 [INFO] [iaglobal] [SKILL] Registrada: multi_coder vv1
+2026-06-24 22:44:21,871 [INFO] [iaglobal] [SKILL] Registrada: prompt_builder vv1
+2026-06-24 22:44:21,871 [INFO] [iaglobal] [SKILL] Registrada: prompt_improver vv1
+2026-06-24 22:44:21,871 [INFO] [iaglobal] [SKILL] Registrada: failure_analysis vv1
+2026-06-24 22:44:21,871 [INFO] [iaglobal] [SKILL] Registrada: knowledge_writer vv1
+2026-06-24 22:44:21,871 [INFO] [iaglobal] [SKILL] Registrada: multi_agent vv1
+2026-06-24 22:44:21,871 [INFO] [iaglobal] [SKILL] Registrada: typing_agent vv1
+2026-06-24 22:47:55,527 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
+2026-06-24 22:47:55,632 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-06-24 22:47:55,838 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:47:55,838 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:47:55,838 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:47:55,838 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:47:55,838 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:47:55,838 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:47:55,839 [WARNING] [iaglobal.evolution.skill_quarantine] 🚫 [QUARANTINE] Skill 'anomalous_skill' foi colocada em quarentena! Falhas: 3, Impacto Máximo: 3. Motivo: MHC anomaly score 1.00
+2026-06-24 22:47:55,839 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:47:55,839 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:47:55,839 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:47:55,839 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:47:55,839 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:47:55,839 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:47:55,843 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for spike_skill: 20.0s
+2026-06-24 22:47:55,844 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:47:55,846 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
+2026-06-24 22:47:55,847 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}

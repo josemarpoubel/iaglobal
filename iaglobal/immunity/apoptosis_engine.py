@@ -48,18 +48,22 @@ class ApoptosisEngine:
             {"executed": bool, "snapshot_path": str, "cleanup_performed": bool}
         """
         logger.warning(f"[APOPTOSIS] Iniciando eliminação de {agent_name}")
-
-        # 1. Serializar estado
+        
+        # 1. Extrair lições aprendidas com a falha (GRAVA NO SHORT TERM)
+        lessons = self._extract_failure_lessons(agent_name, agent_state, reason)
+        await self._record_to_obsidian(agent_name, lessons)
+        
+        # 2. Serializar estado
         snapshot = await self._serialize_state(agent_name, agent_state, reason)
-
-        # 2. Remover do registry (se existir)
+        
+        # 3. Remover do registry (se existir)
         removed = await self._remove_from_registry(agent_name)
-
-        # 3. Limpeza de rastros
+        
+        # 4. Limpeza de rastros
         cleaned = await self._cleanup_traces(agent_name)
-
+        
         logger.info(f"[APOPTOSIS] {agent_name} eliminado com sucesso")
-
+        
         return {
             "executed": True,
             "agent": agent_name,
@@ -67,8 +71,45 @@ class ApoptosisEngine:
             "snapshot_path": snapshot,
             "removed_from_registry": removed,
             "cleanup_performed": cleaned,
+            "lessons_extracted": len(lessons),
             "timestamp": datetime.now(timezone.utc).isoformat(),
         }
+
+    def _extract_failure_lessons(self, agent_name: str, state: Dict[str, Any], reason: str) -> list:
+        """Extrai padrões de falha para aprendizado imunológico."""
+        lessons = []
+        
+        # Analisar métricas de falha
+        if "error" in state:
+            lessons.append({"type": "error_pattern", "detail": str(state.get("error"))[:200]})
+        
+        if "output" in state:
+            output = str(state.get("output", ""))
+            # Detectar padrões suspeitos
+            if "import os" in output or "subprocess" in output:
+                lessons.append({"type": "dangerous_import", "detail": "código potencialmente perigoso detectado"})
+        
+        if "metrics" in state:
+            metrics = state.get("metrics", {})
+            if metrics.get("latency", 0) > 30:
+                lessons.append({"type": "timeout", "detail": f"latência excessiva: {metrics.get('latency')}"})
+        
+        lessons.append({"type": "termination_reason", "detail": reason})
+        
+        return lessons
+
+    async def _record_to_obsidian(self, agent_name: str, lessons: list) -> None:
+        """Grava lições no Obsidian Short Term para análise futura."""
+        try:
+            from iaglobal.obsidian.subconsciousapi import SubconsciousAPI
+            
+            api = SubconsciousAPI()
+            await api.escrever_curto_prazo(
+                f"apoptosis_{agent_name}",
+                {"lessons": lessons, "agent_terminated": agent_name}
+            )
+        except Exception as e:
+            logger.warning(f"[APOPTOSIS] Não foi possível gravar no Obsidian: {e}")
 
     async def _serialize_state(self, agent_name: str, state: Dict[str, Any], reason: str) -> Optional[str]:
         """Serializa estado do agente antes da morte."""

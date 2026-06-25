@@ -22,6 +22,7 @@ from iaglobal.immunity.hallucination_detector import HallucinationDetector
 from iaglobal.immunity.mhc_detector import MHCDetector, mhc_detector
 from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails
 from iaglobal.evolution.metabolism.opportunity_cost_detector import OpportunityCostDetector, opportunity_cost_detector
+from iaglobal.immunity.adaptive_threat_detector import AdaptiveThreatDetector
 from iaglobal.evolution.skill_quarantine import quarantine
 from iaglobal.graphs.communication.membrane_key import MembraneKey
 
@@ -87,6 +88,14 @@ class ImmuneOrchestrator:
             for system_name in list(MembraneKey._MembraneKey__instance._keys.keys()) if hasattr(MembraneKey, '_MembraneKey__instance') else []:
                 pass  # Verificação será feita via payload diretamente
             # Se tem membrane_key válida no contexto, é simbionte
+            symbiont_recognized = True
+            
+            # 7. Adaptive learning - aprender com simbiontes produtivos
+            adaptive = AdaptiveThreatDetector()
+            scan_result = adaptive.scan_for_emerging_threats(output)
+            if not scan_result.get("is_threat"):
+                # Código produtivo - aprender padrão
+                adaptive.learn_from_approved_skill(skill_name, output)
             symbiont_recognized = True
 
         # 1. Loop detection

@@ -5,7 +5,8 @@ import asyncio
 import logging
 import threading
 
-from typing import Callable, List
+from datetime import datetime, timezone
+from typing import Callable, List, Dict, Any
 
 logger = logging.getLogger(__name__)
 
@@ -74,7 +75,29 @@ class GracefulShutdown:
     # CLEANUP SÍNCRONO
     # ============================================================
 
-    def sync_cleanup(self) -> None:
+    def trigger_emergency_shutdown(self, reason: str, details: Dict[str, Any] = None) -> None:
+        """
+        Dispara shutdown preventivo em caso de violação grave.
+        
+        Args:
+            reason: motivo do shutdown
+            details: detalhes da violação
+        """
+        logger.critical(f"[SHUTDOWN] Emergency triggered: {reason}")
+        
+        # Registrar violação no Obsidian Short Term
+        try:
+            from iaglobal.obsidian.subconsciousapi import SubconsciousAPI
+            api = SubconsciousAPI()
+            api.escrever_curto_prazo_sync(
+                f"emergency_shutdown_{reason}",
+                {"reason": reason, "details": details, "timestamp": datetime.now(timezone.utc).isoformat()}
+            )
+        except Exception:
+            pass  # Não interromper shutdown por erro de obsidian
+        
+        # Definir flag para evitar novas execuções
+        self._is_shutting_down = True
         if self._is_shutting_down:
             return
 

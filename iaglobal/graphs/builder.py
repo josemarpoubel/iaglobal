@@ -59,13 +59,13 @@ RUN_NODE_NAMES: List[str] = [
     "documentation", "deployment_plan", "critic", "release", "metrics", "optimization",
     "retrospective", "result_agent", "knowledge_writer", "memory_writer", "memory_cleaner",
 # Metacognition (7)
-    "evaluator", "gap_analyzer", "skill_generator", "sandbox_validator",
-    "evolution_committee", "pipeline_updater", "evolution_trigger",
-    # Darwin Harness (teste de estresse)
-    "darwin_harness",
-    "entropy_sentinel",   # Vigilância de integridade genética (FIRST!)
-    "immune_monitor",   # Monitor custo-benefício contínuo
-    "apoptosis_kill"    # Apoptose programada para parasitas
+     "evaluator", "gap_analyzer", "skill_generator", "sandbox_validator",
+     "evolution_committee", "pipeline_updater", "evolution_trigger",
+     "darwin_harness",
+     "entropy_sentinel",   # Vigilância de integridade genética (FIRST!)
+     "auditor_sentinel",   # Auditoria em tempo real de genesis
+     "immune_monitor",   
+     "apoptosis_kill"    # Apoptose programada para parasitas
     # Evolution Core (5)
     "evolution_knowledge", "evolution_homocysteine", "evolution_methylation",
     "evolution_skill_executor", "evolution_dynamic_registry",

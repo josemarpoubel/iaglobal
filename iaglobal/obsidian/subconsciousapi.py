@@ -341,3 +341,10 @@ O agente executou a estratégia {strategy} com sucesso metabólico.
         vault_agents = self.long_term_dir / "agentes"
         vault_agents.mkdir(parents=True, exist_ok=True)
         return await self.escrever_nota(vault_agents, agent_id, content)
+
+    # Sync wrappers for compatibility
+    escrever_curto_prazo_sync = _sync_wrap(escrever_curto_prazo)
+    escrever_longo_prazo_sync = _sync_wrap(escrever_longo_prazo)
+    obter_insight_subconsciente_sync = _sync_wrap(obter_insight_subconsciente)
+    ler_nota_sync = _sync_wrap(ler_nota)
+    listar_notas_sync = _sync_wrap(listar_notas)
