@@ -98,10 +98,11 @@ PHASES = {
         "apoptosis_kill",
         "adaptive_router",   # Roteamento adaptativo via IVM
         "ga_router_evolve",  # Evolução dos pesos IVM via GA
-        "proposal_quarantine",  # Quarentena de propostas
-        "ai_audit_compliance",  # Auditoria conformidade às leis
-        "meta_director"     # Propósito macro autônomo
-    ]    
+"proposal_quarantine",  # Quarentena de propostas
+    "ai_audit_compliance",  # Auditoria conformidade às leis
+    "success_ritual",      # Ritual de registro de sucesso
+    "meta_director"     # Propósito macro autônomo
+]
     ]
 }
 
@@ -185,7 +186,8 @@ NODE_DEPENDENCIES = {
     "ga_router_evolve": ["adaptive_router"],
     "proposal_quarantine": ["ga_router_evolve"],
     "ai_audit_compliance": ["proposal_quarantine"],
-    "meta_director": ["ai_audit_compliance"]
+    "success_ritual": ["ai_audit_compliance"],
+    "meta_director": ["success_ritual"]
 }
 
 def get_node_phase(node_name: str) -> str:
