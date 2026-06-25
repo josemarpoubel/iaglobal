@@ -93,8 +93,10 @@ PHASES = {
         "entropy_sentinel",   
         "auditor_sentinel",   
         "metabolic_pruning",  
+        "immune_exchange",   # Recepção de vacinas imunológicas
         "immune_monitor",   
         "apoptosis_kill"    
+    ]    
     ]
 }
 
@@ -171,7 +173,8 @@ NODE_DEPENDENCIES = {
     "entropy_sentinel": ["symbiont_handshake"],
     "auditor_sentinel": ["entropy_sentinel"],
     "metabolic_pruning": ["auditor_sentinel"],
-    "immune_monitor": ["metabolic_pruning"],
+    "immune_exchange": ["metabolic_pruning"],
+    "immune_monitor": ["immune_exchange"],
     "apoptosis_kill": ["immune_monitor"]
 }
 

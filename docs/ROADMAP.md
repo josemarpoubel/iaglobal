@@ -627,7 +627,7 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 
 ## Resumo Final
 
-**Total de correções implementadas:** 97/97 passos concluídos
+**Total de correções implementadas:** 98/98 passos concluídos
 
 | 79. Knowledge Writer Auto-Init | ✅ | knowledge_writer_agent.py | 584/584 |
 | 80. Bandit Policy task_type Awareness | ✅ | provider_router.py | 584/584 |
@@ -790,7 +790,8 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 - ✅ `tests/test_parasite_symbiont_recognition.py` — 3 testes (distingue parasitas de simbiontes)
 - ✅ `tests/test_adaptive_threat_detector.py` — 4 testes (aprendizado contínuo de ameaças)
 - ✅ `tests/test_metabolic_pruning.py` — 4 testes (poda de fingerprints SHA3_512)
-- ✅ **Total: 690/690 testes passando**
+- ✅ `tests/test_extreme_stress_scenarios.py` — 5 testes (flood LTM, corrupção massiva)
+- ✅ **Total: 695/695 testes passando**
 
 ### 57. HuggingFace Video Provider Integration ✅
 **Problema:** Sistema precisava de suporte para geração e análise de vídeo via HuggingFace.
@@ -1017,3 +1018,5 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 | 94. Apoptosis Lessons Extraction | ✅ Concluído | Lições de falha gravadas no Obsidian Short Term | 1/1 |
 | 95. Auditor Sentinel Node | ✅ Concluído | Nó de auditoria em tempo real do genesis | 1/1 |
 | 96. Metabolic Pruner | ✅ Concluído | Poda de fingerprints SHA3_512 (TTL 30d, merge similar) | 4/4 |
+| 97. Immune Memory Exchange | ✅ Concluído | Compartilhamento de vacinas entre nós | 1/1 |
+| 98. Extreme Stress Tests | ✅ Concluído | Flood LTM, corrupção massiva, detecção paralela | 5/5 |

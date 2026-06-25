@@ -61,13 +61,13 @@ RUN_NODE_NAMES: List[str] = [
 # Metacognition (7)
      "evaluator", "gap_analyzer", "skill_generator", "sandbox_validator",
      "evolution_committee", "pipeline_updater", "evolution_trigger",
-     "darwin_harness",
-     "entropy_sentinel",   # Vigilância de integridade genética (FIRST!)
-     "auditor_sentinel",   # Auditoria em tempo real de genesis
-     "metabolic_pruning",  # Poda de fingerprints SHA3_512
+     "symbiont_handshake",
+     "entropy_sentinel",   
+     "auditor_sentinel",   
+     "metabolic_pruning",  
+     "immune_exchange",   # Recepção de vacinas imunológicas
      "immune_monitor",   
-     "apoptosis_kill"     # Apoptose programada para parasitas
-    # Evolution Core (5)
+     "apoptosis_kill"
     "evolution_knowledge", "evolution_homocysteine", "evolution_methylation",
     "evolution_skill_executor", "evolution_dynamic_registry",
     "multi_coder",  # Special construction node
