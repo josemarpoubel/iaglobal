@@ -97,6 +97,7 @@ PHASES = {
         "immune_monitor",   
         "apoptosis_kill",
         "adaptive_router",   # Roteamento adaptativo via IVM
+        "ga_router_evolve",  # Evolução dos pesos IVM via GA
         "meta_director"     # Propósito macro autônomo
     ]    
     ]
@@ -179,7 +180,8 @@ NODE_DEPENDENCIES = {
     "immune_monitor": ["immune_exchange"],
     "apoptosis_kill": ["immune_monitor"],
     "adaptive_router": ["apoptosis_kill"],
-    "meta_director": ["adaptive_router"]
+    "ga_router_evolve": ["adaptive_router"],
+    "meta_director": ["ga_router_evolve"]
 }
 
 def get_node_phase(node_name: str) -> str:

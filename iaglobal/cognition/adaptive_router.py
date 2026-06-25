@@ -55,16 +55,26 @@ class AdaptiveRouter:
         self._cost_detector = OpportunityCostDetector()
         self._provider_scores: Dict[str, float] = {}
 
-    def calculate_ivm(self, provider: str, metrics: Dict[str, Any]) -> float:
+    def calculate_ivm(self, provider: str, metrics: Dict[str, Any], weights: Dict[str, float] = None) -> float:
         """
         Calcula IVM (Índice de Viabilidade Metabólica) para provedor.
         
-        Fórmula: IVM = (P × 0.4) + (E × 0.4) + (C × 0.1) + (I × 0.1)
-        - P: Productividade (taxa de sucesso)
-        - E: Energia (inverso de latência + tokens)
-        - C: Cooperação (skills aprovadas)
-        - I: Imunidade (mhc_validated)
+        Fórmula padrão:
+        IVM = (P × 0.4) + (E × 0.4) + (C × 0.1) + (I × 0.1)
+        
+        Args:
+            provider: nome do provedor
+            metrics: métricas de performance
+            weights: pesos customizados (epigenéticos)
         """
+        # Pesos epigenéticos (configuráveis)
+        if weights is None:
+            weights = {
+                "productivity": 0.4,
+                "energy": 0.4,
+                "cooperation": 0.1,
+                "immunity": 0.1,
+            }
         success_rate = metrics.get("success_rate", 0.5)
         avg_latency = metrics.get("avg_latency", 10.0)
         avg_tokens = metrics.get("avg_tokens", 1000)
@@ -75,10 +85,10 @@ class AdaptiveRouter:
         energy_score = max(0, min(1, 20.0 / avg_latency)) if avg_latency > 0 else 1.0
         
         ivm = (
-            success_rate * 0.4 +
-            energy_score * 0.4 +
-            skills_approved * 0.1 +
-            mhc_valid * 0.1
+            success_rate * weights["productivity"] +
+            energy_score * weights["energy"] +
+            skills_approved * weights["cooperation"] +
+            mhc_valid * weights["immunity"]
         )
         
         return round(ivm, 3)
