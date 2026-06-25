@@ -10,6 +10,9 @@ from iaglobal.immunity.pathogen_analyzer import PathogenAnalyzer, pathogen_analy
 from iaglobal.immunity.apoptosis_engine import ApoptosisEngine, apoptosis_engine
 from iaglobal.immunity.epigenetic_masking import EpigeneticMasking, EpigeneticMask, epigenetic_masking
 
+# Import OpportunityCostDetector from evolution/metabolism
+from iaglobal.evolution.metabolism import OpportunityCostDetector
+
 __all__ = [
     "LoopDetector",
     "RegressionDetector",
@@ -34,4 +37,5 @@ __all__ = [
     "EpigeneticMasking",
     "EpigeneticMask",
     "epigenetic_masking",
+    "OpportunityCostDetector",
 ]

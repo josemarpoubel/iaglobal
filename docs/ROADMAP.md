@@ -627,7 +627,7 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 
 ## Resumo Final
 
-**Total de correções implementadas:** 88/88 passos concluídos
+**Total de correções implementadas:** 89/89 passos concluídos
 
 | 79. Knowledge Writer Auto-Init | ✅ | knowledge_writer_agent.py | 584/584 |
 | 80. Bandit Policy task_type Awareness | ✅ | provider_router.py | 584/584 |
@@ -769,6 +769,7 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 - `iaglobal/immunity/apoptosis_engine.py` — Eliminação limpa de agentes
 - `iaglobal/immunity/epigenetic_masking.py` — Barreira hematoencefálica digital
 - `tests/test_immunity_expansion.py` — Testes (7/7)
+- `tests/test_immunity_integrity.py` — Testes de integridade immunity (4/4)
 
 ---
 
@@ -782,7 +783,8 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 - ✅ `tests/test_opportunity_cost.py` — 8 testes (Opportunity Cost + Apoptosis)
 - ✅ `tests/test_entropy_sentinel.py` — 6 testes (Genesis + PySecurity1024)
 - ✅ `tests/test_immunity_expansion.py` — 7 testes (Pathogen + ApoptosisEngine + EpigeneticMasking)
-- ✅ **Total: 669/669 testes passando**
+- ✅ `tests/test_immunity_integrity.py` — 4 testes (integridade módulo immunity)
+- ✅ **Total: 673/673 testes passando**
 
 ### 57. HuggingFace Video Provider Integration ✅
 **Problema:** Sistema precisava de suporte para geração e análise de vídeo via HuggingFace.
@@ -1002,3 +1004,4 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 | 86. PathogenAnalyzer | ✅ Concluído | pathogen_analyzer.py + tests | 7/7 |
 | 87. ApoptosisEngine | ✅ Concluído | apoptosis_engine.py + tests | 7/7 |
 | 88. EpigeneticMasking | ✅ Concluído | epigenetic_masking.py (barreira de memória) | 7/7 |
+| 89. Immunity Integrity Test | ✅ Concluído | test_immunity_integrity.py | 4/4 |

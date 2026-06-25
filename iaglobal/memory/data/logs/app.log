@@ -1956,3 +1956,177 @@
 2026-06-24 21:14:13,327 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
 2026-06-24 21:17:01,635 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em injection_test: [{'type': 'suspicious_imports', 'modules': ['os', 'subprocess'], 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.Popen\\s*\\(', 'context': 'injection_test'}, {'type': 'non_genesis_derivative', 'context': 'injection_test'}]
 2026-06-24 21:17:01,637 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
+2026-06-24 21:30:13,363 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/projeto-iaglobal/.env
+2026-06-24 21:30:13,382 [INFO] [iaglobal] [SKILL] Registrada: planner vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: ingestion vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: domain_analysis vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: business_rules vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: technology_selection vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: system_design vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: api_design vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: database_design vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: threat_modeling vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: observability_design vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: compliance_audit vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: architecture_validator vv1
+2026-06-24 21:30:13,383 [INFO] [iaglobal] [SKILL] Registrada: task_breakdown vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: execution_plan vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: requirements vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: pm vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: architect vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: interpreter vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: prompt_intake vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: enhancement vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: orchestrator_agent vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: risk_analysis vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: security_design vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: security_audit vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: performance_design vv1
+2026-06-24 21:30:13,384 [INFO] [iaglobal] [SKILL] Registrada: performance_audit vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: coder vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: frontend_builder vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: backend_builder vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: database_builder vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: api_builder vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: test_generator vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: tester vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: debugger vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: reviewer vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: critic vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: validator vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: qa vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: debug_coder vv1
+2026-06-24 21:30:13,385 [INFO] [iaglobal] [SKILL] Registrada: fix_validator vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: security vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: performance vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: dependency vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: documentation vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: release vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: deployment_plan vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: metrics vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: optimization vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: knowledge vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: artifact_writer vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: reflexion vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: retrospective vv1
+2026-06-24 21:30:13,386 [INFO] [iaglobal] [SKILL] Registrada: result_agent vv1
+2026-06-24 21:30:13,387 [INFO] [iaglobal] [SKILL] Registrada: genesis_builder vv1
+2026-06-24 21:30:13,387 [INFO] [iaglobal] [SKILL] Registrada: web_classifier vv1
+2026-06-24 21:30:13,387 [INFO] [iaglobal] [SKILL] Registrada: search vv1
+2026-06-24 21:30:13,387 [INFO] [iaglobal] [SKILL] Registrada: evaluator vv1
+2026-06-24 21:30:13,387 [INFO] [iaglobal] [SKILL] Registrada: gap_analyzer vv1
+2026-06-24 21:30:13,387 [INFO] [iaglobal] [SKILL] Registrada: skill_generator vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: sandbox_validator vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: evolution_committee vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: pipeline_updater vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: evolution_trigger vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: integrator vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: semantic_validator vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: local_knowledge vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: knowledge_analyzer vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: memory_writer vv1
+2026-06-24 21:30:13,388 [INFO] [iaglobal] [SKILL] Registrada: memory_cleaner vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: agentmailbox vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: code_executor vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: multi_coder vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: prompt_builder vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: prompt_improver vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: failure_analysis vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: knowledge_writer vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: multi_agent vv1
+2026-06-24 21:30:13,389 [INFO] [iaglobal] [SKILL] Registrada: typing_agent vv1
+2026-06-24 21:30:13,395 [INFO] [iaglobal] ⚖️ Invocando o Tribunal: Validando nascimento do nó...
+2026-06-24 21:30:13,395 [INFO] [iaglobal] ✅ [SOBERANIA CONFIRMADA] DNA validado. Nó autorizado a ingressar na malha.
+2026-06-24 21:30:13,395 [INFO] [iaglobal.security.entropy_sentinel] [ENTROPY] Genesis hash loaded: cc7017b56557586095e8dc6dae27b3e6...
+2026-06-24 21:30:13,397 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for core_db: 06768ab3b54a14c5...
+2026-06-24 21:30:13,398 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for memory_vector: 3143431a2c94393a...
+2026-06-24 21:30:13,398 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for ltm_stm: 55632b41a9a28ac5...
+2026-06-24 21:30:13,398 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for registry: ad8e15a33da4b1a3...
+2026-06-24 21:32:19,840 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/projeto-iaglobal/.env
+2026-06-24 21:32:19,860 [INFO] [iaglobal] [SKILL] Registrada: planner vv1
+2026-06-24 21:32:19,860 [INFO] [iaglobal] [SKILL] Registrada: ingestion vv1
+2026-06-24 21:32:19,860 [INFO] [iaglobal] [SKILL] Registrada: domain_analysis vv1
+2026-06-24 21:32:19,860 [INFO] [iaglobal] [SKILL] Registrada: business_rules vv1
+2026-06-24 21:32:19,860 [INFO] [iaglobal] [SKILL] Registrada: technology_selection vv1
+2026-06-24 21:32:19,860 [INFO] [iaglobal] [SKILL] Registrada: system_design vv1
+2026-06-24 21:32:19,860 [INFO] [iaglobal] [SKILL] Registrada: api_design vv1
+2026-06-24 21:32:19,860 [INFO] [iaglobal] [SKILL] Registrada: database_design vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: threat_modeling vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: observability_design vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: compliance_audit vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: architecture_validator vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: task_breakdown vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: execution_plan vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: requirements vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: pm vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: architect vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: interpreter vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: prompt_intake vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: enhancement vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: orchestrator_agent vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: risk_analysis vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: security_design vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: security_audit vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: performance_design vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: performance_audit vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: coder vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: frontend_builder vv1
+2026-06-24 21:32:19,861 [INFO] [iaglobal] [SKILL] Registrada: backend_builder vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: database_builder vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: api_builder vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: test_generator vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: tester vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: debugger vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: reviewer vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: critic vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: validator vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: qa vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: debug_coder vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: fix_validator vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: security vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: performance vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: dependency vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: documentation vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: release vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: deployment_plan vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: metrics vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: optimization vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: knowledge vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: artifact_writer vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: reflexion vv1
+2026-06-24 21:32:19,862 [INFO] [iaglobal] [SKILL] Registrada: retrospective vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: result_agent vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: genesis_builder vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: web_classifier vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: search vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: evaluator vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: gap_analyzer vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: skill_generator vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: sandbox_validator vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: evolution_committee vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: pipeline_updater vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: evolution_trigger vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: integrator vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: semantic_validator vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: local_knowledge vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: knowledge_analyzer vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: memory_writer vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: memory_cleaner vv1
+2026-06-24 21:32:19,863 [INFO] [iaglobal] [SKILL] Registrada: agentmailbox vv1
+2026-06-24 21:32:19,864 [INFO] [iaglobal] [SKILL] Registrada: code_executor vv1
+2026-06-24 21:32:19,864 [INFO] [iaglobal] [SKILL] Registrada: multi_coder vv1
+2026-06-24 21:32:19,864 [INFO] [iaglobal] [SKILL] Registrada: prompt_builder vv1
+2026-06-24 21:32:19,864 [INFO] [iaglobal] [SKILL] Registrada: prompt_improver vv1
+2026-06-24 21:32:19,864 [INFO] [iaglobal] [SKILL] Registrada: failure_analysis vv1
+2026-06-24 21:32:19,864 [INFO] [iaglobal] [SKILL] Registrada: knowledge_writer vv1
+2026-06-24 21:32:19,864 [INFO] [iaglobal] [SKILL] Registrada: multi_agent vv1
+2026-06-24 21:32:19,864 [INFO] [iaglobal] [SKILL] Registrada: typing_agent vv1
+2026-06-24 21:32:19,870 [INFO] [iaglobal] ⚖️ Invocando o Tribunal: Validando nascimento do nó...
+2026-06-24 21:32:19,870 [INFO] [iaglobal] ✅ [SOBERANIA CONFIRMADA] DNA validado. Nó autorizado a ingressar na malha.
+2026-06-24 21:32:19,870 [INFO] [iaglobal.security.entropy_sentinel] [ENTROPY] Genesis hash loaded: cc7017b56557586095e8dc6dae27b3e6...
+2026-06-24 21:32:19,873 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for core_db: 06768ab3b54a14c5...
+2026-06-24 21:32:19,873 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for memory_vector: 3143431a2c94393a...
+2026-06-24 21:32:19,873 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for ltm_stm: 55632b41a9a28ac5...
+2026-06-24 21:32:19,873 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for registry: ad8e15a33da4b1a3...
+2026-06-24 21:33:57,599 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em test: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'test'}]
+2026-06-24 21:33:57,599 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] hacker negado a core_db
