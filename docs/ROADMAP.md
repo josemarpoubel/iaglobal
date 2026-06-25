@@ -627,7 +627,7 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 
 ## Resumo Final
 
-**Total de correções implementadas:** 90/90 passos concluídos
+**Total de correções implementadas:** 92/92 passos concluídos
 
 | 79. Knowledge Writer Auto-Init | ✅ | knowledge_writer_agent.py | 584/584 |
 | 80. Bandit Policy task_type Awareness | ✅ | provider_router.py | 584/584 |
@@ -785,7 +785,10 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 - ✅ `tests/test_immunity_expansion.py` — 7 testes (Pathogen + ApoptosisEngine + EpigeneticMasking)
 - ✅ `tests/test_immunity_integrity.py` — 4 testes (integridade módulo immunity)
 - ✅ `tests/test_darwin_harness.py` — 4 testes (teste de mutação evolutiva)
-- ✅ **Total: 677/677 testes passando**
+- ✅ `tests/test_symbiotic_communication.py` — 5 testes (simbiose + comunicação celular)
+- ✅ `tests/test_communication_resilience.py` — 3 testes (resiliência sob apoptose)
+- ✅ `tests/test_parasite_symbiont_recognition.py` — 3 testes (distingue parasitas de simbiontes)
+- ✅ **Total: 682/682 testes passando**
 
 ### 57. HuggingFace Video Provider Integration ✅
 **Problema:** Sistema precisava de suporte para geração e análise de vídeo via HuggingFace.
@@ -1006,4 +1009,5 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 | 87. ApoptosisEngine | ✅ Concluído | apoptosis_engine.py + tests | 7/7 |
 | 88. EpigeneticMasking | ✅ Concluído | epigenetic_masking.py (barreira de memória) | 7/7 |
 | 89. Immunity Integrity Test | ✅ Concluído | test_immunity_integrity.py | 4/4 |
-| 90. Darwin Harness Stress Test | ✅ Concluído | darwin_harness.py + no_darwin_harness.py | 4/4 |
+| 91. Symbiotic Communication Protocol | ✅ Concluído | membrane_key.py + acetylcholine_bus integração | 9/9 |
+| 92. Communication Resilience Under Apoptosis | ✅ Concluído | teste de sinalização durante eliminacao de agentes | 3/3 |

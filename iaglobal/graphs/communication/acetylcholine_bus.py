@@ -9,6 +9,8 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Set, Coroutine
 from collections import defaultdict
 
+from iaglobal.graphs.communication.membrane_key import MembraneKey
+
 logger = logging.getLogger(__name__)
 
 DEFAULT_TTL = 60
@@ -71,6 +73,13 @@ class AcetylcholineBus:
 
     async def _route(self, message: AgentMessage):
         """Coleta handlers correspondentes sem duplicidade e os executa de forma concorrente."""
+        # Validar chave de membrana se presente
+        if "membrane_key" in message.payload:
+            mk = MembraneKey()
+            if not mk.validate_key(message.sender, message.payload["membrane_key"]):
+                logger.warning(f"[ACH-BUS] Membrane key invalid for {message.sender} - rejecting")
+                return
+        
         # Conjunto (Set) evita que o mesmo handler seja chamado duas vezes na mesma mensagem
         unique_handlers: Set[Callable] = set()
 

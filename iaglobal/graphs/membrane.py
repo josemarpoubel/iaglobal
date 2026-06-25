@@ -5,6 +5,8 @@ from enum import Enum
 from typing import Any, Callable, Dict, List, Optional
 from dataclasses import dataclass, field
 
+from iaglobal.graphs.communication.membrane_key import MembraneKey
+
 logger = logging.getLogger(__name__)
 
 CORE_ORGANELLES = {"core", "delivery"}
@@ -40,10 +42,18 @@ class Membrane:
         self._routes[organelle.value] = handler
 
     def send(self, message: MembraneMessage) -> Optional[Any]:
+        """Envia mensagem através da membrana com validação de segurança."""
+        # Validar chave de membrana para simbiose externa
+        if "external_key" in message.payload:
+            mk = MembraneKey()
+            if not mk.validate_key("external", message.payload["external_key"]):
+                logger.warning("[MEMBRANE] External key invalid - rejecting symbiote")
+                return None
+        
         if message.source.value not in CORE_ORGANELLES and message.target.value in CORE_ORGANELLES:
             if message.event_type not in ("query", "read"):
                 logger.warning("[MEMBRANE] BLOQUEADO: '%s' tentou modificar core '%s'",
-                              message.source.value, message.target.value)
+                                message.source.value, message.target.value)
                 return None
         handler = self._routes.get(message.target.value)
         if not handler:

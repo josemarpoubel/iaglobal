@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-24T22:53:12.981335+00:00",
+  "updated_at": "2026-06-25T01:27:24.962765+00:00",
   "learning_errors": [
     {
       "id": "20260624225312977020",
@@ -13,6 +13,24 @@
     {
       "id": "20260624225312978669",
       "time": "2026-06-24T22:53:12.978685Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260625012724957399",
+      "time": "2026-06-25T01:27:24.957426Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260625012724959520",
+      "time": "2026-06-25T01:27:24.959545Z",
       "error_type": "TimeoutError",
       "prompt": "erro de timeout no servidor",
       "response_errada": "resp",
@@ -43,6 +61,16 @@
     },
     {
       "timestamp": "2026-06-24T22:53:12.981271+00:00",
+      "component": "test_component",
+      "severity": "ERROR",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
+      "details": {
+        "detail": "info"
+      }
+    },
+    {
+      "timestamp": "2026-06-25T01:27:24.962694+00:00",
       "component": "test_component",
       "severity": "ERROR",
       "execution_id": "exec-1",

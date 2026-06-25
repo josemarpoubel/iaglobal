@@ -1,33 +1,33 @@
 [
   {
     "agent_name": "evolution_trigger",
-    "balance": 200,
-    "total_earned": 100,
+    "balance": 220,
+    "total_earned": 120,
     "total_spent": 0
   },
   {
     "agent_name": "clean_skill",
-    "balance": 60,
+    "balance": 45,
     "total_earned": 0,
-    "total_spent": 40
+    "total_spent": 55
   },
   {
     "agent_name": "spike_skill",
-    "balance": 55,
+    "balance": 40,
     "total_earned": 0,
-    "total_spent": 45
+    "total_spent": 60
   },
   {
     "agent_name": "unknown",
-    "balance": 75,
+    "balance": 50,
     "total_earned": 0,
-    "total_spent": 25
+    "total_spent": 50
   },
   {
     "agent_name": "test_agent",
-    "balance": 90,
+    "balance": 80,
     "total_earned": 0,
-    "total_spent": 10
+    "total_spent": 20
   },
   {
     "agent_name": "test",
@@ -37,32 +37,44 @@
   },
   {
     "agent_name": "evo-obsidian-test",
-    "balance": 95,
-    "total_earned": 25,
-    "total_spent": 30
+    "balance": 90,
+    "total_earned": 50,
+    "total_spent": 60
   },
   {
     "agent_name": "evo-obsidian-test-child-gen1",
-    "balance": 105,
-    "total_earned": 5,
+    "balance": 110,
+    "total_earned": 10,
     "total_spent": 0
   },
   {
     "agent_name": "evo-full-cycle",
-    "balance": 70,
+    "balance": 40,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 60
   },
   {
     "agent_name": "mutant_1",
+    "balance": 90,
+    "total_earned": 0,
+    "total_spent": 10
+  },
+  {
+    "agent_name": "mutant_2",
+    "balance": 90,
+    "total_earned": 0,
+    "total_spent": 10
+  },
+  {
+    "agent_name": "malicious_skill",
     "balance": 95,
     "total_earned": 0,
     "total_spent": 5
   },
   {
-    "agent_name": "mutant_2",
-    "balance": 95,
+    "agent_name": "random_agent",
+    "balance": 90,
     "total_earned": 0,
-    "total_spent": 5
+    "total_spent": 10
   }
 ]

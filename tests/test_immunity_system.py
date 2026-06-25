@@ -106,7 +106,7 @@ class TestImmuneOrchestrator:
         h = orchestrator.health_check()
         
         assert "active_detectors" in h
-        assert h["active_detectors"] == 5
+        assert h["active_detectors"] == 7  # Atualizado com SymbiontDetection
 
 
 class TestParasiteDetection:

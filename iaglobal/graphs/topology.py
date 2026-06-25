@@ -85,13 +85,14 @@ PHASES = {
         "evaluator",            
         "gap_analyzer",         
         "skill_generator",       
-        "sandbox_validator",    # Validação com KPIs objetivos
+        "sandbox_validator",   
         "evolution_committee",  
         "pipeline_updater",     
         "evolution_trigger",
-        "entropy_sentinel",   # Vigilância de integridade genética (FIRST!)
-        "immune_monitor",   # Monitor custo-benefício contínuo
-        "apoptosis_kill"    # Apoptose programada para parasitas
+        "entropy_sentinel",   
+        "symbiont_handshake",  # Handshake para integração de sistemas externos
+        "immune_monitor",   
+        "apoptosis_kill"    
     ]
 }
 

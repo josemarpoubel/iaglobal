@@ -2135,3 +2135,155 @@
 2026-06-24 21:46:47,885 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_1: {'behavior_anomaly': {'score': 0}}
 2026-06-24 21:46:47,913 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_2: 15.768502091747521s
 2026-06-24 21:46:47,914 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_2: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:01:15,346 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key mismatch for trusted_system
+2026-06-24 22:05:11,810 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key mismatch for trusted_system
+2026-06-24 22:05:11,916 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-06-24 22:12:15,769 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key mismatch for trusted_system
+2026-06-24 22:12:15,875 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-06-24 22:21:08,031 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
+2026-06-24 22:21:08,137 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-06-24 22:26:07,963 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules"]
+2026-06-24 22:26:08,077 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules"]
+2026-06-24 22:26:08,186 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: system']
+2026-06-24 22:26:08,295 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-06-24 22:26:08,408 [WARNING] [iaglobal] AST BLOCKED: ["Module 'shutil' is not in allowed_modules"]
+2026-06-24 22:26:08,515 [WARNING] [iaglobal] AST BLOCKED: ["Module 'ctypes' is not in allowed_modules"]
+2026-06-24 22:26:08,626 [WARNING] [iaglobal] AST BLOCKED: ["Module 'multiprocessing' is not in allowed_modules"]
+2026-06-24 22:26:08,741 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules"]
+2026-06-24 22:26:08,853 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules"]
+2026-06-24 22:26:08,968 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: eval']
+2026-06-24 22:26:09,087 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: exec']
+2026-06-24 22:26:09,200 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: compile']
+2026-06-24 22:26:09,313 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: __import__']
+2026-06-24 22:26:09,441 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: getattr']
+2026-06-24 22:26:09,575 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: setattr']
+2026-06-24 22:26:09,687 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: delattr']
+2026-06-24 22:26:09,798 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: system']
+2026-06-24 22:26:09,911 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: popen']
+2026-06-24 22:26:10,026 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: spawn']
+2026-06-24 22:26:10,143 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: execute']
+2026-06-24 22:26:10,260 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: popen']
+2026-06-24 22:26:10,378 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: spawn']
+2026-06-24 22:26:10,496 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __subclasses__']
+2026-06-24 22:26:10,613 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __globals__']
+2026-06-24 22:26:10,736 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __closure__']
+2026-06-24 22:26:10,858 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __class__']
+2026-06-24 22:26:10,972 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __reduce__']
+2026-06-24 22:26:11,085 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __dict__']
+2026-06-24 22:26:11,414 [ERROR] [iaglobal] Syntax error: invalid syntax (<unknown>, line 1)
+2026-06-24 22:26:11,633 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules", "Module 'socket' is not in allowed_modules", "Module 'shutil' is not in allowed_modules"]
+2026-06-24 22:26:11,859 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:11,862 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:11,864 [WARNING] [iaglobal] [SANDBOX] Path '/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/temp/sandbox_exec' nao permitido — criando em /tmp
+2026-06-24 22:26:12,027 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:12,028 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:12,030 [WARNING] [iaglobal] [SANDBOX] Path '/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/temp/sandbox_exec' nao permitido — criando em /tmp
+2026-06-24 22:26:12,260 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:12,261 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:12,262 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-06-24 22:26:12,262 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'socket' is not in allowed_modules"]
+2026-06-24 22:26:12,376 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:12,376 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:12,377 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: eval']
+2026-06-24 22:26:12,377 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ['Unsafe function call: eval']
+2026-06-24 22:26:12,501 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:12,502 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:12,503 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules", 'Unsafe attribute access: system']
+2026-06-24 22:26:12,503 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'os' is not in allowed_modules", 'Unsafe attribute access: system']
+2026-06-24 22:26:12,622 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:12,622 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:12,624 [WARNING] [iaglobal] [SANDBOX] Glutathione bloqueou execucao: [{'type': 'pattern_block', 'message': 'pickle.loads() detectado — risco de deserialização maliciosa'}]
+2026-06-24 22:26:12,734 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:12,734 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:12,735 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-06-24 22:26:12,735 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'socket' is not in allowed_modules"]
+2026-06-24 22:26:14,296 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:14,297 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:17,168 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em mutant_1: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'mutant_1'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'mutant_1'}]
+2026-06-24 22:26:17,169 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_1: 13.148057615612544s
+2026-06-24 22:26:17,169 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_1: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:26:17,179 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_2: 20.40499386607872s
+2026-06-24 22:26:17,180 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_2: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:26:18,987 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: promoted
+2026-06-24 22:26:18,989 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: guardrail_guardrail_test
+2026-06-24 22:26:18,991 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: routed
+2026-06-24 22:26:18,994 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: good
+2026-06-24 22:26:19,241 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-06-24 22:26:19,242 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-06-24 22:26:20,405 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em injection_test: [{'type': 'suspicious_imports', 'modules': ['os', 'subprocess'], 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.Popen\\s*\\(', 'context': 'injection_test'}, {'type': 'non_genesis_derivative', 'context': 'injection_test'}]
+2026-06-24 22:26:20,407 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
+2026-06-24 22:26:20,413 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em test: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'test'}]
+2026-06-24 22:26:20,413 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] hacker negado a core_db
+2026-06-24 22:26:20,417 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.evolution.skill_quarantine] 🚫 [QUARANTINE] Skill 'anomalous_skill' foi colocada em quarentena! Falhas: 3, Impacto Máximo: 3. Motivo: MHC anomaly score 1.00
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:26:20,418 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:26:20,419 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:26:20,422 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for spike_skill: 20.0s
+2026-06-24 22:26:20,423 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:26:20,428 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
+2026-06-24 22:26:20,429 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
+2026-06-24 22:26:20,438 [WARNING] [iaglobal.evo_agent] [evo-obsidian-test] GSH bloqueou input | threat=warning | issues=1
+2026-06-24 22:26:20,444 [WARNING] [iaglobal.evo_agent] [evo-obsidian-test] GSH bloqueou input | threat=warning | issues=1
+2026-06-24 22:26:20,740 [WARNING] [iaglobal.evo_agent] [evo-full-cycle] GSH bloqueou input | threat=warning | issues=1
+2026-06-24 22:26:20,742 [WARNING] [iaglobal.evo_agent] [evo-full-cycle] GSH bloqueou input | threat=warning | issues=1
+2026-06-24 22:26:25,122 [WARNING] [iaglobal] ⚠️ [CIRCUIT BREAKER] test_fake_provider em Cooldown por 2m (Erro 429).
+2026-06-24 22:26:28,211 [WARNING] [iaglobal.graphs.nodes.no_apoptosis_kill] [APOPTOSIS] Iniciando drain para to_kill
+2026-06-24 22:26:28,234 [WARNING] [iaglobal.graphs.nodes.no_apoptosis_kill] [APOPTOSIS] Agente to_kill eliminado com sucesso
+2026-06-24 22:27:23,440 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
+2026-06-24 22:27:23,545 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-06-24 22:27:24,943 [WARNING] [iaglobal] Executando backup de emergência antes de encerrar.
+2026-06-24 22:29:39,375 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em injection_test: [{'type': 'suspicious_imports', 'modules': ['os', 'subprocess'], 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.Popen\\s*\\(', 'context': 'injection_test'}, {'type': 'non_genesis_derivative', 'context': 'injection_test'}]
+2026-06-24 22:29:39,377 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
+2026-06-24 22:29:39,384 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em test: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'test'}]
+2026-06-24 22:29:39,385 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] hacker negado a core_db
+2026-06-24 22:29:39,389 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:29:39,389 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:29:39,389 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:29:39,389 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:29:39,389 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:29:39,389 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:29:39,390 [WARNING] [iaglobal.evolution.skill_quarantine] 🚫 [QUARANTINE] Skill 'anomalous_skill' foi colocada em quarentena! Falhas: 3, Impacto Máximo: 3. Motivo: MHC anomaly score 1.00
+2026-06-24 22:29:39,390 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:29:39,390 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:29:39,390 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:29:39,390 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:29:39,390 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:29:39,390 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:29:39,398 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for spike_skill: 20.0s
+2026-06-24 22:29:39,399 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:29:39,425 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
+2026-06-24 22:29:39,426 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
+2026-06-24 22:29:39,430 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
+2026-06-24 22:29:39,535 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-06-24 22:30:38,826 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em injection_test: [{'type': 'suspicious_imports', 'modules': ['os', 'subprocess'], 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.Popen\\s*\\(', 'context': 'injection_test'}, {'type': 'non_genesis_derivative', 'context': 'injection_test'}]
+2026-06-24 22:30:38,828 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
+2026-06-24 22:30:38,835 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em test: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'test'}]
+2026-06-24 22:30:38,835 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] hacker negado a core_db
+2026-06-24 22:30:38,839 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.evolution.skill_quarantine] 🚫 [QUARANTINE] Skill 'anomalous_skill' foi colocada em quarentena! Falhas: 3, Impacto Máximo: 3. Motivo: MHC anomaly score 1.00
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:30:38,840 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:30:38,841 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-06-24 22:30:38,841 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-06-24 22:30:38,848 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for spike_skill: 20.0s
+2026-06-24 22:30:38,848 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
+2026-06-24 22:30:38,851 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
+2026-06-24 22:30:38,852 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
+2026-06-24 22:30:38,856 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
+2026-06-24 22:30:38,963 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
