@@ -89,8 +89,10 @@ PHASES = {
         "evolution_committee",  
         "pipeline_updater",     
         "evolution_trigger",
+        "symbiont_handshake",  # Handshake para sistemas externos
         "entropy_sentinel",   
-        "symbiont_handshake",  # Handshake para integração de sistemas externos
+        "auditor_sentinel",   
+        "metabolic_pruning",  
         "immune_monitor",   
         "apoptosis_kill"    
     ]
@@ -165,11 +167,12 @@ NODE_DEPENDENCIES = {
     "evolution_committee": ["skill_generator", "sandbox_validator"],
     "pipeline_updater": ["evolution_committee"],
     "evolution_trigger": ["pipeline_updater"],
-    "evolution_knowledge": ["knowledge_analyzer"],
-    "evolution_homocysteine": ["skill_generator"],
-    "evolution_methylation": ["evolution_homocysteine"],
-    "evolution_skill_executor": ["evolution_dynamic_registry"],
-    "evolution_dynamic_registry": ["evolution_homocysteine"]
+    "symbiont_handshake": ["evolution_trigger"],
+    "entropy_sentinel": ["symbiont_handshake"],
+    "auditor_sentinel": ["entropy_sentinel"],
+    "metabolic_pruning": ["auditor_sentinel"],
+    "immune_monitor": ["metabolic_pruning"],
+    "apoptosis_kill": ["immune_monitor"]
 }
 
 def get_node_phase(node_name: str) -> str:

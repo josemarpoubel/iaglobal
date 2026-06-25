@@ -64,8 +64,9 @@ RUN_NODE_NAMES: List[str] = [
      "darwin_harness",
      "entropy_sentinel",   # Vigilância de integridade genética (FIRST!)
      "auditor_sentinel",   # Auditoria em tempo real de genesis
+     "metabolic_pruning",  # Poda de fingerprints SHA3_512
      "immune_monitor",   
-     "apoptosis_kill"    # Apoptose programada para parasitas
+     "apoptosis_kill"     # Apoptose programada para parasitas
     # Evolution Core (5)
     "evolution_knowledge", "evolution_homocysteine", "evolution_methylation",
     "evolution_skill_executor", "evolution_dynamic_registry",
