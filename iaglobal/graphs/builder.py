@@ -68,6 +68,7 @@ RUN_NODE_NAMES: List[str] = [
      "immune_exchange",   # Recepção de vacinas imunológicas
      "immune_monitor",   
      "apoptosis_kill",
+     "adaptive_router",   # Roteamento adaptativo via IVM
      "meta_director"     # Propósito macro autônomo
     "evolution_knowledge", "evolution_homocysteine", "evolution_methylation",
     "evolution_skill_executor", "evolution_dynamic_registry",

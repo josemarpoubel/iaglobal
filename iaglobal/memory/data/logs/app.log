@@ -2413,3 +2413,4 @@
 2026-06-24 22:47:55,844 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
 2026-06-24 22:47:55,846 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
 2026-06-24 22:47:55,847 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
+2026-06-24 23:56:19,234 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/projeto-iaglobal/.env
