@@ -78,10 +78,6 @@ class GracefulShutdown:
     def trigger_emergency_shutdown(self, reason: str, details: Dict[str, Any] = None) -> None:
         """
         Dispara shutdown preventivo em caso de violação grave.
-        
-        Args:
-            reason: motivo do shutdown
-            details: detalhes da violação
         """
         logger.critical(f"[SHUTDOWN] Emergency triggered: {reason}")
         
@@ -98,6 +94,9 @@ class GracefulShutdown:
         
         # Definir flag para evitar novas execuções
         self._is_shutting_down = True
+
+    def sync_cleanup(self) -> None:
+        """Cleanup síncrono no shutdown."""
         if self._is_shutting_down:
             return
 
