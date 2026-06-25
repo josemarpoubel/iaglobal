@@ -52,5 +52,17 @@
     "balance": 70,
     "total_earned": 0,
     "total_spent": 30
+  },
+  {
+    "agent_name": "mutant_1",
+    "balance": 95,
+    "total_earned": 0,
+    "total_spent": 5
+  },
+  {
+    "agent_name": "mutant_2",
+    "balance": 95,
+    "total_earned": 0,
+    "total_spent": 5
   }
 ]

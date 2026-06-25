@@ -2130,3 +2130,8 @@
 2026-06-24 21:32:19,873 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for registry: ad8e15a33da4b1a3...
 2026-06-24 21:33:57,599 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em test: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'test'}]
 2026-06-24 21:33:57,599 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] hacker negado a core_db
+2026-06-24 21:46:47,878 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em mutant_1: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'mutant_1'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'mutant_1'}]
+2026-06-24 21:46:47,879 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_1: 22.895652568900474s
+2026-06-24 21:46:47,885 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_1: {'behavior_anomaly': {'score': 0}}
+2026-06-24 21:46:47,913 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_2: 15.768502091747521s
+2026-06-24 21:46:47,914 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_2: {'behavior_anomaly': {'score': 0}}
