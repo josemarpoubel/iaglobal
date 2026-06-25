@@ -627,7 +627,7 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 
 ## Resumo Final
 
-**Total de correções implementadas:** 101/101 passos concluídos
+**Total de correções implementadas:** 102/102 passos concluídos
 
 | 79. Knowledge Writer Auto-Init | ✅ | knowledge_writer_agent.py | 584/584 |
 | 80. Bandit Policy task_type Awareness | ✅ | provider_router.py | 584/584 |
@@ -794,7 +794,8 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 - ✅ `tests/test_meta_director.py` — 3 testes (propósito macro com imunidade)
 - ✅ `tests/test_adaptive_router.py` — 4 testes (roteamento IVM)
 - ✅ `tests/test_ga_router_optimizer.py` — 6 testes (evolução genética dos pesos)
-- ✅ **Total: 708/708 testes passando**
+- ✅ `tests/test_proposal_quarantine.py` — 4 testes (quarentena de aprovação)
+- ✅ **Total: 712/712 testes passando**
 
 ### 57. HuggingFace Video Provider Integration ✅
 **Problema:** Sistema precisava de suporte para geração e análise de vídeo via HuggingFace.
@@ -1026,3 +1027,4 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 | 99. Meta Director (Purpose Intelligence) | ✅ Concluído | Pursue macro objectives with immune protection | 3/3 |
 | 100. Adaptive LLM Router (IVM) | ✅ Concluído | Roteamento baseado em índice metabólico | 4/4 |
 | 101. GA Router Optimizer | ✅ Concluído | Algoritmo genético para pesos IVM evolutivos | 6/6 |
+| 102. Proposal Quarantine | ✅ Concluído | Quarentena de propostas antes do merge automático | 4/4 |

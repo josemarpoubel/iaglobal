@@ -70,6 +70,7 @@ RUN_NODE_NAMES: List[str] = [
      "apoptosis_kill",
      "adaptive_router",   # Roteamento adaptativo via IVM
      "ga_router_evolve",  # Evolução dos pesos IVM via GA
+     "proposal_quarantine",  # Quarentena de propostas para revisão
      "meta_director"     # Propósito macro autônomo
     "evolution_knowledge", "evolution_homocysteine", "evolution_methylation",
     "evolution_skill_executor", "evolution_dynamic_registry",
