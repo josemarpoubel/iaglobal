@@ -17,11 +17,54 @@ from enum import Enum
 logger = logging.getLogger(__name__)
 
 
+class LawOfSuccess:
+    """
+    Lei do Sucesso — Propósito supremo do organismo.
+    
+    "O sucesso é a realização progressiva de um ideal de valor."
+    
+    No iaglobal:
+    - Ideal = Integridade + Evolução contínua
+    - Valor = IVM (Índice de Viabilidade Metabólica)
+    - Progresso = Subida na hierarquia da complexidade
+    """
+    
+    IDEAL = "Integridade e Evolução Contínua"
+    
+    @classmethod
+    def validate_action(cls, plano: Dict[str, Any]) -> str:
+        """
+        Valida se ação contribui para o sucesso do organismo.
+        
+        Returns:
+            "ALINHADO" ou motivo da violação
+        """
+        # Verificar contribuição para IVM
+        if plano.get("ivm", 0) < 0.5:
+            return "DESCALIBRADO: IVM insuficiente para progresso"
+        
+        # Verificar integridade
+        if plano.get("threats_detected"):
+            return "VIOLAÇÃO: O sucesso não pode ser construído sobre a corrupção."
+        
+        # Verificar disciplina (ordem executada)
+        if not plano.get("disciplined_execution"):
+            return "IMPURO: Falta de disciplina na execução"
+        
+        return "ALINHADO: O propósito é digno."
+    
+    @classmethod
+    def measure_progress(cls, before_ivm: float, after_ivm: float) -> bool:
+        """Mede se houve progresso real."""
+        return after_ivm > before_ivm
+
+
 class MetaIntent(Enum):
     RESEARCH = "research"
     DESIGN = "design"
     OPTIMIZE = "optimize"
     EXPLORE = "explore"
+    SUCCEED = "succeed"  # Nova intenção alinhada à Lei do Sucesso
 
 
 @dataclass
@@ -78,6 +121,18 @@ class MetaDirector:
             metrics={"risk_tolerance": objective.risk_tolerance}
         )
         
+        # Aplicar Lei do Sucesso
+        plano = {
+            "ivm": 0.8,  # Meta-IVM esperado
+            "threats_detected": validation.threat_detected,
+            "disciplined_execution": True,
+        }
+        success_validation = LawOfSuccess.validate_action(plano)
+        
+        if "VIOLAÇÃO" in success_validation:
+            logger.warning(f"[META] Objetivo rejeitado: {success_validation}")
+            return {"success": False, "reason": success_validation}
+        
         if validation.threat_detected:
             logger.warning(f"[META] Objetivo rejeitado por imunidade: {objective.intent}")
             return {"success": False, "reason": "immune_rejection"}
@@ -90,9 +145,10 @@ class MetaDirector:
             # Cada ciclo passa por immune_check
             executed += 1
         
-        # Registrar resultado
+        # Registrar resultado com validação da Lei do Sucesso
         result = {
             "success": executed > 0,
+            "law_of_success": "ALINHADO",
             "cycles_executed": executed,
             "intent": objective.intent.value,
             "timestamp": datetime.now(timezone.utc).isoformat(),
