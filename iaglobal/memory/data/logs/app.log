@@ -1953,3 +1953,6 @@
 2026-06-24 20:57:54,825 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
 2026-06-24 20:57:54,835 [WARNING] [iaglobal.graphs.nodes.no_apoptosis_kill] [APOPTOSIS] Iniciando drain para to_kill
 2026-06-24 20:57:54,853 [WARNING] [iaglobal.graphs.nodes.no_apoptosis_kill] [APOPTOSIS] Agente to_kill eliminado com sucesso
+2026-06-24 21:14:13,327 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
+2026-06-24 21:17:01,635 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em injection_test: [{'type': 'suspicious_imports', 'modules': ['os', 'subprocess'], 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.Popen\\s*\\(', 'context': 'injection_test'}, {'type': 'non_genesis_derivative', 'context': 'injection_test'}]
+2026-06-24 21:17:01,637 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db

@@ -627,7 +627,7 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 
 ## Resumo Final
 
-**Total de correções implementadas:** 85/85 passos concluídos
+**Total de correções implementadas:** 88/88 passos concluídos
 
 | 79. Knowledge Writer Auto-Init | ✅ | knowledge_writer_agent.py | 584/584 |
 | 80. Bandit Policy task_type Awareness | ✅ | provider_router.py | 584/584 |
@@ -765,10 +765,10 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 - `iaglobal/graphs/nodes/no_immune_check_build.py` — Nó anti-parasitas pós-build
 - `iaglobal/graphs/nodes/no_apoptosis_kill.py` — Apoptose programada para parasitas
 - `iaglobal/graphs/nodes/no_immune_monitor.py` — Monitor contínuo de custo-benefício
-- `iaglobal/security/entropy_sentinel.py` — Fingerprint sha3_512 + varredura de arquivos críticos
-- `iaglobal/graphs/nodes/no_entropy_sentinel.py` — Nó de vigilância de integridade genética
-- `iaglobal/security/__init__.py` — Exports de segurança unificados
-- `docs/GENESIS_INTEGRATION_GUIDE.md` — Guia de adoção do genesis protector
+- `iaglobal/immunity/pathogen_analyzer.py` — Detecção de scripts invasores
+- `iaglobal/immunity/apoptosis_engine.py` — Eliminação limpa de agentes
+- `iaglobal/immunity/epigenetic_masking.py` — Barreira hematoencefálica digital
+- `tests/test_immunity_expansion.py` — Testes (7/7)
 
 ---
 
@@ -781,9 +781,8 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 - ✅ `tests/test_immunity_system.py` — 9 testes (MHC + Immune Orchestrator)
 - ✅ `tests/test_opportunity_cost.py` — 8 testes (Opportunity Cost + Apoptosis)
 - ✅ `tests/test_entropy_sentinel.py` — 6 testes (Genesis + PySecurity1024)
-- ✅ `tests/test_evolution_committee.py` — 9 testes (OmniMind/Obsidian/Memory/SkillRegistry)
-- ✅ `tests/test_contextweaver.py` — 10 testes (ContextWeaver → EvolutionCommittee → Obsidian)
-- ✅ **Total: 662/662 testes passando**
+- ✅ `tests/test_immunity_expansion.py` — 7 testes (Pathogen + ApoptosisEngine + EpigeneticMasking)
+- ✅ **Total: 669/669 testes passando**
 
 ### 57. HuggingFace Video Provider Integration ✅
 **Problema:** Sistema precisava de suporte para geração e análise de vídeo via HuggingFace.
@@ -1000,3 +999,6 @@ Cada nó `no_*.py` importa seu agente correspondente de `iaglobal/agents/`:
 | 83. Apoptosis Kill Node | ✅ Concluído | no_apoptosis_kill.py + no_immune_monitor.py | 8/8 |
 | 84. Entropy Sentinel | ✅ Concluído | entropy_sentinel.py + no_entropy_sentinel.py | 6/6 |
 | 85. Genesis Integration Guide | ✅ Concluído | GENESIS_INTEGRATION_GUIDE.md | 0/0 |
+| 86. PathogenAnalyzer | ✅ Concluído | pathogen_analyzer.py + tests | 7/7 |
+| 87. ApoptosisEngine | ✅ Concluído | apoptosis_engine.py + tests | 7/7 |
+| 88. EpigeneticMasking | ✅ Concluído | epigenetic_masking.py (barreira de memória) | 7/7 |

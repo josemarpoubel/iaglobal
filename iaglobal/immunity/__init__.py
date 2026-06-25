@@ -6,6 +6,9 @@ from iaglobal.immunity.glutathione_pool import GlutathionePool, ImmuneResponse
 from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails, COST_VALIDATION_BASIC, COST_VALIDATION_DEEP, COST_AUTO_CORRECTION
 from iaglobal.immunity.mhc_detector import MHCDetector, SkillMHCProfile, mhc_detector
 from iaglobal.immunity.immune_orchestrator import ImmuneOrchestrator, ImmuneReport, immune_orchestrator
+from iaglobal.immunity.pathogen_analyzer import PathogenAnalyzer, pathogen_analyzer
+from iaglobal.immunity.apoptosis_engine import ApoptosisEngine, apoptosis_engine
+from iaglobal.immunity.epigenetic_masking import EpigeneticMasking, EpigeneticMask, epigenetic_masking
 
 __all__ = [
     "LoopDetector",
@@ -24,4 +27,11 @@ __all__ = [
     "ImmuneOrchestrator",
     "ImmuneReport",
     "immune_orchestrator",
+    "PathogenAnalyzer",
+    "pathogen_analyzer",
+    "ApoptosisEngine",
+    "apoptosis_engine",
+    "EpigeneticMasking",
+    "EpigeneticMask",
+    "epigenetic_masking",
 ]
