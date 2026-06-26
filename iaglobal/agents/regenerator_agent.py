@@ -13,6 +13,7 @@ e usa as Leis Universais de Holliwell como guia para regeneração ética.
 """
 
 import logging
+import inspect
 from typing import Dict, Any, List, Optional
 from dataclasses import dataclass
 
@@ -20,8 +21,13 @@ from iaglobal.core.law_engine import law_compliance_engine, LawComplianceEngine
 from iaglobal.immunity.apoptosis_engine import apoptosis_engine
 from iaglobal.evolution.skills.dynamic_registry import dynamic_registry
 from iaglobal.utils.logger import logger
+from iaglobal.core.genesis_gatekeeper import get_gatekeeper
 
 logger = logging.getLogger(__name__)
+
+# DNA do agente para verificação de linhagem
+_AGENT_DNA_VERSION = "1.0.0"
+_AGENT_TYPE = "agent:regenerator"
 
 
 @dataclass
@@ -64,6 +70,37 @@ class RegeneratorAgent:
             "law_violation": "ethical_realignment",
             "apoptosis_pending": "controlled_replacement",
         }
+        
+        # Verificação de linhagem genética no Genesis
+        self._verify_lineage()
+    
+    def _verify_lineage(self):
+        """Verifica o DNA deste agente no Genesis Gatekeeper."""
+        try:
+            source = inspect.getsource(self.__class__)
+            gatekeeper = get_gatekeeper()
+            component_id = f"agents.regenerator_agent.RegeneratorAgent"
+            
+            try:
+                gatekeeper.verify_dna(
+                    component_id=component_id,
+                    source_code=source,
+                    component_type=_AGENT_TYPE,
+                    version=_AGENT_DNA_VERSION
+                )
+                logger.info(f"✓ RegeneratorAgent lineage verified (DNA: {gatekeeper.generate_dna(source, _AGENT_TYPE, _AGENT_DNA_VERSION)[:16]}...)")
+            except ValueError:
+                dna = gatekeeper.register_component(
+                    component_id=component_id,
+                    source_code=source,
+                    component_type=_AGENT_TYPE,
+                    version=_AGENT_DNA_VERSION,
+                    metadata={"purpose": "auto-regeneration", "laws_guided": True}
+                )
+                logger.info(f"✓ RegeneratorAgent registered in Genesis (DNA: {dna[:16]}...)")
+                
+        except Exception as e:
+            logger.warning(f"⚠ Lineage verification skipped during initialization: {e}")
 
     def assess_damage(
         self,
@@ -384,5 +421,17 @@ class RegeneratorAgent:
         return self._regeneration_history[-limit:]
 
 
-# Singleton global
-regenerator_agent = RegeneratorAgent()
+# Singleton global (lazy initialization para evitar circular imports)
+_regenerator_agent_instance = None
+
+def get_regenerator_agent():
+    """Lazy initializer para evitar circular imports."""
+    global _regenerator_agent_instance
+    if _regenerator_agent_instance is None:
+        # Import local para evitar circular dependency
+        from iaglobal.agents.regenerator_agent import RegeneratorAgent
+        _regenerator_agent_instance = RegeneratorAgent()
+    return _regenerator_agent_instance
+
+# Não instanciar aqui - usar get_regenerator_agent() quando necessário
+__all__ = ['RegeneratorAgent', 'get_regenerator_agent']

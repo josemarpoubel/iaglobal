@@ -1,25 +1,11 @@
-```gitignore
-# Byte-compiled / optimized / DLL files
+```
+# Compiled Python files
+*.pyc
 __pycache__/
-*.py[cod]
-*$py.class
-
-# Distribution / packaging
-.iaglobal.egg-info/
-*.egg-info/
-
-# Environment
-.env
 
 # Logs
 *.log
 
-# Database files
-*.db
-
-# JSON error files
-iaglobal/memory/data/error/*.json
-
-# Markdown error reports
-iaglobal/memory/data/error/*.md
+# Distribution files
+*.egg-info/
 ```

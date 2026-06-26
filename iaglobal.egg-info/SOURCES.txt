@@ -6,6 +6,8 @@ iaglobal/__main__.py
 iaglobal/_paths.py
 iaglobal/asgi.py
 iaglobal/auditoria_arquitetural.py
+iaglobal/demo_genesis_gatekeeper.py
+iaglobal/demo_integracao_completa.py
 iaglobal/settings.py
 iaglobal/urls.py
 iaglobal.egg-info/PKG-INFO
@@ -24,6 +26,7 @@ iaglobal/agents/evolution_agent.py
 iaglobal/agents/failure_analysis_agent.py
 iaglobal/agents/intent_classifier_agent.py
 iaglobal/agents/knowledge_writer_agent.py
+iaglobal/agents/law_guardian_agent.py
 iaglobal/agents/multi_agent.py
 iaglobal/agents/multi_coder_agent.py
 iaglobal/agents/orchestrator_agent.py
@@ -33,6 +36,7 @@ iaglobal/agents/planner_agent.py
 iaglobal/agents/pm_agent.py
 iaglobal/agents/prompt_improver.py
 iaglobal/agents/reflexion_agent.py
+iaglobal/agents/regenerator_agent.py
 iaglobal/agents/requirements_agent.py
 iaglobal/agents/result_agent.py
 iaglobal/agents/search_agent.py
@@ -73,8 +77,10 @@ iaglobal/core/decision_engine.py
 iaglobal/core/diagnostico.py
 iaglobal/core/env_loader.py
 iaglobal/core/evolution_controller.py
+iaglobal/core/genesis_gatekeeper.py
 iaglobal/core/governance.py
 iaglobal/core/graceful_shutdown.py
+iaglobal/core/law_engine.py
 iaglobal/core/neuro_orchestrator.py
 iaglobal/core/orchestrator.py
 iaglobal/core/retry_handler.py
@@ -149,10 +155,12 @@ iaglobal/feedback/user_feedback.py
 iaglobal/genesis/__init__.py
 iaglobal/genesis/certify_block.py
 iaglobal/genesis/check_cbor.py
+iaglobal/genesis/genesis_gatekeeper.py
 iaglobal/genesis/genesis_verifier.py
 iaglobal/genesis/identity.py
 iaglobal/genesis/verifygenesis.py
 iaglobal/genesis/data/test_genesis_integrity.py
+iaglobal/genesis/scripts/batch_certify_agents.py
 iaglobal/graphs/__init__.py
 iaglobal/graphs/artifact.py
 iaglobal/graphs/bandit.py
@@ -346,6 +354,7 @@ iaglobal/observability/metrics_collector.py
 iaglobal/observability/tracing.py
 iaglobal/obsidian/__init__.py
 iaglobal/obsidian/consolidation.py
+iaglobal/obsidian/demo_leis_universais.py
 iaglobal/obsidian/error_capture.py
 iaglobal/obsidian/law_compliance_logger.py
 iaglobal/obsidian/learning_system.py
@@ -392,6 +401,7 @@ iaglobal/reflection/failure_analysis.py
 iaglobal/reflection/learning_loop.py
 iaglobal/reflection/reflexion_engine.py
 iaglobal/reflection/self_critique.py
+iaglobal/scripts/test_law_engine.py
 iaglobal/security/__init__.py
 iaglobal/security/ast_gateway.py
 iaglobal/security/entropy_sentinel.py
@@ -408,6 +418,7 @@ iaglobal/storage/batch_writer.py
 iaglobal/storage/converter.py
 iaglobal/storage/daemon_monitor.py
 iaglobal/storage/snapshotter.py
+iaglobal/tests/test_law_integration.py
 iaglobal/tools/__init__.py
 iaglobal/tools/search.py
 iaglobal/tools/search_tools.py

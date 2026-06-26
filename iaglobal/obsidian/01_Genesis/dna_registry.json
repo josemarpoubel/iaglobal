@@ -1,0 +1,34 @@
+{
+  "components": {
+    "agents.regenerator_agent.RegeneratorAgent": {
+      "dna": "35a51aa0f177d9b043ac46b4994834bc44704c6a89f4942f1d76fe8a0de8fa065bd4f944f97602b6829541671e3d6f1d030f17d36ca966ace2c901366739064d",
+      "type": "agent:regenerator",
+      "version": "1.0.0",
+      "registered_at": "2026-06-26T17:22:20.107150",
+      "metadata": {
+        "purpose": "auto-regeneration",
+        "laws_guided": true
+      }
+    },
+    "agents.coder_agent.CoderAgent": {
+      "dna": "9a3df2ae226a28970109245f02d3bc137bbe52a0aefdfb89475bdb7124daa7118dc9ad78649cb4c07970cbebbeb1feb843baf55f21507946e3c555ac3b83df1d",
+      "type": "agent:coder",
+      "version": "1.0.0",
+      "registered_at": "2026-06-26T17:22:20.141489",
+      "metadata": {
+        "temperatura": 0.5,
+        "estilo": "direto"
+      }
+    },
+    "test.mutation_detector": {
+      "dna": "6aee5cd69649afbf8daf58f14e3b3387a7ad7d30aa7d08fd9020bc0e7687d4c2e82549074afc79ae19f356380732f75ebbed806c24d306787a04caa95c09eb00",
+      "type": "test",
+      "version": "1.0.0",
+      "registered_at": "2026-06-26T17:23:31.945628",
+      "metadata": {}
+    }
+  },
+  "metadata": {
+    "created": "2026-06-26 17:22:20.106633"
+  }
+}

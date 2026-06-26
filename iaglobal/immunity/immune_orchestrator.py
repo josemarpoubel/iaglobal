@@ -27,7 +27,11 @@ from iaglobal.immunity.adaptive_threat_detector import AdaptiveThreatDetector
 from iaglobal.evolution.skill_quarantine import quarantine
 from iaglobal.graphs.communication.membrane_key import MembraneKey
 from iaglobal.core.law_engine import LawComplianceEngine, law_compliance_engine
-from iaglobal.agents.regenerator_agent import RegeneratorAgent, regenerator_agent
+
+# Importação lazy para evitar circular dependency
+def _get_regenerator_agent():
+    from iaglobal.agents.regenerator_agent import get_regenerator_agent
+    return get_regenerator_agent()
 
 logger = logging.getLogger(__name__)
 
@@ -72,7 +76,7 @@ class ImmuneOrchestrator:
         self._guardrails = GlutathioneGuardrails()
         self._symbiont_detector = opportunity_cost_detector  # Reutiliza para detecção de simbiontes
         self._law_engine = law_compliance_engine  # Nova camada: Conformidade com Leis Universais
-        self._regenerator = regenerator_agent  # Agente de auto-regeneração
+        self._regenerator = _get_regenerator_agent()  # Agente de auto-regeneração (lazy import)
 
     def scan_execution(
         self,

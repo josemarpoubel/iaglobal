@@ -1,0 +1,17 @@
+{
+  "components": {
+    "agents.regenerator_agent.RegeneratorAgent": {
+      "dna": "35a51aa0f177d9b043ac46b4994834bc44704c6a89f4942f1d76fe8a0de8fa065bd4f944f97602b6829541671e3d6f1d030f17d36ca966ace2c901366739064d",
+      "type": "agent:regenerator",
+      "version": "1.0.0",
+      "registered_at": "2026-06-26T17:36:06.764809",
+      "metadata": {
+        "purpose": "auto-regeneration",
+        "laws_guided": true
+      }
+    }
+  },
+  "metadata": {
+    "created": "2026-06-26 17:36:06.764216"
+  }
+}

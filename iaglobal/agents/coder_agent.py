@@ -18,8 +18,13 @@ from iaglobal._paths import _detect_extension
 from iaglobal.storage.batch_writer import batch_writer, Event
 from iaglobal.utils.logger import get_logger
 from iaglobal.utils.helpers import run_async_safe
+from iaglobal.core.genesis_gatekeeper import get_gatekeeper
 
 logger = get_logger("iaglobal.agents.coder_agent")
+
+# DNA do agente para verificação de linhagem
+_AGENT_DNA_VERSION = "1.0.0"
+_AGENT_TYPE = "agent:coder"
 
 VALID_EXTENSIONS = {".py", ".js", ".html", ".css", ".yaml", ".json", ".xml", ".md", ".php", ".tsx", ".ts", ".sql"}
 _CACHE: Dict[str, Dict] = {}
@@ -48,6 +53,42 @@ class CoderAgent:
         self.bandit = _get_bandit()
         self.credit = CreditAssignmentEngine()
         self._quality_scores: Dict[str, List[float]] = {}
+        
+        # Verificação de linhagem genética no Genesis
+        self._verify_lineage()
+    
+    def _verify_lineage(self):
+        """Verifica o DNA deste agente no Genesis Gatekeeper."""
+        try:
+            # Lê o próprio código fonte para gerar/verificar DNA
+            import inspect
+            source = inspect.getsource(self.__class__)
+            
+            gatekeeper = get_gatekeeper()
+            component_id = f"agents.coder_agent.CoderAgent"
+            
+            # Tenta verificar; se não existir, registra automaticamente
+            try:
+                gatekeeper.verify_dna(
+                    component_id=component_id,
+                    source_code=source,
+                    component_type=_AGENT_TYPE,
+                    version=_AGENT_DNA_VERSION
+                )
+                logger.info(f"✓ CoderAgent lineage verified (DNA: {gatekeeper.generate_dna(source, _AGENT_TYPE, _AGENT_DNA_VERSION)[:16]}...)")
+            except ValueError:
+                # Não registrado ainda - registra agora
+                dna = gatekeeper.register_component(
+                    component_id=component_id,
+                    source_code=source,
+                    component_type=_AGENT_TYPE,
+                    version=_AGENT_DNA_VERSION,
+                    metadata={"temperatura": self.temperatura, "estilo": self.estilo}
+                )
+                logger.info(f"✓ CoderAgent registered in Genesis (DNA: {dna[:16]}...)")
+                
+        except Exception as e:
+            logger.warning(f"⚠ Lineage verification skipped during initialization: {e}")
 
     def _cache_key(self, task: str, contexto: str = "") -> str:
         raw = f"{task}|{contexto}|{self.estilo}"

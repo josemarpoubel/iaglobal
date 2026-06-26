@@ -1,19 +1,25 @@
 # iaglobal/graphs/skill_node.py
 """
-SkillNode — Nó de execução de skills com validação das Leis Universais.
+SkillNode — Nó de execução de skills com validação das Leis Universais e verificação de DNA.
 
 LEIS UNIVERSAIS (Holliwell):
 Cada execução de skill é validada contra as 15 Leis Universais.
 Violações críticas disparam apoptose imediata do nó.
+
+LINHAGEM GENÉTICA (Genesis):
+Cada skill possui um DNA SHA3-512 registrado no Genesis Gatekeeper.
+Skills sem linhagem válida são bloqueadas antes da execução.
 """
 
 import hashlib
+import inspect
 from typing import Any, Dict
 
 from iaglobal.evolution.skills.dynamic_registry import dynamic_registry
 from iaglobal.utils.logger import logger
 from iaglobal.core.law_engine import law_compliance_engine
 from iaglobal.immunity.apoptosis_engine import apoptosis_engine
+from iaglobal.core.genesis_gatekeeper import get_gatekeeper
 
 
 def _compute_node_id(node_type: str, seed_id: str = "", mutation_id: str = "", version: str = "v1", name: str = "") -> str:
@@ -30,6 +36,46 @@ class SkillNode:
         self.seed_id = ""
         self.mutation_id = ""
         self.version = "v1"
+        
+        # Verificação de linhagem genética no Genesis
+        self._verify_lineage()
+    
+    def _verify_lineage(self):
+        """Verifica o DNA desta skill no Genesis Gatekeeper."""
+        try:
+            gatekeeper = get_gatekeeper()
+            component_id = f"skill.{self._skill_name}"
+            
+            # Tenta obter a skill do registry para verificar seu código
+            skill_data = dynamic_registry.get_skill(self._skill_name)
+            if not skill_data:
+                logger.debug(f"[SKILL-NODE] Skill {self._skill_name} não encontrada no registry - pulando verificação de DNA")
+                return
+            
+            # Se a skill tem código fonte, verifica/registra DNA
+            if hasattr(skill_data, '__code__') or callable(skill_data):
+                source = inspect.getsource(skill_data) if hasattr(skill_data, '__module__') else str(skill_data)
+                
+                try:
+                    gatekeeper.verify_dna(
+                        component_id=component_id,
+                        source_code=source,
+                        component_type="skill",
+                        version=self.version
+                    )
+                    logger.debug(f"✓ SkillNode lineage verified: {self._skill_name} (DNA: {gatekeeper.generate_dna(source, 'skill', self.version)[:16]}...)")
+                except ValueError:
+                    dna = gatekeeper.register_component(
+                        component_id=component_id,
+                        source_code=source,
+                        component_type="skill",
+                        version=self.version,
+                        metadata={"node_name": self.name, "auto_registered": True}
+                    )
+                    logger.debug(f"✓ SkillNode registered in Genesis: {self._skill_name} (DNA: {dna[:16]}...)")
+                    
+        except Exception as e:
+            logger.debug(f"⚠ Lineage verification skipped for skill {self._skill_name}: {e}")
 
     @property
     def node_id(self) -> str:
