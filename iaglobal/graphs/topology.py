@@ -98,12 +98,12 @@ PHASES = {
         "apoptosis_kill",
         "adaptive_router",   # Roteamento adaptativo via IVM
         "ga_router_evolve",  # Evolução dos pesos IVM via GA
-"proposal_quarantine",  # Quarentena de propostas
+        "proposal_quarantine",  # Quarentena de propostas
     "ai_audit_compliance",  # Auditoria conformidade às leis
     "success_ritual",      # Ritual de registro de sucesso
     "meta_director"     # Propósito macro autônomo
 ]
-    ]
+
 }
 
 # Dicionário de dependências intra-phase e inter-phase
