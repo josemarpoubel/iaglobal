@@ -1,6 +1,10 @@
 # iaglobal/evolution/metacognition/evolution_committee.py
 """Evolution Committee — avalia skills e toma decisões evolutivas.
 Integração tripla: Obsidian(Vault) + Memory(STM/LTM) + SkillRegistry.
+
+LEIS UNIVERSAIS (Holliwell):
+Todas as decisões evolutivas devem respeitar as 15 Leis Universais.
+Violações críticas bloqueiam a evolução automaticamente.
 """
 import logging
 import asyncio
@@ -9,6 +13,7 @@ from typing import Any, Dict, List
 from iaglobal.evolution.skills.skill_registry import skill_registry
 from iaglobal.obsidian.omnimind import omni_mind
 from iaglobal.memory.async_memory import add_ltm, add_stm, add_memory_vector
+from iaglobal.core.law_engine import law_compliance_engine
 
 logger = logging.getLogger(__name__)
 
@@ -36,6 +41,7 @@ class EvolutionCommittee:
         
         evaluations = []
         all_approved = True
+        law_violations_found = []
         
         # Contexto para decisão
         task_context = str(ctx.get("input", {}).get("task", ""))[:100]
@@ -44,6 +50,33 @@ class EvolutionCommittee:
             skill_name = r.get("skill_name", "")
             severity = r.get("severity", "low")
             skill = skill_registry.get(skill_name)
+            
+            # --- NOVO: Verificação de Leis Universais antes de tudo ---
+            law_check = law_compliance_engine.evaluate_action({
+                "action": f"evolution_{skill_name}",
+                "context": {"task": task_context, "severity": severity},
+                "output": str(r),
+                "metrics": {"gain": r.get("gain", 0), "risk": r.get("risk", 0)}
+            })
+            
+            if not law_check.get("compliant", True):
+                violations = law_check.get("violations", [])
+                law_violations_found.extend(violations)
+                logger.warning(f"[EVOLUTION_COMMITTEE] Violação das Leis Universais em {skill_name}: {violations}")
+                # Violações críticas bloqueiam automaticamente
+                if law_check.get("severity", 0) >= 5:
+                    evaluations.append({
+                        "skill_name": skill_name,
+                        "approved": False,
+                        "gain": {"score": 0, "rationale": "Bloqueado por violação crítica das Leis Universais"},
+                        "risk": {"score": 10, "rationale": "Risco máximo: violação de leis universais"},
+                        "compatibility": {"compatible": False, "conflict": True, "rationale": "Incompatível com Leis Universais"},
+                        "cost": {"score": 10, "rationale": "Custo ético infinito"},
+                        "law_violations": violations,
+                        "blocked_by_law": True
+                    })
+                    all_approved = False
+                    continue
             
             gain = cls._assess_gain(skill_name, severity, skill)
             risk = cls._assess_risk(skill_name, severity, skill)
@@ -54,22 +87,33 @@ class EvolutionCommittee:
             if not approved:
                 all_approved = False
             
-            evaluations.append({
+            eval_entry = {
                 "skill_name": skill_name,
                 "approved": approved,
                 "gain": gain,
                 "risk": risk,
                 "compatibility": compat,
                 "cost": cost,
-            })
+            }
+            
+            if not law_check.get("compliant", True):
+                eval_entry["law_violations"] = violations
+                eval_entry["law_compliance_score"] = law_check.get("compliance_score", 0)
+            
+            evaluations.append(eval_entry)
         
         decision_text = f"Aprovado: {sum(1 for e in evaluations if e['approved'])}/{len(evaluations)}"
+        
+        # Adicionar informação sobre leis universais ao decision_text
+        if law_violations_found:
+            decision_text += f" | Violações: {len(law_violations_found)}"
+            logger.warning(f"[EVOLUTION_COMMITTEE] {len(law_violations_found)} violações das Leis Universais detectadas")
         
         # --- INTEGRAÇÃO 1: OmniMind (consciência) ---
         await cls._register_to_omnimind(evaluations, task_context, decision_text)
         
         # --- INTEGRAÇÃO 2: MemoryVector (LTM+STM) ---
-        await cls._persist_to_memory(evaluations, task_context)
+        await cls._persist_to_memory(evaluations, task_context, law_violations_found)
         
         # --- INTEGRAÇÃO 3: SkillRegistry (ação evolutiva) ---
         await cls._apply_evolution_decision(evaluations)
@@ -82,6 +126,8 @@ class EvolutionCommittee:
             "rejected_count": sum(1 for e in evaluations if not e["approved"]),
             "status": "approved" if all_approved else "rejected",
             "omnimind_guidance": decision_text,
+            "law_violations": law_violations_found if law_violations_found else None,
+            "law_compliance_score": sum(e.get("law_compliance_score", 1.0) for e in evaluations) / max(len(evaluations), 1),
         }
     
     @classmethod
@@ -118,14 +164,16 @@ class EvolutionCommittee:
             logger.warning("[EVOLUTION_COMMITTEE] OmniMind erro: %s", e)
     
     @classmethod
-    async def _persist_to_memory(cls, evaluations: List, task_context: str) -> None:
+    async def _persist_to_memory(cls, evaluations: List, task_context: str, law_violations: List = None) -> None:
         """Persiste decisões no MemoryVector (LTM+STM)."""
         try:
             eval_text = f"EVAL: {task_context} -> {evaluations}"
+            if law_violations:
+                eval_text += f" | LAW_VIOLATIONS: {law_violations}"
             await add_memory_vector(eval_text, "evolution")
-            await add_ltm("evolution_committee", {"evaluations": evaluations, "task_snippet": task_context})
+            await add_ltm("evolution_committee", {"evaluations": evaluations, "task_snippet": task_context, "law_violations": law_violations})
             for e in evaluations:
-                await add_stm(f"skill_eval:{e['skill_name']}", {"approved": e["approved"]})
+                await add_stm(f"skill_eval:{e['skill_name']}", {"approved": e["approved"], "law_compliant": not e.get("blocked_by_law", False)})
         except Exception as e:
             logger.warning("[EVOLUTION_COMMITTEE] Memory erro: %s", e)
     

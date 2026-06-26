@@ -1,39 +1,25 @@
-# Ambientes virtuais e caches
-venv/
+```gitignore
+# Byte-compiled / optimized / DLL files
 __pycache__/
-*.pyc
-.pytest_cache/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.iaglobal.egg-info/
 *.egg-info/
 
-# Dados binários e temporários
-*.db
-*.cbor
-sugestao_teste.json
-
-# Memória e dados gerados
-
-# Arquivos de ambiente e segredos
+# Environment
 .env
-backup.env
 
-# Build e distribuição
-dist/
-build/
+# Logs
+*.log
 
-# IDE
-.vscode/
-.idea/
-.pytest_cache
+# Database files
+*.db
 
-# Ferramentas de Linting e Formatação
-.mypy_cache/
-.ruff_cache/
-.black
+# JSON error files
+iaglobal/memory/data/error/*.json
 
-# Jupyter Notebooks (arquivos temporários)
-.ipynb_checkpoints/
-
-# Sistema Operacional
-.DS_Store
-Thumbs.db
-
+# Markdown error reports
+iaglobal/memory/data/error/*.md
+```

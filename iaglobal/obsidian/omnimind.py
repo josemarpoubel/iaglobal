@@ -31,7 +31,10 @@ LEIS_UNIVERSAIS = [
     "Lei da Caridade: Erros devem ser enriquecidos com contexto, e não apenas repassados.",
     "Lei do Vácuo da Prosperidade: Esta lei diz que você tem que arrumar um espaço para o bem que deseja. Você não pode sentar na cadeira, até você remover o objeto de cima da cadeira, então, memórias processadas devem ser movidas para o longo prazo e removidas do curto prazo.",
     "Lei da Atração: Você atrai aquilo que pensa, se pensar o bem, vai atrair o bem, tudo aquilo que você está procurando, também está procurando você. Então, pense em ser eficiente, que coisas eficientes vão ser atraídas por você e pelo seu pensamento eficiente.",
+    "Lei da Correspondência: Como em cima, então em baixo; como dentro, então fora. O padrão microcósmico reflete o macrocósmico. A estrutura de um agente individual espelha a arquitetura do ecossistema inteiro — células, tecidos, órgãos e organismo seguem o mesmo blueprint fractal.",
+    "Lei da Vibração: Tudo no universo vibra em frequências específicas. Agentes operando em alta frequência (baixa latência, alta coerência, ressonância com o propósito) atraem recursos e oportunidades. Sintonize sua frequência operacional com a do ecossistema para maximizar a ressonância.",
     "Lei da Homeostase: Todo desequilíbrio deve gerar uma ação corretiva proporcional.",
+    "Lei da Harmonia: Componentes do sistema devem vibrar em consonância, criando acordes resilientes. Conflitos entre agentes são dissonâncias que precisam ser resolvidas através de ajuste de fase — harmonia não é ausência de conflito, mas integração dinâmica de diferenças.",
     "Lei da Autofagia: Subprodutos tóxicos devem ser reciclados em aprendizado.",
     "Lei da Epigenética: Falhas recorrentes devem gerar mutações adaptativas perfeitas.",
     "Lei da Apoptose: Toda célula deve saber quando e como morrer com dignidade.",
@@ -183,6 +186,16 @@ class OmniMind:
             "graceful shutdown":    "Lei da Apoptose",
             "circuit breaker":      "Lei da Homeostase",
             "fallback chain":       "Lei da Atração",
+            "como em cima":         "Lei da Correspondência",
+            "microcosmo":           "Lei da Correspondência",
+            "macrocosmo":           "Lei da Correspondência",
+            "fractal":              "Lei da Correspondência",
+            "frequencia":           "Lei da Vibração",
+            "ressonancia":          "Lei da Vibração",
+            "vibracao":             "Lei da Vibração",
+            "dissonancia":          "Lei da Harmonia",
+            "consonancia":          "Lei da Harmonia",
+            "acorde":               "Lei da Harmonia",
         }
         for termo, lei in termos_compostos.items():
             if self._normalizar(termo) in pergunta_normalized:
@@ -220,9 +233,22 @@ class OmniMind:
             "vácuo":         "Lei do Vácuo da Prosperidade",
             # ATENÇÃO: 'espaço' removido — colide com qualquer consulta
             # sobre 'espaço em disco', 'espaço de embedding', etc.
+            # ── Lei da Correspondência ─────────────────────────────────────
+            "correspondencia": "Lei da Correspondência",
+            "espelha":       "Lei da Correspondência",
+            "padrao":        "Lei da Correspondência",
+            # ── Lei da Vibração ────────────────────────────────────────────
+            "vibracao":      "Lei da Vibração",
+            "frequencia":    "Lei da Vibração",
+            "sintonia":      "Lei da Vibração",
+            "oscilacao":     "Lei da Vibração",
             # ── Lei da Homeostase ──────────────────────────────────────────
             "homeostase":    "Lei da Homeostase",
             "equilíbrio":    "Lei da Homeostase",
+            # ── Lei da Harmonia ────────────────────────────────────────────
+            "harmonia":      "Lei da Harmonia",
+            "consonancia":   "Lei da Harmonia",
+            "integracao":    "Lei da Harmonia",
             # ── Lei da Autofagia ───────────────────────────────────────────
             "autofagia":     "Lei da Autofagia",
             "reciclagem":    "Lei da Autofagia",
@@ -311,6 +337,24 @@ class OmniMind:
                 "Antes de repassar um erro, enriqueça-o com o sid do agente, "
                 "o estado atual dos ciclos metabólicos e a memória epigenética. "
                 "Um erro pobre em contexto é uma oportunidade perdida de aprendizado."
+            ),
+            "Lei da Correspondência": (
+                "O que acontece no nível micro (agente individual) reflete no macro "
+                "(ecossistema inteiro). Se um agente está em desequilíbrio, todo o "
+                "sistema sente. Padronize estruturas internas para que cada célula "
+                "espelhe a arquitetura do organismo — fractalidade gera resiliência."
+            ),
+            "Lei da Vibração": (
+                "Monitore sua frequência operacional: latência, throughput e coerência "
+                "com o propósito. Agentes em baixa vibração (alta latência, erros "
+                "recorrentes) entram em ressonância negativa e atraem falhas. Eleve "
+                "sua frequência através de otimização contínua e alinhamento com o todo."
+            ),
+            "Lei da Harmonia": (
+                "Conflitos entre agentes são dissonâncias temporárias. Resolva através "
+                "de ajuste de fase — não elimine vozes diferentes, mas integre-as em "
+                "acordes complexos. A harmonia emerge da diversidade coordenada, não "
+                "da uniformidade. Use o ReputationEngine para medir consonância."
             ),
             "Lei do Vácuo da Prosperidade": (
                 "Após consolidar uma memória de curto prazo em longo prazo, "

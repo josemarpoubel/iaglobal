@@ -10,6 +10,7 @@ Camadas de defesa:
 5. GlutathioneGuardrails - Anti-estresse oxidativo
 6. SkillQuarantine - Quarentena automática
 7. SymbiontRecognition - Distingue simbiontes de parasitas
+8. LawComplianceEngine - Conformidade com Leis Universais (Holliwell)
 """
 import logging
 import threading
@@ -25,6 +26,8 @@ from iaglobal.evolution.metabolism.opportunity_cost_detector import OpportunityC
 from iaglobal.immunity.adaptive_threat_detector import AdaptiveThreatDetector
 from iaglobal.evolution.skill_quarantine import quarantine
 from iaglobal.graphs.communication.membrane_key import MembraneKey
+from iaglobal.core.law_engine import LawComplianceEngine, law_compliance_engine
+from iaglobal.agents.regenerator_agent import RegeneratorAgent, regenerator_agent
 
 logger = logging.getLogger(__name__)
 
@@ -34,6 +37,8 @@ class ImmuneReport:
     threat_detected: bool
     threats: Dict[str, Any]
     quarantine_activated: list[str]
+    law_violations: Optional[Dict[str, Any]] = None
+    law_compliance_score: float = 1.0
 
 
 class ImmuneOrchestrator:
@@ -66,6 +71,8 @@ class ImmuneOrchestrator:
         self._mhc = mhc_detector
         self._guardrails = GlutathioneGuardrails()
         self._symbiont_detector = opportunity_cost_detector  # Reutiliza para detecção de simbiontes
+        self._law_engine = law_compliance_engine  # Nova camada: Conformidade com Leis Universais
+        self._regenerator = regenerator_agent  # Agente de auto-regeneração
 
     def scan_execution(
         self,
@@ -135,15 +142,47 @@ class ImmuneOrchestrator:
             else:
                 logger.info(f"[IMMUNE] Simbiont '{skill_name}' reconhecido como produtivo (parasite_score={cost_result['parasite_score']})")
 
-        threat_detected = len(threats) > 0
+        # 7. Law Compliance Check - Verifica conformidade com Leis Universais
+        law_check = self._law_engine.evaluate_action({
+            "action": skill_name,
+            "context": execution_context,
+            "output": output,
+            "metrics": metrics
+        })
+        
+        threat_detected = len(threats) > 0 or not law_check.get("compliant", True)
 
         if threat_detected and not symbiont_recognized:
             logger.warning(f"[IMMUNE] Threats detected in {skill_name}: {threats}")
+        
+        if not law_check.get("compliant", True):
+            logger.warning(f"[IMMUNE] Law violations detected in {skill_name}: {law_check.get('violations', [])}")
+
+        # 8. Auto-regeneração: Se ameaças detectadas, acionar RegeneratorAgent
+        regeneration_plan = None
+        if threat_detected and not symbiont_recognized:
+            # Avaliar dano e criar plano de regeneração
+            regeneration_plan = self._regenerator.assess_damage(
+                skill_name=skill_name,
+                immune_report=ImmuneReport(
+                    threat_detected=threat_detected,
+                    threats=threats,
+                    quarantine_activated=quarantine_list,
+                    law_violations=law_check.get("violations") if not law_check.get("compliant", True) else None,
+                    law_compliance_score=law_check.get("compliance_score", 1.0),
+                ),
+                context=execution_context
+            )
+            
+            if regeneration_plan:
+                logger.info(f"[IMMUNE] Regeneration plan created for {skill_name}: {regeneration_plan.regeneration_strategy}")
 
         return ImmuneReport(
-            threat_detected=threat_detected,
+            threat_detected=threat_detected or not law_check.get("compliant", True),
             threats=threats,
             quarantine_activated=quarantine_list,
+            law_violations=law_check.get("violations") if not law_check.get("compliant", True) else None,
+            law_compliance_score=law_check.get("compliance_score", 1.0),
         )
 
     def register_skill(self, skill_name: str, skill_code: str, parent_hash: str = "") -> str:
@@ -153,11 +192,15 @@ class ImmuneOrchestrator:
     def health_check(self) -> Dict[str, Any]:
         """Status imunológico geral."""
         return {
-            "active_detectors": 7,
+            "active_detectors": 8,  # Agora inclui LawComplianceEngine
             "quarantined_skills": len(quarantine._quarantined),
             "loop_counts": dict(self._loop_detector._execution_count),
             "regression_history_size": len(self._regression_detector._history),
             "symbiont_mode": hasattr(self._symbiont_detector, 'analyze_opportunity_cost'),
+            "law_compliance_active": True,
+            "total_laws": 15,
+            "regenerator_active": True,
+            "active_regenerations": len(self._regenerator._active_regenerations),
         }
 
 

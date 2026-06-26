@@ -1,0 +1,3 @@
+[console_scripts]
+evolution-lab = iaglobal.cli.evolution_lab:run_evolution_lab
+iaglobal = iaglobal.cli.main:main

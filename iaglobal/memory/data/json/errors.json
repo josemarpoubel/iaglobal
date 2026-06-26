@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-06-25T01:27:24.962765+00:00",
+  "updated_at": "2026-06-26T15:22:39.449012+00:00",
   "learning_errors": [
     {
       "id": "20260624225312977020",
@@ -77,6 +77,26 @@
       "message": "mensagem de erro",
       "details": {
         "detail": "info"
+      }
+    },
+    {
+      "timestamp": "2026-06-26T15:20:54.488483+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-06-26T15:22:39.448958+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
       }
     }
   ]

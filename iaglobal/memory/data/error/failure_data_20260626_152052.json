@@ -1,0 +1,63 @@
+{
+  "errors": {
+    "total": 4,
+    "by_component": {
+      "builder": 2,
+      "test_component": 2
+    },
+    "entries": [
+      {
+        "timestamp": "2026-06-24T17:05:07.776439+00:00",
+        "component": "builder",
+        "severity": "ERROR",
+        "execution_id": null,
+        "message": "Handler not found for node: mini_evaluator_post_arch",
+        "details": {
+          "node": "mini_evaluator_post_arch"
+        }
+      },
+      {
+        "timestamp": "2026-06-24T17:05:09.360885+00:00",
+        "component": "builder",
+        "severity": "ERROR",
+        "execution_id": null,
+        "message": "Handler not found for node: mini_evaluator_post_build",
+        "details": {
+          "node": "mini_evaluator_post_build"
+        }
+      },
+      {
+        "timestamp": "2026-06-24T22:53:12.981271+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-06-25T01:27:24.962694+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      }
+    ],
+    "path": "/workspace/iaglobal/memory/data/json/errors.json"
+  },
+  "metrics": {
+    "total_calls": 0,
+    "by_provider": {}
+  },
+  "logs": {
+    "lines": 3028,
+    "tail_lines": 50,
+    "content": "2026-06-26 15:20:52,639 [INFO] [iaglobal] [SKILL] Registrada: fix_validator vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: security vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: performance vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: dependency vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: documentation vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: release vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: deployment_plan vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: metrics vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: optimization vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: knowledge vv1\n2026-06-26 15:20:52,640 [INFO] [iaglobal] [SKILL] Registrada: artifact_writer vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: reflexion vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: retrospective vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: result_agent vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: genesis_builder vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: web_classifier vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: search vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: evaluator vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: gap_analyzer vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: skill_generator vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: sandbox_validator vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: evolution_committee vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: pipeline_updater vv1\n2026-06-26 15:20:52,641 [INFO] [iaglobal] [SKILL] Registrada: evolution_trigger vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: integrator vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: semantic_validator vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: local_knowledge vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: knowledge_analyzer vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: memory_writer vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: memory_cleaner vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: agentmailbox vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: code_executor vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: multi_coder vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: prompt_builder vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: prompt_improver vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: failure_analysis vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: knowledge_writer vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: multi_agent vv1\n2026-06-26 15:20:52,642 [INFO] [iaglobal] [SKILL] Registrada: typing_agent vv1\n2026-06-26 15:20:52,664 [INFO] [iaglobal] ⚖️ Invocando o Tribunal: Validando nascimento do nó...\n2026-06-26 15:20:52,664 [INFO] [iaglobal] ✅ [SOBERANIA CONFIRMADA] DNA validado. Nó autorizado a ingressar na malha.\n2026-06-26 15:20:52,664 [INFO] [iaglobal.security.entropy_sentinel] [ENTROPY] Genesis hash loaded: cc7017b56557586095e8dc6dae27b3e6...\n2026-06-26 15:20:52,668 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for core_db: 06768ab3b54a14c5...\n2026-06-26 15:20:52,669 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for memory_vector: 3143431a2c94393a...\n2026-06-26 15:20:52,669 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for ltm_stm: 55632b41a9a28ac5...\n2026-06-26 15:20:52,669 [INFO] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC-MASK] Created mask for registry: ad8e15a33da4b1a3...\n2026-06-26 15:20:52,764 [INFO] [iaglobal.omnimind] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 12 principios | 0 agentes registrados\n2026-06-26 15:20:52,779 [INFO] [iaglobal] ENV loaded from /workspace/.env\n2026-06-26 15:20:52,780 [INFO] [iaglobal] --- 🚀 Nova Sessão Iniciada ---\n2026-06-26 15:20:52,784 [INFO] [iaglobal] ENV loaded from /workspace/.env",
+    "path": "/workspace/iaglobal/memory/data/logs/app.log"
+  },
+  "collected_at": "2026-06-26T15:20:52.803316"
+}

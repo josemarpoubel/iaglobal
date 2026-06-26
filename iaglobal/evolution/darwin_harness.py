@@ -20,6 +20,73 @@ from iaglobal.memory.async_memory import add_ltm
 logger = logging.getLogger(__name__)
 
 
+class DynamicAdversarialEnvironment:
+    """
+    Ambiente adversarial dinâmico para teste de evolução.
+    
+    Gera desafios adaptativos para testar a resiliência do sistema.
+    """
+    
+    def __init__(self, seed: int = None):
+        self.seed = seed or random.randint(0, 2**32)
+        random.seed(self.seed)
+        self.challenges_generated = 0
+        self.logger = logging.getLogger(__name__)
+    
+    def generate_challenge(self, difficulty: float = 0.5) -> Dict[str, Any]:
+        """Gera um desafio adversarial."""
+        self.challenges_generated += 1
+        return {
+            "challenge_id": self.challenges_generated,
+            "difficulty": difficulty,
+            "type": random.choice(["mutation", "noise", "adversarial"]),
+            "seed": self.seed
+        }
+
+
+class EvolutionMetrics:
+    """
+    Métricas de evolução do sistema.
+    
+    Trackea fitness, diversity, e progresso evolutivo.
+    """
+    
+    def __init__(self):
+        self.generations = 0
+        self.best_fitness = 0.0
+        self.avg_fitness = 0.0
+        self.diversity_index = 1.0
+    
+    def record_generation(self, best_fit: float, avg_fit: float, diversity: float):
+        """Registra métricas de uma geração."""
+        self.generations += 1
+        self.best_fitness = max(self.best_fitness, best_fit)
+        self.avg_fitness = avg_fit
+        self.diversity_index = diversity
+
+
+class SimulationRecorder:
+    """
+    Gravador de simulações evolutivas.
+    
+    Armazena histórico de execuções para análise posterior.
+    """
+    
+    def __init__(self):
+        self.recordings = []
+    
+    def record(self, event: Dict[str, Any]):
+        """Registra um evento de simulação."""
+        self.recordings.append({
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            **event
+        })
+    
+    def get_history(self) -> list:
+        """Retorna histórico de gravações."""
+        return self.recordings.copy()
+
+
 class DarwinHarness:
     """
     Harness de teste evolutivo.

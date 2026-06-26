@@ -12,6 +12,7 @@ from iaglobal.graphs.node import Node, LineageEntry
 from iaglobal.graphs.workdir import WorkDir
 from iaglobal.graphs.execution_graph import ExecutionGraph
 from iaglobal.evolution import darwin_harness as darwin
+from iaglobal.evolution.darwin_harness import DarwinHarness, EvolutionMetrics, SimulationRecorder
 from iaglobal.evolution.canonical_graph import canonicalize, compute_graph_hash
 from iaglobal.evolution.execution_registry import registry as exec_registry
 from iaglobal.evolution.skills.skill_executor import skill_executor
@@ -25,6 +26,7 @@ from iaglobal.events import dispatcher
 from iaglobal.utils.hash_utils import LineageID
 from iaglobal.utils.helpers import run_async_safe
 from iaglobal.evolution.evolutionruntime import EvolutionStrategy, FastEvolutionStrategy
+from iaglobal.core.law_engine import law_compliance_engine, ComplianceStatus
 
 logger = logging.getLogger(__name__)
 
@@ -347,6 +349,71 @@ class EvolutionEngine:
         strategy = strategy or FastEvolutionStrategy()
         logger.info("🧬 [ASYNC] Iniciando ciclo de evolução: gen=%d, strategy=%s",
                     self.generation, strategy.name)
+        
+        # ── VALIDAÇÃO DAS LEIS UNIVERSAIS (ANTES DA EVOLUÇÃO) ──────────────
+        proposal_data = {
+            "reasoning": f"Ciclo evolutivo da geração {self.generation} com estratégia {strategy.name}",
+            "generation": self.generation,
+            "strategy": strategy.name,
+            "mutation_rate": strategy.mutation_rate,
+            "parent_version": f"gen_{self.generation - 1}" if self.generation > 0 else "genesis",
+            "performance_metrics": {
+                "latency_ms": getattr(self, '_last_latency_ms', 0),
+            },
+            "resource_usage": {
+                "nadph_reserve": getattr(self, '_nadph_reserve', 1.0),
+            },
+        }
+        
+        compliance_report = law_compliance_engine.validate_proposal(
+            proposal_type="mutation",
+            proposal_data=proposal_data,
+            contexto={
+                "agent_id": "evolution_engine",
+                "generation": self.generation,
+                "task": self.current_task.get("prompt", "") if self.current_task else "",
+            },
+        )
+        
+        if compliance_report.status == ComplianceStatus.REJECTED:
+            logger.error(
+                "❌ [LEIS UNIVERSAIS] Evolução REJEITADA | proposta=%s | score=%.2f | violações=%d",
+                compliance_report.proposal_id,
+                compliance_report.score_conformidade,
+                len(compliance_report.violations),
+            )
+            for violacao in compliance_report.violations:
+                logger.error(
+                    "  ⚠️ Violação: %s (severidade %d) - %s",
+                    violacao.lei, violacao.severidade, violacao.descricao,
+                )
+            logger.info("  💡 Orientação OmniMind: %s", compliance_report.orientacao_omnimind)
+            raise RuntimeError(
+                f"Evolução bloqueada pelo LawComplianceEngine: {len(compliance_report.violations)} violações detectadas. "
+                f"Score: {compliance_report.score_conformidade:.2f}. "
+                f"Orientação: {compliance_report.orientacao_omnimind}"
+            )
+        
+        if compliance_report.status == ComplianceStatus.REQUIRES_REVISION:
+            logger.warning(
+                "⚠️ [LEIS UNIVERSAIS] Evolução requer revisão | proposta=%s | score=%.2f | violações=%d",
+                compliance_report.proposal_id,
+                compliance_report.score_conformidade,
+                len(compliance_report.violations),
+            )
+            for violacao in compliance_report.violations:
+                logger.warning(
+                    "  🔧 Correção sugerida: %s - %s",
+                    violacao.lei, violacao.sugestao_correcao,
+                )
+            # Continua mas com logging detalhado
+        
+        logger.info(
+            "✅ [LEIS UNIVERSAIS] Evolução APROVADA | proposta=%s | score=%.2f",
+            compliance_report.proposal_id,
+            compliance_report.score_conformidade,
+        )
+        # ── FIM DA VALIDAÇÃO ────────────────────────────────────────────────
         
         # Ajusta mutation_rate com base na estratégia
         original_mutation_rate = self.mutation_rate
