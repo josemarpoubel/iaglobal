@@ -1,0 +1,82 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iaglobal"
+version = "0.1.0"
+description = "Sistema autônomo multi-agente com IA híbrida (local + cloud), memória persistente e reflexão auto-corretiva e com metamotor de busca soberano"
+authors = [{name = "josemarpoubel"}]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["ai", "agents", "llm", "ollama", "multi-agent", "reflexion"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "accelerate",
+    "aiohttp",
+    "cbor2",
+    "charset-normalizer",
+    "ddgs",
+    "deepdiff",
+    "fastembed",
+    "flask",
+    "flask-sqlalchemy",
+    "fpdf2",
+    "google-ai-generativelanguage",
+    "google-genai",
+    "google-generativeai",
+    "grokipedia-api",
+    "httpx",
+    "huggingface_hub",
+    "jsonschema",
+    "mcp",
+    "numpy",
+    "openai",
+    "pdfminer.six",
+    "peft",
+    "playwright",
+    "protobuf>=5.26.1,<6.0.0",
+    "PyPDF2",
+    "pymupdf",
+    "pytest",
+    "pytest-asyncio",
+    "python-dotenv",
+    "requests",
+    "scrapy",
+    "sentence-transformers",
+    "torch",
+    "tqdm",
+    "transformers",
+    "trl",
+    "urllib3",
+    "watchdog",
+    "django",
+]
+
+[project.urls]
+Homepage = "https://github.com/josemarpoubel/iaglobal"
+Repository = "https://github.com/josemarpoubel/iaglobal"
+
+[tool.setuptools.packages.find]
+include = ["iaglobal*"]
+
+[project.scripts]
+iaglobal = "iaglobal.cli.main:main"
+evolution-lab = "iaglobal.cli.evolution_lab:run_evolution_lab"
+life-signals = "iaglobal.cli.life_signals:main"
+gravar-instintos = "scripts.gravar_instintos:main"
+
+[tool.pytest.ini_options]
+# Ignora tudo que não esteja na pasta de testes
+testpaths = ["tests"]
+# Só considera classes que começam com 'Test'
+python_classes = ["Test*"]
+# Só considera funções que começam com 'test_'
+python_functions = ["test_*"]
+asyncio_mode = "auto"

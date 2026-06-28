@@ -1,0 +1,81 @@
+# IAGlobal — Dependências (Versões Estabilizadas)
+
+fastapi
+accelerate
+aiohttp
+cbor2
+charset-normalizer
+ddgs
+deepdiff
+fastembed
+flask
+flask-sqlalchemy
+fpdf2
+google-ai-generativelanguage
+google-genai
+google-generativeai
+googlesearch-python
+grokipedia-api
+httpx
+huggingface_hub
+jsonschema
+mcp
+nest_asyncio
+numpy
+openai
+pdfminer.six
+peft
+playwright
+protobuf>=5.26.1,<6.0.0
+PyPDF2
+pymupdf
+pytest
+pytest-asyncio
+python-dotenv
+requests
+scrapy
+sentence-transformers
+torch
+tqdm
+transformers
+trl
+urllib3
+watchdog
+
+selenium
+torch 
+torchvision 
+pillow 
+safetensors 
+tokenizers
+bandit
+safety
+beautifulsoup4
+playwright
+cachetools
+redis
+podman-compose
+
+# ==============================================================================
+# BASE CORE (Se o prompt pedir para usar Django)
+# ==============================================================================
+reactpy
+django
+reactpy-django
+daphne
+channels[daphne]
+
+# ==============================================================================
+# BASE MICROSERVICE / FASTAPI (Se o prompt pedir para isolar em FastAPI)
+# ==============================================================================
+reactpy[fastapi]
+uvicorn[standard]
+
+# ==============================================================================
+# EXTRAS PARA PRODUÇÃO AVANÇADA (WebSockets distribuídos)
+# ==============================================================================
+channels-redis
+
+fastapi==0.110.1
+uvicorn==0.29.0
+pydantic==2.7.0

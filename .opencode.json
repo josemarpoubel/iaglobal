@@ -1,0 +1,30 @@
+{
+  "mcp": {
+    "iaglobal-local": {
+      "type": "local",
+      "command": ["/home/kitohamachi/projeto-iaglobal/run_mcp.sh"],
+      "enabled": true,
+      "timeout": 600000,
+      "env": {
+        "PYTHONPATH": "/home/kitohamachi/projeto-iaglobal",
+        "MCP_USER": "iaglobal",
+        "MCP_PASSWORD": "homeostasis"
+      }
+    }
+  },
+  "agent": {
+    "mcp_monitor": {
+      "description": "Monitors OpenCode integrity via iaglobal MCP Server",
+      "mode": "primary",
+      "model": "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
+      "permission": {
+        "task": "allow",
+        "bash": "ask"
+      },
+      "options": {
+        "temperature": 0.0,
+        "ivm_threshold": 0.8
+      }
+    }
+  }
+}

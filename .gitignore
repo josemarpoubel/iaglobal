@@ -1,0 +1,41 @@
+# Ambientes virtuais e caches
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Arquivos de ambiente e segredos
+.env
+backup.env
+.env.*
+
+# Build e distribuição
+dist/
+build/
+
+# IDE
+.vscode/
+.idea/
+.pytest_cache
+
+# Ferramentas de Linting e Formatação
+.mypy_cache/
+.ruff_cache/
+.black
+
+# Jupyter Notebooks (arquivos temporários)
+.ipynb_checkpoints/
+
+# Sistema Operacional
+.DS_Store
+Thumbs.db
+
+# Runtime data (não versionar)
+iaglobal/genesis/data/*.cbor
+iaglobal/memory/data/
+iaglobal/obsidian/
+iaglobal/obsidian.zip
+
+# Arquivos de backup sem extensão .bkp
+*.bkp
