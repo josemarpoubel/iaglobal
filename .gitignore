@@ -31,11 +31,5 @@ build/
 .DS_Store
 Thumbs.db
 
-# Runtime data (não versionar)
-iaglobal/genesis/data/*.cbor
-iaglobal/memory/data/
-iaglobal/obsidian/
-iaglobal/obsidian.zip
-
 # Arquivos de backup sem extensão .bkp
 *.bkp
