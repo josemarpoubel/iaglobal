@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-04T14:37:21.791343+00:00",
+  "updated_at": "2026-07-04T17:20:06.699287+00:00",
   "learning_errors": [
     {
       "id": "20260704143641888960",
@@ -57,6 +57,296 @@
       "message": "mensagem de erro",
       "details": {
         "detail": "info"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:31:59.134867+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:31:59.182125+00:00",
+      "component": "multi_coder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Todas as partes falharam",
+      "details": {
+        "prompt_len": 61,
+        "errors": {
+          "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+          "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+          "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:32:42.975961+00:00",
+      "component": "immune_check",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
+      "details": {
+        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:32:51.678090+00:00",
+      "component": "dependency",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "'str' object has no attribute 'get'",
+      "details": {
+        "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:32:51.702209+00:00",
+      "component": "coder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+      "details": {
+        "task": "Crie uma API REST em FastAPI com endpoints CRUD para usuários"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:33:44.286520+00:00",
+      "component": "result_agent",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "name 'asyncio' is not defined",
+      "details": {
+        "task": "Crie uma API REST em FastAPI com endpoints CRUD para usuários"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:33:48.449088+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:48:25.713832+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:48:25.757733+00:00",
+      "component": "multi_coder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Todas as partes falharam",
+      "details": {
+        "prompt_len": 61,
+        "errors": {
+          "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+          "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+          "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:48:49.241657+00:00",
+      "component": "immune_check",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
+      "details": {
+        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:48:57.361630+00:00",
+      "component": "dependency",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "'str' object has no attribute 'get'",
+      "details": {
+        "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:48:57.384283+00:00",
+      "component": "coder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+      "details": {
+        "task": "Implemente um componente React que exiba uma lista de tarefas"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:49:37.897178+00:00",
+      "component": "result_agent",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "name 'asyncio' is not defined",
+      "details": {
+        "task": "Implemente um componente React que exiba uma lista de tarefas"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T16:49:42.370615+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:00:40.235092+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:00:40.279893+00:00",
+      "component": "multi_coder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Todas as partes falharam",
+      "details": {
+        "prompt_len": 61,
+        "errors": {
+          "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+          "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+          "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:01:04.713407+00:00",
+      "component": "immune_check",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
+      "details": {
+        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:01:04.786456+00:00",
+      "component": "dependency",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "'str' object has no attribute 'get'",
+      "details": {
+        "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:01:04.811372+00:00",
+      "component": "coder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+      "details": {
+        "task": "Implemente um componente React que exiba uma lista de tarefas"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:01:05.155289+00:00",
+      "component": "result_agent",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "name 'asyncio' is not defined",
+      "details": {
+        "task": "Implemente um componente React que exiba uma lista de tarefas"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:01:05.524259+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:18:55.693399+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:18:55.741281+00:00",
+      "component": "multi_coder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Todas as partes falharam",
+      "details": {
+        "prompt_len": 24,
+        "errors": {
+          "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+          "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+          "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
+        }
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:19:23.225471+00:00",
+      "component": "immune_check",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
+      "details": {
+        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:19:31.587413+00:00",
+      "component": "dependency",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "'str' object has no attribute 'get'",
+      "details": {
+        "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:19:31.610832+00:00",
+      "component": "coder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+      "details": {
+        "task": "teste de log no terminal"
+      }
+    },
+    {
+      "timestamp": "2026-07-04T17:20:06.699236+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
       }
     }
   ]

@@ -1,2 +1,0 @@
-[14:31:05] contrato insatisfeito: Skill 'reviewer' requer inputs faltando: ['task']. Disponíveis no contexto: ['co — fallback
-[14:31:05] erro: Contexto insuficiente para executar a skill 'reviewer'. Inputs requeridos: ('code', 'task')

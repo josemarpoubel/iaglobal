@@ -1,2 +1,0 @@
-[14:30:06] contrato insatisfeito: Skill 'memory_cleaner' requer inputs faltando: ['memory_writer']. Disponíveis no — fallback
-[14:30:06] erro: Contexto insuficiente para executar a skill 'memory_cleaner'. Inputs requeridos: ('memory_writer',)

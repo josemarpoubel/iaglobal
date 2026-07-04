@@ -1,2 +1,0 @@
-[14:31:05] contrato insatisfeito: Skill 'knowledge' requer inputs faltando: ['task']. Disponíveis no contexto: ['c — fallback
-[14:31:05] erro: Contexto insuficiente para executar a skill 'knowledge'. Inputs requeridos: ('task',)

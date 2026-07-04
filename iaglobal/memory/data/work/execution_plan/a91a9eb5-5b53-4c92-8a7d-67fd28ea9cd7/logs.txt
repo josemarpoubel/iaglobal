@@ -1,2 +1,0 @@
-[14:31:05] contrato insatisfeito: Skill 'execution_plan' requer inputs faltando: ['architecture_validation']. Disp — fallback
-[14:31:05] erro: Contexto insuficiente para executar a skill 'execution_plan'. Inputs requeridos: ('architecture_validation',)

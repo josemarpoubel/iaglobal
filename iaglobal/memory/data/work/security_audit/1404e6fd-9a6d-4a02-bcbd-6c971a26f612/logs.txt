@@ -1,2 +1,0 @@
-[14:30:06] contrato insatisfeito: Skill 'security_audit' requer inputs faltando: ['security_requirements']. Dispon — fallback
-[14:30:06] erro: Contexto insuficiente para executar a skill 'security_audit'. Inputs requeridos: ('code', 'security_requirements')

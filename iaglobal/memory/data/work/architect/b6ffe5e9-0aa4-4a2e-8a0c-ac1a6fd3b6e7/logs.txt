@@ -1,2 +1,0 @@
-[14:29:09] contrato insatisfeito: Skill 'architect' requer inputs faltando: ['task']. Disponíveis no contexto: ['w — fallback
-[14:29:09] erro: Contexto insuficiente para executar a skill 'architect'. Inputs requeridos: ('task',)

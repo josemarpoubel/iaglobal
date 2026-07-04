@@ -1,9 +1,39 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+# iaglobal/ui/fastapi_app.py
 """
-FastAPI + ReactPy App para IAGLOBAL
-====================================
-Versão standalone (sem Django) usando FastAPI + Uvicorn.
+🌐 FastAPI App — Interface Sensorial do Organismo Computacional
+
+Responsável por:
+- Receber requisições externas (percepção sensorial)
+- Orquestrar execução de tarefas (sistema nervoso central)
+- Broadcast de progresso via WebSocket (sinalização celular)
+- Monitorar saúde do sistema (homeostase)
+- Limpar execuções antigas (autofagia)
+
+v2.0 - Organismo Computacional Completo:
+- Circuit breaker (proteção contra falhas)
+- Telemetria completa (Tracer + batch_writer)
+- Autofagia de execuções antigas
+- Health check real (integra com HealthCheck)
+- Rate limiting (sistema imune)
+- Graceful shutdown (apoptose)
+- Persistência em SQLite (memória de longo prazo)
+- Validação robusta de inputs
+
+AXIOMAS IMPLEMENTADOS:
+- AXIOMA 1 (Homeostase): Health check real + métricas
+- AXIOMA 3 (Glutationa): Circuit breaker + retry
+- AXIOMA 4 (Autofagia): Limpeza de execuções antigas
+- AXIOMA 6 (Apoptose): Graceful shutdown
+- AXIOMA 8 (Sinalização): WebSocket + eventos
 """
 
+import asyncio
+import os
+import sqlite3
+import time
+import uuid
+from contextlib import asynccontextmanager
 from pathlib import Path
 from reactpy import component, html
 from reactpy.backend.fastapi import configure as reactpy_configure, Options
@@ -73,6 +103,9 @@ def AgentDashboard():
         ),
     )
 
+# =====================================================================
+# LIFESPAN (Ciclo de Vida do Organismo)
+# =====================================================================
 
 # Configurar ReactPy PRIMEIRO, antes de qualquer outra rota
 reactpy_configure(app, AgentDashboard, Options(url_prefix="/@"))

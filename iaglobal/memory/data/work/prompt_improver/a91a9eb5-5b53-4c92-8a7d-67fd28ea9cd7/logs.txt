@@ -1,2 +1,0 @@
-[14:31:05] contrato insatisfeito: Skill 'prompt_improver' requer inputs faltando: ['prompt_builder']. Disponíveis  — fallback
-[14:31:05] erro: Contexto insuficiente para executar a skill 'prompt_improver'. Inputs requeridos: ('prompt_builder',)

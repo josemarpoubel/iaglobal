@@ -1,2 +1,0 @@
-[14:30:05] contrato insatisfeito: Skill 'code_executor' requer inputs faltando: ['coder']. Disponíveis no contexto — fallback
-[14:30:05] erro: Contexto insuficiente para executar a skill 'code_executor'. Inputs requeridos: ('coder',)

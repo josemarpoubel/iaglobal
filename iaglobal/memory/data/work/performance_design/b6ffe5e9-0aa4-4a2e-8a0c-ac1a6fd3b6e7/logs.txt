@@ -1,2 +1,0 @@
-[14:29:09] contrato insatisfeito: Skill 'performance_design' requer inputs faltando: ['architecture', 'requirement — fallback
-[14:29:09] erro: Contexto insuficiente para executar a skill 'performance_design'. Inputs requeridos: ('architecture', 'requirements')

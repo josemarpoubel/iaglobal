@@ -1,2 +1,0 @@
-[14:29:10] contrato insatisfeito: Skill 'debugger' requer inputs faltando: ['code', 'error']. Disponíveis no conte — fallback
-[14:29:10] erro: Contexto insuficiente para executar a skill 'debugger'. Inputs requeridos: ('code', 'error')

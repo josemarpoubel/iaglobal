@@ -1,2 +1,0 @@
-[14:31:06] contrato insatisfeito: Skill 'documentation' requer inputs faltando: ['path']. Disponíveis no contexto: — fallback
-[14:31:06] erro: Contexto insuficiente para executar a skill 'documentation'. Inputs requeridos: ('code', 'path')

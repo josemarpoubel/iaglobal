@@ -46,5 +46,17 @@
     "balance": 90,
     "total_earned": 0,
     "total_spent": 10
+  },
+  {
+    "agent_name": "code_executor",
+    "balance": 80,
+    "total_earned": 0,
+    "total_spent": 20
+  },
+  {
+    "agent_name": "evolution_trigger",
+    "balance": 60,
+    "total_earned": 0,
+    "total_spent": 40
   }
 ]

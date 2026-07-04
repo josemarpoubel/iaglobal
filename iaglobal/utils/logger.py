@@ -13,6 +13,39 @@ if not logging.root.handlers:
         ]
     )
 
+# Cache de broadcasters WebSocket registrados
+_web_log_broadcasters = []
+
+
+def register_web_log_broadcast(broadcast_func):
+    """Registra função assíncrona para broadcast de logs para a UI."""
+    _web_log_broadcasters.append(broadcast_func)
+
+
+async def _broadcast_web_log(message: str, level: str = "info"):
+    """Envia log para todos os broadcasters registrados."""
+    for broadcaster in _web_log_broadcasters:
+        try:
+            await broadcaster(message, level)
+        except Exception:
+            pass
+
+
+class WebSocketHandler(logging.Handler):
+    """Handler que envia logs para o terminal da UI via WebSocket."""
+
+    def emit(self, record: logging.LogRecord):
+        try:
+            message = self.format(record)
+            level = record.levelname.lower()
+            if level in ("warning", "error", "critical"):
+                asyncio.get_running_loop().create_task(
+                    _broadcast_web_log(message, level)
+                )
+        except Exception:
+            pass
+
+
 def setup_logger(name="iaglobal"):
     logger = logging.getLogger(name)
     # Evita propagação para o root logger (previne duplicação)
@@ -41,9 +74,18 @@ def setup_logger(name="iaglobal"):
         except Exception:
             pass
             
+        # Handler para WebSocket (UI)
+        try:
+            ws_handler = WebSocketHandler()
+            ws_handler.setFormatter(formatter)
+            ws_handler.setLevel(logging.WARNING)
+            logger.addHandler(ws_handler)
+        except Exception:
+            pass
+            
     return logger
 
-# Adicione estas funções que estão faltando para resolver o ImportError:
+
 def get_logger(name="iaglobal"):
     return logging.getLogger(name)
 

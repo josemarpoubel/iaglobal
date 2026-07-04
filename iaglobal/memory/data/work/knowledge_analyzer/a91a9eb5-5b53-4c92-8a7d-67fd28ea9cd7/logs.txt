@@ -1,2 +1,0 @@
-[14:31:05] contrato insatisfeito: Skill 'knowledge_analyzer' requer inputs faltando: ['local_knowledge']. Disponív — fallback
-[14:31:05] erro: Contexto insuficiente para executar a skill 'knowledge_analyzer'. Inputs requeridos: ('local_knowledge',)

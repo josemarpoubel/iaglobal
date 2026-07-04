@@ -1,4 +1,3 @@
-```gitignore
 # Python cache files
 __pycache__/
 *.pyc
@@ -11,7 +10,6 @@ __pycache__/
 # Environment variables
 .env
 .env.local
-*.env.*
 
 # Test results and temporary data
 .tests/
@@ -38,4 +36,3 @@ Thumbs.db
 iaglobal/memory/data/work/
 iaglobal/memory/data/result/
 iaglobal/memory/data/script/
-```
