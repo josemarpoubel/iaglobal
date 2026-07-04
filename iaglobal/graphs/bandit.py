@@ -13,6 +13,17 @@ from typing import Dict, List, Optional
 
 from iaglobal.utils.logger import get_logger
 
+# Singleton global
+_bandit_instance: Optional['BanditPolicy'] = None
+
+
+def _get_bandit() -> 'BanditPolicy':
+    """Retorna instância singleton do BanditPolicy."""
+    global _bandit_instance
+    if _bandit_instance is None:
+        _bandit_instance = BanditPolicy()
+    return _bandit_instance
+
 
 class BanditPolicy:
     """Multi-Armed Bandit para seleção de provedores."""
