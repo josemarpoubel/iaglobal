@@ -1,0 +1,1 @@
+Resultado processado pela estratégia balanced

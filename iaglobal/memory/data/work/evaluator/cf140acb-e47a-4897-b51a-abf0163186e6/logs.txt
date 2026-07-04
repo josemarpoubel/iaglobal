@@ -1,0 +1,2 @@
+[14:31:58] contrato insatisfeito: Skill 'evaluator' requer inputs faltando: ['result_agent']. Disponíveis no conte — fallback
+[14:31:58] erro: Contexto insuficiente para executar a skill 'evaluator'. Inputs requeridos: ('result_agent',)

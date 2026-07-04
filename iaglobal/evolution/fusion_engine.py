@@ -52,7 +52,6 @@ from __future__ import annotations
 
 import asyncio
 import logging
-import hashlib
 import threading
 import time
 from datetime import datetime, timezone
@@ -61,6 +60,7 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from collections import defaultdict
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.security.pysecurity1024 import gerar_node_id_soberano
 
 logger = get_logger("iaglobal.fusion_engine")
 
@@ -460,15 +460,20 @@ class FusionEngine:
                     inherited_from=selected.inherited_from,
                 )
         
-        # Calcular lineage_hash do híbrido
+        # Calcular lineage_hash do híbrido e gerar ID único com pysecurity1024
         lineage_data = f"{hybrid_name}:hybrid:{hybrid_generation}:{sorted(hybrid_traits.keys())}"
         lineage_hash = hashlib.sha3_512(lineage_data.encode()).hexdigest()[:32]
+        
+        # Gerar ID único fonético para o híbrido usando pysecurity1024
+        hybrid_id = gerar_node_id_soberano(seed=lineage_data)
+        
+        logger.info(f"[FusionEngine] ID fonético gerado: {hybrid_id}")
         
         # Calcular fitness médio dos pais
         avg_fitness = sum(d.fitness_score for d in parent_dnas) / len(parent_dnas)
         
         return AgentDNA(
-            agent_id=hybrid_name,
+            agent_id=hybrid_id,  # Usar ID fonético único
             agent_type="hybrid",
             generation=hybrid_generation,
             traits=hybrid_traits,

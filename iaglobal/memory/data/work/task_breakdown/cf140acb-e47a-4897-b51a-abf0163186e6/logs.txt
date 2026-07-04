@@ -1,0 +1,2 @@
+[14:31:58] contrato insatisfeito: Skill 'task_breakdown' requer inputs faltando: ['planner']. Disponíveis no conte — fallback
+[14:31:58] erro: Contexto insuficiente para executar a skill 'task_breakdown'. Inputs requeridos: ('planner',)
