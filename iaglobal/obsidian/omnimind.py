@@ -830,6 +830,63 @@ class OmniMind:
             "timestamp": time.time(),
         }
 
+    async def update_ivm_metric(
+        self,
+        agent_id: str,
+        ivm: float,
+        metadata: Optional[dict[str, Any]] = None,
+    ) -> None:
+        """Atualiza métrica IVM no registro epigenético do agente.
+
+        Integra IVM com EpigeneticRegistry para aprendizado contínuo.
+        Quando IVM é alto, reforça padrões vencedores. Quando baixo, gera adaptação.
+
+        Args:
+            agent_id: ID do agente
+            ivm: Índice de Viabilidade Metabólica (0.0-1.0)
+            metadata: Contexto adicional (task_hash, error_type, etc.)
+        """
+        from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
+
+        registry = EpigeneticRegistry()
+        task_hash = metadata.get("task_hash", "unknown") if metadata else "unknown"
+        error_type = metadata.get("error_type", "ivm_update") if metadata else "ivm_update"
+
+        if ivm >= self.ivm_threshold_excelencia:
+            # IVM alto: registrar como sucesso epigenético
+            await registry.record_success(agent_id, task_hash)
+            logger.info(
+                "🧬 [IVM] Agente %s com IVM excelente (%.3f) — padrão reforçado no EpigeneticRegistry",
+                agent_id,
+                ivm,
+            )
+        elif ivm < self.ivm_threshold_critico:
+            # IVM baixo: registrar falha para adaptação
+            context = {"ivm": ivm, "threshold_critico": self.ivm_threshold_critico}
+            if metadata:
+                context.update(metadata)
+            await registry.record_failure(agent_id, task_hash, error_type, context)
+            logger.warning(
+                "🧬 [IVM] Agente %s com IVM crítico (%.3f) — adaptação epigenética necessária",
+                agent_id,
+                ivm,
+            )
+        else:
+            # IVM intermediário: registrar para monitoramento
+            context = {"ivm": ivm, "status": "monitoring"}
+            if metadata:
+                context.update(metadata)
+            await registry.record_failure(agent_id, task_hash, "ivm_monitoring", context)
+            logger.debug(
+                "🧬 [IVM] Agente %s com IVM normal (%.3f) — monitoramento contínuo",
+                agent_id,
+                ivm,
+            )
+
+    # Thresholds para IVM (usados em update_ivm_metric e emitir_gatilho_*)
+    ivm_threshold_excelencia: float = 0.85
+    ivm_threshold_critico: float = 0.60
+
     def estado(self) -> dict[str, Any]:
         """Relatório de estado atual da OmniMind."""
         return {
