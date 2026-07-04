@@ -185,15 +185,16 @@ class TestEpigeneticCycle:
         await epigenetic_registry.record_failure(agent_id, task_hash, "TimeoutError", {"attempt": 2})
         weights_2 = await epigenetic_registry.get_adaptive_weights(agent_id, task_hash)
 
-        # Verifica que ajustes são cumulativos
-        assert weights_2["retry_delay"] > weights_1["retry_delay"]
-        assert weights_2["model_priority"] < weights_1["model_priority"]
+        # Verifica que ajustes são cumulativos (ambos > 1.0 devido aos multiplicadores)
+        assert weights_1["retry_delay"] > 1.0  # 1.5 após primeiro timeout
+        assert weights_2["retry_delay"] > weights_1["retry_delay"]  # 2.25 após segundo timeout
+        assert weights_2["model_priority"] < weights_1["model_priority"]  # Reduz com timeouts
 
         # 3. Terceira execução: sucesso
         await epigenetic_registry.record_success(agent_id, task_hash)
         weights_3 = await epigenetic_registry.get_adaptive_weights(agent_id, task_hash)
 
-        # Verifica recuperação parcial
+        # Verifica recuperação parcial (reduz após sucesso, mas mantém >= 1.0)
         assert weights_3["retry_delay"] < weights_2["retry_delay"]
         assert weights_3["retry_delay"] >= 1.0
 

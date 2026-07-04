@@ -547,3 +547,399 @@ AttributeError: 'ShortTermMemory' object has no attribute 'store'
 2026-07-04 14:31:58,766 [WARNING] [iaglobal] [GRAPH] Nó 'pipeline_updater' falhou: Contexto insuficiente para executar a skill 'pipeline_updater'. Inputs requeridos: ('evolution_committee',)
 2026-07-04 14:31:58,769 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['evolution_trigger']
 2026-07-04 14:31:58,771 [WARNING] [iaglobal] [GRAPH] Nó 'evolution_trigger' falhou: Contexto insuficiente para executar a skill 'evolution_trigger'. Inputs requeridos: ('pipeline_updater',)
+2026-07-04 14:36:08,271 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules"]
+2026-07-04 14:36:08,507 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules"]
+2026-07-04 14:36:08,732 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: system']
+2026-07-04 14:36:08,989 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:36:09,232 [WARNING] [iaglobal] AST BLOCKED: ["Module 'shutil' is not in allowed_modules"]
+2026-07-04 14:36:09,470 [WARNING] [iaglobal] AST BLOCKED: ["Module 'ctypes' is not in allowed_modules"]
+2026-07-04 14:36:09,710 [WARNING] [iaglobal] AST BLOCKED: ["Module 'multiprocessing' is not in allowed_modules"]
+2026-07-04 14:36:09,952 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules"]
+2026-07-04 14:36:10,231 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules"]
+2026-07-04 14:36:10,469 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: eval']
+2026-07-04 14:36:10,711 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: exec']
+2026-07-04 14:36:10,990 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: compile']
+2026-07-04 14:36:11,231 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: __import__']
+2026-07-04 14:36:11,474 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: getattr']
+2026-07-04 14:36:11,728 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: setattr']
+2026-07-04 14:36:11,991 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: delattr']
+2026-07-04 14:36:12,290 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: system']
+2026-07-04 14:36:12,528 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: popen']
+2026-07-04 14:36:12,755 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: spawn']
+2026-07-04 14:36:13,033 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: execute']
+2026-07-04 14:36:13,334 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: popen']
+2026-07-04 14:36:13,574 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: spawn']
+2026-07-04 14:36:13,855 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __subclasses__']
+2026-07-04 14:36:14,129 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __globals__']
+2026-07-04 14:36:14,369 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __closure__']
+2026-07-04 14:36:14,594 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __class__']
+2026-07-04 14:36:14,873 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __reduce__']
+2026-07-04 14:36:15,131 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __dict__']
+2026-07-04 14:36:15,849 [ERROR] [iaglobal] Syntax error: invalid syntax (<unknown>, line 1)
+2026-07-04 14:36:16,349 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules", "Module 'socket' is not in allowed_modules", "Module 'shutil' is not in allowed_modules"]
+2026-07-04 14:36:16,850 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:36:16,855 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:36:16,858 [WARNING] [iaglobal] [SANDBOX] Path '/workspace/iaglobal/memory/data/temp/sandbox_exec' nao permitido — criando em /tmp
+2026-07-04 14:36:17,175 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:36:17,175 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:36:17,187 [WARNING] [iaglobal] [SANDBOX] Path '/workspace/iaglobal/memory/data/temp/sandbox_exec' nao permitido — criando em /tmp
+2026-07-04 14:36:17,550 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:36:17,551 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:36:17,551 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:36:17,552 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:36:17,827 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:36:17,828 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:36:17,829 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: eval']
+2026-07-04 14:36:17,829 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ['Unsafe function call: eval']
+2026-07-04 14:36:18,096 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:36:18,097 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:36:18,107 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules", 'Unsafe attribute access: system']
+2026-07-04 14:36:18,107 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'os' is not in allowed_modules", 'Unsafe attribute access: system']
+2026-07-04 14:36:18,373 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:36:18,374 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:36:18,388 [WARNING] [iaglobal] [SANDBOX] Glutathione bloqueou execucao: [{'type': 'pattern_block', 'message': 'pickle.loads() detectado — risco de deserialização maliciosa'}]
+2026-07-04 14:36:18,629 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:36:18,630 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:36:18,630 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:36:18,630 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:36:21,968 [ERROR] [iaglobal.graphs.nodes.no_sandbox_validator] [SANDBOX_VALIDATOR] Falha crítica no pipeline de validação de sandbox: name 'time' is not defined
+Traceback (most recent call last):
+  File "/workspace/iaglobal/graphs/nodes/no_sandbox_validator.py", line 40, in run_sandbox_validator
+    result = await agent.validate_async(code=code, task=task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/iaglobal/agents/semantic_validator.py", line 299, in validate_async
+    start_time = time.time()
+                 ^^^^
+NameError: name 'time' is not defined. Did you forget to import 'time'
+2026-07-04 14:36:21,971 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:21,972 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:21,991 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:21,991 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:21,992 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,011 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,011 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,011 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,054 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,054 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,055 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,067 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,068 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,070 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,071 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,071 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,073 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,131 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em mutant_1: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'mutant_1'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'mutant_1'}]
+2026-07-04 14:36:22,132 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_1: 14.369289324541569s
+2026-07-04 14:36:22,133 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_1: {'behavior_anomaly': {'score': 0}}
+2026-07-04 14:36:22,136 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_2: 11.239436593162553s
+2026-07-04 14:36:22,148 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_2: {'behavior_anomaly': {'score': 0}}
+2026-07-04 14:36:22,635 [ERROR] [iaglobal.entropy_sentinel] [EntropySentinel] 🔄 DEPENDÊNCIA CIRCULAR DETECTADA: agent_a → agent_b → agent_a
+2026-07-04 14:36:22,647 [ERROR] [iaglobal.entropy_sentinel] [EntropySentinel] 🔄 DEPENDÊNCIA CIRCULAR DETECTADA: agent_a → agent_b → agent_c → agent_a
+2026-07-04 14:36:22,650 [ERROR] [iaglobal.entropy_sentinel] [EntropySentinel] 🔄 DEPENDÊNCIA CIRCULAR DETECTADA: x → y → x
+2026-07-04 14:36:22,650 [WARNING] [iaglobal.entropy_sentinel] [EntropySentinel] ⚠️ x violou ordem (dependência circular: x → y → x)
+2026-07-04 14:36:22,890 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,891 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,914 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,915 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,915 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,931 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,931 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,932 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,955 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,955 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,967 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,988 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,988 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,989 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:22,993 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:22,994 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:22,994 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:23,008 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] SkillRegistry erro: name 'time' is not defined
+2026-07-04 14:36:23,012 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:23,012 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:23,012 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:23,027 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:23,028 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:23,028 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:23,029 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:23,029 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:23,030 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:23,031 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:23,031 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:23,031 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:23,032 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:23,032 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:23,032 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:23,033 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:23,033 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:23,047 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:23,053 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:36:23,053 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:36:23,054 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:36:23,831 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: promoted
+2026-07-04 14:36:23,834 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: guardrail_guardrail_test
+2026-07-04 14:36:23,847 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: routed
+2026-07-04 14:36:23,852 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: good
+2026-07-04 14:36:24,095 [ERROR] [iaglobal.graphs.nodes_module] ❌ Falha crítica ao carregar nó modular do arquivo no_async_violation_detector.py: No module named 'iaglobal.evolution.bandit'
+2026-07-04 14:36:24,353 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:36:24,354 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:36:24,391 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-04 14:36:26,654 [ERROR] [iaglobal.graphs.nodes_module] ❌ Falha crítica ao carregar nó modular do arquivo no_search.py: No module named 'ddgs'
+2026-07-04 14:36:26,668 [ERROR] [iaglobal.graphs.nodes_module] ❌ Falha crítica ao carregar nó modular do arquivo no_search_agent.py: No module named 'ddgs'
+2026-07-04 14:36:26,672 [ERROR] [iaglobal.graphs.nodes_module] ❌ Falha crítica ao carregar nó modular do arquivo no_search_web_brain.py: No module named 'ddgs'
+2026-07-04 14:36:27,032 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em injection_test: [{'type': 'suspicious_imports', 'modules': ['os', 'subprocess'], 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.Popen\\s*\\(', 'context': 'injection_test'}, {'type': 'non_genesis_derivative', 'context': 'injection_test'}]
+2026-07-04 14:36:27,034 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
+2026-07-04 14:36:27,050 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em test: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'test'}]
+2026-07-04 14:36:27,050 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] hacker negado a core_db
+2026-07-04 14:36:27,054 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.evolution.skill_quarantine] 🚫 [QUARANTINE] Skill 'anomalous_skill' foi colocada em quarentena! Falhas: 3, Impacto Máximo: 3. Motivo: MHC anomaly score 1.00
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:36:27,055 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:36:27,069 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for spike_skill: 20.0s
+2026-07-04 14:36:27,070 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
+2026-07-04 14:36:27,073 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
+2026-07-04 14:36:27,074 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
+2026-07-04 14:36:28,992 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente agente_x com DNA inválido!
+2026-07-04 14:36:29,516 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente agente_ciclo_completo com DNA inválido!
+2026-07-04 14:36:29,535 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente agente_completo com DNA inválido!
+2026-07-04 14:36:34,926 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test
+2026-07-04 14:36:34,928 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test burst
+2026-07-04 14:36:34,929 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test 3
+2026-07-04 14:36:34,935 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test
+2026-07-04 14:36:34,947 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test
+2026-07-04 14:36:35,076 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:36:35,090 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:36:35,096 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:36:36,946 [WARNING] [iaglobal.graphs.nodes.no_apoptosis_kill] [APOPTOSIS] Iniciando drain para to_kill
+2026-07-04 14:36:36,948 [WARNING] [iaglobal.graphs.nodes.no_apoptosis_kill] [APOPTOSIS] Agente to_kill eliminado com sucesso
+2026-07-04 14:36:38,936 [WARNING] [iaglobal.symbiosis_score] [SymbiosisScore] ⚠️ AGENTE ISOLADO: lonely_agent (score=0.00, última cooperação há 10.0min)
+2026-07-04 14:36:38,951 [WARNING] [iaglobal.symbiosis_score] [SymbiosisScore] ⚠️ AGENTE ISOLADO: isolated_agent (score=0.00, última cooperação há 10.0min)
+2026-07-04 14:36:38,991 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
+2026-07-04 14:36:38,995 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-07-04 14:36:41,856 [WARNING] [iaglobal] Executando backup de emergência antes de encerrar.
+2026-07-04 14:36:42,300 [WARNING] [iaglobal.vacuum_trigger] [VacuumTrigger] 🚨 VÁCUO NECESSÁRIO: density=0.85 > 0.8 | urgency=recommended
+2026-07-04 14:36:42,301 [WARNING] [iaglobal.vacuum_trigger] [VacuumTrigger] 🚨 VÁCUO NECESSÁRIO: diversity=0.06 < 0.3 | urgency=critical
+2026-07-04 14:36:42,303 [WARNING] [iaglobal.vacuum_trigger] [VacuumTrigger] 🚨 VÁCUO NECESSÁRIO: stale_ratio=1.00 > 0.5 | urgency=emergency
+2026-07-04 14:37:00,930 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules"]
+2026-07-04 14:37:01,168 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules"]
+2026-07-04 14:37:01,455 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: system']
+2026-07-04 14:37:01,692 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:37:01,916 [WARNING] [iaglobal] AST BLOCKED: ["Module 'shutil' is not in allowed_modules"]
+2026-07-04 14:37:02,151 [WARNING] [iaglobal] AST BLOCKED: ["Module 'ctypes' is not in allowed_modules"]
+2026-07-04 14:37:02,391 [WARNING] [iaglobal] AST BLOCKED: ["Module 'multiprocessing' is not in allowed_modules"]
+2026-07-04 14:37:02,653 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules"]
+2026-07-04 14:37:02,911 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules"]
+2026-07-04 14:37:03,152 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: eval']
+2026-07-04 14:37:03,412 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: exec']
+2026-07-04 14:37:03,656 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: compile']
+2026-07-04 14:37:03,951 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: __import__']
+2026-07-04 14:37:04,194 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: getattr']
+2026-07-04 14:37:04,432 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: setattr']
+2026-07-04 14:37:04,672 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: delattr']
+2026-07-04 14:37:04,915 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: system']
+2026-07-04 14:37:05,196 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: popen']
+2026-07-04 14:37:05,455 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: spawn']
+2026-07-04 14:37:05,707 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: execute']
+2026-07-04 14:37:05,970 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: popen']
+2026-07-04 14:37:06,246 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe attribute access: spawn']
+2026-07-04 14:37:06,471 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __subclasses__']
+2026-07-04 14:37:06,712 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __globals__']
+2026-07-04 14:37:06,933 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __closure__']
+2026-07-04 14:37:07,195 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __class__']
+2026-07-04 14:37:07,427 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __reduce__']
+2026-07-04 14:37:07,652 [WARNING] [iaglobal] AST BLOCKED: ['Forbidden dunder access: __dict__']
+2026-07-04 14:37:08,366 [ERROR] [iaglobal] Syntax error: invalid syntax (<unknown>, line 1)
+2026-07-04 14:37:08,854 [WARNING] [iaglobal] AST BLOCKED: ["Module 'subprocess' is not in allowed_modules", "Module 'socket' is not in allowed_modules", "Module 'shutil' is not in allowed_modules"]
+2026-07-04 14:37:09,349 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:37:09,351 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:37:09,353 [WARNING] [iaglobal] [SANDBOX] Path '/workspace/iaglobal/memory/data/temp/sandbox_exec' nao permitido — criando em /tmp
+2026-07-04 14:37:09,649 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:37:09,650 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:37:09,651 [WARNING] [iaglobal] [SANDBOX] Path '/workspace/iaglobal/memory/data/temp/sandbox_exec' nao permitido — criando em /tmp
+2026-07-04 14:37:09,986 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:37:09,987 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:37:09,988 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:37:09,988 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:37:10,314 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:37:10,315 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:37:10,315 [WARNING] [iaglobal] AST BLOCKED: ['Unsafe function call: eval']
+2026-07-04 14:37:10,315 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ['Unsafe function call: eval']
+2026-07-04 14:37:10,551 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:37:10,551 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:37:10,552 [WARNING] [iaglobal] AST BLOCKED: ["Module 'os' is not in allowed_modules", 'Unsafe attribute access: system']
+2026-07-04 14:37:10,552 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'os' is not in allowed_modules", 'Unsafe attribute access: system']
+2026-07-04 14:37:10,813 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:37:10,814 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:37:10,815 [WARNING] [iaglobal] [SANDBOX] Glutathione bloqueou execucao: [{'type': 'pattern_block', 'message': 'pickle.loads() detectado — risco de deserialização maliciosa'}]
+2026-07-04 14:37:11,075 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:37:11,075 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:37:11,076 [WARNING] [iaglobal] AST BLOCKED: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:37:11,086 [WARNING] [iaglobal] [SANDBOX] AST bloqueou execucao: ["Module 'socket' is not in allowed_modules"]
+2026-07-04 14:37:14,114 [ERROR] [iaglobal.graphs.nodes.no_sandbox_validator] [SANDBOX_VALIDATOR] Falha crítica no pipeline de validação de sandbox: name 'time' is not defined
+Traceback (most recent call last):
+  File "/workspace/iaglobal/graphs/nodes/no_sandbox_validator.py", line 40, in run_sandbox_validator
+    result = await agent.validate_async(code=code, task=task)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/iaglobal/agents/semantic_validator.py", line 299, in validate_async
+    start_time = time.time()
+                 ^^^^
+NameError: name 'time' is not defined. Did you forget to import 'time'
+2026-07-04 14:37:14,128 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,129 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,135 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,136 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,146 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,154 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,155 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,155 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,173 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,173 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,173 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,174 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,174 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,187 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,187 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,187 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,188 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,208 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em mutant_1: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'mutant_1'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'mutant_1'}]
+2026-07-04 14:37:14,209 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_1: 10.418231978775815s
+2026-07-04 14:37:14,210 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_1: {'behavior_anomaly': {'score': 0}}
+2026-07-04 14:37:14,213 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for mutant_2: 15.739656865328278s
+2026-07-04 14:37:14,213 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in mutant_2: {'behavior_anomaly': {'score': 0}}
+2026-07-04 14:37:14,689 [ERROR] [iaglobal.entropy_sentinel] [EntropySentinel] 🔄 DEPENDÊNCIA CIRCULAR DETECTADA: agent_a → agent_b → agent_a
+2026-07-04 14:37:14,690 [ERROR] [iaglobal.entropy_sentinel] [EntropySentinel] 🔄 DEPENDÊNCIA CIRCULAR DETECTADA: agent_a → agent_b → agent_c → agent_a
+2026-07-04 14:37:14,692 [ERROR] [iaglobal.entropy_sentinel] [EntropySentinel] 🔄 DEPENDÊNCIA CIRCULAR DETECTADA: x → y → x
+2026-07-04 14:37:14,692 [WARNING] [iaglobal.entropy_sentinel] [EntropySentinel] ⚠️ x violou ordem (dependência circular: x → y → x)
+2026-07-04 14:37:14,830 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,831 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,847 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,847 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,848 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,869 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,869 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,870 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,875 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,875 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,876 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,891 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,891 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,891 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,908 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,908 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,909 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,911 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] SkillRegistry erro: name 'time' is not defined
+2026-07-04 14:37:14,913 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,913 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,914 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,930 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,930 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,931 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,931 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,931 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,932 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,933 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,933 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,934 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,934 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,934 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,947 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,948 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,948 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,948 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:14,966 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente EvolutionCommittee com DNA inválido!
+2026-07-04 14:37:14,967 [WARNING] [iaglobal.evolution.metacognition.evolution_committee] [EVOLUTION_COMMITTEE] OmniMind erro: name 'time' is not defined
+2026-07-04 14:37:14,967 [ERROR] [iaglobal.memory.async_memory] [ASYNC_MEMORY] Erro no MemoryVector: No module named 'fastembed'
+2026-07-04 14:37:15,533 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: promoted
+2026-07-04 14:37:15,535 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: guardrail_guardrail_test
+2026-07-04 14:37:15,548 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: routed
+2026-07-04 14:37:15,552 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: good
+2026-07-04 14:37:15,667 [ERROR] [iaglobal.graphs.nodes_module] ❌ Falha crítica ao carregar nó modular do arquivo no_async_violation_detector.py: No module named 'iaglobal.evolution.bandit'
+2026-07-04 14:37:15,909 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-04 14:37:15,910 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: unknown - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-04 14:37:15,927 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-04 14:37:17,913 [ERROR] [iaglobal.graphs.nodes_module] ❌ Falha crítica ao carregar nó modular do arquivo no_search.py: No module named 'ddgs'
+2026-07-04 14:37:17,914 [ERROR] [iaglobal.graphs.nodes_module] ❌ Falha crítica ao carregar nó modular do arquivo no_search_agent.py: No module named 'ddgs'
+2026-07-04 14:37:17,926 [ERROR] [iaglobal.graphs.nodes_module] ❌ Falha crítica ao carregar nó modular do arquivo no_search_web_brain.py: No module named 'ddgs'
+2026-07-04 14:37:18,135 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em injection_test: [{'type': 'suspicious_imports', 'modules': ['os', 'subprocess'], 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'injection_test'}, {'type': 'injection_pattern', 'pattern': '\\.Popen\\s*\\(', 'context': 'injection_test'}, {'type': 'non_genesis_derivative', 'context': 'injection_test'}]
+2026-07-04 14:37:18,148 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] random_agent negado a core_db
+2026-07-04 14:37:18,154 [WARNING] [iaglobal.immunity.pathogen_analyzer] [PATHOGEN] Detectado em test: [{'type': 'suspicious_imports', 'modules': ['os'], 'context': 'test'}, {'type': 'injection_pattern', 'pattern': '\\.system\\s*\\(', 'context': 'test'}]
+2026-07-04 14:37:18,154 [WARNING] [iaglobal.immunity.epigenetic_masking] [EPIGENETIC] hacker negado a core_db
+2026-07-04 14:37:18,169 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:18,169 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:18,170 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:18,170 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:18,170 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:18,170 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:18,170 [WARNING] [iaglobal.evolution.skill_quarantine] 🚫 [QUARANTINE] Skill 'anomalous_skill' foi colocada em quarentena! Falhas: 3, Impacto Máximo: 3. Motivo: MHC anomaly score 1.00
+2026-07-04 14:37:18,170 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:18,170 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:18,171 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:18,171 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:18,171 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:18,171 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:18,189 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for spike_skill: 20.0s
+2026-07-04 14:37:18,190 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
+2026-07-04 14:37:18,192 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
+2026-07-04 14:37:18,193 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
+2026-07-04 14:37:18,249 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente agente_x com DNA inválido!
+2026-07-04 14:37:18,534 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente agente_ciclo_completo com DNA inválido!
+2026-07-04 14:37:18,538 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente agente_completo com DNA inválido!
+2026-07-04 14:37:18,950 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test
+2026-07-04 14:37:18,952 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test burst
+2026-07-04 14:37:18,953 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test 3
+2026-07-04 14:37:18,972 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test
+2026-07-04 14:37:18,974 [WARNING] [iaglobal.metabolic_rhythm] [MetabolicRhythm] ⚡ BURST MODE ATIVADO | cpu_budget=0.50 | duration_max=60s | reason=test
+2026-07-04 14:37:19,131 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:37:19,132 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:37:19,149 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:37:20,056 [WARNING] [iaglobal.graphs.nodes.no_apoptosis_kill] [APOPTOSIS] Iniciando drain para to_kill
+2026-07-04 14:37:20,068 [WARNING] [iaglobal.graphs.nodes.no_apoptosis_kill] [APOPTOSIS] Agente to_kill eliminado com sucesso
+2026-07-04 14:37:20,469 [WARNING] [iaglobal.symbiosis_score] [SymbiosisScore] ⚠️ AGENTE ISOLADO: lonely_agent (score=0.00, última cooperação há 10.0min)
+2026-07-04 14:37:20,473 [WARNING] [iaglobal.symbiosis_score] [SymbiosisScore] ⚠️ AGENTE ISOLADO: isolated_agent (score=0.00, última cooperação há 10.0min)
+2026-07-04 14:37:20,508 [WARNING] [iaglobal.graphs.communication.membrane_key] [MEMBRANE] Key invalid or not found
+2026-07-04 14:37:20,512 [WARNING] [iaglobal.graphs.membrane] [MEMBRANE] BLOQUEADO: 'ingestion' tentou modificar core 'core'
+2026-07-04 14:37:21,754 [WARNING] [iaglobal] Executando backup de emergência antes de encerrar.
+2026-07-04 14:37:21,978 [WARNING] [iaglobal.vacuum_trigger] [VacuumTrigger] 🚨 VÁCUO NECESSÁRIO: density=0.85 > 0.8 | urgency=recommended
+2026-07-04 14:37:21,979 [WARNING] [iaglobal.vacuum_trigger] [VacuumTrigger] 🚨 VÁCUO NECESSÁRIO: diversity=0.06 < 0.3 | urgency=critical
+2026-07-04 14:37:21,981 [WARNING] [iaglobal.vacuum_trigger] [VacuumTrigger] 🚨 VÁCUO NECESSÁRIO: stale_ratio=1.00 > 0.5 | urgency=emergency
+2026-07-04 14:37:39,449 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:37:39,450 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:37:39,471 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:37:39,590 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.evolution.skill_quarantine] 🚫 [QUARANTINE] Skill 'anomalous_skill' foi colocada em quarentena! Falhas: 3, Impacto Máximo: 3. Motivo: MHC anomaly score 1.00
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:39,591 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:39,592 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for anomalous_skill: 20.0s
+2026-07-04 14:37:39,592 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] File ops anomaly for anomalous_skill: 300 ops
+2026-07-04 14:37:39,607 [WARNING] [iaglobal.immunity.mhc_detector] [MHC] CPU anomaly for spike_skill: 20.0s
+2026-07-04 14:37:39,608 [WARNING] [iaglobal.immunity.immune_orchestrator] [IMMUNE] Threats detected in spike_skill: {'behavior_anomaly': {'score': 0}}
+2026-07-04 14:37:39,610 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: suspicious_skill - {'unauthorized_path': '/etc/passwd'}
+2026-07-04 14:37:39,612 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: leaky_skill - {'memory_leak': True}
+2026-07-04 14:37:54,387 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:37:54,389 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:37:54,411 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:39:31,093 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:39:31,106 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:39:31,127 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:40:12,792 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:40:12,793 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:40:12,814 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:40:52,056 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:40:52,069 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:40:52,090 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
