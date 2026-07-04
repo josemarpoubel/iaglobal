@@ -70,3 +70,96 @@ class BanditPolicy:
         # para obter lista de agentes e seus IVMs
         # Exemplo: self.weights["high_ivm_agent"] *= 1.5
         self.logger.info("✅ BanditPolicy ajustado para priorizar agentes de alta performance")
+
+    def rank_models(
+        self,
+        node_id: str,
+        task_type: str,
+        candidates: List[str],
+        context: Optional[dict] = None
+    ) -> List[tuple]:
+        """
+        Ranqueia modelos candidatos baseado nos pesos do bandit.
+        
+        Returns:
+            Lista de tuplas (score, model_name) ordenada decrescente
+        """
+        ranked = []
+        for model in candidates:
+            weight = self.weights.get(model, 0.0)
+            # Verificar circuit breaker
+            if self.circuit_breakers.get(model, 0) < time.time():
+                score = weight
+            else:
+                score = -float('inf')  # Penaliza modelos em cooldown
+            ranked.append((score, model))
+        
+        # Ordenar por score decrescente
+        ranked.sort(key=lambda x: x[0], reverse=True)
+        return ranked
+
+    def select_model(
+        self,
+        node_id: str,
+        task_type: str,
+        candidates: List[str],
+        context: Optional[dict] = None
+    ) -> str:
+        """
+        Seleciona o melhor modelo baseado no ranking.
+        
+        Returns:
+            Nome do modelo selecionado
+        """
+        if not candidates:
+            raise ValueError("Nenhum candidato disponível")
+        
+        ranked = self.rank_models(node_id, task_type, candidates, context)
+        if not ranked:
+            return candidates[0]  # Fallback
+        
+        # Retorna o modelo com maior score
+        return ranked[0][1]
+
+    def select_top_n(
+        self,
+        node_id: str,
+        task_type: str,
+        candidates: List[str],
+        n: int = 3,
+        context: Optional[dict] = None
+    ) -> List[str]:
+        """
+        Seleciona os top N modelos baseado no ranking.
+        
+        Returns:
+            Lista de nomes dos top N modelos
+        """
+        ranked = self.rank_models(node_id, task_type, candidates, context)
+        top_n = ranked[:n]
+        return [model for _, model in top_n]
+
+    async def async_execute_model(
+        self,
+        model_name: str,
+        prompt: str,
+        **kwargs
+    ) -> dict:
+        """
+        Executa um modelo assincronamente (wrapper para provedor).
+        
+        Returns:
+            Dict com resultado da execução
+        """
+        # Este método delega para o provider_router ou LLMClient
+        # Implementação básica como placeholder
+        self.logger.info(f"🚀 Executando modelo {model_name}...")
+        
+        # Em produção, isso chamaria o provedor real
+        # Por enquanto, retorna estrutura básica
+        return {
+            "model": model_name,
+            "prompt": prompt,
+            "status": "delegated",
+            "kwargs": kwargs
+        }
