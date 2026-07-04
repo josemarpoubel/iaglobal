@@ -1,9 +1,8 @@
-venv/
-__pycache__/
-*.pyc
-.env
-.bak*
+```
+# Logs
+*.log
 
-# Se for muito grande (>1GB), considerar:
-# git lfs install
-# git lfs track "*.json"
+# Data files that might be generated/updated frequently
+iaglobal/memory/data/logs/
+iaglobal/memory/data/json/*.json
+```
