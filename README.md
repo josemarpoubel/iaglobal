@@ -1,4 +1,4 @@
-# 🌌 iaglobal — The Holliwell Paradigm
+# 🌌 iaglobal — Biological Evolution + The Holliwell Paradigm
 
 ### *The First Synthetic Organism Governed by Metabolic Viability*
 
