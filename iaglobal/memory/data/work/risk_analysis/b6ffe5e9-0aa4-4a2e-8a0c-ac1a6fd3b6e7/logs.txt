@@ -1,0 +1,2 @@
+[14:29:09] contrato insatisfeito: Skill 'risk_analysis' requer inputs faltando: ['architecture', 'task']. Disponív — fallback
+[14:29:09] erro: Contexto insuficiente para executar a skill 'risk_analysis'. Inputs requeridos: ('architecture', 'task')

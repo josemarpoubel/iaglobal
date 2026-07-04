@@ -1,0 +1,2 @@
+[14:29:10] contrato insatisfeito: Skill 'evolution_committee' requer inputs faltando: ['sandbox_validator']. Dispo — fallback
+[14:29:10] erro: Contexto insuficiente para executar a skill 'evolution_committee'. Inputs requeridos: ('sandbox_validator',)

@@ -1,0 +1,2 @@
+[14:31:05] contrato insatisfeito: Skill 'genesis_builder' requer inputs faltando: ['blockchain_name', 'author']. D — fallback
+[14:31:05] erro: Contexto insuficiente para executar a skill 'genesis_builder'. Inputs requeridos: ('blockchain_name', 'author')

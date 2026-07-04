@@ -1,0 +1,2 @@
+[14:30:06] contrato insatisfeito: Skill 'result_agent' requer inputs faltando: ['documentation', 'release', 'metri — fallback
+[14:30:06] erro: Contexto insuficiente para executar a skill 'result_agent'. Inputs requeridos: ('documentation', 'release', 'metrics', 'optimization')

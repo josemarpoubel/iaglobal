@@ -1,0 +1,2 @@
+[14:30:05] contrato insatisfeito: Skill 'backend_builder' requer inputs faltando: ['execution_plan']. Disponíveis  — fallback
+[14:30:05] erro: Contexto insuficiente para executar a skill 'backend_builder'. Inputs requeridos: ('execution_plan',)

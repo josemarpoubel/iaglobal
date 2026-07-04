@@ -1,0 +1,2 @@
+[14:29:10] contrato insatisfeito: Skill 'fix_validator' requer inputs faltando: ['code']. Disponíveis no contexto: — fallback
+[14:29:10] erro: Contexto insuficiente para executar a skill 'fix_validator'. Inputs requeridos: ('code',)

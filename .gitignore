@@ -1,51 +1,61 @@
-```gitignore
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-
+```
 # Logs
 *.log
-logs/
 
-# Testing
-.pytest_cache/
-.coverage
-htmlcov/
-.coverage.*
+# Database files
+*.db
 
-# Environment
+# Temporary work files
+iaglobal/memory/data/work/*/logs.txt
+iaglobal/memory/data/work/*/*/logs.txt
+iaglobal/memory/data/work/*/*/*/logs.txt
+
+# Generated code files in work directory
+iaglobal/memory/data/work/*/code.py
+iaglobal/memory/data/work/*/*/code.py
+iaglobal/memory/data/work/*/*/*/code.py
+
+# Generated result and script files
+iaglobal/memory/data/result/
+iaglobal/memory/data/script/
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Environment files
 .env
 .env.local
 .env.*
-.venv/
-venv/
-ENV/
 
-# IDE
+# IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS
+# OS files
 .DS_Store
 Thumbs.db
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Build artifacts
+dist/
+build/
+target/
+*.egg-info/
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.gradle/
 ```

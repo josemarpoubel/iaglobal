@@ -1,0 +1,2 @@
+[14:30:06] contrato insatisfeito: Skill 'artifact_writer' requer inputs faltando: ['artifact']. Disponíveis no con — fallback
+[14:30:06] erro: Contexto insuficiente para executar a skill 'artifact_writer'. Inputs requeridos: ('artifact',)

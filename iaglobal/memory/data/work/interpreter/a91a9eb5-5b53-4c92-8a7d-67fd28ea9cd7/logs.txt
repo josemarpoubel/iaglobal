@@ -1,0 +1,2 @@
+[14:31:05] contrato insatisfeito: Skill 'interpreter' requer inputs faltando: ['task']. Disponíveis no contexto: [ — fallback
+[14:31:05] erro: Contexto insuficiente para executar a skill 'interpreter'. Inputs requeridos: ('task',)

@@ -1,0 +1,2 @@
+[14:29:10] contrato insatisfeito: Skill 'deployment_plan' requer inputs faltando: ['code']. Disponíveis no context — fallback
+[14:29:10] erro: Contexto insuficiente para executar a skill 'deployment_plan'. Inputs requeridos: ('code',)

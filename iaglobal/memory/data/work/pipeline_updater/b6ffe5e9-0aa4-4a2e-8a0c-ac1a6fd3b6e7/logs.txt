@@ -1,0 +1,2 @@
+[14:29:10] contrato insatisfeito: Skill 'pipeline_updater' requer inputs faltando: ['evolution_committee']. Dispon — fallback
+[14:29:10] erro: Contexto insuficiente para executar a skill 'pipeline_updater'. Inputs requeridos: ('evolution_committee',)

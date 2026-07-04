@@ -1,0 +1,2 @@
+[14:30:05] contrato insatisfeito: Skill 'knowledge_writer' requer inputs faltando: ['coder', 'task']. Disponíveis  — fallback
+[14:30:05] erro: Contexto insuficiente para executar a skill 'knowledge_writer'. Inputs requeridos: ('coder', 'task')
