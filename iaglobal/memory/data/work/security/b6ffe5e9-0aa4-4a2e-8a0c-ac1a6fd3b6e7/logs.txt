@@ -1,0 +1,2 @@
+[14:29:10] contrato insatisfeito: Skill 'security' requer inputs faltando: ['code']. Disponíveis no contexto: ['wo — fallback
+[14:29:10] erro: Contexto insuficiente para executar a skill 'security'. Inputs requeridos: ('code',)

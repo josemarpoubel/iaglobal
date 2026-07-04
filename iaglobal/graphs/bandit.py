@@ -4,12 +4,13 @@ Multi-Armed Bandit para seleção de provedores LLM com:
 - IVM-based Rewards
 - Epsilon-Greedy
 - Fallback Chain
+- Credit Assignment Integration
 """
 
 import random
 import time
 from collections import defaultdict
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Any
 
 from iaglobal.utils.logger import get_logger
 
@@ -28,9 +29,12 @@ def _get_bandit() -> 'BanditPolicy':
 class BanditPolicy:
     """Multi-Armed Bandit para seleção de provedores."""
 
-    def __init__(self, epsilon: float = 0.1, decay: float = 0.99):
+    def __init__(self, epsilon: float = 0.1, decay: float = 0.99, 
+                 credit: Optional[Any] = None, probe_timeout: float = 5.0):
         self.epsilon = epsilon
         self.decay = decay
+        self.credit_engine = credit  # CreditAssignmentEngine opcional
+        self.probe_timeout = probe_timeout
         self.weights: Dict[str, float] = defaultdict(float)
         self.rewards: Dict[str, List[float]] = defaultdict(list)
         self.circuit_breakers: Dict[str, float] = {}

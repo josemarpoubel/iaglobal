@@ -1,0 +1,2 @@
+[14:29:10] contrato insatisfeito: Skill 'compliance_audit' requer inputs faltando: ['semantic_validator']. Disponí — fallback
+[14:29:10] erro: Contexto insuficiente para executar a skill 'compliance_audit'. Inputs requeridos: ('semantic_validator',)
