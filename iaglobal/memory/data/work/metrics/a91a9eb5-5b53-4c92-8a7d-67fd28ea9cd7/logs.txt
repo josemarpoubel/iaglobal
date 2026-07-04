@@ -1,0 +1,2 @@
+[14:31:06] contrato insatisfeito: Skill 'metrics' requer inputs faltando: ['execution_log']. Disponíveis no contex — fallback
+[14:31:06] erro: Contexto insuficiente para executar a skill 'metrics'. Inputs requeridos: ('execution_log',)

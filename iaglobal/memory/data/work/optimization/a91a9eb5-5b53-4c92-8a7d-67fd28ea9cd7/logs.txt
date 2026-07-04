@@ -1,0 +1,2 @@
+[14:31:06] contrato insatisfeito: Skill 'optimization' requer inputs faltando: ['execution_history']. Disponíveis  — fallback
+[14:31:06] erro: Contexto insuficiente para executar a skill 'optimization'. Inputs requeridos: ('execution_history',)

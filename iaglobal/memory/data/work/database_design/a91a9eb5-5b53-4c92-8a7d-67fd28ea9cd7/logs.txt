@@ -1,0 +1,2 @@
+[14:31:05] contrato insatisfeito: Skill 'database_design' requer inputs faltando: ['architect']. Disponíveis no co — fallback
+[14:31:05] erro: Contexto insuficiente para executar a skill 'database_design'. Inputs requeridos: ('architect',)

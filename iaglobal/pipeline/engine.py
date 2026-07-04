@@ -102,9 +102,9 @@ class PipelineEngine:
                 if hasattr(self.orchestrator, 'memory') and self.orchestrator.memory:
                     memory_instance = self.orchestrator.memory
                 else:
-                    from iaglobal.memory.term_short import ShortTermMemory
-                    from iaglobal._paths import MEMORIES_DB
-                    memory_instance = ShortTermMemory(db_path=MEMORIES_DB)
+                    # Fallback: usar MemoryStorage que tem store/retrieve/delete
+                    from iaglobal.memory.memory_storage import MemoryStorage
+                    memory_instance = MemoryStorage()
                 
                 await asyncio.to_thread(memory_instance.delete, state.prompt)
 
@@ -153,9 +153,9 @@ class PipelineEngine:
         if hasattr(self.orchestrator, 'memory') and self.orchestrator.memory:
             memory_instance = self.orchestrator.memory
         else:
-            from iaglobal.memory.term_short import ShortTermMemory
-            from iaglobal._paths import MEMORIES_DB
-            memory_instance = ShortTermMemory(db_path=MEMORIES_DB)
+            # Fallback: usar MemoryStorage que tem store/retrieve/delete
+            from iaglobal.memory.memory_storage import MemoryStorage
+            memory_instance = MemoryStorage()
         
         try:
             cached = memory_instance.retrieve(state.prompt)
@@ -430,10 +430,9 @@ class PipelineEngine:
         if hasattr(self.orchestrator, 'memory') and self.orchestrator.memory:
             memory_instance = self.orchestrator.memory
         else:
-            # Fallback: criar instância direta de memória
-            from iaglobal.memory.term_short import ShortTermMemory
-            from iaglobal._paths import MEMORIES_DB
-            memory_instance = ShortTermMemory(db_path=MEMORIES_DB)
+            # Fallback: usar MemoryStorage que tem store/retrieve/delete
+            from iaglobal.memory.memory_storage import MemoryStorage
+            memory_instance = MemoryStorage()
         
         await asyncio.to_thread(
             memory_instance.store,

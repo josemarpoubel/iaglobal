@@ -1,0 +1,2 @@
+[14:31:05] contrato insatisfeito: Skill 'search' requer inputs faltando: ['task', 'needs_web']. Disponíveis no con — fallback
+[14:31:05] erro: Contexto insuficiente para executar a skill 'search'. Inputs requeridos: ('task', 'needs_web')

@@ -1,0 +1,2 @@
+[14:31:05] contrato insatisfeito: Skill 'multi_agent' requer inputs faltando: ['task']. Disponíveis no contexto: [ — fallback
+[14:31:05] erro: Contexto insuficiente para executar a skill 'multi_agent'. Inputs requeridos: ('task',)

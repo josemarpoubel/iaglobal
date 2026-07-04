@@ -1,0 +1,2 @@
+[14:31:05] contrato insatisfeito: Skill 'prompt_intake' requer inputs faltando: ['task']. Disponíveis no contexto: — fallback
+[14:31:05] erro: Contexto insuficiente para executar a skill 'prompt_intake'. Inputs requeridos: ('task',)
