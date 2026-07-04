@@ -1,0 +1,2 @@
+[14:31:58] contrato insatisfeito: Skill 'qa' requer inputs faltando: ['integrator']. Disponíveis no contexto: ['co — fallback
+[14:31:58] erro: Contexto insuficiente para executar a skill 'qa'. Inputs requeridos: ('integrator',)

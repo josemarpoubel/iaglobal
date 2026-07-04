@@ -1,0 +1,2 @@
+[14:31:58] contrato insatisfeito: Skill 'requirements' requer inputs faltando: ['task', 'refined_task']. Disponíve — fallback
+[14:31:58] erro: Contexto insuficiente para executar a skill 'requirements'. Inputs requeridos: ('task', 'refined_task')

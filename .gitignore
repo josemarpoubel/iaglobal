@@ -1,61 +1,41 @@
-```
-# Logs
-*.log
-
-# Database files
-*.db
-
-# Temporary work files
-iaglobal/memory/data/work/*/logs.txt
-iaglobal/memory/data/work/*/*/logs.txt
-iaglobal/memory/data/work/*/*/*/logs.txt
-
-# Generated code files in work directory
-iaglobal/memory/data/work/*/code.py
-iaglobal/memory/data/work/*/*/code.py
-iaglobal/memory/data/work/*/*/*/code.py
-
-# Generated result and script files
-iaglobal/memory/data/result/
-iaglobal/memory/data/script/
-
-# Python cache
+```gitignore
+# Python cache files
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Environment files
+# Logs
+*.log
+
+# Environment variables
 .env
 .env.local
-.env.*
+*.env.*
 
-# IDE files
+# Test results and temporary data
+.tests/
+.test_results/
+*.tmp
+*.temp
+
+# Coverage reports
+.coverage
+htmlcov/
+coverage/
+
+# IDE specific
 .vscode/
 .idea/
 *.swp
 *.swo
 
-# OS files
+# OS generated
 .DS_Store
 Thumbs.db
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
-
-# Build artifacts
-dist/
-build/
-target/
-*.egg-info/
-
-# Dependencies
-node_modules/
-.venv/
-venv/
-.mypy_cache/
-.pytest_cache/
-.gradle/
+# Memory data and work files
+iaglobal/memory/data/work/
+iaglobal/memory/data/result/
+iaglobal/memory/data/script/
 ```
