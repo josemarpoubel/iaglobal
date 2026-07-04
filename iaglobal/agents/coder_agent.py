@@ -19,6 +19,7 @@ from iaglobal._paths import _detect_extension
 from iaglobal.storage.batch_writer import batch_writer, Event
 from iaglobal.utils.logger import get_logger
 from iaglobal.utils.helpers import run_async_safe
+from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
 
 logger = get_logger("iaglobal.agents.coder_agent")
 
@@ -49,6 +50,8 @@ class CoderAgent:
         self.bandit = _get_bandit()
         self.credit = CreditAssignmentEngine()
         self._quality_scores: Dict[str, List[float]] = {}
+        self.epigenetic_registry = EpigeneticRegistry()
+        self.agent_id = f"coder_agent_{id(self) % 10000}"
 
     def _cache_key(self, task: str, contexto: str = "") -> str:
         raw = f"{task}|{contexto}|{self.estilo}"
@@ -233,6 +236,23 @@ REGRAS DE RETORNO:
         security_feedback: str = ""
     ) -> CodeArtifact:
         task_str = task.text if hasattr(task, 'text') else str(task)
+        task_hash = hashlib.sha3_512(task_str.encode()).hexdigest()[:16]
+        
+        # Consulta pesos epigenéticos antes de executar
+        epigenetic_weights = await self.epigenetic_registry.get_adaptive_weights(
+            self.agent_id, task_hash
+        )
+        
+        # Aplica pesos epigenéticos ao comportamento
+        retry_delay_base = epigenetic_weights.get("retry_delay", 1.0)
+        model_priority_factor = epigenetic_weights.get("model_priority", 1.0)
+        fallback_enabled = epigenetic_weights.get("fallback_enabled", True)
+        
+        logger.info(
+            "[EPIGENETIC] %s | Pesos: retry_delay=%.2f, model_priority=%.2f, fallback=%s",
+            self.agent_id, retry_delay_base, model_priority_factor, fallback_enabled
+        )
+        
         cache_key = self._cache_key(task_str, contexto)
         cached = self._get_cached(cache_key)
         if cached:
@@ -240,6 +260,12 @@ REGRAS DE RETORNO:
 
         prompt = self._build_prompt(task_str, contexto, erros_contexto, security_feedback)
         modelos = self._modelos_candidatos(3)
+        
+        # Ajusta prioridade de modelos baseado em epigenética
+        if model_priority_factor < 0.7:
+            logger.warning("[EPIGENETIC] Reduzindo ambicao dos modelos devido a historico")
+            modelos = modelos[:2]  # Reduz numero de modelos
+        
         logger.info("[CODER] Gerando codigo via modelos=%s estilo=%s", modelos, self.estilo)
 
         async def _tentar(modelo: str, tentativa: int = 1) -> Optional[CodeArtifact]:
@@ -274,19 +300,34 @@ REGRAS DE RETORNO:
             validos.sort(key=lambda a: a.score, reverse=True)
             best = validos[0]
             self._set_cache(cache_key, best)
+            
+            # Registra sucesso epigenético
+            await self.epigenetic_registry.record_success(self.agent_id, task_hash)
+            
             Tracer.trace_event("CoderSuccess", {"model": best.model_used, "score": best.score, "files": list(best.files.keys())})
             return best
 
+        # Determina tipo de erro para registro epigenético
+        error_type = "unknown_failure"
+        # Tenta identificar o erro mais comum das tentativas
+        
         logger.warning("[CODER] Todos os modelos falharam, tentando retry com backoff")
         for tentativa, modelo in enumerate(modelos):
-            delay = min(2 ** tentativa + random.uniform(0, 1), 15)
+            delay = min((2 ** tentativa + random.uniform(0, 1)) * retry_delay_base, 15)
             await asyncio.sleep(delay)
             resultado = await _tentar(modelo, tentativa + 2)
             if resultado:
                 self._set_cache(cache_key, resultado)
+                await self.epigenetic_registry.record_success(self.agent_id, task_hash)
                 return resultado
 
         logger.error("[CODER] Falha apos todas as tentativas e retries")
+        
+        # Registra falha epigenética para aprendizado futuro
+        await self.epigenetic_registry.record_failure(
+            self.agent_id, task_hash, error_type, {"task": task_str[:200]}
+        )
+        
         Tracer.trace_event("CoderFailed", {"task": task_str[:80]})
         return CodeArtifact(code="", files={})
 
