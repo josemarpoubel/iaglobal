@@ -1,0 +1,2 @@
+[14:30:06] contrato insatisfeito: Skill 'release' requer inputs faltando: ['path', 'documentation']. Disponíveis n — fallback
+[14:30:06] erro: Contexto insuficiente para executar a skill 'release'. Inputs requeridos: ('code', 'path', 'documentation')

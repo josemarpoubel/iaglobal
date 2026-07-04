@@ -1,0 +1,2 @@
+[14:30:05] contrato insatisfeito: Skill 'multi_coder' requer inputs faltando: ['execution_plan']. Disponíveis no c — fallback
+[14:30:05] erro: Contexto insuficiente para executar a skill 'multi_coder'. Inputs requeridos: ('execution_plan',)

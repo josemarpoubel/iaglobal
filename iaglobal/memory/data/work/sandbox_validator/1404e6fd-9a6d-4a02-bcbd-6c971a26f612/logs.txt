@@ -1,0 +1,2 @@
+[14:30:06] contrato insatisfeito: Skill 'sandbox_validator' requer inputs faltando: ['skill_generator']. Disponíve — fallback
+[14:30:06] erro: Contexto insuficiente para executar a skill 'sandbox_validator'. Inputs requeridos: ('skill_generator',)

@@ -98,7 +98,15 @@ class PipelineEngine:
                     return cached
             else:
                 logger.info("🔥 --force: bypassing cache")
-                await asyncio.to_thread(self.orchestrator.memory.delete, state.prompt)
+                # Verificar se orchestrator tem memory, senão usar memória direta
+                if hasattr(self.orchestrator, 'memory') and self.orchestrator.memory:
+                    memory_instance = self.orchestrator.memory
+                else:
+                    from iaglobal.memory.term_short import ShortTermMemory
+                    from iaglobal._paths import MEMORIES_DB
+                    memory_instance = ShortTermMemory(db_path=MEMORIES_DB)
+                
+                await asyncio.to_thread(memory_instance.delete, state.prompt)
 
             # Geração via DAG
             await self._async_generation_stage(state, parallel=parallel)
@@ -140,8 +148,17 @@ class PipelineEngine:
     def _memory_stage(self, state: PipelineState) -> Optional[PipelineResult]:
         state.current_stage = PipelineStage.MEMORY.name
         logger.info("📖 lendo o aprendizado anterior ...")
+        
+        # Verificar se orchestrator tem memory, senão usar memória direta
+        if hasattr(self.orchestrator, 'memory') and self.orchestrator.memory:
+            memory_instance = self.orchestrator.memory
+        else:
+            from iaglobal.memory.term_short import ShortTermMemory
+            from iaglobal._paths import MEMORIES_DB
+            memory_instance = ShortTermMemory(db_path=MEMORIES_DB)
+        
         try:
-            cached = self.orchestrator.memory.retrieve(state.prompt)
+            cached = memory_instance.retrieve(state.prompt)
         except Exception:
             cached = None
 
@@ -408,8 +425,18 @@ class PipelineEngine:
     async def _async_persistence_stage(self, state: PipelineState) -> None:
         state.current_stage = PipelineStage.PERSISTENCE.name
         logger.info("📝 archivando aprendizado (async) ...")
+        
+        # Verificar se orchestrator tem memory, senão usar memória direta
+        if hasattr(self.orchestrator, 'memory') and self.orchestrator.memory:
+            memory_instance = self.orchestrator.memory
+        else:
+            # Fallback: criar instância direta de memória
+            from iaglobal.memory.term_short import ShortTermMemory
+            from iaglobal._paths import MEMORIES_DB
+            memory_instance = ShortTermMemory(db_path=MEMORIES_DB)
+        
         await asyncio.to_thread(
-            self.orchestrator.memory.store,
+            memory_instance.store,
             state.prompt,
             state.generated_code or "",
             {

@@ -153,3 +153,137 @@ Traceback (most recent call last):
   File "/workspace/iaglobal/pipeline/engine.py", line 329, in _async_generation_stage
     raise RuntimeError("Nenhum dos nós da DAG produziu código válido.")
 RuntimeError: Nenhum dos nós da DAG produziu código válido.
+2026-07-04 14:30:03,331 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-04 14:30:03,373 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-04 14:30:03,433 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-04 14:30:05,528 [WARNING] [iaglobal] [PIPELINE] Graph nodes vazios, construindo...
+2026-07-04 14:30:05,530 [WARNING] [iaglobal] [PIPELINE] Antes build - registry size=78
+2026-07-04 14:30:05,532 [WARNING] [iaglobal] [PIPELINE] Depois build - graph nodes=78
+2026-07-04 14:30:05,532 [WARNING] [iaglobal] [PIPELINE] Nós raiz (sem deps): ['agentmailbox', 'prompt_intake']
+2026-07-04 14:30:05,532 [WARNING] [iaglobal] [PIPELINE] Nós do grafo: ['agentmailbox', 'prompt_intake', 'enhancement', 'interpreter', 'web_classifier', 'orchestrator_agent', 'pm', 'requirements', 'ingestion', 'domain_analysis', 'business_rules', 'local_knowledge', 'search', 'knowledge', 'knowledge_analyzer', 'dependency', 'prompt_builder', 'prompt_improver', 'technology_selection', 'architect', 'risk_analysis', 'system_design', 'api_design', 'database_design', 'security_design', 'threat_modeling', 'performance_design', 'observability_design', 'architecture_validator', 'planner', 'task_breakdown', 'execution_plan', 'multi_coder', 'coder', 'frontend_builder', 'backend_builder', 'database_builder', 'api_builder', 'test_generator', 'integrator', 'genesis_builder', 'code_executor', 'reviewer', 'semantic_validator', 'security_audit', 'performance_audit', 'compliance_audit', 'performance', 'security', 'qa', 'tester', 'debugger', 'validator', 'fix_validator', 'debug_coder', 'documentation', 'deployment_plan', 'release', 'artifact_writer', 'metrics', 'optimization', 'retrospective', 'reflexion', 'result_agent', 'critic', 'memory_writer', 'memory_cleaner', 'evaluator', 'gap_analyzer', 'skill_generator', 'sandbox_validator', 'evolution_committee', 'pipeline_updater', 'evolution_trigger', 'failure_analysis', 'knowledge_writer', 'multi_agent', 'typing_agent']
+2026-07-04 14:30:05,534 [WARNING] [iaglobal] [PIPELINE] ⚙️ INICIANDO GERAÇÃO | prompt=simular_gatilho_de_evolucao | parallel=False
+2026-07-04 14:30:05,535 [WARNING] [iaglobal] 🎯 BANDIT indisponível (BanditPolicy.select_model() got an unexpected keyword argument 'node'), usando fallback
+2026-07-04 14:30:05,607 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['agentmailbox', 'prompt_intake']
+2026-07-04 14:30:05,614 [WARNING] [iaglobal] [GRAPH] Nó 'prompt_intake' falhou: Contexto insuficiente para executar a skill 'prompt_intake'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,630 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['enhancement', 'interpreter', 'multi_agent', 'typing_agent', 'web_classifier']
+2026-07-04 14:30:05,648 [WARNING] [iaglobal] [GRAPH] Nó 'enhancement' falhou: Contexto insuficiente para executar a skill 'enhancement'. Inputs requeridos: ('task', 'intake_report')
+2026-07-04 14:30:05,649 [WARNING] [iaglobal] [GRAPH] Nó 'interpreter' falhou: Contexto insuficiente para executar a skill 'interpreter'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,650 [WARNING] [iaglobal] [GRAPH] Nó 'multi_agent' falhou: Contexto insuficiente para executar a skill 'multi_agent'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,651 [WARNING] [iaglobal] [GRAPH] Nó 'typing_agent' falhou: Contexto insuficiente para executar a skill 'typing_agent'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,652 [WARNING] [iaglobal] [GRAPH] Nó 'web_classifier' falhou: Contexto insuficiente para executar a skill 'web_classifier'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,654 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['orchestrator_agent']
+2026-07-04 14:30:05,669 [WARNING] [iaglobal] [GRAPH] Nó 'orchestrator_agent' falhou: Contexto insuficiente para executar a skill 'orchestrator_agent'. Inputs requeridos: ('enhanced_task', 'prerequisites')
+2026-07-04 14:30:05,671 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['pm']
+2026-07-04 14:30:05,673 [WARNING] [iaglobal] [GRAPH] Nó 'pm' falhou: Contexto insuficiente para executar a skill 'pm'. Inputs requeridos: ('requirements',)
+2026-07-04 14:30:05,674 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['requirements']
+2026-07-04 14:30:05,688 [WARNING] [iaglobal] [GRAPH] Nó 'requirements' falhou: Contexto insuficiente para executar a skill 'requirements'. Inputs requeridos: ('task', 'refined_task')
+2026-07-04 14:30:05,691 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['domain_analysis', 'ingestion']
+2026-07-04 14:30:05,693 [WARNING] [iaglobal] [GRAPH] Nó 'domain_analysis' falhou: Contexto insuficiente para executar a skill 'domain_analysis'. Inputs requeridos: ('requirements',)
+2026-07-04 14:30:05,707 [WARNING] [iaglobal] [GRAPH] Nó 'ingestion' falhou: Contexto insuficiente para executar a skill 'ingestion'. Inputs requeridos: ('requirements',)
+2026-07-04 14:30:05,709 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['business_rules']
+2026-07-04 14:30:05,711 [WARNING] [iaglobal] [GRAPH] Nó 'business_rules' falhou: Contexto insuficiente para executar a skill 'business_rules'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,712 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['local_knowledge']
+2026-07-04 14:30:05,714 [WARNING] [iaglobal] [GRAPH] Nó 'local_knowledge' falhou: Contexto insuficiente para executar a skill 'local_knowledge'. Inputs requeridos: ('prompt_intake',)
+2026-07-04 14:30:05,715 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['search']
+2026-07-04 14:30:05,727 [WARNING] [iaglobal] [TRACE] Silent drop detectado em search - nó sem output válido
+2026-07-04 14:30:05,728 [WARNING] [iaglobal] [GRAPH] Nó 'search' falhou: Contexto insuficiente para executar a skill 'search'. Inputs requeridos: ('task', 'needs_web')
+2026-07-04 14:30:05,729 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['knowledge']
+2026-07-04 14:30:05,731 [WARNING] [iaglobal] [GRAPH] Nó 'knowledge' falhou: Contexto insuficiente para executar a skill 'knowledge'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,733 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['knowledge_analyzer']
+2026-07-04 14:30:05,747 [WARNING] [iaglobal] [GRAPH] Nó 'knowledge_analyzer' falhou: Contexto insuficiente para executar a skill 'knowledge_analyzer'. Inputs requeridos: ('local_knowledge',)
+2026-07-04 14:30:05,749 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['dependency']
+2026-07-04 14:30:05,751 [WARNING] [iaglobal] [GRAPH] Nó 'dependency' falhou: Contexto insuficiente para executar a skill 'dependency'. Inputs requeridos: ('code', 'path', 'requirements')
+2026-07-04 14:30:05,753 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['prompt_builder', 'technology_selection']
+2026-07-04 14:30:05,768 [WARNING] [iaglobal] [GRAPH] Nó 'prompt_builder' falhou: Contexto insuficiente para executar a skill 'prompt_builder'. Inputs requeridos: ('prompt_intake',)
+2026-07-04 14:30:05,769 [WARNING] [iaglobal] [GRAPH] Nó 'technology_selection' falhou: Contexto insuficiente para executar a skill 'technology_selection'. Inputs requeridos: ('business_rules',)
+2026-07-04 14:30:05,771 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['prompt_improver', 'architect']
+2026-07-04 14:30:05,787 [WARNING] [iaglobal] [GRAPH] Nó 'prompt_improver' falhou: Contexto insuficiente para executar a skill 'prompt_improver'. Inputs requeridos: ('prompt_builder',)
+2026-07-04 14:30:05,788 [WARNING] [iaglobal] [GRAPH] Nó 'architect' falhou: Contexto insuficiente para executar a skill 'architect'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,794 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['api_design', 'database_design', 'observability_design', 'performance_design', 'risk_analysis', 'security_design', 'system_design']
+2026-07-04 14:30:05,829 [WARNING] [iaglobal] [GRAPH] Nó 'api_design' falhou: Contexto insuficiente para executar a skill 'api_design'. Inputs requeridos: ('architect',)
+2026-07-04 14:30:05,830 [WARNING] [iaglobal] [GRAPH] Nó 'database_design' falhou: Contexto insuficiente para executar a skill 'database_design'. Inputs requeridos: ('architect',)
+2026-07-04 14:30:05,831 [WARNING] [iaglobal] [GRAPH] Nó 'observability_design' falhou: Contexto insuficiente para executar a skill 'observability_design'. Inputs requeridos: ('architect',)
+2026-07-04 14:30:05,831 [WARNING] [iaglobal] [GRAPH] Nó 'performance_design' falhou: Contexto insuficiente para executar a skill 'performance_design'. Inputs requeridos: ('architecture', 'requirements')
+2026-07-04 14:30:05,832 [WARNING] [iaglobal] [GRAPH] Nó 'risk_analysis' falhou: Contexto insuficiente para executar a skill 'risk_analysis'. Inputs requeridos: ('architecture', 'task')
+2026-07-04 14:30:05,833 [WARNING] [iaglobal] [GRAPH] Nó 'security_design' falhou: Contexto insuficiente para executar a skill 'security_design'. Inputs requeridos: ('architecture', 'requirements')
+2026-07-04 14:30:05,847 [WARNING] [iaglobal] [GRAPH] Nó 'system_design' falhou: Contexto insuficiente para executar a skill 'system_design'. Inputs requeridos: ('architect',)
+2026-07-04 14:30:05,850 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['architecture_validator', 'threat_modeling']
+2026-07-04 14:30:05,867 [WARNING] [iaglobal] [GRAPH] Nó 'architecture_validator' falhou: Contexto insuficiente para executar a skill 'architecture_validator'. Inputs requeridos: ('technology_selection',)
+2026-07-04 14:30:05,869 [WARNING] [iaglobal] [GRAPH] Nó 'threat_modeling' falhou: Contexto insuficiente para executar a skill 'threat_modeling'. Inputs requeridos: ('security_design',)
+2026-07-04 14:30:05,871 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['planner']
+2026-07-04 14:30:05,874 [WARNING] [iaglobal] [GRAPH] Nó 'planner' falhou: Contexto insuficiente para executar a skill 'planner'. Inputs requeridos: ('task',)
+2026-07-04 14:30:05,887 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['task_breakdown']
+2026-07-04 14:30:05,890 [WARNING] [iaglobal] [GRAPH] Nó 'task_breakdown' falhou: Contexto insuficiente para executar a skill 'task_breakdown'. Inputs requeridos: ('planner',)
+2026-07-04 14:30:05,892 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['execution_plan']
+2026-07-04 14:30:05,894 [WARNING] [iaglobal] [GRAPH] Nó 'execution_plan' falhou: Contexto insuficiente para executar a skill 'execution_plan'. Inputs requeridos: ('architecture_validation',)
+2026-07-04 14:30:05,896 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['coder', 'multi_coder']
+2026-07-04 14:30:05,909 [WARNING] [iaglobal] [TRACE] Silent drop detectado em coder - nó sem output válido
+2026-07-04 14:30:05,909 [WARNING] [iaglobal] [GRAPH] Nó 'coder' falhou: Contexto insuficiente para executar a skill 'coder'. Inputs requeridos: ('task', 'plan')
+2026-07-04 14:30:05,910 [WARNING] [iaglobal] [GRAPH] Nó 'multi_coder' falhou: Contexto insuficiente para executar a skill 'multi_coder'. Inputs requeridos: ('execution_plan',)
+2026-07-04 14:30:05,913 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['backend_builder', 'database_builder', 'frontend_builder', 'knowledge_writer']
+2026-07-04 14:30:05,930 [WARNING] [iaglobal] [GRAPH] Nó 'backend_builder' falhou: Contexto insuficiente para executar a skill 'backend_builder'. Inputs requeridos: ('execution_plan',)
+2026-07-04 14:30:05,931 [WARNING] [iaglobal] [GRAPH] Nó 'database_builder' falhou: Contexto insuficiente para executar a skill 'database_builder'. Inputs requeridos: ('execution_plan',)
+2026-07-04 14:30:05,932 [WARNING] [iaglobal] [GRAPH] Nó 'frontend_builder' falhou: Contexto insuficiente para executar a skill 'frontend_builder'. Inputs requeridos: ('execution_plan',)
+2026-07-04 14:30:05,932 [WARNING] [iaglobal] [GRAPH] Nó 'knowledge_writer' falhou: Contexto insuficiente para executar a skill 'knowledge_writer'. Inputs requeridos: ('coder', 'task')
+2026-07-04 14:30:05,934 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['api_builder']
+2026-07-04 14:30:05,947 [WARNING] [iaglobal] [GRAPH] Nó 'api_builder' falhou: Contexto insuficiente para executar a skill 'api_builder'. Inputs requeridos: ('execution_plan',)
+2026-07-04 14:30:05,950 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['integrator', 'test_generator']
+2026-07-04 14:30:05,953 [WARNING] [iaglobal] [GRAPH] Nó 'integrator' falhou: Contexto insuficiente para executar a skill 'integrator'. Inputs requeridos: ('frontend_builder', 'backend_builder', 'database_builder', 'api_builder')
+2026-07-04 14:30:05,953 [WARNING] [iaglobal] [GRAPH] Nó 'test_generator' falhou: Contexto insuficiente para executar a skill 'test_generator'. Inputs requeridos: ('backend_code', 'frontend_code', 'db_schema', 'api_code')
+2026-07-04 14:30:05,969 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['code_executor', 'genesis_builder', 'qa', 'reviewer']
+2026-07-04 14:30:05,987 [WARNING] [iaglobal] [TRACE] Silent drop detectado em reviewer - nó sem output válido
+2026-07-04 14:30:05,987 [WARNING] [iaglobal] [GRAPH] Nó 'code_executor' falhou: Contexto insuficiente para executar a skill 'code_executor'. Inputs requeridos: ('coder',)
+2026-07-04 14:30:05,988 [WARNING] [iaglobal] [GRAPH] Nó 'genesis_builder' falhou: Contexto insuficiente para executar a skill 'genesis_builder'. Inputs requeridos: ('blockchain_name', 'author')
+2026-07-04 14:30:05,989 [WARNING] [iaglobal] [GRAPH] Nó 'qa' falhou: Contexto insuficiente para executar a skill 'qa'. Inputs requeridos: ('integrator',)
+2026-07-04 14:30:05,990 [WARNING] [iaglobal] [GRAPH] Nó 'reviewer' falhou: Contexto insuficiente para executar a skill 'reviewer'. Inputs requeridos: ('code', 'task')
+2026-07-04 14:30:05,992 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['failure_analysis', 'semantic_validator', 'tester']
+2026-07-04 14:30:05,996 [WARNING] [iaglobal] [GRAPH] Nó 'failure_analysis' falhou: Contexto insuficiente para executar a skill 'failure_analysis'. Inputs requeridos: ('code_executor', 'debugger')
+2026-07-04 14:30:06,006 [WARNING] [iaglobal] [GRAPH] Nó 'semantic_validator' falhou: Contexto insuficiente para executar a skill 'semantic_validator'. Inputs requeridos: ('reviewer',)
+2026-07-04 14:30:06,007 [WARNING] [iaglobal] [GRAPH] Nó 'tester' falhou: Contexto insuficiente para executar a skill 'tester'. Inputs requeridos: ('code', 'task')
+2026-07-04 14:30:06,013 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['compliance_audit', 'performance', 'performance_audit', 'security', 'security_audit', 'debugger', 'documentation']
+2026-07-04 14:30:06,032 [WARNING] [iaglobal] [GRAPH] Nó 'compliance_audit' falhou: Contexto insuficiente para executar a skill 'compliance_audit'. Inputs requeridos: ('semantic_validator',)
+2026-07-04 14:30:06,034 [WARNING] [iaglobal] [GRAPH] Nó 'performance_audit' falhou: Contexto insuficiente para executar a skill 'performance_audit'. Inputs requeridos: ('code', 'performance_requirements')
+2026-07-04 14:30:06,048 [WARNING] [iaglobal] [GRAPH] Nó 'security_audit' falhou: Contexto insuficiente para executar a skill 'security_audit'. Inputs requeridos: ('code', 'security_requirements')
+2026-07-04 14:30:06,050 [WARNING] [iaglobal] [GRAPH] Nó 'documentation' falhou: Contexto insuficiente para executar a skill 'documentation'. Inputs requeridos: ('code', 'path')
+2026-07-04 14:30:06,052 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['deployment_plan', 'validator']
+2026-07-04 14:30:06,067 [WARNING] [iaglobal] [GRAPH] Nó 'validator' falhou: Contexto insuficiente para executar a skill 'validator'. Inputs requeridos: ('code', 'task')
+2026-07-04 14:30:06,070 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['release', 'fix_validator']
+2026-07-04 14:30:06,073 [WARNING] [iaglobal] [GRAPH] Nó 'release' falhou: Contexto insuficiente para executar a skill 'release'. Inputs requeridos: ('code', 'path', 'documentation')
+2026-07-04 14:30:06,090 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['artifact_writer', 'metrics', 'debug_coder']
+2026-07-04 14:30:06,108 [WARNING] [iaglobal] [GRAPH] Nó 'artifact_writer' falhou: Contexto insuficiente para executar a skill 'artifact_writer'. Inputs requeridos: ('artifact',)
+2026-07-04 14:30:06,109 [WARNING] [iaglobal] [GRAPH] Nó 'metrics' falhou: Contexto insuficiente para executar a skill 'metrics'. Inputs requeridos: ('execution_log',)
+2026-07-04 14:30:06,109 [WARNING] [iaglobal] [GRAPH] Nó 'debug_coder' falhou: Contexto insuficiente para executar a skill 'debug_coder'. Inputs requeridos: ('tester',)
+2026-07-04 14:30:06,111 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['optimization']
+2026-07-04 14:30:06,113 [WARNING] [iaglobal] [GRAPH] Nó 'optimization' falhou: Contexto insuficiente para executar a skill 'optimization'. Inputs requeridos: ('execution_history',)
+2026-07-04 14:30:06,126 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['retrospective']
+2026-07-04 14:30:06,128 [WARNING] [iaglobal] [GRAPH] Nó 'retrospective' falhou: Contexto insuficiente para executar a skill 'retrospective'. Inputs requeridos: ('metrics_report', 'execution_log')
+2026-07-04 14:30:06,130 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['reflexion', 'result_agent']
+2026-07-04 14:30:06,134 [WARNING] [iaglobal] [GRAPH] Nó 'result_agent' falhou: Contexto insuficiente para executar a skill 'result_agent'. Inputs requeridos: ('documentation', 'release', 'metrics', 'optimization')
+2026-07-04 14:30:06,135 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['critic']
+2026-07-04 14:30:06,147 [WARNING] [iaglobal] [GRAPH] Nó 'critic' falhou: Contexto insuficiente para executar a skill 'critic'. Inputs requeridos: ('code', 'task')
+2026-07-04 14:30:06,149 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['memory_writer']
+2026-07-04 14:30:06,151 [WARNING] [iaglobal] [GRAPH] Nó 'memory_writer' falhou: Contexto insuficiente para executar a skill 'memory_writer'. Inputs requeridos: ('result_agent',)
+2026-07-04 14:30:06,152 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['memory_cleaner']
+2026-07-04 14:30:06,167 [WARNING] [iaglobal] [GRAPH] Nó 'memory_cleaner' falhou: Contexto insuficiente para executar a skill 'memory_cleaner'. Inputs requeridos: ('memory_writer',)
+2026-07-04 14:30:06,169 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['evaluator']
+2026-07-04 14:30:06,170 [WARNING] [iaglobal] [GRAPH] Nó 'evaluator' falhou: Contexto insuficiente para executar a skill 'evaluator'. Inputs requeridos: ('result_agent',)
+2026-07-04 14:30:06,172 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['gap_analyzer']
+2026-07-04 14:30:06,174 [WARNING] [iaglobal] [GRAPH] Nó 'gap_analyzer' falhou: Contexto insuficiente para executar a skill 'gap_analyzer'. Inputs requeridos: ('evaluator',)
+2026-07-04 14:30:06,187 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['skill_generator']
+2026-07-04 14:30:06,189 [WARNING] [iaglobal] [GRAPH] Nó 'skill_generator' falhou: Contexto insuficiente para executar a skill 'skill_generator'. Inputs requeridos: ('gap_analyzer',)
+2026-07-04 14:30:06,190 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['sandbox_validator']
+2026-07-04 14:30:06,192 [WARNING] [iaglobal] [GRAPH] Nó 'sandbox_validator' falhou: Contexto insuficiente para executar a skill 'sandbox_validator'. Inputs requeridos: ('skill_generator',)
+2026-07-04 14:30:06,193 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['evolution_committee']
+2026-07-04 14:30:06,207 [WARNING] [iaglobal] [GRAPH] Nó 'evolution_committee' falhou: Contexto insuficiente para executar a skill 'evolution_committee'. Inputs requeridos: ('sandbox_validator',)
+2026-07-04 14:30:06,209 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['pipeline_updater']
+2026-07-04 14:30:06,211 [WARNING] [iaglobal] [GRAPH] Nó 'pipeline_updater' falhou: Contexto insuficiente para executar a skill 'pipeline_updater'. Inputs requeridos: ('evolution_committee',)
+2026-07-04 14:30:06,213 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['evolution_trigger']
+2026-07-04 14:30:06,214 [WARNING] [iaglobal] [GRAPH] Nó 'evolution_trigger' falhou: Contexto insuficiente para executar a skill 'evolution_trigger'. Inputs requeridos: ('pipeline_updater',)
+2026-07-04 14:30:06,228 [ERROR] [iaglobal] 💥 [ASYNC PIPELINE] Failure: 'Orchestrator' object has no attribute 'memory'
+Traceback (most recent call last):
+  File "/workspace/iaglobal/pipeline/engine.py", line 114, in async_execute
+    await self._async_persistence_stage(state)
+  File "/workspace/iaglobal/pipeline/engine.py", line 412, in _async_persistence_stage
+    self.orchestrator.memory.store,
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Orchestrator' object has no attribute 'memory'
