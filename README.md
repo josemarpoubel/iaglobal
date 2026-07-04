@@ -157,21 +157,582 @@ iaglobal history --stats
 
 ```
 iaglobal/
-├── agents/              # 64 specialized agents
-├── cognition/           # AdaptiveRouter · ClassifierMemory · ReputationEngine
-├── core/                # Orchestrator · GracefulShutdown · BanditPolicy
-├── evolution/
-│   ├── metabolism/      # methylation · homocysteine · transsulfuration · opportunity_cost
-│   └── skills/          # DynamicRegistry · SkillExecutor
-├── genesis/             # Genesis verification · Identity · Tribunal
-├── graphs/
-│   ├── nodes/           # 108 modular execution nodes
-│   └── communication/   # AcetylcholineBus · membrane_key
-├── immunity/            # 12-layer immune system
-├── intention/           # MetaDirector · Law of Success
-├── memory/              # CognitiveCache · SemanticCache · EpisodicMemory
-├── obsidian/            # Persistent knowledge base (vault)
-└── providers/           # 14 LLM providers
+.
+├── agents
+│   ├── coder_agent.py
+│   ├── critic_agent.py
+│   ├── debugger_agent.py
+│   ├── dependency_agent.py
+│   ├── enhancement_agent.py
+│   ├── evolution_agent.py
+│   ├── failure_analysis_agent.py
+│   ├── ingestion
+│   │   ├── file_ingestion_agent.py
+│   │   └── __init__.py
+│   ├── __init__.py
+│   ├── intent_classifier_agent.py
+│   ├── knowledge_writer_agent.py
+│   ├── multi_agent.py
+│   ├── multi_coder_agent.py
+│   ├── orchestrator_agent.py
+│   ├── performance_audit_agent.py
+│   ├── performance_design_agent.py
+│   ├── planner_agent.py
+│   ├── pm_agent.py
+│   ├── prompt_improver.py
+│   ├── reflexion_agent.py
+│   ├── requirements_agent.py
+│   ├── result_agent.py
+│   ├── search_agent.py
+│   ├── security_audit_agent.py
+│   ├── security_design_agent.py
+│   ├── semantic_validator.py
+│   ├── skill_generator_agent.py
+│   ├── tester_agent.py
+│   ├── typing_agent.py
+│   └── validator.py
+├── api
+│   ├── __init__.py
+│   └── mcp_server.py
+├── asgi.py
+├── auditoria_arquitetural.py
+├── check_integrations.py
+├── cli
+│   ├── bootstrap_engine.py
+│   ├── bootstrap.py
+│   ├── evolution_lab.py
+│   ├── __init__.py
+│   ├── life_signals.py
+│   ├── main.py
+│   ├── output.py
+│   └── status.py
+├── cognition
+│   ├── adaptive_router.py
+│   ├── agents
+│   │   ├── __init__.py
+│   │   └── task_classifier_agent.py
+│   ├── __init__.py
+│   ├── learning
+│   │   ├── classifier_memory.py
+│   │   └── __init__.py
+│   ├── outcome_tracker.py
+│   ├── reputation_engine.py
+│   └── task_fingerprint.py
+├── communication
+│   └── __init__.py
+├── core
+│   ├── apoptosis.py
+│   ├── assistant.py
+│   ├── assistant.py.bkp
+│   ├── cognitive_proxy.py
+│   ├── cognitive_runtime.py
+│   ├── config.py
+│   ├── decision_engine.py
+│   ├── diagnostico.py
+│   ├── env_loader.py
+│   ├── evolution_controller.py
+│   ├── governance.py
+│   ├── graceful_shutdown.py
+│   ├── __init__.py
+│   ├── law_enforcement.py
+│   ├── neuro_orchestrator.py
+│   ├── orchestrator.py
+│   ├── retry_handler.py
+│   └── structure.py
+├── dashboard
+│   └── metabolic_sleep_dashboard.py
+├── debug
+│   ├── __init__.py
+│   └── node_timing.py
+├── events
+│   ├── decision_event.py
+│   ├── event_dispatcher.py
+│   ├── event_store.py
+│   ├── event_types.py
+│   ├── __init__.py
+│   └── replay.py
+├── evolution
+│   ├── agents
+│   │   ├── gap_analyzer.py
+│   │   ├── __init__.py
+│   │   └── knowledge_agent.py
+│   ├── canonical_graph.py
+│   ├── collapse_detector.py
+│   ├── darwin_harness.py
+│   ├── epigenetic.py
+│   ├── evo_agent.py
+│   ├── evolutionengine.py
+│   ├── evolution_replay.py
+│   ├── evolutionruntime.py
+│   ├── execution_context.py
+│   ├── execution_registry.py
+│   ├── fusion_engine.py
+│   ├── ga_router_optimizer.py
+│   ├── genomic_reflection.py
+│   ├── handler_evolution.py
+│   ├── homeostasis_controller.py
+│   ├── __init__.py
+│   ├── meta_agent_designer.py
+│   ├── metabolic_lifecycle.py
+│   ├── metabolic_rhythm.py
+│   ├── metabolism
+│   │   ├── homocysteine_pool.py
+│   │   ├── __init__.py
+│   │   ├── methylation_cycle.py
+│   │   ├── opportunity_cost_detector.py
+│   │   └── transsulfuration_cycle.py
+│   ├── metacognition
+│   │   ├── evaluator.py
+│   │   ├── evolution_backlog.py
+│   │   ├── evolution_committee.py
+│   │   ├── evolution_trigger.py
+│   │   ├── failure_taxonomy.py
+│   │   ├── gap_analyzer.py
+│   │   ├── __init__.py
+│   │   ├── pipeline_updater.py
+│   │   ├── sandbox_validator.py
+│   │   └── skill_generator.py
+│   ├── meta_evolver.py
+│   ├── proposal_quarantine.py
+│   ├── reward_aggregator.py
+│   ├── same_engine.py
+│   ├── self_optimizer.py
+│   ├── skill_quarantine.py
+│   ├── skills
+│   │   ├── dynamic_registry.py
+│   │   ├── __init__.py
+│   │   ├── reactpy_skill_registry.py
+│   │   ├── run_fn_factory.py
+│   │   ├── skill_executor.py
+│   │   ├── skill.py
+│   │   ├── skill_registry.py
+│   │   └── skill_versions.py
+│   ├── task_agent_factory.py
+│   └── task_analyzer.py
+├── exceptions.py
+├── execution
+│   ├── cpu_affinity.py
+│   ├── executor.py
+│   ├── __init__.py
+│   └── sandbox.py
+├── feedback
+│   ├── benchmark_runner.py
+│   ├── betaine_judge.py
+│   ├── __init__.py
+│   ├── reward_aggregator.py
+│   ├── reward_signal.py
+│   └── user_feedback.py
+├── genesis
+│   ├── certify_block.py
+│   ├── check_cbor.py
+│   ├── data
+│   │   ├── integrity_tree.cbor
+│   │   ├── test_genesis_integrity.py
+│   │   ├── webhidden_genesis_blueprint.cbor
+│   │   └── webhidden_genesis_evolutive.cbor
+│   ├── fusion_engine.py
+│   ├── genesis_purifier.py
+│   ├── genesis_verifier.py
+│   ├── identity.py
+│   ├── __init__.py
+│   └── verifygenesis.py
+├── graphs
+│   ├── artifact.py
+│   ├── bandit.py
+│   ├── builder.py
+│   ├── communication
+│   │   ├── acetylcholine_bus.py
+│   │   ├── agent_mailbox.py
+│   │   ├── __init__.py
+│   │   └── membrane_key.py
+│   ├── credit.py
+│   ├── edge.py
+│   ├── edges.py
+│   ├── execution_context.py
+│   ├── execution_engine.py
+│   ├── execution_graph.py
+│   ├── graph_builder_v2.py
+│   ├── __init__.py
+│   ├── instrumentation.py
+│   ├── membrane.py
+│   ├── migrar_nodes.py
+│   ├── node.py
+│   ├── nodes
+│   │   ├── _disk_swap.py
+│   │   ├── __init__.py
+│   │   ├── no_adaptive_router.py
+│   │   ├── no_agentmailbox.py
+│   │   ├── no_ai_audit_compliance.py
+│   │   ├── no_api_builder.py
+│   │   ├── no_api_design.py
+│   │   ├── no_apoptosis_kill.py
+│   │   ├── no_architect.py
+│   │   ├── no_architecture_validator.py
+│   │   ├── no_artifact_writer.py
+│   │   ├── no_async_violation_detector.py
+│   │   ├── no_auditor_sentinel.py
+│   │   ├── no_backend_builder.py
+│   │   ├── no_business_rules.py
+│   │   ├── no_clarity_directive.py
+│   │   ├── no_code_executor.py
+│   │   ├── no_coder.py
+│   │   ├── no_compliance_audit.py
+│   │   ├── no_context_weaver.py
+│   │   ├── no_critic.py
+│   │   ├── no_darwin_harness.py
+│   │   ├── no_database_builder.py
+│   │   ├── no_database_design.py
+│   │   ├── no_debug_coder.py
+│   │   ├── no_debugger.py
+│   │   ├── no_dependency.py
+│   │   ├── no_deployment_plan.py
+│   │   ├── no_documentation.py
+│   │   ├── no_domain_analysis.py
+│   │   ├── no_enhancement.py
+│   │   ├── no_entropy_sentinel.py
+│   │   ├── no_evaluator.py
+│   │   ├── no_evolution_committee.py
+│   │   ├── no_evolution_dynamic_registry.py
+│   │   ├── no_evolution_homocysteine.py
+│   │   ├── no_evolution_knowledge.py
+│   │   ├── no_evolution_methylation.py
+│   │   ├── no_evolution_skill_executor.py
+│   │   ├── no_evolution_trigger.py
+│   │   ├── no_execution_plan.py
+│   │   ├── no_failure_analysis.py
+│   │   ├── no_fix_validator.py
+│   │   ├── no_frontend_builder.py
+│   │   ├── no_fugue_compartment.py
+│   │   ├── no_fusion.py
+│   │   ├── no_gap_analyzer.py
+│   │   ├── no_ga_router_evolve.py
+│   │   ├── no_genesis_builder.py
+│   │   ├── no_immune_check_build.py
+│   │   ├── no_immune_check.py
+│   │   ├── no_immune_exchange.py
+│   │   ├── no_immune_monitor.py
+│   │   ├── no_ingestion.py
+│   │   ├── no_integrator.py
+│   │   ├── no_interpreter.py
+│   │   ├── no_knowledge_analyzer.py
+│   │   ├── no_knowledge.py
+│   │   ├── no_knowledge_writer.py
+│   │   ├── no_law_of_thought_enforcer.py
+│   │   ├── no_local_knowledge.py
+│   │   ├── no_memory_cleaner.py
+│   │   ├── no_memory_writer.py
+│   │   ├── no_metabolic_pruning.py
+│   │   ├── no_meta_director.py
+│   │   ├── no_metrics.py
+│   │   ├── no_mini_evaluator_post_arch.py
+│   │   ├── no_mini_evaluator_post_build.py
+│   │   ├── no_multi_agent.py
+│   │   ├── no_multi_coder.py
+│   │   ├── no_observability_design.py
+│   │   ├── no_optimization.py
+│   │   ├── no_orchestrator_agent.py
+│   │   ├── no_performance_audit.py
+│   │   ├── no_performance_design.py
+│   │   ├── no_performance.py
+│   │   ├── no_pipeline_updater.py
+│   │   ├── no_pip_install.py
+│   │   ├── no_planner.py
+│   │   ├── no_pm.py
+│   │   ├── no_prompt_builder.py
+│   │   ├── no_prompt_improver.py
+│   │   ├── no_prompt_intake.py
+│   │   ├── no_proposal_quarantine.py
+│   │   ├── no_qa.py
+│   │   ├── no_reactpy.py
+│   │   ├── no_reflexion.py
+│   │   ├── no_release.py
+│   │   ├── no_requirements.py
+│   │   ├── no_result_agent.py
+│   │   ├── no_retrospective.py
+│   │   ├── no_reviewer.py
+│   │   ├── no_risk_analysis.py
+│   │   ├── no_sandbox_validator.py
+│   │   ├── no_scheduler.py
+│   │   ├── no_search_agent.py
+│   │   ├── no_search.py
+│   │   ├── no_search_web_brain.py
+│   │   ├── no_search_wikipedia.py
+│   │   ├── no_security_audit.py
+│   │   ├── no_security_design.py
+│   │   ├── no_security.py
+│   │   ├── no_semantic_validator.py
+│   │   ├── no_skill_generator.py
+│   │   ├── no_success_ritual.py
+│   │   ├── no_symbiont_handshake.py
+│   │   ├── no_system_design.py
+│   │   ├── no_task_breakdown.py
+│   │   ├── no_technology_selection.py
+│   │   ├── no_tester.py
+│   │   ├── no_test_generator.py
+│   │   ├── no_threat_modeling.py
+│   │   ├── no_typing_agent.py
+│   │   ├── no_vacuum_strength.py
+│   │   ├── no_validator.py
+│   │   ├── no_web_classifier.py
+│   │   ├── _search_enhanced.py
+│   │   ├── _search_queries.py
+│   │   ├── _search_router.py
+│   │   ├── _search_shared.py
+│   │   ├── _search_sources.py
+│   │   └── _search_wikipedia.py
+│   ├── nodes.py
+│   ├── pipeline_definition.py
+│   ├── policy.py
+│   ├── registry.py
+│   ├── scheduler.py
+│   ├── skill_node.py
+│   ├── state_store.py
+│   ├── task.py
+│   ├── task_runner.py
+│   ├── telemetry.py
+│   ├── topology.py
+│   └── workdir.py
+├── immunity
+│   ├── adaptive_threat_detector.py
+│   ├── apoptosis_engine.py
+│   ├── async_violation_detector.py
+│   ├── emergent_behavior_detector.py
+│   ├── entropy_sentinel.py
+│   ├── epigenetic_masking.py
+│   ├── glutathione_guardrails.py
+│   ├── glutathione_pool.py
+│   ├── hallucination_detector.py
+│   ├── immune_memory_exchange.py
+│   ├── immune_orchestrator.py
+│   ├── __init__.py
+│   ├── loop_detector.py
+│   ├── metabolic_pruner.py
+│   ├── mhc_detector.py
+│   ├── pathogen_analyzer.py
+│   ├── regression_detector.py
+│   ├── symbiosis_score.py
+│   └── vacuum_trigger.py
+├── __init__.py
+├── integration_registry.py
+├── intention
+│   └── meta_director.py
+├── ivm_compliance.py
+├── __main__.py
+├── mcp
+│   └── mcp_agent.py
+├── memory
+│   ├── async_memory.py
+│   ├── backup_manager.py
+│   ├── cache.py
+│   ├── check_db.py
+│   ├── cognitive_cache.py
+│   ├── consolidation.py
+│   ├── core.py
+│   ├── data
+│   │   ├── auditoria
+│   │   │   └── relatorio_funcoes.txt
+│   │   ├── cache
+│   │   │   └── memory_swap
+│   │   │       └── stm.db
+│   │   ├── core.db
+│   │   ├── json
+│   │   │   └── genome_apoptose_agent.json
+│   │   ├── life_signals.json
+│   │   ├── result
+│   │   │   ├── project001
+│   │   │   │   ├── metadata.json
+│   │   │   │   └── output.pdf
+│   │   │   ├── project002
+│   │   │   │   ├── metadata.json
+│   │   │   │   └── output.pdf
+│   │   │   ├── project003
+│   │   │   │   ├── metadata.json
+│   │   │   │   └── output.pdf
+│   │   │   └── project004
+│   │   │       ├── metadata.json
+│   │   │       └── output.pdf
+│   │   └── work
+│   │       └── obsidian
+│   │           └── 05_Lineages
+│   │               ├── hybrid_001.md
+│   │               ├── MOC_Ancestry.md
+│   │               ├── mutant_hybrid.md
+│   │               └── test_hybrid.md
+│   ├── db_manager.py
+│   ├── fusion_engine.py
+│   ├── __init__.py
+│   ├── memory_error.py
+│   ├── memory.py
+│   ├── memory_storage.py
+│   ├── memory_vector.py
+│   ├── persistence.py
+│   ├── ranking.py
+│   ├── raw_pool.py
+│   ├── semantic_cache.py
+│   ├── term_long.py
+│   └── term_short.py
+├── metabolism
+│   ├── clarity_directive.py
+│   ├── metabolic_autocorrect.py
+│   ├── metabolic_invariants.py
+│   └── metabolic_metrics.py
+├── models
+│   ├── agent_context.py
+│   ├── event_bus.py
+│   ├── __init__.py
+│   └── task.py
+├── observability
+│   ├── health.py
+│   ├── __init__.py
+│   ├── metrics_collector.py
+│   └── tracing.py
+├── obsidian
+│   ├── 01_Instincts
+│   │   └── test.md
+│   ├── 02_Short_Term
+│   │   ├── apoptosis_evo-obsidian-test.md
+│   │   ├── erro_test_20260627160057915461.md
+│   │   ├── erro_test_20260627160057916504.md
+│   │   ├── erro_test_agent_20260627160057914414.md
+│   │   ├── evolution_committee_1782577593.md
+│   │   ├── evolution_committee_1782577594.md
+│   │   ├── evolution_committee_1782599125.md
+│   │   ├── evolution_committee_1782599126.md
+│   │   ├── evolution_committee_1782599267.md
+│   │   ├── evolution_committee_1782599268.md
+│   │   ├── evolution_committee_1782604021.md
+│   │   └── evolution_committee_1782604022.md
+│   ├── 03_Long_Term
+│   │   └── mhc_audit_20260627.md
+│   ├── 04_Synapses
+│   │   ├── Mapa_Mental_Subconsciente.md
+│   │   ├── proposals
+│   │   │   ├── proposal_approval_test_20260625003734.md
+│   │   │   ├── proposal_approval_test_20260625004757.md
+│   │   │   ├── proposal_storage_test_20260625003734.md
+│   │   │   ├── proposal_storage_test_20260625004757.md
+│   │   │   ├── proposal_test_component_20260625003734.md
+│   │   │   └── proposal_test_component_20260625004757.md
+│   │   └── success_log.md
+│   ├── 05_Quarantine
+│   ├── ancestry_tree.py
+│   ├── consolidation.py
+│   ├── epigenetic_registry.py
+│   ├── error_capture.py
+│   ├── __init__.py
+│   ├── law_compliance_logger.py
+│   ├── learning_system.py
+│   ├── omnimind.py
+│   ├── subconsciousapi.py
+│   └── success_cycle_logger.py
+├── _paths.py
+├── pipeline
+│   ├── engine.py
+│   ├── __init__.py
+│   ├── pipelinestate.py
+│   ├── result.py
+│   └── stages.py
+├── providers
+│   ├── async_http.py
+│   ├── batch_writer.py
+│   ├── gemini_provider.py
+│   ├── groq_provider.py
+│   ├── groq_provider.py.bkp
+│   ├── hf_image_provider.py
+│   ├── hf_inference_provider.py
+│   ├── hf_router_provider.py
+│   ├── hf_video_provider.py
+│   ├── huggingchat_provider.py
+│   ├── __init__.py
+│   ├── nvidia_provider.py
+│   ├── ollama_provider.py
+│   ├── openai_provider.py
+│   ├── opencode_provider.py
+│   ├── openrouter_provider.py
+│   ├── perplexity_provider.py
+│   ├── poe_provider.py
+│   ├── provider_config.py
+│   ├── provider_metrics.py
+│   ├── provider_registry.py
+│   ├── provider_router.py
+│   ├── provider_scorer.py
+│   ├── provider_state.py
+│   ├── task_router.py
+│   └── token_usage.py
+├── recycling
+│   ├── embedding_pruner.py
+│   ├── __init__.py
+│   ├── mta_pool.py
+│   ├── prompt_recycler.py
+│   └── skill_recycler.py
+├── reflection
+│   ├── failure_analysis.py
+│   ├── __init__.py
+│   ├── learning_loop.py
+│   ├── reflexion_engine.py
+│   └── self_critique.py
+├── security
+│   ├── ast_gateway.py
+│   ├── entropy_sentinel.py
+│   ├── __init__.py
+│   ├── network_guard.py
+│   ├── pysecurity1024.py
+│   ├── resource_limits.py
+│   ├── sandbox_executor.py
+│   └── sandbox_rules.py
+├── server
+│   ├── __init__.py
+│   ├── leiame_server.md
+│   ├── __main__.py
+│   ├── mcp_server.py
+│   └── server.py
+├── settings.py
+├── state
+│   └── __init__.py
+├── storage
+│   ├── batch_writer.py
+│   ├── converter.py
+│   ├── daemon_monitor.py
+│   ├── __init__.py
+│   └── snapshotter.py
+├── subconscious
+│   ├── delta_sleep.py
+│   ├── fugue_compartment.py
+│   └── subconscious_api.py
+├── tools
+│   ├── __init__.py
+│   ├── search.py
+│   ├── search_tools.py
+│   ├── tool_router.py
+│   └── web_brain.py
+├── ui
+│   ├── fastapi_app.py
+│   ├── reactpy_components.py
+│   ├── static
+│   │   ├── css
+│   │   └── js
+│   ├── urls.py
+│   └── views.py
+├── urls.py
+├── utils
+│   ├── ansi_colors.py
+│   ├── controlled_subprocess.py
+│   ├── hash_utils.py
+│   ├── helpers.py
+│   ├── __init__.py
+│   ├── life_signal_collector.py
+│   ├── logger.py
+│   └── playwright_util.py
+└── validation
+    ├── ast_security.py
+    ├── engine.py
+    ├── gateway.py
+    ├── __init__.py
+    ├── normalization.py
+    ├── scoring.py
+    └── syntax.py
+
+68 directories, 506 files
 ```
 
 ---
