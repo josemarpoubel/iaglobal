@@ -1,0 +1,2 @@
+[14:31:58] contrato insatisfeito: Skill 'system_design' requer inputs faltando: ['architect']. Disponíveis no cont — fallback
+[14:31:58] erro: Contexto insuficiente para executar a skill 'system_design'. Inputs requeridos: ('architect',)

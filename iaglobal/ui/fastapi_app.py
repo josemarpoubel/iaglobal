@@ -9,7 +9,9 @@ from reactpy import component, html
 from reactpy.backend.fastapi import configure as reactpy_configure
 from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
+import uvicorn
 
+# Criar app FastAPI com configurações compatíveis
 app = FastAPI(title="IAGLOBAL ReactPy UI")
 
 # Design tokens
@@ -51,16 +53,40 @@ def AgentDashboard():
     )
 
 
-# Configure ReactPy no FastAPI
-reactpy_configure(app, AgentDashboard)
+# Configure ReactPy no FastAPI (usa route padrão)
+try:
+    reactpy_configure(app, AgentDashboard)
+except AttributeError:
+    # Fallback para versões mais recentes do FastAPI
+    from reactpy.backend.fastapi import Options
+    options = Options()
+    reactpy_configure(app, AgentDashboard, options=options)
 
 # Servir arquivos estáticos do resultado
-RESULTS_DIR = Path("/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/result")
+RESULTS_DIR = Path(__file__).parent.parent / "memory" / "data" / "result"
 if RESULTS_DIR.exists():
     app.mount("/result", StaticFiles(directory=str(RESULTS_DIR)), name="result")
 
 
+@app.get("/")
+async def root():
+    """Redireciona para o dashboard ReactPy."""
+    return {"message": "IAGLOBAL UI", "dashboard": "/@/AgentDashboard"}
+
+
+@app.get("/health")
+async def health():
+    """Health check endpoint."""
+    return {"status": "healthy", "service": "iaglobal-ui"}
+
+
 def run_server(host: str = "0.0.0.0", port: int = 8000):
     """Run the ReactPy FastAPI server."""
-    import uvicorn
+    print(f"🚀 Starting IAGLOBAL UI server on http://{host}:{port}")
+    print(f"📊 Dashboard: http://{host}:{port}/@/AgentDashboard")
+    print(f"📁 Results: http://{host}:{port}/result")
     uvicorn.run(app, host=host, port=port)
+
+
+if __name__ == "__main__":
+    run_server()

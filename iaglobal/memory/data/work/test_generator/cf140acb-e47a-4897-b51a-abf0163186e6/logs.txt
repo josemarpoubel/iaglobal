@@ -1,0 +1,2 @@
+[14:31:58] contrato insatisfeito: Skill 'test_generator' requer inputs faltando: ['backend_code', 'frontend_code', — fallback
+[14:31:58] erro: Contexto insuficiente para executar a skill 'test_generator'. Inputs requeridos: ('backend_code', 'frontend_code', 'db_schema', 'api_code')

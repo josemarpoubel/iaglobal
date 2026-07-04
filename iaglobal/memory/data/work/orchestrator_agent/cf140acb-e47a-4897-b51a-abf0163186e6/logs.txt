@@ -1,0 +1,2 @@
+[14:31:58] contrato insatisfeito: Skill 'orchestrator_agent' requer inputs faltando: ['enhanced_task', 'prerequisi — fallback
+[14:31:58] erro: Contexto insuficiente para executar a skill 'orchestrator_agent'. Inputs requeridos: ('enhanced_task', 'prerequisites')

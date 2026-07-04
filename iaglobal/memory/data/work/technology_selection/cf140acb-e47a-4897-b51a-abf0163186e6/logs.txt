@@ -1,0 +1,2 @@
+[14:31:58] contrato insatisfeito: Skill 'technology_selection' requer inputs faltando: ['business_rules']. Disponí — fallback
+[14:31:58] erro: Contexto insuficiente para executar a skill 'technology_selection'. Inputs requeridos: ('business_rules',)
