@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'database_builder' requer inputs faltando: ['execution_plan']. Disponíveis — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'database_builder'. Inputs requeridos: ('execution_plan',)

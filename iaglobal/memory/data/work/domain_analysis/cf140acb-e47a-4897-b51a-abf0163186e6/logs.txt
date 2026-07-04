@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'domain_analysis' requer inputs faltando: ['requirements']. Disponíveis no — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'domain_analysis'. Inputs requeridos: ('requirements',)

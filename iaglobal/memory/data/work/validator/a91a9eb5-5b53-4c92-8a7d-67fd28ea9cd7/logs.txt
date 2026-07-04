@@ -1,2 +1,0 @@
-[14:31:06] contrato insatisfeito: Skill 'validator' requer inputs faltando: ['task']. Disponíveis no contexto: ['c — fallback
-[14:31:06] erro: Contexto insuficiente para executar a skill 'validator'. Inputs requeridos: ('code', 'task')

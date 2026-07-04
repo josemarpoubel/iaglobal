@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'gap_analyzer' requer inputs faltando: ['evaluator']. Disponíveis no conte — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'gap_analyzer'. Inputs requeridos: ('evaluator',)

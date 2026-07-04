@@ -1,2 +1,0 @@
-[14:29:09] contrato insatisfeito: Skill 'threat_modeling' requer inputs faltando: ['security_design']. Disponíveis — fallback
-[14:29:09] erro: Contexto insuficiente para executar a skill 'threat_modeling'. Inputs requeridos: ('security_design',)

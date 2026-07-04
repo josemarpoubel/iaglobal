@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'ingestion' requer inputs faltando: ['requirements']. Disponíveis no conte — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'ingestion'. Inputs requeridos: ('requirements',)

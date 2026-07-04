@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'dependency' requer inputs faltando: ['path', 'requirements']. Disponíveis — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'dependency'. Inputs requeridos: ('code', 'path', 'requirements')

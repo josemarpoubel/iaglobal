@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'security_design' requer inputs faltando: ['architecture', 'requirements'] — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'security_design'. Inputs requeridos: ('architecture', 'requirements')

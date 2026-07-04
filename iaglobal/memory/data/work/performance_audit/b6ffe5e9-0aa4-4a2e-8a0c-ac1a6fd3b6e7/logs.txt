@@ -1,2 +1,0 @@
-[14:29:10] contrato insatisfeito: Skill 'performance_audit' requer inputs faltando: ['code', 'performance_requirem — fallback
-[14:29:10] erro: Contexto insuficiente para executar a skill 'performance_audit'. Inputs requeridos: ('code', 'performance_requirements')

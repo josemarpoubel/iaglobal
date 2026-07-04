@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'failure_analysis' requer inputs faltando: ['code_executor', 'debugger'].  — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'failure_analysis'. Inputs requeridos: ('code_executor', 'debugger')

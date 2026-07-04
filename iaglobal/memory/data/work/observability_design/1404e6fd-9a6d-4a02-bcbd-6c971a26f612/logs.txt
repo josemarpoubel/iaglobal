@@ -1,2 +1,0 @@
-[14:30:05] contrato insatisfeito: Skill 'observability_design' requer inputs faltando: ['architect']. Disponíveis  — fallback
-[14:30:05] erro: Contexto insuficiente para executar a skill 'observability_design'. Inputs requeridos: ('architect',)

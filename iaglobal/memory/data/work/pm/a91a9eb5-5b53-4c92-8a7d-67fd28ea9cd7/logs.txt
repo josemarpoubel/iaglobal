@@ -1,2 +1,0 @@
-[14:31:05] contrato insatisfeito: Skill 'pm' requer inputs faltando: ['requirements']. Disponíveis no contexto: [' — fallback
-[14:31:05] erro: Contexto insuficiente para executar a skill 'pm'. Inputs requeridos: ('requirements',)

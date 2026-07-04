@@ -1,2 +1,0 @@
-[14:29:10] contrato insatisfeito: Skill 'evolution_trigger' requer inputs faltando: ['pipeline_updater']. Disponív — fallback
-[14:29:10] erro: Contexto insuficiente para executar a skill 'evolution_trigger'. Inputs requeridos: ('pipeline_updater',)

@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'local_knowledge' requer inputs faltando: ['prompt_intake']. Disponíveis n — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'local_knowledge'. Inputs requeridos: ('prompt_intake',)

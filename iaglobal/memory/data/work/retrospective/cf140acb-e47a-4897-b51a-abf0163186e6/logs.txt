@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'retrospective' requer inputs faltando: ['metrics_report', 'execution_log' — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'retrospective'. Inputs requeridos: ('metrics_report', 'execution_log')

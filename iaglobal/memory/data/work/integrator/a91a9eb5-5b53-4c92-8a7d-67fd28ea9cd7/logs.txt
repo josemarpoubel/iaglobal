@@ -1,2 +1,0 @@
-[14:31:05] contrato insatisfeito: Skill 'integrator' requer inputs faltando: ['frontend_builder', 'backend_builder — fallback
-[14:31:05] erro: Contexto insuficiente para executar a skill 'integrator'. Inputs requeridos: ('frontend_builder', 'backend_builder', 'database_builder', 'api_builder')

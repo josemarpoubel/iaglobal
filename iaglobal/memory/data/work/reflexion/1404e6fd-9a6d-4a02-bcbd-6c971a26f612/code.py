@@ -1,1 +1,0 @@
-Resultado processado pela estratégia precise

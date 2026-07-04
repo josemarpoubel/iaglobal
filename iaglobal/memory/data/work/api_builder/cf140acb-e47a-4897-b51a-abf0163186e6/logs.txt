@@ -1,2 +1,0 @@
-[14:31:58] contrato insatisfeito: Skill 'api_builder' requer inputs faltando: ['execution_plan']. Disponíveis no c — fallback
-[14:31:58] erro: Contexto insuficiente para executar a skill 'api_builder'. Inputs requeridos: ('execution_plan',)
