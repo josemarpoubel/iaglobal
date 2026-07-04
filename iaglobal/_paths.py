@@ -73,6 +73,7 @@ HOMOCYSTEINE_POOL_FILE = JSON_DIR / "homocysteine_pool.json"
 GLUTATHIONE_POOL_FILE = JSON_DIR / "glutathione_pool.json"
 CHOLINE_POOL_FILE = TEMP_DIR / "choline_pool.json"
 MTA_POOL_FILE = TEMP_DIR / "mta_pool.json"
+METHYLATION_ENGINE_FILE = JSON_DIR / "methylation_engine.json"
 ERROR_LOG = JSON_DIR / "errors.json"
 ERROR_DIR = DATA_ROOT / "error"
 

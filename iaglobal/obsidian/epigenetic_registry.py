@@ -268,3 +268,7 @@ class EpigeneticRegistry:
             profile["avg_reward"] = reward_sum / reward_count
         
         return profile
+
+
+# Singleton global
+epigenetic_registry = EpigeneticRegistry()
