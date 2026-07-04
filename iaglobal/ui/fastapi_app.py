@@ -11,6 +11,7 @@ from fastapi import FastAPI
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import JSONResponse, HTMLResponse
 import uvicorn
+import logging
 
 # Importar conversor de dados CBOR/JSON
 try:
@@ -77,6 +78,8 @@ def AgentDashboard():
 reactpy_configure(app, AgentDashboard, Options(url_prefix="/@"))
 
 
+logger = logging.getLogger(__name__)
+
 # Servir arquivos estáticos do resultado
 RESULTS_DIR = Path(__file__).parent.parent / "memory" / "data" / "result"
 if RESULTS_DIR.exists():
@@ -116,10 +119,11 @@ async def api_execucoes(limit: int = 50):
             "count": len(executions),
             "executions": executions
         })
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to fetch execution history")
         return JSONResponse(
             status_code=500,
-            content={"success": False, "error": str(e)}
+            content={"success": False, "error": "Internal server error"}
         )
 
 
@@ -132,10 +136,11 @@ async def api_agentes():
             "success": True,
             **agents
         })
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to fetch agent status")
         return JSONResponse(
             status_code=500,
-            content={"success": False, "error": str(e)}
+            content={"success": False, "error": "Internal server error"}
         )
 
 
@@ -148,10 +153,11 @@ async def api_metabolismo():
             "success": True,
             **metabolic
         })
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to fetch metabolic state")
         return JSONResponse(
             status_code=500,
-            content={"success": False, "error": str(e)}
+            content={"success": False, "error": "Internal server error"}
         )
 
 
@@ -164,10 +170,11 @@ async def api_epigenetica(agent_id: str = None):
             "success": True,
             **markers
         })
-    except Exception as e:
+    except Exception:
+        logger.exception("Failed to fetch epigenetic markers")
         return JSONResponse(
             status_code=500,
-            content={"success": False, "error": str(e)}
+            content={"success": False, "error": "Internal server error"}
         )
 
 
