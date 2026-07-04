@@ -1,0 +1,9 @@
+venv/
+__pycache__/
+*.pyc
+.env
+.bak*
+
+# Se for muito grande (>1GB), considerar:
+# git lfs install
+# git lfs track "*.json"
