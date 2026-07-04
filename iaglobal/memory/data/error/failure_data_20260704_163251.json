@@ -1,0 +1,102 @@
+{
+  "errors": {
+    "total": 7,
+    "by_component": {
+      "test_component": 2,
+      "builder": 1,
+      "multi_coder": 1,
+      "immune_check": 1,
+      "dependency": 1,
+      "coder": 1
+    },
+    "entries": [
+      {
+        "timestamp": "2026-07-04T14:36:41.893647+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-07-04T14:37:21.791303+00:00",
+        "component": "test_component",
+        "severity": "ERROR",
+        "execution_id": "exec-1",
+        "message": "mensagem de erro",
+        "details": {
+          "detail": "info"
+        }
+      },
+      {
+        "timestamp": "2026-07-04T16:31:59.134867+00:00",
+        "component": "builder",
+        "severity": "ERROR",
+        "execution_id": null,
+        "message": "Handler not found for node: meta_directorevolution_knowledge",
+        "details": {
+          "node": "meta_directorevolution_knowledge"
+        }
+      },
+      {
+        "timestamp": "2026-07-04T16:31:59.182125+00:00",
+        "component": "multi_coder",
+        "severity": "ERROR",
+        "execution_id": null,
+        "message": "Todas as partes falharam",
+        "details": {
+          "prompt_len": 61,
+          "errors": {
+            "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+            "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+            "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
+          }
+        }
+      },
+      {
+        "timestamp": "2026-07-04T16:32:42.975961+00:00",
+        "component": "immune_check",
+        "severity": "ERROR",
+        "execution_id": null,
+        "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
+        "details": {
+          "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
+        }
+      },
+      {
+        "timestamp": "2026-07-04T16:32:51.678090+00:00",
+        "component": "dependency",
+        "severity": "ERROR",
+        "execution_id": null,
+        "message": "'str' object has no attribute 'get'",
+        "details": {
+          "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
+        }
+      },
+      {
+        "timestamp": "2026-07-04T16:32:51.702209+00:00",
+        "component": "coder",
+        "severity": "ERROR",
+        "execution_id": null,
+        "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+        "details": {
+          "task": "Crie uma API REST em FastAPI com endpoints CRUD para usuários"
+        }
+      }
+    ],
+    "path": "/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/json/errors.json"
+  },
+  "metrics": {
+    "total_calls": 0,
+    "by_provider": {}
+  },
+  "logs": {
+    "lines": 1079,
+    "tail_lines": 50,
+    "content": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_coder.py\", line 74, in run_coder\n    artifact = await _coder.generate(\n               ^^^^^^^^^^^^^^^^^^^^^^\n    ...<4 lines>...\n    )\n    ^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/coder_agent.py\", line 262, in generate\n    modelos = self._modelos_candidatos(3)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/coder_agent.py\", line 223, in _modelos_candidatos\n    modelos = self.bandit.select_top_n(\n        node=\"coder_agent\", strategy=\"code_generation\", n=count\n    )\nTypeError: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'\n2026-07-04 13:32:51,704 [WARNING] [iaglobal] [TRACE] Silent drop detectado em coder - nó sem output válido\n2026-07-04 13:32:51,704 [WARNING] [iaglobal] [GRAPH] Nó 'coder' falhou: BanditPolicy.select_model() missing 1 required positional argument: 'candidates'\n2026-07-04 13:32:51,706 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['multi_coder']\n2026-07-04 13:32:51,713 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['backend_builder', 'frontend_builder']\n2026-07-04 13:32:51,721 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['api_builder', 'database_builder', 'code_executor']\n2026-07-04 13:32:51,729 [ERROR] [iaglobal] [OmniMind] 🚨 ALERTA DE PATÓGENO: Agente CodeExecutor com DNA inválido!\n2026-07-04 13:32:51,740 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['immune_check_build', 'mini_evaluator_post_build', 'test_generator']\n2026-07-04 13:32:51,745 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE\n2026-07-04 13:32:51,746 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: immune_check_build - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}\n2026-07-04 13:32:51,765 [WARNING] [iaglobal] [GRAPH] Nó 'immune_check_build' falhou: BanditPolicy.select_model() missing 1 required positional argument: 'candidates'\n2026-07-04 13:32:51,769 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['integrator']\n2026-07-04 13:32:51,776 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['reviewer']\n2026-07-04 13:32:51,781 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['semantic_validator']\n2026-07-04 13:32:51,787 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['security_audit']\n2026-07-04 13:32:51,793 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['performance_audit']\n2026-07-04 13:32:51,799 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['compliance_audit']\n2026-07-04 13:32:51,807 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['debug_coder']\n2026-07-04 13:32:51,898 [ERROR] [iaglobal.graphs.nodes.no_debug_coder] [DEBUG_CODER] Falha crítica no pipeline do Debug Coder Agent: BanditPolicy.select_model() got an unexpected keyword argument 'node'\nTraceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_debug_coder.py\", line 44, in run_debug_coder\n    result = await agent.corrigir_codigo(codigo=code, erro=erro_contexto, task=task)\n             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/debugger_agent.py\", line 364, in corrigir_codigo\n    repaired_code, _ = await self._repair_code(\n                       ^^^^^^^^^^^^^^^^^^^^^^^^\n    ...<3 lines>...\n    )\n    ^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/debugger_agent.py\", line 186, in _repair_code\n    model = self.bandit.select_model(\n        node=\"debugger_agent\",\n        strategy=\"debug\",\n    )\nTypeError: BanditPolicy.select_model() got an unexpected keyword argument 'node'\n2026-07-04 13:32:51,903 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['fix_validator']\n2026-07-04 13:32:51,909 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['documentation', 'failure_analysis']",
+    "path": "/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/logs/app.log"
+  },
+  "collected_at": "2026-07-04T16:32:51.913814"
+}

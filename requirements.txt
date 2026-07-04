@@ -1,6 +1,11 @@
+# FastAPI / API
+fastapi
+uvicorn
+pydantic
+pydantic-core
+
 # IAGlobal — Dependências (Versões Estabilizadas)
 
-fastapi
 accelerate
 aiohttp
 cbor2
@@ -43,10 +48,10 @@ urllib3
 watchdog
 
 selenium
-torch 
-torchvision 
-pillow 
-safetensors 
+torch
+torchvision
+pillow
+safetensors
 tokenizers
 bandit
 safety
@@ -75,7 +80,3 @@ uvicorn[standard]
 # EXTRAS PARA PRODUÇÃO AVANÇADA (WebSockets distribuídos)
 # ==============================================================================
 channels-redis
-
-fastapi==0.110.1
-uvicorn==0.29.0
-pydantic==2.7.0
