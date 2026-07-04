@@ -1,0 +1,14 @@
+{
+  "state": {
+    "sam_e_level": 100.0,
+    "methylation_capacity": 100.0,
+    "homocysteine_level": 0.0,
+    "technical_debt_score": 0.5,
+    "last_cycle_time": "2026-07-04T14:22:37.212185+00:00",
+    "cycles_completed": 13,
+    "successful_methylations": 2,
+    "failed_methylations": 1,
+    "guardrails_created": 2
+  },
+  "last_updated": "2026-07-04T14:22:37.228828+00:00"
+}

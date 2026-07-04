@@ -1,0 +1,11 @@
+2026-07-04 13:24:42,708 [WARNING] [iaglobal] 🧬 [IVM] Agente AGENT_TEST_002 com IVM crítico (0.450) — adaptação epigenética necessária
+2026-07-04 13:41:03,812 [ERROR] [iaglobal] [SKILL] Tentativa de registro de skill inválida: test_skill_methylation
+2026-07-04 14:20:49,131 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:22:10,468 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:22:22,954 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:22:22,967 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:22:22,969 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:22:23,030 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
+2026-07-04 14:22:37,190 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] 'parasite_skill' detectado como parasita — rejeitando
+2026-07-04 14:22:37,192 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] SAMe insuficiente (15.0 < 20.0) — adiando
+2026-07-04 14:22:37,212 [WARNING] [iaglobal.evolution.metabolism.methylation_engine] [METHYLATION] ⚠️ HOMOCISTEÍNA ELEVADA (61.0 ≥ 50.0) — Technical debt acumulado!
