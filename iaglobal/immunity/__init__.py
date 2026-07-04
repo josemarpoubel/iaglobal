@@ -9,6 +9,7 @@ from iaglobal.immunity.immune_orchestrator import ImmuneOrchestrator, ImmuneRepo
 from iaglobal.immunity.pathogen_analyzer import PathogenAnalyzer, pathogen_analyzer
 from iaglobal.immunity.apoptosis_engine import ApoptosisEngine, apoptosis_engine
 from iaglobal.immunity.epigenetic_masking import EpigeneticMasking, EpigeneticMask, epigenetic_masking
+from iaglobal.immunity.autoimmunity_detector import AutoimmunityDetector, get_autoimmunity_detector
 
 # Import OpportunityCostDetector from evolution/metabolism
 from iaglobal.evolution.metabolism import OpportunityCostDetector
@@ -37,5 +38,7 @@ __all__ = [
     "EpigeneticMasking",
     "EpigeneticMask",
     "epigenetic_masking",
+    "AutoimmunityDetector",
+    "get_autoimmunity_detector",
     "OpportunityCostDetector",
 ]

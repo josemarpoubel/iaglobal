@@ -1,11 +1,41 @@
+# iaglobal/obsidian/epigenetic_registry.py
+"""
+EpigeneticRegistry — Registro de comportamento adaptativo de agentes via Obsidian Vault.
+
+Tradução das Leis de Holliwell:
+- Lei 4 (Colheita): O que você planta no registro epigenético, colhe em adaptação comportamental.
+- Lei 6 (Amor): Reconheça e recompense padrões de sucesso; eles se multiplicarão.
+- Lei 9 (Esforço): O esforço de registrar falhas gera aprendizado proporcional.
+
+Funcionalidades:
+- Registro de falhas/sucessos como marcas epigenéticas
+- Recuperação de pesos adaptativos para ajuste de comportamento
+- Integração com BanditPolicy para rewards baseados em IVM
+- Ciclo completo: Falha → Peso → Adaptação → Reward → Epigenética
+"""
+
 import asyncio
 import hashlib
 import logging
 import time
 from pathlib import Path
-from typing import Dict, Any
+from typing import Dict, Any, Optional, List
+from dataclasses import dataclass, field
 
 logger = logging.getLogger("iaglobal")
+
+
+@dataclass
+class EpigeneticMarker:
+    """Marca epigenética com metadados completos."""
+    agent_id: str
+    task_hash: str
+    error_type: str
+    timestamp: float
+    context: Dict[str, Any]
+    ivm_score: Optional[float] = None
+    reward_value: Optional[float] = None
+    adaptation_count: int = 0
 
 
 class EpigeneticRegistry:
@@ -16,14 +46,16 @@ class EpigeneticRegistry:
             "/home/kitohamachi/projeto-iaglobal/obsidian/epigenetic"
         )
         self.base_path.mkdir(parents=True, exist_ok=True)
-
+        self._memory_cache: Dict[str, EpigeneticMarker] = {}
+        
     def _epigenetic_id(self, agent_id: str, task_hash: str, error_type: str) -> str:
         return hashlib.sha3_512(
             f"{agent_id}:{task_hash}:{error_type}".encode()
         ).hexdigest()[:16]
 
     async def record_failure(
-        self, agent_id: str, task_hash: str, error_type: str, context: Dict[str, Any]
+        self, agent_id: str, task_hash: str, error_type: str, context: Dict[str, Any],
+        ivm_score: Optional[float] = None
     ) -> str:
         """Registra uma falha como 'marca epigenética' no Obsidian Vault."""
         metadata = {
@@ -32,9 +64,22 @@ class EpigeneticRegistry:
             "error_type": error_type,
             "timestamp": time.time(),
             "context": context,
+            "ivm_score": ivm_score,
         }
         epigenetic_id = self._epigenetic_id(agent_id, task_hash, error_type)
         file_path = self.base_path / f"{epigenetic_id}.cbor"
+
+        # Atualiza cache em memória
+        marker = EpigeneticMarker(
+            agent_id=agent_id,
+            task_hash=task_hash,
+            error_type=error_type,
+            timestamp=metadata["timestamp"],
+            context=context,
+            ivm_score=ivm_score,
+            adaptation_count=0
+        )
+        self._memory_cache[epigenetic_id] = marker
 
         def _write():
             import cbor2
@@ -42,10 +87,14 @@ class EpigeneticRegistry:
                 cbor2.dump(metadata, f)
 
         await asyncio.to_thread(_write)
-        logger.info("🧬 [EPIGENETIC] Falha registrada: %s | %s", epigenetic_id, error_type)
+        logger.info("🧬 [EPIGENETIC] Falha registrada: %s | %s | IVM=%.2f", epigenetic_id, error_type, ivm_score or 0.0)
         return epigenetic_id
 
-    async def record_success(self, agent_id: str, task_hash: str) -> str:
+    async def record_success(
+        self, agent_id: str, task_hash: str, 
+        ivm_score: Optional[float] = None,
+        reward_value: Optional[float] = None
+    ) -> str:
         """Registra uma tentativa bem-sucedida como 'epigenética positiva'."""
         metadata = {
             "agent_id": agent_id,
@@ -53,9 +102,24 @@ class EpigeneticRegistry:
             "error_type": "success",
             "timestamp": time.time(),
             "context": {"status": "success"},
+            "ivm_score": ivm_score,
+            "reward_value": reward_value,
         }
         epigenetic_id = self._epigenetic_id(agent_id, task_hash, "success")
         file_path = self.base_path / f"{epigenetic_id}.cbor"
+
+        # Atualiza cache em memória
+        marker = EpigeneticMarker(
+            agent_id=agent_id,
+            task_hash=task_hash,
+            error_type="success",
+            timestamp=metadata["timestamp"],
+            context={"status": "success"},
+            ivm_score=ivm_score,
+            reward_value=reward_value,
+            adaptation_count=1
+        )
+        self._memory_cache[epigenetic_id] = marker
 
         def _write():
             import cbor2
@@ -63,7 +127,7 @@ class EpigeneticRegistry:
                 cbor2.dump(metadata, f)
 
         await asyncio.to_thread(_write)
-        logger.info("✅ [EPIGENETIC] Sucesso registrado: %s", epigenetic_id)
+        logger.info("✅ [EPIGENETIC] Sucesso registrado: %s | IVM=%.2f | Reward=%.2f", epigenetic_id, ivm_score or 0.0, reward_value or 0.0)
         return epigenetic_id
 
     async def get_adaptive_weights(
@@ -95,3 +159,116 @@ class EpigeneticRegistry:
             return result
 
         return await asyncio.to_thread(_read_all)
+
+    async def apply_bandit_reward(
+        self, agent_id: str, task_hash: str, 
+        reward: float, ivm: float
+    ) -> None:
+        """Aplica reward do BanditPolicy e atualiza marca epigenética."""
+        epigenetic_id = self._epigenetic_id(agent_id, task_hash, "success")
+        
+        # Atualiza ou cria marcador com reward
+        if epigenetic_id in self._memory_cache:
+            marker = self._memory_cache[epigenetic_id]
+            marker.reward_value = reward
+            marker.ivm_score = ivm
+            marker.adaptation_count += 1
+        else:
+            # Cria novo marcador de reward
+            marker = EpigeneticMarker(
+                agent_id=agent_id,
+                task_hash=task_hash,
+                error_type="success",
+                timestamp=time.time(),
+                context={"bandit_reward": reward, "ivm": ivm},
+                ivm_score=ivm,
+                reward_value=reward,
+                adaptation_count=1
+            )
+            self._memory_cache[epigenetic_id] = marker
+        
+        # Persiste em disco
+        metadata = {
+            "agent_id": agent_id,
+            "task_hash": task_hash,
+            "error_type": "success",
+            "timestamp": marker.timestamp,
+            "context": {"bandit_reward": reward, "ivm": ivm},
+            "ivm_score": ivm,
+            "reward_value": reward,
+        }
+        file_path = self.base_path / f"{epigenetic_id}.cbor"
+        
+        def _write():
+            import cbor2
+            with open(file_path, "wb") as f:
+                cbor2.dump(metadata, f)
+        
+        await asyncio.to_thread(_write)
+        logger.info(
+            "🎯 [EPIGENETIC] Reward aplicado: %s | Reward=%.2f | IVM=%.2f | Adaptações=%d",
+            epigenetic_id, reward, ivm, marker.adaptation_count
+        )
+
+    async def get_agent_epigenetic_profile(self, agent_id: str) -> Dict[str, Any]:
+        """Retorna perfil epigenético completo de um agente."""
+        profile = {
+            "total_markers": 0,
+            "successes": 0,
+            "failures": 0,
+            "avg_ivm": 0.0,
+            "avg_reward": 0.0,
+            "adaptation_events": [],
+        }
+        
+        ivm_sum = 0.0
+        reward_sum = 0.0
+        ivm_count = 0
+        reward_count = 0
+        
+        def _read_all():
+            import cbor2
+            markers = []
+            for file in self.base_path.glob("*.cbor"):
+                try:
+                    with open(file, "rb") as f:
+                        data = cbor2.load(f)
+                    if data.get("agent_id") == agent_id:
+                        markers.append(data)
+                except Exception as exc:
+                    logger.warning("[EPIGENETIC] Falha ao ler %s: %s", file.name, exc)
+            return markers
+        
+        markers = await asyncio.to_thread(_read_all)
+        
+        profile["total_markers"] = len(markers)
+        
+        for marker in markers:
+            error_type = marker.get("error_type")
+            if error_type == "success":
+                profile["successes"] += 1
+                if marker.get("ivm_score") is not None:
+                    ivm_sum += marker["ivm_score"]
+                    ivm_count += 1
+                if marker.get("reward_value") is not None:
+                    reward_sum += marker["reward_value"]
+                    reward_count += 1
+            else:
+                profile["failures"] += 1
+            
+            profile["adaptation_events"].append({
+                "type": error_type,
+                "timestamp": marker.get("timestamp"),
+                "ivm": marker.get("ivm_score"),
+            })
+        
+        if ivm_count > 0:
+            profile["avg_ivm"] = ivm_sum / ivm_count
+        if reward_count > 0:
+            profile["avg_reward"] = reward_sum / reward_count
+        
+        return profile
+
+
+# Singleton global
+epigenetic_registry = EpigeneticRegistry()
