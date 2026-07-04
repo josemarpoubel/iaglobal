@@ -48,16 +48,32 @@ class EpigeneticRegistry:
         self.base_path.mkdir(parents=True, exist_ok=True)
         self._memory_cache: Dict[str, EpigeneticMarker] = {}
         
-    def _epigenetic_id(self, agent_id: str, task_hash: str, error_type: str) -> str:
-        return hashlib.sha3_512(
-            f"{agent_id}:{task_hash}:{error_type}".encode()
-        ).hexdigest()[:16]
+    def _epigenetic_id(self, agent_id: str, task_hash: str, error_type: str, event_index: int = None) -> str:
+        """Gera ID único para marca epigenética.
+        
+        Se event_index for fornecido, cria ID único para cada evento.
+        Caso contrário, usa ID determinístico baseado em agent/task/error.
+        """
+        if event_index is not None:
+            # ID único por evento (para múltiplos rewards/sucessos)
+            return hashlib.sha3_512(
+                f"{agent_id}:{task_hash}:{error_type}:{event_index}:{time.time()}".encode()
+            ).hexdigest()[:16]
+        else:
+            # ID determinístico para lookup de pesos adaptativos
+            return hashlib.sha3_512(
+                f"{agent_id}:{task_hash}:{error_type}".encode()
+            ).hexdigest()[:16]
 
     async def record_failure(
         self, agent_id: str, task_hash: str, error_type: str, context: Dict[str, Any],
         ivm_score: Optional[float] = None
     ) -> str:
         """Registra uma falha como 'marca epigenética' no Obsidian Vault."""
+        # Usa timestamp para criar ID único para cada evento de falha
+        event_index = int(time.time() * 1000) % 1000000
+        epigenetic_id = self._epigenetic_id(agent_id, task_hash, error_type, event_index=event_index)
+        
         metadata = {
             "agent_id": agent_id,
             "task_hash": task_hash,
@@ -66,7 +82,6 @@ class EpigeneticRegistry:
             "context": context,
             "ivm_score": ivm_score,
         }
-        epigenetic_id = self._epigenetic_id(agent_id, task_hash, error_type)
         file_path = self.base_path / f"{epigenetic_id}.cbor"
 
         # Atualiza cache em memória
@@ -144,13 +159,14 @@ class EpigeneticRegistry:
                     with open(file, "rb") as f:
                         data = cbor2.load(f)
                     if data.get("agent_id") == agent_id and data.get("task_hash") == task_hash:
-                        error_type = data.get("error_type")
-                        if error_type == "timeout":
+                        error_type = data.get("error_type", "").lower()
+                        # Normaliza tipos de erro: "TimeoutError" → "timeout", "InvalidOutput" → "invalid_output"
+                        if "timeout" in error_type:
                             result["retry_delay"] *= 1.5
                             result["model_priority"] *= 0.8
-                        elif error_type == "invalid_output":
+                        elif "invalid" in error_type or error_type == "invalid_output":
                             result["fallback_enabled"] = False
-                        elif error_type == "security_rejection":
+                        elif "security" in error_type:
                             result["model_priority"] *= 0.5
                         elif error_type == "success":
                             result["retry_delay"] = min(result["retry_delay"] * 0.9, 1.0)
@@ -165,27 +181,21 @@ class EpigeneticRegistry:
         reward: float, ivm: float
     ) -> None:
         """Aplica reward do BanditPolicy e atualiza marca epigenética."""
-        epigenetic_id = self._epigenetic_id(agent_id, task_hash, "success")
+        # Usa event_index para criar ID único para cada reward
+        epigenetic_id = self._epigenetic_id(agent_id, task_hash, "success", event_index=int(time.time() * 1000) % 1000000)
         
-        # Atualiza ou cria marcador com reward
-        if epigenetic_id in self._memory_cache:
-            marker = self._memory_cache[epigenetic_id]
-            marker.reward_value = reward
-            marker.ivm_score = ivm
-            marker.adaptation_count += 1
-        else:
-            # Cria novo marcador de reward
-            marker = EpigeneticMarker(
-                agent_id=agent_id,
-                task_hash=task_hash,
-                error_type="success",
-                timestamp=time.time(),
-                context={"bandit_reward": reward, "ivm": ivm},
-                ivm_score=ivm,
-                reward_value=reward,
-                adaptation_count=1
-            )
-            self._memory_cache[epigenetic_id] = marker
+        # Cria novo marcador de reward (sempre cria novo para acumular)
+        marker = EpigeneticMarker(
+            agent_id=agent_id,
+            task_hash=task_hash,
+            error_type="success",
+            timestamp=time.time(),
+            context={"bandit_reward": reward, "ivm": ivm},
+            ivm_score=ivm,
+            reward_value=reward,
+            adaptation_count=1
+        )
+        self._memory_cache[epigenetic_id] = marker
         
         # Persiste em disco
         metadata = {

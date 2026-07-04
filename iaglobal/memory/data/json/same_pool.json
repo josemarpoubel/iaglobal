@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "agent_name": "unknown",
+    "balance": 50,
+    "total_earned": 0,
+    "total_spent": 50
+  },
+  {
+    "agent_name": "mutant_1",
+    "balance": 90,
+    "total_earned": 0,
+    "total_spent": 10
+  },
+  {
+    "agent_name": "mutant_2",
+    "balance": 90,
+    "total_earned": 0,
+    "total_spent": 10
+  },
+  {
+    "agent_name": "test_agent",
+    "balance": 80,
+    "total_earned": 0,
+    "total_spent": 20
+  },
+  {
+    "agent_name": "test",
+    "balance": 100,
+    "total_earned": 0,
+    "total_spent": 0
+  },
+  {
+    "agent_name": "clean_skill",
+    "balance": 85,
+    "total_earned": 0,
+    "total_spent": 15
+  },
+  {
+    "agent_name": "spike_skill",
+    "balance": 85,
+    "total_earned": 0,
+    "total_spent": 15
+  },
+  {
+    "agent_name": "random_agent",
+    "balance": 90,
+    "total_earned": 0,
+    "total_spent": 10
+  }
+]
