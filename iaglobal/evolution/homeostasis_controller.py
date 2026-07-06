@@ -123,7 +123,7 @@ class HomeostasisController:
         if sla["in_compliance"]:
             return {"adjusted": False, "changes": []}
 
-        current_epsilon = get_flag("bandit_epsilon", 0.2)
+        current_epsilon = get_flag("bandit_epsilon")
         new_epsilon = current_epsilon
         changes: List[Dict[str, Any]] = []
         penalty = 1.0

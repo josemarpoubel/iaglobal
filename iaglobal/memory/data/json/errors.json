@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-06T16:17:10.674924+00:00",
+  "updated_at": "2026-07-06T16:31:54.826165+00:00",
   "learning_errors": [
     {
       "id": "20260706053555214815",
@@ -288,6 +288,42 @@
       "response_errada": "resp",
       "critica_sandbox": "crit",
       "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706162731477581",
+      "time": "2026-07-06T16:27:31.477603Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706162731481406",
+      "time": "2026-07-06T16:27:31.481422Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706163154815468",
+      "time": "2026-07-06T16:31:54.815488Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706163154819745",
+      "time": "2026-07-06T16:31:54.819804Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
     }
   ],
   "runtime_errors": [
@@ -523,6 +559,26 @@
     },
     {
       "timestamp": "2026-07-06T16:17:10.674868+00:00",
+      "component": "test_component",
+      "severity": "ERROR",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
+      "details": {
+        "detail": "info"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T16:27:31.487777+00:00",
+      "component": "test_component",
+      "severity": "ERROR",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
+      "details": {
+        "detail": "info"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T16:31:54.826099+00:00",
       "component": "test_component",
       "severity": "ERROR",
       "execution_id": "exec-1",

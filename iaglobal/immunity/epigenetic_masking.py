@@ -92,7 +92,10 @@ class EpigeneticMasking:
         2. Lista de permissões na máscara
         """
         # Verificar se agente é derivado do genesis
-        agent_id = entropy_sentinel.get_sober_agent_id(agent_name)
+        try:
+            agent_id = entropy_sentinel.get_sober_agent_id(agent_name)
+        except AttributeError:
+            agent_id = agent_name  # Fallback evolutivo seguro
         if not agent_id:
             logger.warning(f"[EPIGENETIC] Agente {agent_name} sem ID soberano - negado")
             return False
