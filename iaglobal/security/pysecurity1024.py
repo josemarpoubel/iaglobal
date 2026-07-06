@@ -77,6 +77,10 @@ def gerar_node_id_soberano(public_key: bytes) -> str:
     Usa SHA3-512 para garantir que chaves públicas similares gerem IDs opostos.
     """
     # 16 bytes de SHA3 = 256 bits de entropia = Desprezível probabilidade de colisão
+    if isinstance(public_key, str):
+            public_key = public_key.encode()
+    if isinstance(public_key, str):
+        public_key = public_key.encode()
     digest = hashlib.sha3_512(public_key).digest()[:32]
     return Pysecurity1024.bytes_para_frase(digest)
 
