@@ -89,7 +89,7 @@ class KnowledgeAgent:
     def extract_and_store(self, task: str, source_data: str) -> None:
         """Extrai conhecimento de dados de busca e armazena automaticamente."""
         import re
-        snippets = re.findall(r'(?:^|\n)[•\-\*]\s*(.{30,200})', source_data)
+        snippets = re.findall(r'(?:^|\n)[ \-\*]\s*(.{30,200})', source_data)
         if not snippets:
             snippets = [s.strip() for s in source_data.split("\n") if len(s.strip()) > 50][:5]
         for snippet in snippets[:5]:
@@ -213,7 +213,7 @@ class KnowledgeAgent:
             lines.append(f"  [{label}] ({len(entries)} entradas)")
             for e in entries[:max_entries]:
                 hits = e.get("hits", 0)
-                lines.append(f"    • {e['title'][:70]} (consultado {hits}x)")
+                lines.append(f"      {e['title'][:70]} (consultado {hits}x)")
         return "\n".join(lines)
 
 

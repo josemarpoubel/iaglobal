@@ -1,7 +1,7 @@
 ---
 tipo: MapaSinapticoCentral
-ultima_atualizacao: "2026-07-06T16:39:21.031948+00:00Z"
-total_notas: 102
+ultima_atualizacao: "2026-07-06T16:44:04.264302+00:00Z"
+total_notas: 109
 tags_ativas: ["#evolucao", "#gargalo-resolvido", "#metabolismo", "#skill", "#skill-skill_0", "#skill-skill_1", "#skill-skill_2", "#skill-test_web_skill", "#skill-vector_test"]
 ---
 
@@ -24,6 +24,7 @@ tags_ativas: ["#evolucao", "#gargalo-resolvido", "#metabolismo", "#skill", "#ski
 - [[evolution_committee_1782599267]]
 - [[evolution_committee_1783354592]]
 - [[apoptosis_evo-obsidian-test-child-gen1]]
+- [[erro_decorated_test_20260706164103275301]]
 - [[evolucao_skill_2_1783354192]]
 - [[erro_decorated_test_20260706140012093067]]
 - [[evolucao_vector_test_1783354592]]
@@ -32,6 +33,7 @@ tags_ativas: ["#evolucao", "#gargalo-resolvido", "#metabolismo", "#skill", "#ski
 - [[evolucao_skill_0_1783355202]]
 - [[erro_decorated_test_20260706141247262853]]
 - [[evolution_committee_1783221040]]
+- [[evolucao_skill_2_1783356029]]
 - [[evolucao_skill_2_1783355479]]
 - [[erro_decorated_test_20260706163529883436]]
 - [[erro_decorated_test_20260706141503765493]]
@@ -42,11 +44,13 @@ tags_ativas: ["#evolucao", "#gargalo-resolvido", "#metabolismo", "#skill", "#ski
 - [[erro_decorated_test_20260706141533038099]]
 - [[evolucao_skill_0_1783355479]]
 - [[erro_decorated_test_20260706161028262896]]
+- [[evolucao_skill_0_1783356029]]
 - [[evolucao_vector_test_1783355202]]
 - [[mhc_audit_20260706]]
 - [[mhc_audit_20260627]]
 - [[evolucao_skill_1_1783355695]]
 - [[evolution_committee_1783355479]]
+- [[evolution_committee_1783356029]]
 - [[evolution_committee_1783199343]]
 - [[evolucao_skill_2_1783354593]]
 - [[evolution_committee_1783311129]]
@@ -62,6 +66,8 @@ tags_ativas: ["#evolucao", "#gargalo-resolvido", "#metabolismo", "#skill", "#ski
 - [[evolucao_skill_0_1783349678]]
 - [[erro_decorated_test_20260706140922914289]]
 - [[apoptosis_evo-obsidian-test]]
+- [[evolucao_vector_test_1783356029]]
+- [[evolucao_skill_1_1783356029]]
 - [[evolution_committee_1783355202]]
 - [[evolution_committee_1783311128]]
 - [[evolution_committee_1782599126]]
@@ -70,6 +76,7 @@ tags_ativas: ["#evolucao", "#gargalo-resolvido", "#metabolismo", "#skill", "#ski
 - [[evolution_committee_1783311057]]
 - [[evolution_committee_1783345736]]
 - [[evolution_committee_1783175782]]
+- [[evolucao_test_web_skill_1783356029]]
 - [[evolution_committee_1783342495]]
 - [[erro_decorated_test_20260706141336973845]]
 - [[evolution_committee_1783355695]]

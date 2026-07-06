@@ -57,7 +57,12 @@ class BanditPolicy:
         
         self.epsilon = epsilon
         self.decay = decay
-        self.credit_engine = credit  # CreditAssignmentEngine opcional
+        self.credit_engine = credit
+        # Garante inicialização do CreditAssignmentEngine
+        if self.credit_engine is None:
+            from iaglobal.graphs.credit import CreditAssignmentEngine
+            self.credit_engine = CreditAssignmentEngine()
+  # CreditAssignmentEngine opcional
         self.probe_timeout = probe_timeout
         self.weights: Dict[str, float] = defaultdict(float)
         self.rewards: Dict[str, List[float]] = defaultdict(list)

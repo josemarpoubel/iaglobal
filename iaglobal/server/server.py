@@ -147,7 +147,7 @@ async def dashboard_json():
     long_term = len(list((obsidian_dir / "03_Long_Term").glob("*.md"))) if (obsidian_dir / "03_Long_Term").exists() else 0
     synapses = len(list((obsidian_dir / "04_Synapses").glob("*.md"))) if (obsidian_dir / "04_Synapses").exists() else 0
 
-    cpu_report = cpu_affinity.dispersion_report()
+    cpu_report = await cpu_affinity.dispersion_report()
     evo_status = runtime.status()
 
     return {
