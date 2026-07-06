@@ -6,7 +6,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569835
+    "created_at": 1783355956.440409
   },
   {
     "skill_name": "skill_0d034884",
@@ -15,7 +15,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "test input",
-    "created_at": 1783355410.569843
+    "created_at": 1783355956.440416
   },
   {
     "skill_name": "skill_0b096f77",
@@ -24,7 +24,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "lifecycle input",
-    "created_at": 1783355410.569847
+    "created_at": 1783355956.44042
   },
   {
     "skill_name": "skill_ae1b6b5d",
@@ -33,7 +33,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569849
+    "created_at": 1783355956.440423
   },
   {
     "skill_name": "skill_bdc71927",
@@ -42,7 +42,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.569852
+    "created_at": 1783355956.440426
   },
   {
     "skill_name": "auto_fix_6053",
@@ -51,7 +51,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569858
+    "created_at": 1783355956.440432
   },
   {
     "skill_name": "skill_cf86af50",
@@ -60,7 +60,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "test input",
-    "created_at": 1783355410.569861
+    "created_at": 1783355956.440434
   },
   {
     "skill_name": "skill_bd8f7128",
@@ -69,7 +69,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "lifecycle input",
-    "created_at": 1783355410.569863
+    "created_at": 1783355956.440437
   },
   {
     "skill_name": "skill_14ef0d72",
@@ -78,7 +78,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569865
+    "created_at": 1783355956.440439
   },
   {
     "skill_name": "skill_cc807145",
@@ -87,7 +87,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.569868
+    "created_at": 1783355956.440442
   },
   {
     "skill_name": "auto_fix_7132",
@@ -96,7 +96,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569871
+    "created_at": 1783355956.440444
   },
   {
     "skill_name": "skill_98f374a4",
@@ -105,7 +105,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "test input",
-    "created_at": 1783355410.569873
+    "created_at": 1783355956.440447
   },
   {
     "skill_name": "skill_65f3910e",
@@ -114,7 +114,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "lifecycle input",
-    "created_at": 1783355410.569876
+    "created_at": 1783355956.440449
   },
   {
     "skill_name": "skill_ebebb344",
@@ -123,7 +123,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569878
+    "created_at": 1783355956.440452
   },
   {
     "skill_name": "skill_535fdaeb",
@@ -132,7 +132,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.56988
+    "created_at": 1783355956.440455
   },
   {
     "skill_name": "auto_fix_3877",
@@ -141,7 +141,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569883
+    "created_at": 1783355956.440457
   },
   {
     "skill_name": "skill_4d29cc79",
@@ -150,7 +150,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "test input",
-    "created_at": 1783355410.569886
+    "created_at": 1783355956.440459
   },
   {
     "skill_name": "skill_ded58905",
@@ -159,7 +159,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "lifecycle input",
-    "created_at": 1783355410.569888
+    "created_at": 1783355956.440462
   },
   {
     "skill_name": "skill_1a715e66",
@@ -168,7 +168,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569891
+    "created_at": 1783355956.440465
   },
   {
     "skill_name": "skill_d06efbf5",
@@ -177,7 +177,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.569893
+    "created_at": 1783355956.440467
   },
   {
     "skill_name": "auto_fix_6743",
@@ -186,7 +186,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569896
+    "created_at": 1783355956.44047
   },
   {
     "skill_name": "auto_fix_5259",
@@ -195,7 +195,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569898
+    "created_at": 1783355956.440472
   },
   {
     "skill_name": "skill_ef4bd154",
@@ -204,7 +204,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "test input",
-    "created_at": 1783355410.569901
+    "created_at": 1783355956.440474
   },
   {
     "skill_name": "skill_62705562",
@@ -213,7 +213,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "lifecycle input",
-    "created_at": 1783355410.569903
+    "created_at": 1783355956.440477
   },
   {
     "skill_name": "skill_59ac0952",
@@ -222,7 +222,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569906
+    "created_at": 1783355956.440479
   },
   {
     "skill_name": "skill_a21bc465",
@@ -231,7 +231,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.569911
+    "created_at": 1783355956.440484
   },
   {
     "skill_name": "skill_6d0b69d6",
@@ -240,7 +240,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569913
+    "created_at": 1783355956.440487
   },
   {
     "skill_name": "skill_2e0077c4",
@@ -249,7 +249,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569916
+    "created_at": 1783355956.44049
   },
   {
     "skill_name": "skill_2e711880",
@@ -258,7 +258,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569919
+    "created_at": 1783355956.440493
   },
   {
     "skill_name": "skill_46ce1880",
@@ -267,7 +267,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.569921
+    "created_at": 1783355956.440495
   },
   {
     "skill_name": "skill_60e09a85",
@@ -276,7 +276,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569923
+    "created_at": 1783355956.440497
   },
   {
     "skill_name": "skill_15b217e7",
@@ -285,7 +285,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569928
+    "created_at": 1783355956.440499
   },
   {
     "skill_name": "skill_3934e709",
@@ -294,7 +294,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.56993
+    "created_at": 1783355956.440504
   },
   {
     "skill_name": "skill_06588b4d",
@@ -303,7 +303,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.569932
+    "created_at": 1783355956.440509
   },
   {
     "skill_name": "skill_6a9af9dd",
@@ -312,7 +312,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569935
+    "created_at": 1783355956.440518
   },
   {
     "skill_name": "skill_32b2e44a",
@@ -321,7 +321,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569937
+    "created_at": 1783355956.440526
   },
   {
     "skill_name": "skill_b93fdfb9",
@@ -330,7 +330,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569939
+    "created_at": 1783355956.440532
   },
   {
     "skill_name": "auto_fix_1286",
@@ -339,7 +339,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569942
+    "created_at": 1783355956.440539
   },
   {
     "skill_name": "skill_2aeeeea2",
@@ -348,7 +348,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "lifecycle input",
-    "created_at": 1783355410.569944
+    "created_at": 1783355956.44056
   },
   {
     "skill_name": "skill_cbaa978e",
@@ -357,7 +357,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569946
+    "created_at": 1783355956.440565
   },
   {
     "skill_name": "skill_9c2f0947",
@@ -366,7 +366,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.569948
+    "created_at": 1783355956.440584
   },
   {
     "skill_name": "auto_fix_4087",
@@ -375,7 +375,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569951
+    "created_at": 1783355956.44059
   },
   {
     "skill_name": "auto_fix_6975",
@@ -384,7 +384,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569953
+    "created_at": 1783355956.440595
   },
   {
     "skill_name": "auto_fix_6182",
@@ -393,7 +393,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569956
+    "created_at": 1783355956.4406
   },
   {
     "skill_name": "auto_fix_3853",
@@ -402,7 +402,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569958
+    "created_at": 1783355956.440605
   },
   {
     "skill_name": "skill_6bd8d8d0",
@@ -411,7 +411,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.56996
+    "created_at": 1783355956.440611
   },
   {
     "skill_name": "auto_fix_7006",
@@ -420,7 +420,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569963
+    "created_at": 1783355956.440616
   },
   {
     "skill_name": "skill_9d8833c1",
@@ -429,7 +429,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569965
+    "created_at": 1783355956.440621
   },
   {
     "skill_name": "auto_fix_5233",
@@ -438,7 +438,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569967
+    "created_at": 1783355956.440634
   },
   {
     "skill_name": "skill_63879a0c",
@@ -447,7 +447,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569972
+    "created_at": 1783355956.440655
   },
   {
     "skill_name": "auto_fix_6490",
@@ -456,7 +456,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355410.569974
+    "created_at": 1783355956.440658
   },
   {
     "skill_name": "skill_e33c85d3",
@@ -465,7 +465,7 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355410.569976
+    "created_at": 1783355956.44066
   },
   {
     "skill_name": "skill_934e283d",
@@ -474,7 +474,7 @@
     "score": 0.5,
     "route": "undecided",
     "source_gap": "teste de consulta",
-    "created_at": 1783355410.569979
+    "created_at": 1783355956.440663
   },
   {
     "skill_name": "auto_fix_6641",
@@ -483,7 +483,7 @@
     "score": 0.85,
     "route": "production",
     "source_gap": "Falha ao buscar c\u00f3digo na internet",
-    "created_at": 1783355415.026588
+    "created_at": 1783355956.440665
   },
   {
     "skill_name": "skill_e08e9c01",
@@ -492,6 +492,42 @@
     "score": 0.7,
     "route": "production",
     "source_gap": "erro de parsing no modulo de configuracao",
-    "created_at": 1783355481.72237
+    "created_at": 1783355956.440667
+  },
+  {
+    "skill_name": "auto_fix_7210",
+    "skill_description": "Corre\u00e7\u00e3o autom\u00e1tica para: Falha ao buscar c\u00f3digo na internet",
+    "generation": 0,
+    "score": 0.85,
+    "route": "production",
+    "source_gap": "Falha ao buscar c\u00f3digo na internet",
+    "created_at": 1783355956.44067
+  },
+  {
+    "skill_name": "skill_8353fc9d",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783355956.440672
+  },
+  {
+    "skill_name": "auto_fix_9485",
+    "skill_description": "Corre\u00e7\u00e3o autom\u00e1tica para: Falha ao buscar c\u00f3digo na internet",
+    "generation": 0,
+    "score": 0.85,
+    "route": "production",
+    "source_gap": "Falha ao buscar c\u00f3digo na internet",
+    "created_at": 1783355960.888913
+  },
+  {
+    "skill_name": "skill_2cd5f100",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783356030.776958
   }
 ]

@@ -53,5 +53,15 @@
     "name": "guardrail_hallucination_4512",
     "description": "Escalamento de alucina\u00e7\u00e3o detectada",
     "detector": "hallucination_detector"
+  },
+  {
+    "name": "guardrail_hallucination_6211",
+    "description": "Escalamento de alucina\u00e7\u00e3o detectada",
+    "detector": "hallucination_detector"
+  },
+  {
+    "name": "guardrail_hallucination_9871",
+    "description": "Escalamento de alucina\u00e7\u00e3o detectada",
+    "detector": "hallucination_detector"
   }
 ]

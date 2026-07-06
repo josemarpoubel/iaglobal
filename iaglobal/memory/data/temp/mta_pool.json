@@ -322,5 +322,41 @@
       "response_preview": "resp"
     },
     "timestamp": 1783355514.821197
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783355730.412321
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783355730.4157553
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783356063.719238
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783356063.7224655
   }
 ]
