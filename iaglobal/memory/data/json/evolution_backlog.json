@@ -3,13 +3,13 @@
     "description": "Falha ao buscar c\u00f3digo na internet",
     "type": "recurrent_error",
     "severity": "high",
-    "frequency": 7,
+    "frequency": 8,
     "impact": 7,
     "reuse": 1,
     "first_seen": "2026-07-06T05:33:05.316518+00:00",
-    "last_seen": "2026-07-06T14:25:31.959318+00:00",
+    "last_seen": "2026-07-06T14:41:19.224567+00:00",
     "resolved": true,
-    "priority": 49,
-    "resolved_at": "2026-07-06T14:25:31.960427+00:00"
+    "priority": 56,
+    "resolved_at": "2026-07-06T14:41:19.225883+00:00"
   }
 ]

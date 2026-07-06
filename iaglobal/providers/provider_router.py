@@ -254,6 +254,37 @@ def _clear_circuit_breaker_bans():
     _BANS_CLEARED = True
 
 
+def _registrar_evolucao(provider: str, ivm: float, latencia_ms: float, custo: float, sucesso: bool):
+    """
+    Registra execução na BanditPolicyEvolutiva para aprendizado contínuo.
+    
+    Esta função conecta o IVM do agent com o fitness do provider,
+    criando o feedback loop evolutivo da Geração 2.
+    """
+    if not EVOLUTIVA_DISPONIVEL:
+        return
+    
+    try:
+        bandit = _get_bandit()
+        if isinstance(bandit, BanditPolicyEvolutiva):
+            # Registra de forma assíncrona (não bloqueia)
+            asyncio.create_task(
+                bandit.registrar_execucao(
+                    provider_id=provider,
+                    ivm=ivm,
+                    latencia_ms=latencia_ms,
+                    custo_creditos=custo,
+                    sucesso=sucesso,
+                ),
+                name=f"evolucao_{provider}"
+            )
+            logger.debug(
+                f"🧬 [EVOLUÇÃO] {provider}: IVMA={ivm:.3f}, sucesso={sucesso}"
+            )
+    except Exception as e:
+        logger.error(f"[EVOLUÇÃO] Erro ao registrar: {e}")
+
+
 def _get_bandit():
     """
     Retorna instância singleton do BanditPolicy.
@@ -341,6 +372,9 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
         reward = reward_aggregator.calculate_reward(RewardMetrics(success=True, latency_ms=latency*1000, cost_usd=cost, token_count=total_tokens))
         _get_credit().record(ExecutionEvent(node=BANDIT_NODE, success=True, latency=latency, model=model, strategy=task_type, reward=reward))
         metrics.record(provider, model, prompt, True, latency*1000, prompt_tokens, completion_tokens, total_tokens, cost, task_type)
+        # Registra evolução (Geração 2)
+        ivm_estimado = 0.9 if latency < 2.0 else 0.7 if latency < 5.0 else 0.5
+        _registrar_evolucao(provider, ivm_estimado, latency*1000, cost, True)
 
         return result
 

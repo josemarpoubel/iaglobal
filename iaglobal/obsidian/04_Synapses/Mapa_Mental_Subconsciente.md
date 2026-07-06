@@ -1,7 +1,7 @@
 ---
 tipo: MapaSinapticoCentral
-ultima_atualizacao: "2026-07-06T14:25:32.074886+00:00Z"
-total_notas: 49
+ultima_atualizacao: "2026-07-06T14:41:19.369892+00:00Z"
+total_notas: 54
 tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
 ---
 
@@ -15,9 +15,11 @@ tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
 - [[evolution_committee_1783346376]]
 - [[evolution_committee_1783199344]]
 - [[apoptosis_test-apoptose]]
+- [[evolution_committee_1783347989]]
 - [[erro_test_20260627160057915461]]
 - [[evolution_committee_1783175781]]
 - [[evolution_committee_1782599267]]
+- [[apoptosis_evo-obsidian-test-child-gen1]]
 - [[erro_decorated_test_20260706140012093067]]
 - [[erro_decorated_test_20260704143721308239]]
 - [[erro_decorated_test_20260706141247262853]]
@@ -48,14 +50,17 @@ tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
 - [[evolution_committee_1782599268]]
 - [[erro_decorated_test_20260706141802322991]]
 - [[mhc_audit_20260704]]
+- [[apoptosis_evo-full-cycle]]
 - [[evolution_committee_1782604021]]
 - [[evolution_committee_1783221039]]
 - [[mhc_audit_20260705]]
 - [[erro_decorated_test_20260706053554048663]]
+- [[erro_decorated_test_20260706142706338301]]
 - [[evolution_committee_1782577594]]
 - [[evolution_committee_1783311094]]
 - [[erro_decorated_test_20260706134933940815]]
 - [[evolution_committee_1783347445]]
+- [[evolution_committee_1783347990]]
 - [[erro_decorated_test_20260706141419096047]]
 - [[fugue_test_agent_critical]]
 - [[evolution_committee_1782577593]]
