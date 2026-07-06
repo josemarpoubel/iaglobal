@@ -1,14 +1,14 @@
 [
   {
     "agent_name": "evolution_trigger",
-    "balance": 210,
-    "total_earned": 120,
+    "balance": 230,
+    "total_earned": 140,
     "total_spent": 10
   },
   {
     "agent_name": "test-apoptose",
-    "balance": 135,
-    "total_earned": 35,
+    "balance": 155,
+    "total_earned": 55,
     "total_spent": 0
   },
   {
@@ -19,8 +19,8 @@
   },
   {
     "agent_name": "test-lifecycle",
-    "balance": 10,
-    "total_earned": 30,
+    "balance": 20,
+    "total_earned": 40,
     "total_spent": 120
   },
   {
@@ -31,327 +31,327 @@
   },
   {
     "agent_name": "mutant_1",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "mutant_2",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_0",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_1",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_2",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_3",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_4",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_5",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_6",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_7",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_8",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_9",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_10",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_11",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_12",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_13",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_14",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_15",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_16",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_17",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_18",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_19",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_20",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_21",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_22",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_23",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_24",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_25",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_26",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_27",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_28",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_29",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_30",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_31",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_32",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_33",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_34",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_35",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_36",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_37",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_38",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_39",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_40",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_41",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_42",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_43",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_44",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_45",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_46",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_47",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_48",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "suspicious_49",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "corruption_test",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "test_agent",
-    "balance": 40,
+    "balance": 30,
     "total_earned": 0,
-    "total_spent": 60
+    "total_spent": 70
   },
   {
     "agent_name": "test",
@@ -361,38 +361,38 @@
   },
   {
     "agent_name": "clean_skill",
-    "balance": 70,
+    "balance": 65,
     "total_earned": 0,
-    "total_spent": 30
+    "total_spent": 35
   },
   {
     "agent_name": "spike_skill",
+    "balance": 65,
+    "total_earned": 0,
+    "total_spent": 35
+  },
+  {
+    "agent_name": "evo-obsidian-test",
+    "balance": 20,
+    "total_earned": 400,
+    "total_spent": 480
+  },
+  {
+    "agent_name": "random_agent",
     "balance": 70,
     "total_earned": 0,
     "total_spent": 30
   },
   {
-    "agent_name": "evo-obsidian-test",
-    "balance": 15,
-    "total_earned": 375,
-    "total_spent": 460
-  },
-  {
-    "agent_name": "random_agent",
-    "balance": 75,
-    "total_earned": 0,
-    "total_spent": 25
-  },
-  {
     "agent_name": "evo-obsidian-test-child-gen1",
-    "balance": 125,
-    "total_earned": 25,
+    "balance": 130,
+    "total_earned": 30,
     "total_spent": 0
   },
   {
     "agent_name": "evo-full-cycle",
-    "balance": 125,
-    "total_earned": 25,
+    "balance": 130,
+    "total_earned": 30,
     "total_spent": 0
   }
 ]

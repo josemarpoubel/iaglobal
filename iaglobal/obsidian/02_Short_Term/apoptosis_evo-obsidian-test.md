@@ -1,7 +1,7 @@
 ---
 id: "apoptosis_evo-obsidian-test"
 tipo: "MemoriaBruta"
-timestamp: "2026-07-06T14:42:44.118627+00:00Z"
+timestamp: "2026-07-06T14:54:40.359053+00:00Z"
 tags: ["#apoptose", "#agente-evo-obsidian-test", "#lições-aprendidas"]
 ---
 

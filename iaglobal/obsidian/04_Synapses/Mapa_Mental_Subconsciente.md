@@ -1,7 +1,7 @@
 ---
 tipo: MapaSinapticoCentral
-ultima_atualizacao: "2026-07-06T14:41:19.369892+00:00Z"
-total_notas: 54
+ultima_atualizacao: "2026-07-06T14:54:27.629005+00:00Z"
+total_notas: 56
 tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
 ---
 
@@ -61,7 +61,9 @@ tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
 - [[erro_decorated_test_20260706134933940815]]
 - [[evolution_committee_1783347445]]
 - [[evolution_committee_1783347990]]
+- [[erro_decorated_test_20260706144317197689]]
 - [[erro_decorated_test_20260706141419096047]]
 - [[fugue_test_agent_critical]]
+- [[evolution_committee_1783348960]]
 - [[evolution_committee_1782577593]]
 - [[evolution_committee_1783346375]]

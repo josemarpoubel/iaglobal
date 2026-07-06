@@ -232,5 +232,23 @@
       "response_preview": "resp"
     },
     "timestamp": 1783348997.6466491
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783349715.18702
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783349715.1905506
   }
 ]
