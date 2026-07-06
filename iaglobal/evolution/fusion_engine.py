@@ -466,7 +466,7 @@ class FusionEngine:
         lineage_hash = hashlib.sha3_512(lineage_data.encode()).hexdigest()[:32]
         
         # Gerar ID único fonético para o híbrido usando pysecurity1024
-        hybrid_id = gerar_node_id_soberano(seed=lineage_data)
+        hybrid_id = gerar_node_id_soberano(lineage_data)
         
         logger.info(f"[FusionEngine] ID fonético gerado: {hybrid_id}")
         

@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-06T14:55:15.193981+00:00",
+  "updated_at": "2026-07-06T16:10:28.722145+00:00",
   "learning_errors": [
     {
       "id": "20260706053555214815",
@@ -252,6 +252,24 @@
       "response_errada": "resp",
       "critica_sandbox": "crit",
       "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706161028712971",
+      "time": "2026-07-06T16:10:28.712999Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706161028717163",
+      "time": "2026-07-06T16:10:28.717185Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
     }
   ],
   "runtime_errors": [
@@ -467,6 +485,16 @@
     },
     {
       "timestamp": "2026-07-06T14:55:15.193935+00:00",
+      "component": "test_component",
+      "severity": "ERROR",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
+      "details": {
+        "detail": "info"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T16:10:28.722093+00:00",
       "component": "test_component",
       "severity": "ERROR",
       "execution_id": "exec-1",

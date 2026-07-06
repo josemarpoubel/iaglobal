@@ -1,20 +1,21 @@
 ---
 tipo: MapaSinapticoCentral
-ultima_atualizacao: "2026-07-06T14:54:27.629005+00:00Z"
-total_notas: 56
-tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
+ultima_atualizacao: "2026-07-06T16:08:27.694918+00:00Z"
+total_notas: 64
+tags_ativas: ["#evolucao", "#gargalo-resolvido", "#metabolismo", "#skill", "#skill-skill_0", "#skill-skill_1", "#skill-skill_2", "#skill-test_web_skill", "#skill-vector_test"]
 ---
 
 # Córtex Sináptico Central (Subconsciente iaglobal)
 
 ## Tags Ativas no Ecossistema
-#gargalo-resolvido, #metabolismo
+#evolucao, #gargalo-resolvido, #metabolismo, #skill, #skill-skill_0, #skill-skill_1, #skill-skill_2, #skill-test_web_skill, #skill-vector_test
 
 ## Memórias de Longo Prazo Consolidadas
 - [[erro_decorated_test_20260704143641066772]]
 - [[evolution_committee_1783346376]]
 - [[evolution_committee_1783199344]]
 - [[apoptosis_test-apoptose]]
+- [[evolution_committee_1783349678]]
 - [[evolution_committee_1783347989]]
 - [[erro_test_20260627160057915461]]
 - [[evolution_committee_1783175781]]
@@ -35,6 +36,7 @@ tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
 - [[evolution_committee_1782604022]]
 - [[erro_test_agent_20260627160057914414]]
 - [[evolution_committee_1783175834]]
+- [[evolucao_skill_0_1783349678]]
 - [[erro_decorated_test_20260706140922914289]]
 - [[apoptosis_evo-obsidian-test]]
 - [[evolution_committee_1783311128]]
@@ -47,9 +49,11 @@ tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
 - [[evolution_committee_1783342495]]
 - [[erro_decorated_test_20260706141336973845]]
 - [[apoptosis_test-lifecycle]]
+- [[evolucao_skill_1_1783349678]]
 - [[evolution_committee_1782599268]]
 - [[erro_decorated_test_20260706141802322991]]
 - [[mhc_audit_20260704]]
+- [[evolucao_test_web_skill_1783349677]]
 - [[apoptosis_evo-full-cycle]]
 - [[evolution_committee_1782604021]]
 - [[evolution_committee_1783221039]]
@@ -63,7 +67,11 @@ tags_ativas: ["#gargalo-resolvido", "#metabolismo"]
 - [[evolution_committee_1783347990]]
 - [[erro_decorated_test_20260706144317197689]]
 - [[erro_decorated_test_20260706141419096047]]
+- [[evolucao_skill_2_1783349678]]
 - [[fugue_test_agent_critical]]
+- [[evolucao_vector_test_1783349678]]
+- [[evolution_committee_1783349677]]
 - [[evolution_committee_1783348960]]
 - [[evolution_committee_1782577593]]
 - [[evolution_committee_1783346375]]
+- [[erro_decorated_test_20260706145514611130]]
