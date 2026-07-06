@@ -1,3 +1,4 @@
+import time
 # iaglobal/evolution/metacognition/evolution_committee.py
 """Evolution Committee — avalia skills e toma decisões evolutivas.
 Integração tripla: Obsidian(Vault) + Memory(STM/LTM) + SkillRegistry.
