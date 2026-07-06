@@ -241,10 +241,14 @@ class DecisionReplaySystem:
             # 1. Instancia o Bandit localmente usando o motor de créditos recebido
             bandit = BanditPolicy(credit=credit)
 
-            # 2. Pergunta ao bandit qual string de modelo usar baseada no histórico
+            # Candidatos padrão: cloud primeiro, local fallback
+            candidates = ["groq/llama-3.3-70b-versatile", "nvidia/mistralai/mistral-large-3-675b-instruct-2512", "ollama/qwen2.5:0.5b"]
+            
+            # Usa select_model síncrono (select_model_with_lock é async)
             chosen_model = bandit.select_model(
-                node="analisador", 
-                strategy="general"
+                node_id="analisador", 
+                task_type="general",
+                candidates=candidates
             )
 
             # 3. Executa através da interface limpa e encapsulada do bandit

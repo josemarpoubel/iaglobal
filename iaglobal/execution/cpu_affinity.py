@@ -1,6 +1,7 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # iaglobal/execution/cpu_affinity.py
 #
-# Weight-based CPU Budget Scheduler
+# Weight-based CPU Budget Scheduler (Assíncrono)
 #
 # Em vez de fixar agentes em núcleos específicos (core pinning), cada agente
 # recebe um budget de CPU (padrão: 25%). O ResourceManager distribui a carga
@@ -13,11 +14,12 @@
 # - Modo de sobrevivência (redução temporária para 10%)
 # - Sistema de pontuação (fitness_score) no genome.json
 # - Auto-crítica de eficiência energética
+# - Totalmente assíncrono (asyncio)
 
 import os
 import hashlib
 import time
-import threading
+import asyncio
 import json
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
@@ -111,22 +113,22 @@ class ResourceManager:
     BUDGET_PRIORIDADE = 0.35  # 35% — para agentes de alta prioridade
 
     def __init__(self):
-        self._lock = threading.Lock()
+        self._lock = None
         self._agents_por_prioridade: Dict[str, float] = {}
 
-    def alocar(self, agentes: List[Tuple[str, float]]) -> Dict[str, float]:
-        """Distribui budgets proporcionalmente à prioridade de cada agente.
+    @property
+    def lock(self):
+        """Lazy initialization para evitar erros de event loop no import."""
+        if self._lock is None:
+            self._lock = asyncio.Lock()
+        return self._lock
 
-        Args:
-            agentes: Lista de (agent_id, prioridade) onde prioridade é 0-1.
-
-        Returns:
-            Dict mapeando agent_id -> budget (0.0-1.0)
-        """
+    async def alocar(self, agentes: List[Tuple[str, float]]) -> Dict[str, float]:
+        """Distribui budgets proporcionalmente à prioridade de cada agente."""
         if not agentes:
             return {}
 
-        with self._lock:
+        async with self.lock:
             total_prioridade = sum(p for _, p in agentes) or 1.0
             budgets = {}
             for agent_id, prioridade in agentes:
@@ -140,8 +142,9 @@ class ResourceManager:
                 self._agents_por_prioridade[agent_id] = prioridade
             return budgets
 
-    def obter_prioridade(self, agent_id: str) -> float:
-        return self._agents_por_prioridade.get(agent_id, 0.5)
+    async def obter_prioridade(self, agent_id: str) -> float:
+        async with self.lock:
+            return self._agents_por_prioridade.get(agent_id, 0.5)
 
 
 # =========================================================================
@@ -149,19 +152,10 @@ class ResourceManager:
 # =========================================================================
 
 class CpuAffinityManager:
-    """Gerenciador de budget de CPU por agente (Weight-based Scheduler).
-
-    Remove dependência de os.sched_setaffinity e sys.platform.
-    Cada agente recebe um budget de CPU (padrão 25%) e o ResourceManager
-    distribui a carga com base em prioridade e fitness.
-
-    Métodos legados (assign_core_deterministic, pin_to_hash, pin_current)
-    continuam funcionando mas não fixam mais o processo em núcleos —
-    retornam apenas um core lógico para logging/monitoramento.
-    """
+    """Gerenciador de budget de CPU por agente (Weight-based Scheduler)."""
 
     def __init__(self):
-        self._lock = threading.Lock()
+        self._lock = None
         self._total_cores: int = os.cpu_count() or 1
         self._agents: Dict[str, AgentCpuMetrics] = {}
         self._budgets: Dict[str, float] = {}
@@ -169,6 +163,13 @@ class CpuAffinityManager:
         self.resource_manager = ResourceManager()
         self._metabolic_state = "NORMAL" # NORMAL, DEEP_SLEEP, ADRENALINE
         self._adrenaline_expiry = 0.0
+
+    @property
+    def lock(self):
+        """Lazy initialization para evitar erros de event loop no import."""
+        if self._lock is None:
+            self._lock = asyncio.Lock()
+        return self._lock
 
     # ==============================================================
     # UTILITÁRIOS INTERNOS
@@ -188,6 +189,7 @@ class CpuAffinityManager:
         return int(self._hash_agent(agent_id), 16) % self._total_cores
 
     def _get_or_create_metrics(self, agent_id: str) -> AgentCpuMetrics:
+        # Nota: Assume-se que esta função seja chamada DENTRO do lock
         if agent_id not in self._agents:
             self._agents[agent_id] = AgentCpuMetrics(agent_id=agent_id)
         return self._agents[agent_id]
@@ -196,49 +198,32 @@ class CpuAffinityManager:
     # MÉTODOS LEGADOS (backward-compatible)
     # ==============================================================
 
-    def assign_core_deterministic(self, agent_id: str) -> int:
-        """Atribui um core lógico baseado no hash (para compatibilidade).
-
-        Não fixa o processo — apenas retorna o core para logging.
-        """
+    async def assign_core_deterministic(self, agent_id: str) -> int:
         core = self._core_from_hash(agent_id)
-        with self._lock:
+        async with self.lock:
             self._last_agent_map[agent_id] = core
             self._get_or_create_metrics(agent_id)
             if agent_id not in self._budgets:
                 self._budgets[agent_id] = BUDGET_PADRAO
         return core
 
-    def pin_to_hash(self, agent_id: str) -> int:
-        """Cross-platform: não fixa mais o processo. Retorna core lógico.
-
-        Antigamente chamava os.sched_setaffinity — agora apenas registra.
-        """
+    async def pin_to_hash(self, agent_id: str) -> int:
         core = self._core_from_hash(agent_id)
-        with self._lock:
+        async with self.lock:
             self._last_agent_map[agent_id] = core
             self._get_or_create_metrics(agent_id)
         return core
 
-    def pin_current(self, agent_id: str):
-        """Cross-platform: não fixa mais o processo. Apenas registra.
-
-        Retorna o core lógico derivado do hash para compatibilidade com
-        chamadas existentes (ex: bootstrap.py espera um valor).
-        """
-        core = self.pin_to_hash(agent_id)
+    async def pin_current(self, agent_id: str):
+        core = await self.pin_to_hash(agent_id)
         return core
 
-    def map_balanced(self, agents: List[str]) -> Dict[str, int]:
-        """Distribui budgets de CPU igualmente entre todos os agentes.
-
-        Retorna dict agent_id -> core lógico (para compatibilidade).
-        """
+    async def map_balanced(self, agents: List[str]) -> Dict[str, int]:
         if not agents:
             return {}
 
         assignment = {}
-        with self._lock:
+        async with self.lock:
             budget = min(BUDGET_PADRAO, 1.0 / max(len(agents), 1))
             for agent in agents:
                 self._budgets[agent] = round(budget, 3)
@@ -254,12 +239,8 @@ class CpuAffinityManager:
         )
         return assignment
 
-    def dispersion_report(self) -> dict:
-        """Relatório de distribuição de budgets e métricas IVM.
-
-        Compatível com o formato esperado por status.py e orchestrator.py.
-        """
-        with self._lock:
+    async def dispersion_report(self) -> dict:
+        async with self.lock:
             total_agents = len(self._agents)
             per_core: Dict[int, List[str]] = {}
             for agent_id in self._agents:
@@ -285,7 +266,6 @@ class CpuAffinityManager:
                 agentes_em_sobrevivencia = sum(1 for m in self._agents.values() if m.em_modo_sobrevivencia)
 
             return {
-                # Compatibilidade com status.py
                 "total_cores": self._total_cores,
                 "agents_mapped": total_agents,
                 "max_load": max_load,
@@ -294,7 +274,6 @@ class CpuAffinityManager:
                 "efficiency": round(1.0 - abs(imbalance) * 0.1, 3),
                 "per_core": {str(k): v for k, v in per_core.items()},
                 "distribution": counts,
-                # Novas métricas IVM
                 "ivm_medio": round(ivm_medio, 3),
                 "fitness_medio": round(fitness_medio, 3),
                 "total_agents": total_agents,
@@ -303,13 +282,12 @@ class CpuAffinityManager:
                 "total_budget_alocado": round(sum(budgets.values()), 3) if budgets else 0,
             }
 
-    def rebalance_if_needed(self, *args, **kwargs):
-        """Verifica e rebalanceia budgets se a distribuição estiver desigual.
-
-        Aceita *args e **kwargs para compatibilidade com chamadas existentes
-        que podem passar argumentos posicionais ou nomeados.
-        """
-        with self._lock:
+    async def rebalance_if_needed(self, *args, **kwargs) -> bool:
+        """Corrige desequilíbrio de budget redistribuindo por prioridade/fitness
+        (via ResourceManager), em vez de achatar todos os agentes para o mesmo
+        valor. Antes, esta função chamava map_balanced() e apagava o próprio
+        sinal de fitness_score que update_fitness() vinha calculando."""
+        async with self.lock:
             if not self._budgets:
                 return False
 
@@ -321,32 +299,48 @@ class CpuAffinityManager:
             min_budget = min(budgets_list)
             agents_list = list(self._budgets.keys())
 
-            if max_budget - min_budget > 0.1 and len(agents_list) > 1:
-                self.map_balanced(agents_list)
-                logger.info("[CPU] Rebalanceamento automático de budgets concluído.")
-                return True
+            # Snapshot de fitness sob o mesmo lock — evita ler métricas de um
+            # agente que está sendo mutado por outra coroutine ao mesmo tempo.
+            prioridades = [
+                (agent_id, self._agents[agent_id].fitness_score if agent_id in self._agents else 0.5)
+                for agent_id in agents_list
+            ]
+
+        if max_budget - min_budget <= 0.1 or len(agents_list) <= 1:
             return False
+
+        # resource_manager tem seu próprio asyncio.Lock — chamado fora do
+        # self.lock para evitar contenção cruzada entre os dois locks.
+        novos_budgets = await self.resource_manager.alocar(prioridades)
+
+        async with self.lock:
+            for agent_id, budget in novos_budgets.items():
+                self._budgets[agent_id] = budget
+                metrics = self._get_or_create_metrics(agent_id)
+                metrics.cpu_budget = budget
+                metrics.ultimo_ajuste = time.time()
+
+        logger.info(
+            "[CPU] Rebalanceamento por prioridade/fitness concluído (%d agentes).",
+            len(agents_list),
+        )
+        return True
 
     # ==============================================================
     # NOVOS MÉTODOS — Budget de CPU
     # ==============================================================
 
-    def set_cpu_budget(self, agent_id: str, budget: float) -> None:
-        """Define o budget de CPU para um agente (0.0 a 1.0 = 0% a 100%).
-        
-        Respeita o teto homeostático, a menos que esteja em modo Adrenalina.
-        """
+    async def set_cpu_budget(self, agent_id: str, budget: float) -> None:
         teto = BUDGET_ADRENALINA if self._metabolic_state == "ADRENALINE" else BUDGET_PADRAO
         budget = max(0.0, min(teto, budget))
-        with self._lock:
+        async with self.lock:
             self._budgets[agent_id] = round(budget, 3)
             metrics = self._get_or_create_metrics(agent_id)
             metrics.cpu_budget = round(budget, 3)
             metrics.ultimo_ajuste = time.time()
 
-    def entrar_estase(self):
-        """Ativa o Deep Sleep: reduz todos os agentes para o mínimo vital (5%)."""
-        with self._lock:
+    async def entrar_estase(self):
+        async with self.lock:
             self._metabolic_state = "DEEP_SLEEP"
             for agent_id in self._budgets:
                 self._budgets[agent_id] = BUDGET_DEEP_SLEEP
@@ -354,50 +348,37 @@ class CpuAffinityManager:
                 metrics.cpu_budget = BUDGET_DEEP_SLEEP
         logger.info("[CPU] 🌙 Entrando em DEEP SLEEP: Ritmo metabólico reduzido para 5%%.")
 
-    def disparar_adrenalina(self, agent_id: str, duracao: float = 30.0):
-        """Ativa Burst Mode: permite que um agente chegue a 50% de CPU por tempo limitado.
-        Gera estresse oxidativo (penalidade de fitness posterior).
-        """
-        with self._lock:
+    async def disparar_adrenalina(self, agent_id: str, duracao: float = 30.0):
+        async with self.lock:
             self._metabolic_state = "ADRENALINE"
             self._adrenaline_expiry = time.time() + duracao
-            self.set_cpu_budget(agent_id, BUDGET_ADRENALINA)
+        await self.set_cpu_budget(agent_id, BUDGET_ADRENALINA)
         logger.warning("[CPU] ⚡ ADRENALINA: Agente %s em Burst Mode (50%% CPU) por %.1fs", agent_id, duracao)
 
-    def atualizar_estado_metabolico(self):
-        """Sincroniza o estado metabólico e limpa a adrenalina se expirada."""
-        with self._lock:
+    async def atualizar_estado_metabolico(self):
+        async with self.lock:
             if self._metabolic_state == "ADRENALINE" and time.time() > self._adrenaline_expiry:
                 self._metabolic_state = "NORMAL"
                 logger.info("[CPU] 📉 Adrenalina esgotada. Retornando à homeostase normal.")
 
-
-    def get_cpu_budget(self, agent_id: str) -> float:
-        """Retorna o budget de CPU atual do agente."""
-        with self._lock:
+    async def get_cpu_budget(self, agent_id: str) -> float:
+        async with self.lock:
             return self._budgets.get(agent_id, BUDGET_PADRAO)
 
-    def get_all_budgets(self) -> Dict[str, float]:
-        """Retorna todos os budgets atuais."""
-        with self._lock:
+    async def get_all_budgets(self) -> Dict[str, float]:
+        async with self.lock:
             return dict(self._budgets)
 
-    def survival_mode(self, agent_id: str) -> None:
-        """Ativa modo de sobrevivência: reduz budget para 10%.
-
-        Usado quando o nó está sob carga pesada ou quando um agente
-        nômade entra em um nó já ocupado.
-        """
-        self.set_cpu_budget(agent_id, BUDGET_SOBREVIVENCIA)
-        with self._lock:
+    async def survival_mode(self, agent_id: str) -> None:
+        await self.set_cpu_budget(agent_id, BUDGET_SOBREVIVENCIA)
+        async with self.lock:
             metrics = self._get_or_create_metrics(agent_id)
             metrics.em_modo_sobrevivencia = True
         logger.info("[CPU] Agente %s em modo de sobrevivência: budget=10%%", agent_id)
 
-    def restore_budget(self, agent_id: str) -> None:
-        """Restaura o budget ao padrão (25%), saindo do modo sobrevivência."""
-        self.set_cpu_budget(agent_id, BUDGET_PADRAO)
-        with self._lock:
+    async def restore_budget(self, agent_id: str) -> None:
+        await self.set_cpu_budget(agent_id, BUDGET_PADRAO)
+        async with self.lock:
             metrics = self._get_or_create_metrics(agent_id)
             metrics.em_modo_sobrevivencia = False
         logger.info("[CPU] Agente %s restaurado ao budget padrão: 25%%", agent_id)
@@ -406,61 +387,53 @@ class CpuAffinityManager:
     # IVM — Índice de Viabilidade Metabólica
     # ==============================================================
 
-    def calcular_ivm(self, agent_id: str,
-                     produtividade: Optional[float] = None,
-                     cpu_usage: Optional[float] = None,
-                     obsidian_notes: Optional[int] = None) -> float:
-        """Calcula o IVM (Índice de Viabilidade Metabólica) de um agente.
-
-        Fórmula:
-            IVM = (P × 0.4) + (E × 0.4) + (C × 0.2)
-
-        Onde:
-            P = Produtividade (taxa de conclusão de tarefas)
-            E = Eficiência Energética (inverso do uso de CPU)
-            C = Cooperação (notas registradas no Obsidian)
-        """
-        metrics = self._get_or_create_metrics(agent_id)
-
-        p = produtividade if produtividade is not None else metrics.produtividade
-        cpu = cpu_usage if cpu_usage is not None else metrics.cpu_usage_atual
+    async def calcular_ivm(self, agent_id: str,
+                           produtividade: Optional[float] = None,
+                           cpu_usage: Optional[float] = None,
+                           obsidian_notes: Optional[int] = None) -> float:
+        
+        async with self.lock:
+            metrics = self._get_or_create_metrics(agent_id)
+            
+            # Realiza cópias locais dentro do lock para evitar race conditions no cálculo
+            p = produtividade if produtividade is not None else metrics.produtividade
+            cpu = cpu_usage if cpu_usage is not None else metrics.cpu_usage_atual
+            budget = metrics.cpu_budget
+            notes = obsidian_notes if obsidian_notes is not None else metrics.obsidian_notes_escritas
 
         if cpu <= 0.01:
             e = 1.0
         else:
-            ratio = cpu / metrics.cpu_budget
+            ratio = cpu / budget
             if ratio <= 1.0:
                 e = 1.0 - (ratio * 0.5)
             else:
                 e = max(0.0, 1.0 - ratio)
 
-        notes = obsidian_notes if obsidian_notes is not None else metrics.obsidian_notes_escritas
         c = min(1.0, notes / 10.0)
 
         ivm = (p * 0.4) + (e * 0.4) + (c * 0.2)
         ivm = max(0.0, min(1.0, ivm))
 
-        with self._lock:
+        async with self.lock:
             metrics.ivm_atual = ivm
 
         return ivm
 
-    def monitorar_metabolismo(self, agent_id: str) -> dict:
-        """Monitora o IVM do agente e retorna ação evolutiva recomendada.
-        
-        Sincronização Epigenética: Se o IVM for crítico, grava uma cicatriz 
-        no genome.json para que a linhagem herde a fragilidade.
-        """
-        metrics = self._get_or_create_metrics(agent_id)
-        ivm = self.calcular_ivm(agent_id)
+    async def monitorar_metabolismo(self, agent_id: str) -> dict:
+        async with self.lock:
+            metrics_dict = self._get_or_create_metrics(agent_id).to_dict()
+            
+        ivm = await self.calcular_ivm(agent_id)
         
         if ivm < IVM_THRESHOLD_CRITICO:
             acao = "apoptose"
             motivo = "baixa_viabilidade_metabolica"
-            # GRAVAÇÃO EPIGENÉTICA: O sistema sente a dor da ineficiência
             try:
                 from iaglobal.evolution.epigenetic import epigenetic_memory
-                epigenetic_memory.gravar_cicatriz(agent_id, motivo, 0.1)
+                # Assumindo que epigenetic_memory.gravar_cicatriz pode não ser async.
+                # Se for async, adicione um await. Aqui usamos to_thread para prevenir bloqueios de I/O na função.
+                await asyncio.to_thread(epigenetic_memory.gravar_cicatriz, agent_id, motivo, 0.1)
             except Exception as e:
                 logger.debug("[CPU] Falha ao gravar marca epigenética: %s", e)
         elif ivm > IVM_THRESHOLD_EXCELENCIA:
@@ -475,76 +448,72 @@ class CpuAffinityManager:
             "motivo": motivo,
             "ivm": round(ivm, 3),
             "agente": agent_id,
-            "metrics": metrics.to_dict(),
+            "metrics": metrics_dict,
         }
-
 
     # ==============================================================
     # FITNESS SCORE — Sistema de Pontuação
     # ==============================================================
 
-    def update_fitness(self, agent_id: str,
-                       trabalho_realizado: float = 0.0,
-                       custo_cpu: float = 0.0,
-                       uptime_segundos: float = 0.0,
-                       obsidian_notes: int = 0) -> float:
-        """Atualiza o fitness score do agente no genome.json.
+    async def update_fitness(self, agent_id: str,
+                             trabalho_realizado: float = 0.0,
+                             custo_cpu: float = 0.0,
+                             uptime_segundos: float = 0.0,
+                             obsidian_notes: int = 0) -> float:
+        
+        async with self.lock:
+            metrics = self._get_or_create_metrics(agent_id)
+            score = metrics.fitness_score * FITNESS_DECAY
 
-        Componentes:
-        - Eficiência Energética: Score += (Trabalho Realizado / Custo de CPU)
-        - Confiabilidade: Score += (Tempo de Uptime sem Apoptose)
-        - Contribuição Imunológica: Score += (Notas registradas no Obsidian)
-        """
-        metrics = self._get_or_create_metrics(agent_id)
+            if custo_cpu > 0:
+                eficiencia = trabalho_realizado / custo_cpu
+                score += eficiencia * 0.2
 
-        score = metrics.fitness_score * FITNESS_DECAY
+            confiabilidade = min(1.0, uptime_segundos / 3600.0)
+            score += confiabilidade * 0.15
 
-        if custo_cpu > 0:
-            eficiencia = trabalho_realizado / custo_cpu
-            score += eficiencia * 0.2
+            contribuicao = min(1.0, obsidian_notes / 20.0)
+            score += contribuicao * 0.15
 
-        confiabilidade = min(1.0, uptime_segundos / 3600.0)
-        score += confiabilidade * 0.15
+            score = max(0.0, min(1.0, score))
 
-        contribuicao = min(1.0, obsidian_notes / 20.0)
-        score += contribuicao * 0.15
-
-        score = max(0.0, min(1.0, score))
-
-        with self._lock:
             metrics.fitness_score = score
             if obsidian_notes:
                 metrics.obsidian_notes_escritas += obsidian_notes
 
-        self._persist_fitness(agent_id, score)
+        await self._persist_fitness(agent_id, score)
         return score
 
-    def get_fitness(self, agent_id: str) -> float:
-        """Retorna o fitness score atual do agente."""
-        with self._lock:
+    async def get_fitness(self, agent_id: str) -> float:
+        async with self.lock:
             metrics = self._agents.get(agent_id)
             return metrics.fitness_score if metrics else 0.5
 
-    def _persist_fitness(self, agent_id: str, score: float) -> None:
-        """Persiste o fitness score no genome.json do agente."""
+    async def _persist_fitness(self, agent_id: str, score: float) -> None:
         genome_path = self._resolve_genome_path(agent_id)
         if not genome_path:
             return
         try:
-            genome_path.parent.mkdir(parents=True, exist_ok=True)
+            # Operações de sistema de arquivos são delegadas para uma thread pool
+            await asyncio.to_thread(genome_path.parent.mkdir, parents=True, exist_ok=True)
+            
             if genome_path.exists():
-                data = json.loads(genome_path.read_text())
+                raw_data = await asyncio.to_thread(genome_path.read_text)
+                data = json.loads(raw_data)
             else:
                 data = {"agent_id": agent_id, "genome": {}}
+                
             data["fitness_score"] = round(score, 3)
             data["ultima_atualizacao"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-            genome_path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+            
+            json_str = json.dumps(data, indent=2, ensure_ascii=False)
+            await asyncio.to_thread(genome_path.write_text, json_str)
+            
         except Exception as e:
             logger.debug("[CPU] Não foi possível persistir fitness: %s", e)
 
     @staticmethod
     def _resolve_genome_path(agent_id: str) -> Optional[Path]:
-        """Resolve o caminho do genome.json para o agente."""
         try:
             from iaglobal._paths import JSON_DIR
             return JSON_DIR / f"genome_{agent_id}.json"
@@ -555,35 +524,39 @@ class CpuAffinityManager:
     # AUTO-CRÍTICA — Monitoramento de Eficiência
     # ==============================================================
 
-    def auto_critica(self, agent_id: str) -> dict:
-        """Analisa a eficiência do consumo de recursos do agente.
+    async def auto_critica(self, agent_id: str) -> dict:
+        async with self.lock:
+            metrics = self._get_or_create_metrics(agent_id)
+            cpu_usage = metrics.cpu_usage_atual
+            budget = metrics.cpu_budget
+            produtividade = metrics.produtividade
+            em_modo = metrics.em_modo_sobrevivencia
+            eficiencia = metrics.eficiencia_energetica
+            fitness = metrics.fitness_score
+            metrics_copy = metrics
 
-        Retorna diagnóstico sugerindo ações corretivas se o agente
-        estiver consumindo mais CPU do que o necessário para o resultado.
-        """
-        metrics = self._get_or_create_metrics(agent_id)
-        ivm = self.calcular_ivm(agent_id)
+        ivm = await self.calcular_ivm(agent_id)
 
         diagnosticos = []
-        if metrics.cpu_usage_atual > metrics.cpu_budget * 0.8:
+        if cpu_usage > budget * 0.8:
             diagnosticos.append("consumo_de_cpu_elevado")
-        if metrics.produtividade < 0.3 and metrics.cpu_usage_atual > 0.1:
+        if produtividade < 0.3 and cpu_usage > 0.1:
             diagnosticos.append("baixa_produtividade_com_alto_cpu")
         if ivm < 0.4:
             diagnosticos.append("ivm_critico_risco_de_apoptose")
-        if metrics.em_modo_sobrevivencia and metrics.cpu_usage_atual < 0.05:
+        if em_modo and cpu_usage < 0.05:
             diagnosticos.append("modo_sobrevivencia_ativo_mas_ocioso")
 
         return {
             "agent_id": agent_id,
             "ivm": round(ivm, 3),
-            "cpu_usage": round(metrics.cpu_usage_atual, 3),
-            "cpu_budget": metrics.cpu_budget,
-            "produtividade": round(metrics.produtividade, 3),
-            "eficiencia": round(metrics.eficiencia_energetica, 3),
-            "fitness": round(metrics.fitness_score, 3),
+            "cpu_usage": round(cpu_usage, 3),
+            "cpu_budget": budget,
+            "produtividade": round(produtividade, 3),
+            "eficiencia": round(eficiencia, 3),
+            "fitness": round(fitness, 3),
             "diagnosticos": diagnosticos,
-            "recommendacao": self._gerar_recomendacao(ivm, metrics),
+            "recommendacao": self._gerar_recomendacao(ivm, metrics_copy),
         }
 
     @staticmethod
@@ -600,30 +573,26 @@ class CpuAffinityManager:
                     "ou distribuir subtarefas para agentes ociosos.")
         return "Operação normal. Nenhuma ação necessária."
 
-    def reportar_uso_cpu(self, agent_id: str, uso: float) -> None:
-        """Registra o uso atual de CPU do agente (0.0 a 1.0)."""
-        with self._lock:
+    async def reportar_uso_cpu(self, agent_id: str, uso: float) -> None:
+        async with self.lock:
             metrics = self._get_or_create_metrics(agent_id)
             metrics.cpu_usage_atual = max(0.0, min(1.0, uso))
 
-    def registrar_tarefa(self, agent_id: str, sucesso: bool) -> None:
-        """Registra a conclusão de uma tarefa (sucesso ou falha)."""
-        with self._lock:
+    async def registrar_tarefa(self, agent_id: str, sucesso: bool) -> None:
+        async with self.lock:
             metrics = self._get_or_create_metrics(agent_id)
             if sucesso:
                 metrics.tasks_completadas += 1
             else:
                 metrics.tasks_falhas += 1
 
-    def get_metrics(self, agent_id: str) -> Optional[dict]:
-        """Retorna todas as métricas de um agente."""
-        with self._lock:
+    async def get_metrics(self, agent_id: str) -> Optional[dict]:
+        async with self.lock:
             metrics = self._agents.get(agent_id)
             return metrics.to_dict() if metrics else None
 
-    def get_all_metrics(self) -> Dict[str, dict]:
-        """Retorna métricas de todos os agentes."""
-        with self._lock:
+    async def get_all_metrics(self) -> Dict[str, dict]:
+        async with self.lock:
             return {aid: m.to_dict() for aid, m in self._agents.items()}
 
 

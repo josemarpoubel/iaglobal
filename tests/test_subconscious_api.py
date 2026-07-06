@@ -11,6 +11,7 @@ async def mock_vault():
     with patch("iaglobal.subconscious.subconscious_api.ObsidianSubconscious") as mock:
         mock_vault = mock.return_value
         mock_vault.escrever_nota = AsyncMock(return_value="test_id_123")
+        mock_vault.escrever_longo_prazo = AsyncMock(return_value="test_id_123")
         mock_vault.buscar_notas = AsyncMock(return_value=[{
             "id": "test_id_123",
             "origem": "busca_test",
@@ -36,13 +37,8 @@ async def test_registrar_tarefa(mock_vault):
             "fugue_id": "test_fugue_id",
         },
     )
-    assert task_id == "test_id_123"
-    api.vault.escrever_nota.assert_called_once_with(
-        origem="test",
-        tipo="critical",
-        metadados={"agent_id": "test_agent", "fugue_id": "test_fugue_id"},
-        tags=["fugue", "subconscious"],
-    )
+    assert task_id == "test_fugue_id"
+    api.vault.escrever_longo_prazo.assert_called_once()
 
 
 @pytest.mark.asyncio

@@ -74,7 +74,8 @@ class Dashboard:
         lines.append("  ── CPU Affinity ──")
         try:
             from iaglobal.execution.cpu_affinity import cpu_affinity
-            report = cpu_affinity.dispersion_report()
+            import asyncio
+            report = asyncio.run(cpu_affinity.dispersion_report())
             lines.append(f"  Cores       : {report['total_cores']}")
             lines.append(f"  Agents map  : {report['agents_mapped']}")
             lines.append(f"  Max/core    : {report['max_load']}")

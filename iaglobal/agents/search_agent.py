@@ -5,14 +5,16 @@ import os
 import re
 import requests
 
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.tools.search_tools import SearchTools
 from iaglobal.memory.memory_vector import store
 from iaglobal.memory.db_manager import db
 from iaglobal.utils.logger import logger
 from iaglobal.providers.provider_router import route_generate
 
-class SearchAgent:
+class SearchAgent(AgentBase):
     def __init__(self):
+        super().__init__(agent_name="search")
         # Endpoint HTML estável que não exige JavaScript e evita telas de desafio anti-bot
         self.search_url = "https://duckduckgo.com?"
         self.headers = {
@@ -105,7 +107,7 @@ class SearchAgent:
             logger.error(f"❌ [SEARCH AGENT]: Falha crítica ao aprender via DuckDuckGo: {e}")
             return False
 
-    def process_task(self, task: str) -> str:
+    async def process_task(self, task: str) -> str:
         cache_key = f"search:{hash(task)}"
         cached = db.get_cached_search(cache_key)
         if cached:
@@ -114,7 +116,7 @@ class SearchAgent:
 
         logger.info(f"🛰️ [SEARCH AGENT]: processando tarefa: '{task[:100]}'")
         if "código" in task.lower() or "html" in task.lower() or "github" in task.lower():
-            result = SearchTools.search_and_fetch_code(task)
+            result = await SearchTools.search_and_fetch_code(task)
         else:
             snippets = SearchTools.search_and_fetch_raw(task, max_results=3)
             result = "\n\n".join(

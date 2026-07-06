@@ -105,6 +105,11 @@ class ShortTermMemory:
         self._expire()
         return list(self._buffer)[-n:]
 
+    def get_all_with_metadata(self) -> List[Dict]:
+        """Retorna todos os itens com metadata."""
+        self._expire()
+        return list(self._buffer)
+
     def search(self, query: str, top_k: int = 5) -> List[Dict]:
         self._expire()
         query_lower = query.lower()

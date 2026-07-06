@@ -14,6 +14,7 @@ from typing import Dict, List, Set, Any
 from dataclasses import dataclass, field
 
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import AgentBase
 
 @dataclass
 class DependencyResult:
@@ -22,7 +23,10 @@ class DependencyResult:
     packages: List[str] = field(default_factory=list)
     excluded_sections: List[str] = field(default_factory=list)
 
-class DependencyAgent:
+class DependencyAgent(AgentBase):
+    def __init__(self):
+        super().__init__(agent_name="dependency")
+
     # Regex para capturar o nome da seção e as dependências abaixo dela
     # Ex: Captura "BASE CORE" e as linhas seguintes até o próximo comentário ou fim do arquivo
     _SECTION_REGEX = re.compile(

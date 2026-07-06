@@ -18,10 +18,10 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from iaglobal.obsidian.omnimind import omni_mind, LEIS_UNIVERSAIS
-from iaglobal.evolution.bandit import BanditPolicy
+from iaglobal.graphs.bandit import BanditPolicy
 from iaglobal.evolution.genomic_reflection import ExecutionMetrics
 from iaglobal.immunity.immune_memory_exchange import ImmuneMemoryExchange
-from iaglobal.events.acetylcholine_bus import AcetylcholineBus, AgentMessage
+from iaglobal.graphs.communication.acetylcholine_bus import AcetylcholineBus, AgentMessage
 from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.immunity.async_violation_detector")
@@ -758,4 +758,6 @@ class AsyncViolationDetector:
 
 #=====================================================================================
 
+# Singleton instance
+async_violation_detector = AsyncViolationDetector()
 

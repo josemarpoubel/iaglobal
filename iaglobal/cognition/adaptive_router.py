@@ -93,7 +93,7 @@ class AdaptiveRouter:
         
         return round(ivm, 3)
 
-    def select_optimal_provider(self, task_type: str, required_mhc: bool = True) -> str:
+    async def select_optimal_provider(self, task_type: str, required_mhc: bool = True) -> str:
         """
         Seleciona provedor ótimo via IVM.
         
@@ -107,10 +107,11 @@ class AdaptiveRouter:
         # Usar select_model do bandit se disponível
         if self._bandit:
             try:
-                # Bandit select_model precisa do formato correto
-                result = self._bandit.select_model("adaptive_router", task_type)
+                # Candidatos padrão: cloud primeiro, local fallback
+                candidates = ["groq/llama-3.3-70b-versatile", "nvidia/mistralai/mistral-large-3-675b-instruct-2512", "ollama/qwen2.5:0.5b"]
+                result = await self._bandit.select_model_with_lock("adaptive_router", task_type, candidates)
                 if result:
-                    return result.get("provider", "ollama")
+                    return result
             except Exception:
                 pass
         

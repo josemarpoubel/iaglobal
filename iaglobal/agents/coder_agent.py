@@ -11,9 +11,7 @@ from typing import Union, Dict, List, Optional
 
 from iaglobal.models.task import Task
 from iaglobal.observability.tracing import Tracer
-from iaglobal.graphs.bandit import BanditPolicy, _get_bandit
-from iaglobal.graphs.credit import CreditAssignmentEngine
-from iaglobal.graphs.telemetry import ExecutionEvent
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal._paths import _detect_extension
 
 from iaglobal.storage.batch_writer import batch_writer, Event
@@ -21,7 +19,7 @@ from iaglobal.utils.logger import get_logger
 from iaglobal.utils.helpers import run_async_safe
 from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
 
-logger = get_logger("iaglobal.agents.coder_agent")
+logger = get_logger("iaglobal")
 
 VALID_EXTENSIONS = {".py", ".js", ".html", ".css", ".yaml", ".json", ".xml", ".md", ".php", ".tsx", ".ts", ".sql"}
 _CACHE: Dict[str, Dict] = {}
@@ -43,12 +41,13 @@ class CodeArtifact:
     model_used: str = ""
     score: float = 0.0
 
-class CoderAgent:
+class CoderAgent(AgentBase):
     def __init__(self, temperatura: float = 0.5, estilo: str = "direto, minimalista"):
+        # Inicializa AgentBase com nome único
+        super().__init__(agent_name="coder")
+        
         self.temperatura = temperatura
         self.estilo = estilo
-        self.bandit = _get_bandit()
-        self.credit = CreditAssignmentEngine()
         self._quality_scores: Dict[str, List[float]] = {}
         self.epigenetic_registry = EpigeneticRegistry()
         self.agent_id = f"coder_agent_{id(self) % 10000}"
@@ -271,7 +270,12 @@ REGRAS DE RETORNO:
         async def _tentar(modelo: str, tentativa: int = 1) -> Optional[CodeArtifact]:
             try:
                 t0 = time.monotonic()
-                resultado = await self.bandit.async_execute_model(model=modelo, prompt=prompt, task_type="code")
+                # Usa _call_llm do AgentBase para registrar métricas automaticamente
+                resultado = await self._call_llm(
+                    prompt=prompt,
+                    task_type="code",
+                    candidates=[modelo],  # Força modelo específico
+                )
                 latencia = time.monotonic() - t0
                 if not resultado or len(resultado.strip()) < 10:
                     logger.warning(f"[CODER] Conteúdo vazio/curto retornado pelo modelo {modelo}. Resultado: {repr(resultado)[:100]}")

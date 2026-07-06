@@ -16,17 +16,19 @@ from datetime import datetime, timezone
 from collections import Counter
 
 from iaglobal._paths import CORE_DB, get_db_connection as _norm_path
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.memory.fusion_engine import KnowledgeGraph, FakeNoiseDetector
 from iaglobal.memory.memory_vector import store as vector_store, search as vector_search
 from iaglobal.utils.logger import logger
 
 
-class KnowledgeWriterAgent:
+class KnowledgeWriterAgent(AgentBase):
     """Agente que escreve e mantém a base de conhecimento automaticamente."""
 
     ENTRY_TYPES = ["concept", "definition", "code_snippet", "faq", "relation", "summary"]
 
     def __init__(self, db_path: Union[str, Path] = CORE_DB):
+        super().__init__(agent_name="knowledgewriter")
         p = Path(db_path) if isinstance(db_path, str) else db_path
         self.db_path = _norm_path(p)
         self.kg = KnowledgeGraph(db_path)

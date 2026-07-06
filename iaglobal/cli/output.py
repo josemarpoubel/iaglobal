@@ -8,6 +8,7 @@ class OutputRenderer:
     def render(result):
         script_path = None
         response_text = None
+        success = getattr(result, "success", False)
 
         if hasattr(result, "script_path") and result.script_path:
             script_path = result.script_path
@@ -31,7 +32,7 @@ class OutputRenderer:
             if not script_path:
                 script_path = result.get("path")
 
-        if script_path:
+        if success and script_path:
             print(f"\n✅ Seu script ficou pronto na pasta {script_path}")
             if response_text:
                 print(f"\n📄 Código gerado ({len(response_text)} caracteres)")

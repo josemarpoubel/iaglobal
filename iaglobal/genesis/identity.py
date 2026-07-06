@@ -219,7 +219,7 @@ async def verify_genesis_integrity() -> Dict[str, Any]:
 # =====================================================================
 # NODE IDENTITY (Núcleo de Identidade Soberana)
 # =====================================================================
-
+# iaglobal/genesis/identity.py
 class NodeIdentity:
     """
     🧬 Identidade Soberana Efêmera (RAM-Only).

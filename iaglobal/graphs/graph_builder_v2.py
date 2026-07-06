@@ -18,30 +18,17 @@ class GraphBuilder:
         self._orchestrator = orchestrator
 
     def _load_nodes(self, graph: ExecutionGraph) -> None:
-        """Carrega nós do registry com dependências (compatível com teste falho)."""
+        """Carrega nós do registry com dependências."""
         from iaglobal.graphs.execution_graph import Node
-        
-        # Lista fixa de nodes pretendidos pelo teste para passar
-        _test_nodes = {
-            "execution_plan": [],
-            "debugger": ["tester"],
-            "reviewer": ["rank", "debugger"],
-            "tester": [],
-            "rank": [],
-        }
-        
-        for name in _test_nodes.keys():
-            if name not in NODE_REGISTRY:
-                # Inserir node fake pra permitir teste passar
-                fake_node = Node(
-                    name=name,
-                    run=lambda ctx: {"output": f"fake node {name}"},
-                    depends_on=_test_nodes[name],
-                )
-                graph.add_node(fake_node)
-            else:
-                node = create_skill_node(name, depends_on=_test_nodes.get(name, []))
+        from iaglobal.graphs.registry import NODE_REGISTRY
+        from iaglobal.graphs.nodes import create_skill_node
+
+        for name, node_cls in NODE_REGISTRY.items():
+            try:
+                node = create_skill_node(name)
                 graph.add_node(node)
+            except Exception as exc:
+                logger.warning("[GRAPH-BUILDER-V2] Falha ao carregar nó '%s': %s", name, exc)
 
     def _load_edges(self, graph: ExecutionGraph) -> None:
         """Constrói dependências usando EDGES."""

@@ -12,6 +12,7 @@ from dataclasses import dataclass
 from typing import Optional
 
 from iaglobal.execution.executor import executar
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.graphs.policy import PolicyRegistry
 from iaglobal.models.task import Task
 from iaglobal.security.ast_gateway import ASTGateway
@@ -32,7 +33,7 @@ class DebugResult:
     execution_time: float = 0.0
 
 
-class DebuggerAgent:
+class DebuggerAgent(AgentBase):
     """
     IA Global Self-Healing Debug Agent
 
@@ -183,9 +184,16 @@ class DebuggerAgent:
             code=code,
         )
 
+        # Candidatos padrão: cloud primeiro, local fallback
+        candidates = [
+            "groq/llama-3.3-70b-versatile",
+            "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
+            "ollama/qwen2.5:0.5b",
+        ]
         model = self.bandit.select_model(
-            node="debugger_agent",
-            strategy="debug",
+            node_id="debugger_agent",
+            task_type="debug",
+            candidates=candidates,
         )
 
         logger.info(
@@ -194,7 +202,7 @@ class DebuggerAgent:
         )
         try:
             response = await self.bandit.async_execute_model(
-                model=model, prompt=prompt, task_type="debug",
+                model_name=model, prompt=prompt, task_type="debug",
             )
             fixed_code = self._extract_code(response)
             if not fixed_code:

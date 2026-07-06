@@ -19,7 +19,7 @@ warnings.warn(
 )
 
 
-class EvolutionCommitteeAgent:
+class EvolutionCommitteeAgent(AgentBase):
     def evaluate(self, context: Dict[str, Any]) -> Dict[str, Any]:
         report = context.get("evolution_report", {})
         score = report.get("score", 0)
@@ -33,7 +33,7 @@ class EvolutionCommitteeAgent:
         }
 
 
-class EvolutionTriggerAgent:
+class EvolutionTriggerAgent(AgentBase):
     def should_evolve(self, context: Dict[str, Any]) -> Dict[str, Any]:
         metrics = context.get("metrics", {})
         generations = metrics.get("generations", 0)
@@ -46,7 +46,7 @@ class EvolutionTriggerAgent:
         }
 
 
-class PipelineUpdaterAgent:
+class PipelineUpdaterAgent(AgentBase):
     def update(self, context: Dict[str, Any]) -> List[Dict[str, Any]]:
         evolution_result = context.get("evolution_result", {})
         changes = evolution_result.get("suggested_changes", [])

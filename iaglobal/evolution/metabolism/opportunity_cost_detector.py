@@ -126,7 +126,7 @@ class OpportunityCostDetector:
             )
 
             # Calcular reward médio
-            reward_score = self._aggregator.aggregate(profile.reward_signals) if profile.reward_signals else 0.0
+            reward_score = self._aggregator.aggregate(profile.reward_signals) if profile.reward_signals else 0.5
 
             # Calcular parasite score
             parasite_score = max(0.0, cost_score - reward_score)

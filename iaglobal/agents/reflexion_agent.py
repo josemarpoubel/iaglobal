@@ -40,6 +40,7 @@ from enum import Enum, auto
 from typing import List, Optional, Protocol, Union
 
 from iaglobal.models.task import Task
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.reflection.reflexion_engine import extract_code_block
 from iaglobal.utils.logger import logger as _base_logger
 from iaglobal.providers.provider_router import route_generate
@@ -344,7 +345,7 @@ def _extract_categories(analysis: str) -> List[ProblemCategory]:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
-class ReflexionAgent:
+class ReflexionAgent(AgentBase):
     """
     Agente de reflexão e auto-melhoria — Geração 8.
 

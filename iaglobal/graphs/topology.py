@@ -43,6 +43,7 @@ PHASES = {
         "immune_check"              # Anti-parasitas digital
     ],
     "planejamento": [
+        "applied_ai_engineer",
         "planner",              
         "task_breakdown",       
         "execution_plan"        
@@ -92,11 +93,9 @@ PHASES = {
         "evolution_trigger",
         "symbiont_handshake", # Handshake para sistemas externos
         "entropy_sentinel", # Lei da Ordem
-        "symbiosis_score", # Lei da Caridade
-        "vacuum_trigger", # Lei do Vácuo
-        "no_vacuum_strength",  # Aplica Lei do Vácuo da Prosperidade
-        "no_clarity_directive",  # Direção Autônoma (clareamento via IVM)
-        "no_fugue_compartment",  # Processamento de tarefas críticas em segundo plano
+        "vacuum_strength",  # Aplica Lei do Vácuo da Prosperidade
+        "clarity_directive",  # Direção Autônoma (clareamento via IVM)
+        "fugue_compartment",  # Processamento de tarefas críticas em segundo plano
         "fusion",  # Fusão de agentes (DNA resonance)
         "auditor_sentinel",
         "metabolic_pruning",
@@ -151,7 +150,8 @@ NODE_DEPENDENCIES = {
     "observability_design": ["architecture_validator"],
     "mini_evaluator_post_arch": ["architecture_validator"],  # Gate após arquitetura
     "immune_check": ["mini_evaluator_post_arch"],  # Anti-parasitas digital
-    "planner": ["immune_check"],  # Aguarda verificação imunológica
+    "applied_ai_engineer": ["immune_check"],
+    "planner": ["applied_ai_engineer"],  # Aguarda otimização de IA aplicada
     "mini_evaluator_post_build": ["code_executor"],  # Gate pós construção
     "task_breakdown": ["immune_check"],  # After immune check, not planner
     "execution_plan": ["task_breakdown"],

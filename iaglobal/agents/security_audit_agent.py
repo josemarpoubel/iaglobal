@@ -4,6 +4,7 @@
 import re
 from typing import List
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import AgentBase
 
 
 def _contem_padrao_regex_perigoso(code: str) -> bool:
@@ -38,7 +39,7 @@ def _contem_padrao_regex_perigoso(code: str) -> bool:
     return False
 
 
-class SecurityAuditAgent:
+class SecurityAuditAgent(AgentBase):
     """Audita o código gerado contra requisitos de segurança."""
 
     def audit(self, code: str, security_requirements: list,

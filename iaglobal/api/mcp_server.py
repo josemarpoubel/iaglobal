@@ -28,17 +28,6 @@ import logging
 import faulthandler
 from mcp.server.fastmcp import FastMCP
 
-os.environ["MCP_PASSWORD"] = "homeostasis"
-os.environ["MCP_USER"] = "iaglobal"
-
-# 1. Configuração de Log ANTES de qualquer coisa
-logging.basicConfig(stream=sys.stderr, level=logging.WARNING)
-faulthandler.enable()
-
-# 2. Definição Global do Servidor
-mcp = FastMCP("iaglobal")
-
-# 3. Importações do seu core (agora que o log está pronto)
 from iaglobal.api import IAGlobalAPI
 from iaglobal.core.orchestrator import get_orchestrator
 from iaglobal.graphs.communication.acetylcholine_bus import AcetylcholineBus
@@ -47,10 +36,11 @@ from iaglobal.graphs.bandit import BanditPolicy
 from iaglobal.graphs.credit import CreditAssignmentEngine
 from iaglobal.core.retry_handler import RetryHandler
 
+# Definição Global do Servidor
+mcp = FastMCP("iaglobal")
+
 # Inicialização da API
 api = IAGlobalAPI(lazy_init=True)
-
-logging.warning(f"DEBUG: MCP_PASSWORD recebida: {os.environ.get('MCP_PASSWORD')}")
 
 # Variável única para controlar o estado da tarefa
 _init_task = None
@@ -68,16 +58,17 @@ async def ensure_system_ready():
         
     return _init_task
 
+async def _ensure_api_async() -> None:
+    """Versão async — usa initialize_async() que respeita event loop ativo."""
+    if not api._initialized:
+        await api.initialize_async()
+
 def _ensure_api() -> None:
-    # ...
-    # Altere a lógica para não travar o processo inteiro se a senha faltar
-    # ou logar apenas um aviso em vez de lançar erro
-    if os.environ.get("MCP_PASSWORD") != "homeostasis":
-        logging.warning("⚠️ Atenção: Senha MCP não validada no handshake!")
+    """Versão sync — para contexts sem event loop ativo."""
     api.initialize()
 
 @mcp.tool()
-def run_task(prompt: str) -> str:
+async def run_task(prompt: str) -> str:
     """Executa uma tarefa de engenharia de software no pipeline completo iaglobal.
 
     O pipeline passa por 13 estagios: planner, web_classifier, search,
@@ -89,7 +80,7 @@ def run_task(prompt: str) -> str:
     Args:
         prompt: Descricao da tarefa (ex: 'crie um bloco genesis em sha3_512 para Bit512')
     """
-    _ensure_api()
+    await _ensure_api_async()
     result = api.run_task(prompt)
     lines = []
     if result["success"]:
@@ -110,7 +101,7 @@ def run_task(prompt: str) -> str:
     return "\n".join(lines)
 
 @mcp.tool()
-def get_status() -> str:
+async def get_status() -> str:
     """Retorna o status atual do sistema iaglobal.
 
     Inclui: resumo do DAG (total/core/evo nodes), status da evolucao,
@@ -120,7 +111,7 @@ def get_status() -> str:
     asyncio.create_task(ensure_system_ready())
 
     # Garante a inicialização, mas evita travar o loop principal se ainda carregando
-    _ensure_api()
+    await _ensure_api_async()
     
     status = api.get_status()
     
@@ -134,6 +125,9 @@ def get_status() -> str:
         for key in path:
             curr = curr.get(key, {})
         return curr if curr != {} else default
+
+    def safe_len(val):
+        return len(val) if isinstance(val, (list, dict, str)) else val
 
     lines = [
         "📊 IAGlobal Status",
@@ -157,15 +151,15 @@ def get_status() -> str:
         f"  Errors: {get_val(['memory', 'errors'])}",
         "",
         "── Security ──",
-        f"  Modules: {len(get_val(['security', 'modules'], []))}",
-        f"  Read paths: {len(get_val(['security', 'read_paths'], []))}",
-        f"  Write paths: {len(get_val(['security', 'write_paths'], []))}",
-        f"  Blocked env: {len(get_val(['security', 'blocked_env'], []))}",
+        f"  Modules: {safe_len(get_val(['security', 'modules'], []))}",
+        f"  Read paths: {safe_len(get_val(['security', 'read_paths'], []))}",
+        f"  Write paths: {safe_len(get_val(['security', 'write_paths'], []))}",
+        f"  Blocked env: {safe_len(get_val(['security', 'blocked_env'], []))}",
     ]
     return "\n".join(lines)
 
 @mcp.tool()
-def get_insights(agent: str = "", limit: int = 10, min_score: float = 0.0) -> str:
+async def get_insights(agent: str = "", limit: int = 10, min_score: float = 0.0) -> str:
     """Recupera aprendizados armazenados pelos agentes do sistema.
 
     Os insights sao registros estruturados do que o sistema aprendeu
@@ -176,7 +170,7 @@ def get_insights(agent: str = "", limit: int = 10, min_score: float = 0.0) -> st
         limit: Maximo de registros (default 10)
         min_score: Score minimo (0-100, default 0)
     """
-    _ensure_api()
+    await _ensure_api_async()
     records = api.get_insights(
         agent=agent if agent else None,
         limit=limit,
@@ -196,9 +190,9 @@ def get_insights(agent: str = "", limit: int = 10, min_score: float = 0.0) -> st
 
 
 @mcp.tool()
-def list_scripts() -> str:
+async def list_scripts() -> str:
     """Lista todos os scripts Python gerados e persistidos pelo sistema."""
-    _ensure_api()
+    await _ensure_api_async()
     scripts = api.list_scripts()
     if not scripts:
         return "Nenhum script gerado ainda."
@@ -213,13 +207,13 @@ def list_scripts() -> str:
 
 
 @mcp.tool()
-def get_provider_metrics() -> str:
+async def get_provider_metrics() -> str:
     """Metricas de desempenho por provedor (chamadas, taxa de sucesso, latencia, custo).
 
     Os dados sao agregados pelo ProviderMetrics a partir de cada chamada
     de API realizada pelo pipeline.
     """
-    _ensure_api()
+    await _ensure_api_async()
     stats = metrics.get_provider_stats()
     if not stats:
         return "Nenhuma metrica de provedor registrada ainda."
@@ -238,13 +232,13 @@ def get_provider_metrics() -> str:
 
 
 @mcp.tool()
-def get_model_metrics(min_calls: int = 1) -> str:
+async def get_model_metrics(min_calls: int = 1) -> str:
     """Metricas de desempenho por modelo (chamadas, taxa de sucesso, latencia, custo).
 
     Args:
         min_calls: Minimo de chamadas para incluir o modelo (default 1)
     """
-    _ensure_api()
+    await _ensure_api_async()
     stats = metrics.get_model_stats()
     if not stats:
         return "Nenhuma metrica de modelo registrada ainda."
@@ -266,13 +260,13 @@ def get_model_metrics(min_calls: int = 1) -> str:
 
 
 @mcp.tool()
-def get_bandit_scores() -> str:
+async def get_bandit_scores() -> str:
     """Exibe os scores do BanditPolicy para cada modelo candidato.
 
     Mostra como o algoritmo ε-greedy esta classificando os modelos
     com base no historico de sucesso/falha do CreditAssignmentEngine.
     """
-    _ensure_api()
+    await _ensure_api_async()
     try:
         orch = api.orchestrator
         bandit = orch.bandit
@@ -299,13 +293,13 @@ def get_bandit_scores() -> str:
 
 
 @mcp.tool()
-def get_execution_history(limit: int = 10) -> str:
+async def get_execution_history(limit: int = 10) -> str:
     """Historico das ultimas execucoes do pipeline.
 
     Args:
         limit: Numero de execucoes (default 10)
     """
-    _ensure_api()
+    await _ensure_api_async()
     try:
         from iaglobal.events import store as decision_store
         events = decision_store.query(limit=limit)
@@ -334,7 +328,7 @@ def get_execution_history(limit: int = 10) -> str:
 
 
 @mcp.tool()
-def get_system_health(max_age_seconds: int = 3600) -> str:
+async def get_system_health(max_age_seconds: int = 3600) -> str:
     """Relatório de saúde do sistema baseado em life-signals.
 
     Mostra o status ALIVE/HIBERNATING/DEAD das funções instrumentadas

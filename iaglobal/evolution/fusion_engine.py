@@ -51,6 +51,7 @@ Exemplo de uso assíncrono:
 from __future__ import annotations
 
 import asyncio
+import hashlib
 import logging
 import threading
 import time

@@ -1,7 +1,7 @@
 ---
 id: "apoptosis_evo-obsidian-test"
 tipo: "MemoriaBruta"
-timestamp: "2026-06-27T23:47:06.493114+00:00Z"
+timestamp: "2026-07-06T14:39:55.068415+00:00Z"
 tags: ["#apoptose", "#agente-evo-obsidian-test", "#lições-aprendidas"]
 ---
 
@@ -13,14 +13,14 @@ tags: ["#apoptose", "#agente-evo-obsidian-test", "#lições-aprendidas"]
 
 ### Lições Extraídas
 
-- **termination_reason**: test_apoptose
+- **termination_reason**: test_cleanup
 
 ```json
 {
   "lessons": [
     {
       "type": "termination_reason",
-      "detail": "test_apoptose"
+      "detail": "test_cleanup"
     }
   ],
   "agent_terminated": "evo-obsidian-test"

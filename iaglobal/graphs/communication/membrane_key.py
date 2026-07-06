@@ -11,7 +11,7 @@ import threading
 from datetime import datetime, timezone
 from typing import Dict, Optional, Any
 
-from iaglobal.security.entropy_sentinel import entropy_sentinel
+from iaglobal.immunity.entropy_sentinel import entropy_sentinel
 from iaglobal.security.pysecurity1024 import gerar_node_id_soberano
 
 logger = logging.getLogger(__name__)
@@ -41,7 +41,11 @@ class MembraneKey:
             return
         self._initialized = True
         self._keys: Dict[str, Dict[str, Any]] = {}
-        self._genesis_hash = entropy_sentinel._genesis_hash or "default"
+        try:
+            from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
+            self._genesis_hash = GENESIS_HASH_OFFICIAL
+        except Exception:
+            self._genesis_hash = entropy_sentinel._genesis_hash if hasattr(entropy_sentinel, '_genesis_hash') else "default"
 
     def generate_key(self, system_name: str, permissions: list = None) -> str:
         """

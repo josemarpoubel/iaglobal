@@ -132,7 +132,7 @@ class ExecutionGraph:
 
     async def _execute_node_async(self, node: Node, input_data: dict) -> dict:
         # 1. Afinidade Determinística baseada no DNA (Hash) do nó
-        cpu_affinity.pin_to_hash(node.name)
+        await cpu_affinity.pin_to_hash(node.name)
         
         # Registra handlers no bus (lazy)
         self._register_bus_handlers()
@@ -151,11 +151,14 @@ class ExecutionGraph:
             }
 
         start = time.time()
-        raw_task = str(input_data.get("task", ""))
+        raw_task = str(input_data.get("task", "") or
+                       (input_data.get("input", {}).get("task", "") if isinstance(input_data.get("input"), dict) else ""))
         exec_id = str(input_data.get("metadata", {}).get("execution_id", raw_task))
         workdir = make_workdir(node.name, exec_id, raw_task)
 
         ctx = {"input": input_data, "memory": self.results, "workdir": workdir}
+        if raw_task:
+            ctx["task"] = raw_task
         trace = trace_node_execution(node.name, ctx)
         skill_name = node.node_type if node.node_type != "general" else node.name
         
@@ -188,9 +191,9 @@ class ExecutionGraph:
                     if asyncio.iscoroutine(result):
                         result = await result
                     executed = True
-                except Exception:
+                except Exception as e:
                     node_run_failed = True
-                    raise
+                    logger.debug("[GRAPH] Nó '%s' node.run falhou: %s — continuando para fallback Bandit", node.name, str(e)[:80])
 
 #====================================================================================================
 
@@ -220,13 +223,30 @@ class ExecutionGraph:
                     logger.info("[GRAPH] Nó '%s' pulado (single-run já executada)", node.name)
 
             # 2. Caso o nó não tenha retornado nada útil, dispara o Bandit Policy
-            if not result_text and not node_run_failed:
-                from iaglobal.graphs.bandit import BanditPolicy
-                bandit = BanditPolicy(credit=self.credit)
+            # Também dispara se o output for muito curto ou genérico (modelo local fraco)
+            _weak_output = result_text and (len(result_text.strip()) < 80 or result_text.strip().lower() in [
+                "olá! como posso te ajudar hoje?", "olá, tudo bem?", "hello", "olá",
+            ])
+            if not result_text or _weak_output:
+                from iaglobal.graphs.bandit import _get_bandit
+                bandit = _get_bandit()
+
+                # Candidatos fixos: modelos cloud primeiro, Ollama como fallback
+                candidates = [
+                    "groq/llama-3.3-70b-versatile",
+                    "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
+                    "ollama/qwen2.5:0.5b",
+                ]
                 
-                chosen_model = await asyncio.to_thread(bandit.select_model, node.name, node.strategy)
+                # Seleção com semáforo integrado (evita rate limit)
+                chosen_model = await bandit.select_model_with_lock(
+                    node_id=node.name,
+                    task_type=node.strategy,
+                    candidates=candidates
+                )
+                
                 result_text = await bandit.async_execute_model(
-                    model=chosen_model, prompt=raw_task, task_type=node.strategy
+                    model_name=chosen_model, prompt=raw_task, task_type=node.strategy
                 )
 
             # 3. Validação final do sucesso
@@ -249,16 +269,15 @@ class ExecutionGraph:
 
 # --- ATUALIZAÇÃO DA POLÍTICA PÓS EXECUÇÃO ---
         # Se 'bandit' e 'chosen_model' foram definidos no escopo anterior
-        if 'bandit' in locals() and 'chosen_model' in locals() and success:
+        if 'bandit' in locals() and 'chosen_model' in locals() and result_text:
             try:
+                reward = 1.0 if success else 0.0
+                ivm = getattr(self._homeostasis, 'current_ivm', 0.5)
                 await asyncio.to_thread(
-                    bandit.update_policy,
-                    node=node.name,
-                    model=chosen_model,
-                    strategy=node.strategy,
-                    success=success,
-                    latency=latency,
-                    reward=1.0 if success else 0.0
+                    bandit.update_reward,
+                    chosen_model,
+                    reward,
+                    ivm,
                 )
             except Exception as e_train:
                 logger.warning(f"[GRAPH-ASYNC] Falha ao atualizar bandit: {e_train}")
@@ -525,8 +544,10 @@ class ExecutionGraph:
     def _aggregate(self, duration: float, execution_id: Optional[str] = None) -> Dict[str, Any]:
         """Agregação final com seleção baseada em pontuação (score)."""
         scored = []
+        any_success = False
         for name, r in self.results.items():
             if isinstance(r, dict) and r.get("success"):
+                any_success = True
                 output_text = self._get_output_text(r)
                 if output_text:
                     score = self._compute_score(name, r)
@@ -538,12 +559,18 @@ class ExecutionGraph:
             final_text = scored[0][0]
             logger.info("🏆 Melhor resultado: %s (score=%.2f)", scored[0][2], scored[0][1])
         elif self.results:
-            # Fallback para o texto mais longo caso nenhum tenha pontuação
-            final_text = max((self._get_output_text(r) for r in self.results.values() if isinstance(r, dict)), 
-                             key=len, default="")
+            fallback_candidates = []
+            for name, r in self.results.items():
+                if not isinstance(r, dict):
+                    continue
+                text = self._get_output_text(r)
+                priority = 3 if name in self._CODE_NODE_PRIORITY else 1
+                fallback_candidates.append((priority, len(text), text))
+            fallback_candidates.sort(key=lambda x: (x[0], x[1]), reverse=True)
+            final_text = fallback_candidates[0][2] if fallback_candidates else ""
 
         return {
-            "success": True,
+            "success": any_success,
             "execution_time": duration,
             "nodes_executed": len(self.results),
             "final_output": final_text,
@@ -551,37 +578,38 @@ class ExecutionGraph:
             "execution_id": execution_id or "",
         }
 
-    def _compute_score(self, node_name: str, result: dict) -> float:
-        """
-        Calcula o score de qualidade do nó com normalização de segurança.
-        Escala: 0.0 a 1.0.
-        """
-        score = 0.0
+    _CODE_NODE_PRIORITY = {
+        "integrator", "coder", "debug_coder", "api_builder", "backend_builder",
+        "frontend_builder", "database_builder", "multi_coder", "artifact_writer",
+    }
 
-        # 1. Qualidade Funcional (Testes: 50% + 10% bônus)
+    def _compute_score(self, node_name: str, result: dict) -> float:
+        score = 0.0
+        output_text = self._get_output_text(result)
+        code_len = len(output_text)
+
+        # 1. Bônus para nós que produzem código substancial (50%)
+        if code_len >= 200:
+            code_quality = min(1.0, code_len / 3000.0)
+            score += code_quality * 0.40
+        if node_name in self._CODE_NODE_PRIORITY:
+            score += 0.10
+
+        # 2. Qualidade Funcional (Testes: 20%)
         tests_passed = max(0, int(result.get("tests_passed", 0)))
         tests_total = max(0, int(result.get("tests_total", 0)))
         if tests_total > 0:
-            score += (tests_passed / tests_total) * 0.50
-            if tests_passed == tests_total:
-                score += 0.10
+            score += (tests_passed / tests_total) * 0.20
 
-        # 2. Avaliação de Critic (20%)
+        # 3. Avaliação de Critic (15%)
         critic_score = max(0.0, min(100.0, float(result.get("critic_score", 0))))
-        score += (critic_score / 100.0) * 0.20
+        score += (critic_score / 100.0) * 0.15
 
-        # 3. Validação de Segurança (15%)
+        # 4. Validação de Segurança (10%)
         if result.get("security_valid", True):
-            score += 0.15
+            score += 0.10
 
-        # 4. Simplicidade/Concisão (10%) - Penaliza código excessivamente longo
-        output_text = self._get_output_text(result)
-        code_len = len(output_text)
-        # 5000 caracteres é o teto para penalidade total
-        simplicity = max(0.0, 1.0 - min(code_len / 5000.0, 1.0))
-        score += simplicity * 0.10
-
-        # 5. Performance/Latência (5%) - Penaliza latência acima de 30s
+        # 5. Performance/Latência (5%)
         latency = max(0.001, float(result.get("latency", 1.0)))
         perf = max(0.0, 1.0 - min(latency / 30.0, 1.0))
         score += perf * 0.05

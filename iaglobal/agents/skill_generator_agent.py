@@ -15,6 +15,7 @@ from datetime import datetime, timezone
 from collections import Counter
 
 from iaglobal._paths import CORE_DB, get_db_connection as _norm_path
+from iaglobal.agents.agent_base import AgentBase
 
 from iaglobal.evolution.skills.skill import Skill
 
@@ -30,10 +31,11 @@ from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
 
-class SkillGeneratorAgent:
+class SkillGeneratorAgent(AgentBase):
     """Gera skills automaticamente da base de conhecimento."""
 
     def __init__(self, db_path: Union[str, Path] = CORE_DB):
+        super().__init__(agent_name="skillgenerator")
         p = Path(db_path) if isinstance(db_path, str) else db_path
         self.db_path = _norm_path(p)
         self.kg = KnowledgeGraph(self.db_path)

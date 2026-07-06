@@ -10,11 +10,23 @@ import logging
 import asyncio
 from typing import Dict, Any
 
-from iaglobal.providers.provider_router import async_route_generate
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.memory.memory_error import record_error
 from iaglobal.graphs.communication.acetylcholine_bus import AgentMessage
 
 logger = logging.getLogger(__name__)
+
+
+# Instância singleton do agent para reutilização
+_documentation_agent = None
+
+
+def _get_documentation_agent() -> AgentBase:
+    """Retorna instancia singleton do DocumentationAgent."""
+    global _documentation_agent
+    if _documentation_agent is None:
+        _documentation_agent = AgentBase(agent_name="documentation")
+    return _documentation_agent
 
 
 async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -79,9 +91,12 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
     try:
         logger.info("[DOCUMENTATION] Disparando inferência assíncrona para redação técnica do documento...")
         
-        # Chamada assíncrona do provider core
-        doc = await async_route_generate(
-            model="", prompt=prompt, task_type="documentation"
+        # Usa AgentBase para chamar BanditPolicy
+        agent = _get_documentation_agent()
+        doc = await agent._call_llm(
+            prompt=prompt,
+            task_type="documentation",
+            timeout=60.0
         )
         
         # Portão de segurança: validação de tamanho mínimo da documentação gerada
@@ -113,7 +128,7 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
                     "model": resolved_model,
                     "success": True,
                     "latency": latency_ms,
-                    "cost": ctx.get("estimated_cost", 0.008)  # Custo de inferência estimado para redação rica
+                    "cost": ctx.get("estimated_cost", 0.008)
                 }
             }
             
@@ -140,4 +155,3 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 "cost": 0.0
             }
         }
-

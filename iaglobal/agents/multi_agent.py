@@ -23,6 +23,7 @@ from dataclasses import dataclass
 from typing import Any, Dict, Optional, Union
 
 from iaglobal.models.task import Task
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.utils.logger import logger
 
 
@@ -115,6 +116,7 @@ class PipelineOrchestrator:
     """
     
     def __init__(self, **kwargs):
+        super().__init__(agent_name="multi")
         logger.warning("[MULTI_AGENT] PipelineOrchestrator instanciado - use graph-based orchestration")
     
     def resolve(self, task: Union[str, Task], max_iters: int = 3) -> str:

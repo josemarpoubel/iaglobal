@@ -2,6 +2,7 @@
 # iaglobal/agents/enhancement_agent.py
 
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import AgentBase
 
 
 # Mapa de dominio → bibliotecas recomendadas (PyPI)
@@ -42,7 +43,7 @@ def _suggest_libs(task: str) -> list:
     return sorted(suggested)[:8]
 
 
-class EnhancementAgent:
+class EnhancementAgent(AgentBase):
     """Enriquece e refina o prompt de entrada após o intake."""
 
     def enhance(self, task: str, intake: dict, knowledge_context: str = "",

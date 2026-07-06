@@ -30,723 +30,377 @@ AXIOMAS IMPLEMENTADOS:
 
 import asyncio
 import os
+import re
 import sqlite3
 import time
 import uuid
+from collections import defaultdict
 from contextlib import asynccontextmanager
 from pathlib import Path
-from typing import Any, Dict, List, Optional
-
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect, HTTPException, Request
-from fastapi.responses import HTMLResponse, JSONResponse
+from reactpy import component, html
+from reactpy.backend.fastapi import configure as reactpy_configure, Options
+from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.staticfiles import StaticFiles
+from fastapi.responses import JSONResponse, HTMLResponse
 from fastapi.templating import Jinja2Templates
-from fastapi.middleware.cors import CORSMiddleware
-from pydantic import BaseModel, Field
+import uvicorn
+import logging
 
-from iaglobal.utils.logger import get_logger, register_web_log_broadcast
-from iaglobal.observability.tracing import Tracer
-from iaglobal.storage.batch_writer import batch_writer, Event
-from iaglobal.observability.health import HealthCheck
-from iaglobal.ui.workspace_runner import get_workspace_runner, WorkspaceRunnerError
-from iaglobal.ui.git_workspace import GitWorkspaceError
-from iaglobal._paths import CORE_DB
+# Importar conversor de dados CBOR/JSON
+try:
+    from .data_converter import (
+        get_execution_history,
+        get_agent_status,
+        get_metabolic_state,
+        get_epigenetic_markers
+    )
+except ImportError:
+    # Fallback para execução direta
+    import sys
+    sys.path.insert(0, str(Path(__file__).parent))
+    from data_converter import (
+        get_execution_history,
+        get_agent_status,
+        get_metabolic_state,
+        get_epigenetic_markers
+    )
 
-logger = get_logger("iaglobal")
+# Criar app FastAPI com configurações compatíveis
+app = FastAPI(title="IAGLOBAL ReactPy UI")
+templates = Jinja2Templates(directory=str(Path(__file__).parent / "templates"))
+
+# =====================================================================
+# UI ORCHESTRATOR — Singleton seguro para execução real via Bootstrap
+# =====================================================================
+_ui_orchestrator = None
+_ui_bootstrap_lock = asyncio.Lock()
 
 
-async def _broadcast_log_to_ui(message: str, level: str = "info"):
-    """Envia log para todas as conexões WebSocket ativas."""
+async def _get_ui_orchestrator():
+    """Inicializa o Orchestrator uma única vez via Bootstrap."""
+    global _ui_orchestrator
+    if _ui_orchestrator is not None:
+        return _ui_orchestrator
+
+    async with _ui_bootstrap_lock:
+        if _ui_orchestrator is None:
+            try:
+                from iaglobal.cli.bootstrap import bootstrap
+                _ui_orchestrator = await bootstrap.initialize()
+            except Exception as exc:
+                logger.exception("Falha ao inicializar UI Orchestrator")
+                raise RuntimeError(f"UI bootstrap unavailable: {exc}") from exc
+    return _ui_orchestrator
+
+
+_ENVIRONMENT_DETAILS_RE = re.compile(r"<environment_details>.*?</environment_details>", re.DOTALL)
+
+
+def _sanitize_terminal_output(text: str) -> str:
+    """Remove blocos de metadados de ambiente injetados por provedores/agentes."""
+    if not text:
+        return text
+    cleaned = _ENVIRONMENT_DETAILS_RE.sub("", text)
+    return cleaned.strip()
+
+
+async def _broadcast_execution(execution_id: str, status: str, message: str = "", error: str = ""):
+    """Envia atualização de status para o WebSocket do cliente."""
+    payload = {"type": "status", "status": status, "execution_id": execution_id}
+    if message:
+        payload["message"] = _sanitize_terminal_output(message)
+    if error:
+        payload["error"] = _sanitize_terminal_output(error)
+    await ws_manager.broadcast(execution_id, payload)
+
+
+async def _run_pipeline_background(execution_id: str, task: str):
+    """Executa o pipeline real do iaglobal em background e notifica o frontend."""
     try:
-        await manager.broadcast_all({
-            "type": "log",
-            "level": level,
-            "message": message,
-        })
-    except Exception:
-        pass
+        await _broadcast_execution(execution_id, "running", "Inicializando orquestrador...")
+        orch = await _get_ui_orchestrator()
+        await _broadcast_execution(execution_id, "running", "Executando pipeline...")
+        result = await orch.pipeline.execute(task)
+        status = "completed" if result.success else "failed"
+        message = result.response or result.error or "Concluído"
+        await _broadcast_execution(execution_id, status, message)
+    except Exception as exc:
+        logger.exception("Falha na execução background do pipeline")
+        await _broadcast_execution(execution_id, "failed", error=str(exc))
+
+# Design tokens
+DARK_THEME = {
+    "bg_primary": "#0f0f23",
+    "bg_secondary": "#1a1a2e", 
+    "bg_card": "#16213e",
+    "accent": "#ff6b6b",
+    "text_light": "#e8e8ff",
+}
 
 
-register_web_log_broadcast(_broadcast_log_to_ui)
-
-
-# =====================================================================
-# PARÂMETROS HOMEOSTÁTICOS (Epigenética Operacional)
-# =====================================================================
-MAX_EXECUTIONS_MEMORY = int(os.environ.get('UI_MAX_EXECUTIONS', '1000'))
-EXECUTION_TTL_HOURS = int(os.environ.get('UI_EXECUTION_TTL_HOURS', '24'))
-TASK_TIMEOUT_SECONDS = int(os.environ.get('UI_TASK_TIMEOUT', '300'))
-CB_FAILURE_THRESHOLD = int(os.environ.get('UI_CB_THRESHOLD', '5'))
-CB_RECOVERY_TIMEOUT = float(os.environ.get('UI_CB_RECOVERY', '60'))
-RATE_LIMIT_PER_MINUTE = int(os.environ.get('UI_RATE_LIMIT', '120'))
-
-
-# =====================================================================
-# MODELOS DE VALIDAÇÃO (Chaperonas Moleculares)
-# =====================================================================
-
-class TaskRequest(BaseModel):
-    """Validação de input de tarefa."""
-    task: str = Field(..., min_length=3, max_length=10000, description="Descrição da tarefa")
-    
-    def validate_task(self):
-        if not self.task.strip():
-            raise ValueError("Task não pode ser vazia")
-        if len(self.task.strip()) < 3:
-            raise ValueError("Task muito curta (mínimo 3 caracteres)")
-
-
-class TaskResponse(BaseModel):
-    """Resposta de criação de tarefa."""
-    execution_id: str
-    status: str
-    created_at: float
-
-
-# =====================================================================
-# CIRCUIT BREAKER (Glutationa — Defesa Antioxidante)
-# =====================================================================
-
-class UICircuitBreaker:
-    """Circuit breaker para proteger contra falhas em cascata."""
-    
-    def __init__(self):
-        self._failures = 0
-        self._last_failure = 0.0
-        self._lock = asyncio.Lock()
-    
-    async def can_execute(self) -> bool:
-        async with self._lock:
-            if self._failures >= CB_FAILURE_THRESHOLD:
-                if (time.time() - self._last_failure) < CB_RECOVERY_TIMEOUT:
-                    return False
-                self._failures = 0
-            return True
-    
-    async def record_success(self):
-        async with self._lock:
-            self._failures = 0
-    
-    async def record_failure(self):
-        async with self._lock:
-            self._failures += 1
-            self._last_failure = time.time()
-    
-    async def get_state(self) -> str:
-        async with self._lock:
-            if self._failures >= CB_FAILURE_THRESHOLD:
-                return "OPEN"
-            elif self._failures > 0:
-                return "HALF_OPEN"
-            return "CLOSED"
-
-
-_ui_cb = UICircuitBreaker()
-
-
-# =====================================================================
-# RATE LIMITER (Sistema Imune — Defesa contra Abuso)
-# =====================================================================
-
-class RateLimiter:
-    """Rate limiter simples por IP."""
-    
-    def __init__(self, max_requests: int = RATE_LIMIT_PER_MINUTE):
-        self._requests: Dict[str, List[float]] = {}
-        self._max_requests = max_requests
-        self._lock = asyncio.Lock()
-    
-    async def is_allowed(self, client_ip: str) -> bool:
-        async with self._lock:
-            now = time.time()
-            
-            if client_ip in self._requests:
-                self._requests[client_ip] = [
-                    t for t in self._requests[client_ip]
-                    if now - t < 60
-                ]
-            else:
-                self._requests[client_ip] = []
-            
-            if len(self._requests[client_ip]) >= self._max_requests:
-                return False
-            
-            self._requests[client_ip].append(now)
-            return True
-
-
-_rate_limiter = RateLimiter()
-
-
-# =====================================================================
-# CONNECTION MANAGER (Sinalização Celular)
-# =====================================================================
-
-class ConnectionManager:
-    """Gerencia conexões WebSocket ativas por execution_id."""
-    
-    def __init__(self):
-        self.active_connections: Dict[str, List[WebSocket]] = {}
-        self._lock = asyncio.Lock()
-    
-    async def connect(self, websocket: WebSocket, execution_id: str):
-        await websocket.accept()
-        async with self._lock:
-            if execution_id not in self.active_connections:
-                self.active_connections[execution_id] = []
-            self.active_connections[execution_id].append(websocket)
-        
-        logger.info("[WS] Conexão registrada: %s", execution_id)
-    
-    async def disconnect(self, websocket: WebSocket, execution_id: str):
-        async with self._lock:
-            if execution_id in self.active_connections:
-                try:
-                    self.active_connections[execution_id].remove(websocket)
-                except ValueError:
-                    pass
-                
-                if not self.active_connections[execution_id]:
-                    del self.active_connections[execution_id]
-        
-        logger.info("[WS] Conexão removida: %s", execution_id)
-    
-    async def broadcast_all(self, message: dict):
-        """Envia mensagem para todas as conexões ativas."""
-        async with self._lock:
-            dead_conns = []
-            for execution_id, conns in list(self.active_connections.items()):
-                for conn in conns:
-                    try:
-                        await conn.send_json(message)
-                    except Exception:
-                        dead_conns.append((execution_id, conn))
-            
-            for execution_id, conn in dead_conns:
-                try:
-                    self.active_connections[execution_id].remove(conn)
-                except (ValueError, KeyError):
-                    pass
-            
-            for execution_id, conns in list(self.active_connections.items()):
-                if not conns:
-                    self.active_connections.pop(execution_id, None)
-
-    async def broadcast(self, execution_id: str, message: dict):
-        """Envia mensagem para conexões de uma execução específica."""
-        async with self._lock:
-            if execution_id not in self.active_connections:
-                return
-            
-            dead = []
-            for conn in self.active_connections[execution_id]:
-                try:
-                    await conn.send_json(message)
-                except Exception:
-                    dead.append(conn)
-            
-            for conn in dead:
-                try:
-                    self.active_connections[execution_id].remove(conn)
-                except (ValueError, KeyError):
-                    pass
-            
-            if not self.active_connections.get(execution_id):
-                self.active_connections.pop(execution_id, None)
-
-
-manager = ConnectionManager()
-
-
-# =====================================================================
-# EXECUTION STORE (Memória de Longo Prazo com Autofagia)
-# =====================================================================
-
-class ExecutionStore:
-    """
-    Store de execuções com:
-    - Thread-safety (asyncio.Lock)
-    - Autofagia (remove execuções antigas)
-    - Persistência opcional em SQLite
-    - Métricas endógenas
-    """
-    
-    def __init__(self):
-        self._executions: Dict[str, Dict[str, Any]] = {}
-        self._lock = asyncio.Lock()
-        self._metrics = {
-            "created": 0,
-            "completed": 0,
-            "failed": 0,
-            "cancelled": 0,
-            "autophagy_events": 0,
-        }
-    
-    async def create(self, execution_id: str, task: str) -> Dict[str, Any]:
-        """Cria nova execução."""
-        async with self._lock:
-            execution = {
-                "id": execution_id,
-                "task": task,
-                "status": "pending",
-                "created_at": time.time(),
-                "result": None,
-                "error": None,
-            }
-            self._executions[execution_id] = execution
-            self._metrics["created"] += 1
-            
-            await self._autophagy()
-            
-            return execution
-    
-    async def get(self, execution_id: str) -> Optional[Dict[str, Any]]:
-        """Obtém execução por ID."""
-        async with self._lock:
-            return self._executions.get(execution_id)
-    
-    async def update(self, execution_id: str, **kwargs):
-        """Atualiza execução."""
-        async with self._lock:
-            if execution_id in self._executions:
-                self._executions[execution_id].update(kwargs)
-                
-                status = kwargs.get("status")
-                if status == "completed":
-                    self._metrics["completed"] += 1
-                elif status == "failed":
-                    self._metrics["failed"] += 1
-                elif status == "cancelled":
-                    self._metrics["cancelled"] += 1
-    
-    async def list_all(self, limit: int = 50) -> List[Dict[str, Any]]:
-        """Lista execuções."""
-        async with self._lock:
-            executions = list(self._executions.values())
-            executions.sort(key=lambda x: x.get("created_at", 0), reverse=True)
-            return executions[:limit]
-    
-    async def _autophagy(self):
-        """Remove execuções antigas (autofagia)."""
-        now = time.time()
-        cutoff = now - (EXECUTION_TTL_HOURS * 3600)
-        
-        to_remove = [
-            eid for eid, exec_data in self._executions.items()
-            if exec_data.get("created_at", 0) < cutoff
-        ]
-        
-        for eid in to_remove:
-            del self._executions[eid]
-        
-        if len(self._executions) > MAX_EXECUTIONS_MEMORY:
-            sorted_execs = sorted(
-                self._executions.items(),
-                key=lambda x: x[1].get("created_at", 0)
-            )
-            to_remove = [eid for eid, _ in sorted_execs[:-MAX_EXECUTIONS_MEMORY]]
-            for eid in to_remove:
-                del self._executions[eid]
-        
-        if to_remove:
-            self._metrics["autophagy_events"] += len(to_remove)
-            logger.debug("[EXECUTIONS] Autofagia: %d execuções removidas", len(to_remove))
-    
-    async def get_metrics(self) -> Dict[str, Any]:
-        """Retorna métricas do store."""
-        async with self._lock:
-            total = len(self._executions)
-            completed = self._metrics["completed"]
-            failed = self._metrics["failed"]
-            
-            return {
-                **self._metrics,
-                "total_executions": total,
-                "success_rate": round((completed / total * 100), 1) if total > 0 else 0,
-            }
-
-
-executions = ExecutionStore()
-
+@component
+def AgentDashboard():
+    """Dashboard simples dos agentes."""
+    return html.div(
+        {"style": {
+            "background": f"linear-gradient(135deg, {DARK_THEME['bg_primary']}, {DARK_THEME['bg_secondary']})",
+            "minHeight": "100vh",
+            "padding": "2rem",
+            "color": DARK_THEME["text_light"],
+            "fontFamily": "system-ui, sans-serif",
+        }},
+        html.h1({"style": {"color": DARK_THEME["accent"]}}, "🧠 IAGLOBAL Agent Dashboard"),
+        html.div({"style": {"display": "grid", "gap": "1rem", "marginTop": "2rem"}},
+            html.div({"style": {"background": DARK_THEME["bg_card"], "padding": "1rem", "borderRadius": "8px"}},
+                html.h3({"style": {"color": DARK_THEME["accent"]}}, "CoderAgent"),
+                html.p({"style": {"color": "#00ff88"}}, "Status: active"),
+            ),
+            html.div({"style": {"background": DARK_THEME["bg_card"], "padding": "1rem", "borderRadius": "8px"}},
+                html.h3({"style": {"color": DARK_THEME["accent"]}}, "KnowledgeWriter"),
+                html.p({"style": {"color": "#00ff88"}}, "Status: learning"),
+            ),
+            html.div({"style": {"background": DARK_THEME["bg_card"], "padding": "1rem", "borderRadius": "8px"}},
+                html.h3({"style": {"color": DARK_THEME["accent"]}}, "ProviderMetrics"), 
+                html.p({"style": {"color": "#00ff88"}}, "Status: tracking"),
+            ),
+        ),
+    )
 
 # =====================================================================
 # LIFESPAN (Ciclo de Vida do Organismo)
 # =====================================================================
 
-@asynccontextmanager
-async def lifespan(app: FastAPI):
-    """Gerencia ciclo de vida da aplicação (apoptose graceful)."""
-    logger.info("[UI] 🚀 Iniciando IAGLOBAL Agent Workspace")
-    
-    try:
-        Tracer.trace_event("UIStartup", {"status": "starting"})
-    except Exception:
-        pass
-    
-    yield
-    
-    logger.info("[UI] 🛑 Shutting down IAGLOBAL Agent Workspace")
-    
-    async with manager._lock:
-        for execution_id, connections in list(manager.active_connections.items()):
-            for conn in connections:
-                try:
-                    await conn.close(code=1001, reason="Server shutting down")
-                except Exception:
-                    pass
-        manager.active_connections.clear()
-    
-    try:
-        Tracer.trace_event("UIShutdown", {"status": "completed"})
-    except Exception:
-        pass
+# Configurar ReactPy PRIMEIRO, antes de qualquer outra rota
+reactpy_configure(app, AgentDashboard, Options(url_prefix="/@"))
 
 
-# =====================================================================
-# CONFIGURAÇÃO DA APLICAÇÃO
-# =====================================================================
+logger = logging.getLogger(__name__)
 
-app = FastAPI(
-    title="IAGLOBAL Agent Workspace",
-    description="Interface própria para orquestração de agentes iaglobal — 100% gratuita",
-    version="2.0.0",
-    lifespan=lifespan,
-)
-
-# CORS
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-# Diretórios
-BASE_DIR = Path(__file__).resolve().parent
-TEMPLATES_DIR = BASE_DIR / "templates"
-STATIC_DIR = BASE_DIR / "static"
-RESULTS_DIR = Path("/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/result")
-
-templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
-
-if STATIC_DIR.exists():
-    app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="ui-static")
-
+# Servir arquivos estáticos do resultado
+RESULTS_DIR = Path(__file__).parent.parent / "memory" / "data" / "result"
 if RESULTS_DIR.exists():
     app.mount("/result", StaticFiles(directory=str(RESULTS_DIR)), name="result")
 
 
-# =====================================================================
-# MIDDLEWARE (Rate Limiter)
-# =====================================================================
-
-@app.middleware("http")
-async def rate_limit_middleware(request: Request, call_next):
-    client_ip = request.client.host if request.client else "unknown"
-    if not await _rate_limiter.is_allowed(client_ip):
-        return JSONResponse(
-            status_code=429,
-            content={"error": "Rate limit exceeded", "retry_after": 60}
-        )
-    return await call_next(request)
+@app.get("/")
+async def root(request: Request):
+    """Serve a página principal do workspace com prompt e terminal."""
+    return templates.TemplateResponse("index.html", {"request": request})
 
 
-# =====================================================================
-# ENDPOINTS — API REST (Percepção Sensorial)
-# =====================================================================
-
-@app.get("/api/health")
+@app.get("/health")
 async def health():
-    """Health check real — integra com HealthCheck do organismo."""
-    try:
-        health_status = HealthCheck.summary()
-        
-        return {
-            "status": "ok" if health_status.get("overall_healthy") else "degraded",
-            "service": "iaglobal-ui",
-            "version": "2.0.0",
-            "health": health_status,
-            "circuit_breaker": await _ui_cb.get_state(),
-        }
-    except Exception as e:
-        logger.error("[UI] Health check falhou: %s", e)
-        return {
-            "status": "error",
-            "service": "iaglobal-ui",
-            "version": "2.0.0",
-            "error": str(e),
-        }
+    """Health check endpoint."""
+    return {"status": "healthy", "service": "iaglobal-ui"}
 
 
-@app.post("/api/task")
-async def create_task(request: TaskRequest):
-    """Cria nova tarefa para execução."""
-    if not await _ui_cb.can_execute():
-        logger.warning("[UI] Circuit breaker OPEN — rejeitando tarefa")
-        raise HTTPException(
-            status_code=503,
-            detail="Service temporarily unavailable (circuit breaker OPEN)"
-        )
-    
+@app.get("/api/execucoes")
+async def api_execucoes(limit: int = 50):
+    """API endpoint para histórico de execuções."""
     try:
-        request.validate_task()
-    except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
-    
-    execution_id = str(uuid.uuid4())
-    
-    execution = await executions.create(execution_id, request.task.strip())
-    
-    asyncio.create_task(_run_task_background(execution_id, request.task.strip()))
-    
-    try:
-        Tracer.trace_event("TaskCreated", {
-            "execution_id": execution_id,
-            "task_length": len(request.task),
+        executions = get_execution_history(limit)
+        return JSONResponse(content={
+            "success": True,
+            "count": len(executions),
+            "executions": executions
         })
-        
-        batch_writer.emit(Event(
-            event_type="TaskCreated",
-            payload=execution_id,
-            model="ui",
-            latency_ms=0.0,
-            tokens_in=0,
-            tokens_out=0,
-        ))
-    except Exception as e:
-        logger.warning("[UI] Falha na telemetria: %s", e)
-    
-    return TaskResponse(
-        execution_id=execution_id,
-        status=execution["status"],
-        created_at=execution["created_at"],
-    )
-
-
-@app.get("/api/task/{execution_id}")
-async def get_task_status(execution_id: str):
-    """Obtém status de uma execução."""
-    execution = await executions.get(execution_id)
-    if not execution:
-        raise HTTPException(status_code=404, detail="Execução não encontrada")
-    return execution
+    except Exception:
+        logger.exception("Failed to fetch execution history")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Internal server error"}
+        )
 
 
 @app.get("/api/tasks")
-async def list_tasks(limit: int = 50):
-    """Lista execuções recentes."""
+async def api_tasks(limit: int = 50):
+    """Alias para histórico de execuções esperado pelo frontend."""
     try:
-        return {"executions": await executions.list_all(limit)}
-    except Exception as e:
-        logger.error("[UI] Erro em /api/tasks: %s", e, exc_info=True)
-        raise HTTPException(status_code=500, detail=f"Erro ao listar tarefas: {e}")
+        executions = get_execution_history(limit)
+        return JSONResponse(content={
+            "success": True,
+            "count": len(executions),
+            "executions": executions
+        })
+    except Exception:
+        logger.exception("Failed to fetch tasks")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Internal server error"}
+        )
 
 
-@app.delete("/api/task/{execution_id}")
-async def cancel_task(execution_id: str):
-    """Cancela uma execução."""
-    execution = await executions.get(execution_id)
-    if not execution:
-        raise HTTPException(status_code=404, detail="Execução não encontrada")
-    
-    await executions.update(execution_id, status="cancelled")
-    
-    logger.info("[UI] Tarefa cancelada: %s", execution_id)
-    
-    return {"status": "cancelled", "execution_id": execution_id}
-
-
-@app.get("/api/metrics")
-async def get_metrics():
-    """Métricas reais do sistema."""
-    exec_metrics = await executions.get_metrics()
-    
-    return {
-        **exec_metrics,
-        "circuit_breaker": await _ui_cb.get_state(),
-        "active_websockets": sum(len(conns) for conns in manager.active_connections.values()),
-    }
-
-
-# =====================================================================
-# BACKGROUND TASK (Metabolismo de Tarefas)
-# =====================================================================
-
-async def _run_task_background(execution_id: str, task_description: str):
-    """Executa tarefa em background com circuit breaker e timeout."""
-    start_time = time.time()
-    
-    await executions.update(execution_id, status="running", started_at=time.time())
-    
+@app.post("/api/task")
+async def api_create_task(request: Request):
+    """Cria uma nova execução de tarefa no workspace."""
     try:
-        await manager.broadcast(execution_id, {
-            "type": "status",
-            "status": "running",
-            "message": "Iniciando execução...",
+        body = await request.json()
+        task = (body or {}).get("task") or ""
+        if not task or len(task.strip()) < 3:
+            return JSONResponse(
+                status_code=400,
+                content={"success": False, "error": "Tarefa inválida"}
+            )
+
+        execution_id = f"ui_{uuid.uuid4().hex}"
+        asyncio.create_task(_run_pipeline_background(execution_id, task))
+        return JSONResponse(content={
+            "success": True,
+            "execution_id": execution_id,
+            "status": "pending"
         })
-        
-        runner = get_workspace_runner()
-        result = await asyncio.wait_for(
-            runner.run_task(task_description, execution_id=execution_id),
-            timeout=TASK_TIMEOUT_SECONDS,
+    except Exception:
+        logger.exception("Failed to create task")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Internal server error"}
         )
-        
-        status = "completed" if result.get("success") else "failed"
-        
-        logger.info("[UI] Resultado recebido: success=%s keys=%s", result.get("success"), list(result.keys()))
-        
-        await executions.update(
-            execution_id,
-            status=status,
-            result=result,
-            finished_at=time.time(),
+
+
+@app.get("/api/task/{execution_id}")
+async def api_get_task(execution_id: str):
+    """Detalhes de uma execução pelo ID."""
+    try:
+        executions = get_execution_history(limit=200)
+        match = next((item for item in executions if item.get("id") == execution_id), None)
+        if not match:
+            return JSONResponse(
+                status_code=404,
+                content={"success": False, "error": "Not found"}
+            )
+        return JSONResponse(content={"success": True, **match})
+    except Exception:
+        logger.exception("Failed to fetch task")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Internal server error"}
         )
-        
-        try:
-            output_text = result.get("final_output") or ""
-            logger.info("[UI] final_output len=%s", len(output_text))
-            if output_text:
-                RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-                safe_name = f"{execution_id}.txt"
-                target = RESULTS_DIR / safe_name
-                target.write_text(output_text, encoding="utf-8")
-                logger.info("[UI] Resultado salvo em %s", target)
-            else:
-                logger.warning("[UI] final_output vazio, nada salvo")
-        except Exception as e:
-            logger.error("[UI] Falha ao salvar resultado em disco: %s", e)
-        
-        await manager.broadcast(execution_id, {
-            "type": "status",
-            "status": status,
-            "result": result,
+
+
+@app.get("/api/agentes")
+async def api_agentes():
+    """API endpoint para status dos agentes."""
+    try:
+        agents = get_agent_status()
+        return JSONResponse(content={
+            "success": True,
+            **agents
         })
-        
-        await _ui_cb.record_success()
-        
-        latency_ms = (time.time() - start_time) * 1000
-        try:
-            Tracer.trace_event("TaskCompleted", {
-                "execution_id": execution_id,
-                "status": status,
-                "latency_ms": round(latency_ms, 2),
-            })
-            
-            batch_writer.emit(Event(
-                event_type="TaskCompleted",
-                payload=f"{execution_id}:{status}",
-                model="ui",
-                latency_ms=round(latency_ms, 1),
-                tokens_in=0,
-                tokens_out=0,
-            ))
-        except Exception as e:
-            logger.warning("[UI] Falha na telemetria: %s", e)
-        
-        logger.info(
-            "[UI] ✅ Tarefa %s concluída: %s (%.2fs)",
-            execution_id, status, latency_ms / 1000
+    except Exception:
+        logger.exception("Failed to fetch agent status")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Internal server error"}
         )
-    
-    except asyncio.TimeoutError:
-        await executions.update(
-            execution_id,
-            status="failed",
-            error=f"Timeout após {TASK_TIMEOUT_SECONDS}s",
-            finished_at=time.time(),
-        )
-        
-        await manager.broadcast(execution_id, {
-            "type": "status",
-            "status": "failed",
-            "error": f"Timeout após {TASK_TIMEOUT_SECONDS}s",
+
+
+@app.get("/api/metabolismo")
+async def api_metabolismo():
+    """API endpoint para estado metabólico."""
+    try:
+        metabolic = get_metabolic_state()
+        return JSONResponse(content={
+            "success": True,
+            **metabolic
         })
-        
-        await _ui_cb.record_failure()
-        logger.error("[UI] ⏱️ Timeout na tarefa %s", execution_id)
-    
-    except Exception as e:
-        await executions.update(
-            execution_id,
-            status="failed",
-            error=str(e),
-            finished_at=time.time(),
+    except Exception:
+        logger.exception("Failed to fetch metabolic state")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Internal server error"}
         )
-        
-        await manager.broadcast(execution_id, {
-            "type": "status",
-            "status": "failed",
-            "error": str(e),
+
+
+@app.get("/api/epigenetica")
+async def api_epigenetica(agent_id: str = None):
+    """API endpoint para marcadores epigenéticos."""
+    try:
+        markers = get_epigenetic_markers(agent_id)
+        return JSONResponse(content={
+            "success": True,
+            **markers
         })
-        
-        await _ui_cb.record_failure()
-        logger.error("[UI] ❌ Erro na tarefa %s: %s", execution_id, e)
+    except Exception:
+        logger.exception("Failed to fetch epigenetic markers")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Internal server error"}
+        )
 
 
 # =====================================================================
-# WEBSOCKET (Sinalização Celular)
+# WEBSOCKET — Broadcast de progresso das execuções
 # =====================================================================
+
+class ConnectionManager:
+    """Gerencia conexões WebSocket por execution_id."""
+
+    def __init__(self) -> None:
+        self._connections: dict[str, list[WebSocket]] = defaultdict(list)
+
+    async def connect(self, execution_id: str, websocket: WebSocket) -> None:
+        await websocket.accept()
+        self._connections[execution_id].append(websocket)
+
+    def disconnect(self, execution_id: str, websocket: WebSocket) -> None:
+        if websocket in self._connections[execution_id]:
+            self._connections[execution_id].remove(websocket)
+
+    async def broadcast(self, execution_id: str, message: dict) -> None:
+        for ws in list(self._connections.get(execution_id, [])):
+            try:
+                await ws.send_json(message)
+            except Exception:
+                self.disconnect(execution_id, ws)
+
+
+ws_manager = ConnectionManager()
+
 
 @app.websocket("/ws/progress/{execution_id}")
-async def websocket_progress(websocket: WebSocket, execution_id: str):
-    """WebSocket para progresso em tempo real."""
-    await manager.connect(websocket, execution_id)
-    
+async def ws_progress(websocket: WebSocket, execution_id: str):
+    """WebSocket para acompanhar progresso de uma execução."""
+    await ws_manager.connect(execution_id, websocket)
     try:
-        execution = await executions.get(execution_id)
-        if execution:
-            await websocket.send_json({
-                "type": "status",
-                "status": execution.get("status", "unknown"),
-                "data": execution,
-            })
-        
+        await websocket.send_json({"type": "status", "status": "connected", "execution_id": execution_id})
         while True:
             data = await websocket.receive_text()
-            if data == "ping":
-                await websocket.send_text("pong")
-    
     except WebSocketDisconnect:
-        await manager.disconnect(websocket, execution_id)
-    
-    except Exception as e:
-        logger.error("[WS] Erro: %s", e)
-        await manager.disconnect(websocket, execution_id)
+        ws_manager.disconnect(execution_id, websocket)
+    except Exception:
+        ws_manager.disconnect(execution_id, websocket)
+
+
+@app.get("/api/agentes")
+async def api_get_task(execution_id: str):
+    """Detalhes de uma execução pelo ID."""
+    try:
+        executions = get_execution_history(limit=200)
+        match = next((item for item in executions if item.get("id") == execution_id), None)
+        if not match:
+            return JSONResponse(
+                status_code=404,
+                content={"success": False, "error": "Not found"}
+            )
+        return JSONResponse(content={"success": True, **match})
+    except Exception:
+        logger.exception("Failed to fetch task")
+        return JSONResponse(
+            status_code=500,
+            content={"success": False, "error": "Internal server error"}
+        )
 
 
 # =====================================================================
-# TEMPLATES — PÁGINAS HTML
+# SERVER ENTRYPOINT
 # =====================================================================
 
-@app.get("/", response_class=HTMLResponse)
-async def index(request: Request):
-    """Página inicial."""
-    env = templates.env
-    template = env.get_template("index.html")
-    html = template.render(title="IAGLOBAL Agent Workspace")
-    return HTMLResponse(content=html)
-
-
-@app.get("/dashboard", response_class=HTMLResponse)
-async def dashboard(request: Request):
-    """Dashboard com métricas."""
-    env = templates.env
-    template = env.get_template("dashboard.html")
-    html = template.render(title="Dashboard — IAGLOBAL")
-    return HTMLResponse(content=html)
-
-
-# =====================================================================
-# SERVER
-# =====================================================================
-
-def run_server(host: str = "0.0.0.0", port: int = 8001):
-    """Inicia servidor FastAPI."""
-    import uvicorn
-    
-    logger.info("[UI] 🌐 Iniciando IAGLOBAL Agent Workspace em http://%s:%d", host, port)
-    uvicorn.run(app=app, host=host, port=port, log_level="info")
+def run_server(host: str = "0.0.0.0", port: int = 8000):
+    """Run the ReactPy FastAPI server."""
+    print(f"🚀 Starting IAGLOBAL UI server on http://{host}:{port}")
+    print(f"📊 Dashboard: http://{host}:{port}/@/AgentDashboard")
+    print(f"📁 Results: http://{host}:{port}/result")
+    uvicorn.run(app, host=host, port=port)
 
 
 if __name__ == "__main__":

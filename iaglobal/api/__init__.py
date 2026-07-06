@@ -50,12 +50,40 @@ class IAGlobalAPI:
         """Inicialização async segura — use quando já houver event loop rodando."""
         if self._initialized:
             return
-        await self.initialize()
+        from iaglobal.core.env_loader import load_env
+        from iaglobal.cli.bootstrap import bootstrap
+
+        load_env()
+        logger.info("[API] Inicializando IAGlobal (async)...")
+        t0 = time.time()
+
+        self._orchestrator = await bootstrap.initialize()
+
+        self._initialized = True
+        logger.info("[API] IAGlobal pronto em %.2fs (async)", time.time() - t0)
 
     def initialize(self) -> None:
-        """Inicializa o sistema (Orchestrator, Evolution Runtime, Event Bus)."""
+        """Inicializa o sistema (Orchestrator, Evolution Runtime, Event Bus).
+
+        Atenção: Se já houver um event loop rodando (ex: dentro de um handler
+        FastMCP), esta chamada falhará. Use initialize_async() nesse caso.
+        """
         if self._initialized:
             return
+
+        # Detecta se há um event loop rodando — new_event_loop() falharia
+        running_loop = False
+        try:
+            asyncio.get_running_loop()
+            running_loop = True
+        except RuntimeError:
+            pass
+
+        if running_loop:
+            raise RuntimeError(
+                "IAGlobalAPI.initialize() chamado dentro de um event loop ativo. "
+                "Use await api.initialize_async() em vez de api.initialize()."
+            )
 
         from iaglobal.core.env_loader import load_env
         from iaglobal.cli.bootstrap import bootstrap
@@ -64,10 +92,6 @@ class IAGlobalAPI:
         logger.info("[API] Inicializando IAGlobal...")
         t0 = time.time()
 
-        # bootstrap.initialize() é async — precisamos executá-lo em um loop
-        import asyncio
-        # Executa bootstrap.initialize() de forma síncrona segura,
-        # independentemente de haver ou não um event loop rodando.
         new_loop = asyncio.new_event_loop()
         asyncio.set_event_loop(new_loop)
         try:
@@ -81,7 +105,10 @@ class IAGlobalAPI:
     @property
     def orchestrator(self):
         if not self._initialized:
-            self.initialize()
+            raise RuntimeError(
+                "IAGlobalAPI não inicializado. Chame initialize() ou "
+                "await initialize_async() antes de acessar orchestrator."
+            )
         return self._orchestrator
 
     # ── Tarefas ──

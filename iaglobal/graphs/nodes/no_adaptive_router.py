@@ -27,7 +27,7 @@ async def run_adaptive_router(context: Dict[str, Any]) -> Dict[str, Any]:
     task_type = context.get("task_type", "general")
     required_mhc = context.get("required_mhc", True)
     
-    selected = adaptive_router.select_optimal_provider(task_type, required_mhc)
+    selected = await adaptive_router.select_optimal_provider(task_type, required_mhc)
     
     metrics = adaptive_router.get_provider_metrics(selected)
     ivm = adaptive_router.calculate_ivm(selected, metrics)

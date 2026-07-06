@@ -68,7 +68,11 @@ class EpigeneticMasking:
 
     def _load_masks_from_genesis(self) -> None:
         """Carrega máscaras baseadas no genesis hash."""
-        genesis_hash = entropy_sentinel._genesis_hash or "default"
+        try:
+            from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
+            genesis_hash = GENESIS_HASH_OFFICIAL
+        except Exception:
+            genesis_hash = getattr(entropy_sentinel, '_genesis_hash', None) or "default"
         
         for resource, agents in self.CRITICAL_RESOURCES.items():
             mask = EpigeneticMask(

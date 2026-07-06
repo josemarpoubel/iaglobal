@@ -190,12 +190,22 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
     }),
 
     # ======================================================
+    # PHASE 3.5 — AI ENGINEERING OPTIMIZATION
+    # ======================================================
+
+    ("applied_ai_engineer", {
+        "strategy": "general",
+        "critical": False,
+        "depends_on": ["architecture_validator"]
+    }),
+
+    # ======================================================
     # PHASE 4 — PLANNING
     # ======================================================
 
     ("planner", {
         "strategy": "general",
-        "depends_on": ["architecture_validator"]
+        "depends_on": ["applied_ai_engineer"]
     }),
 
     ("task_breakdown", {

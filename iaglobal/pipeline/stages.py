@@ -2,7 +2,6 @@ from enum import Enum, auto
 
 
 class PipelineStage(Enum):
-
     INIT = auto()
 
     MEMORY = auto()
@@ -10,6 +9,8 @@ class PipelineStage(Enum):
     PLANNING = auto()
 
     GENERATION = auto()
+
+    METABOLISM = auto()
 
     VALIDATION = auto()
 

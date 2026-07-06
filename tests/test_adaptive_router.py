@@ -41,11 +41,11 @@ class TestAdaptiveRouter:
         
         assert ivm < 0.5
 
-    def test_select_optimal_provider(self):
+    async def test_select_optimal_provider(self):
         """Seleciona provedor ótimo."""
         router = AdaptiveRouter()
         
-        provider = router.select_optimal_provider("general")
+        provider = await router.select_optimal_provider("general")
         
         assert provider in ["ollama", "groq", "nvidia", "gemini"]
 

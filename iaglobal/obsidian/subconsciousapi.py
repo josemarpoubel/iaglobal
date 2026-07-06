@@ -24,7 +24,7 @@ import logging
 import re
 from pathlib import Path
 from datetime import datetime, UTC
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from iaglobal._paths import PACKAGE_DIR
 
@@ -353,6 +353,87 @@ O agente executou a estratégia {strategy} com sucesso metabólico.
         await asyncio.to_thread(_mkdir)
         return await self.escrever_nota(vault_agents, agent_id, content)
 
+    # =================================================================
+    # BUSCA E ATUALIZAÇÃO (async)
+    # =================================================================
+
+    async def buscar_notas(self, query: str) -> List[Dict[str, Any]]:
+        """Busca notas no vault via query de tags/formato.
+
+        Formato query: "#tag1 #tag2 origem:\\"teste\\""
+        Retorna lista de dicts com id, origem, tipo, metadados.
+        """
+        def _buscar():
+            resultados = []
+            for f in self.long_term_dir.glob("*.md"):
+                texto = f.read_text(encoding="utf-8")
+                frontmatch = re.search(r"---\n(.*?)\n---", texto, re.DOTALL)
+                if frontmatch:
+                    frontmatter = {}
+                    for line in frontmatch.group(1).split("\n"):
+                        if ":" in line:
+                            k, v = line.split(":", 1)
+                            frontmatter[k.strip()] = v.strip().strip('"')
+                    resultados.append({
+                        "id": f.stem,
+                        "origem": frontmatter.get("origem", ""),
+                        "tipo": frontmatter.get("tipo", ""),
+                        "metadados": frontmatter,
+                        "conteudo": texto,
+                    })
+            return resultados
+
+        notas = await asyncio.to_thread(_buscar)
+        # Filtrar por query se houver
+        if query:
+            query_lower = query.lower()
+            notas = [n for n in notas if query_lower in n.get("conteudo", "").lower() or
+                     query_lower in n.get("id", "").lower()]
+        return notas
+
+    async def atualizar_nota(
+        self, nome: str, conteudo: Optional[str] = None, **kwargs
+    ) -> bool:
+        """Atualiza uma nota existente com novos campos/conteúdo."""
+        caminho = self.long_term_dir / f"{nome}.md"
+
+        if not caminho.exists():
+            return False
+
+        def _atualizar():
+            texto = caminho.read_text(encoding="utf-8")
+            frontmatch = re.search(r"---\n(.*?)\n---", texto, re.DOTALL)
+            if frontmatch:
+                frontmatter = {}
+                for line in frontmatch.group(1).split("\n"):
+                    if ":" in line:
+                        k, v = line.split(":", 1)
+                        frontmatter[k.strip()] = v.strip().strip('"')
+
+                # Atualizar campos
+                for k, v in kwargs.items():
+                    frontmatter[k] = v
+
+                # Reconstruir nota
+                novo_front = "\n".join(f'{k}: "{v}"' if isinstance(v, str) else f"{k}: {v}"
+                                        for k, v in frontmatter.items())
+                corpo = texto[frontmatch.end():].strip() if conteudo is None else conteudo
+                novo_texto = f"---\n{novo_front}\n---\n\n{corpo}\n"
+                caminho.write_text(novo_texto, encoding="utf-8")
+            return True
+
+        return await asyncio.to_thread(_atualizar)
+
+    async def remover_nota(self, nome: str) -> bool:
+        """Remove uma nota do vault."""
+        for diretorio in [self.long_term_dir, self.short_term_dir,
+                          self.synapses_dir, self.instincts_dir]:
+            caminho = diretorio / f"{nome}.md"
+            if caminho.exists():
+                caminho.unlink()
+                return True
+        return False
+
     # Sync wrappers for compatibility
     escrever_curto_prazo_sync = _sync_wrap(escrever_curto_prazo)
     escrever_longo_prazo_sync = _sync_wrap(escrever_longo_prazo)
@@ -360,3 +441,6 @@ O agente executou a estratégia {strategy} com sucesso metabólico.
     ler_nota_sync = _sync_wrap(ler_nota)
     listar_notas_sync = _sync_wrap(listar_notas)
     registrar_erro_sync = _sync_wrap(registrar_erro)
+    buscar_notas_sync = _sync_wrap(buscar_notas)
+    atualizar_nota_sync = _sync_wrap(atualizar_nota)
+    remover_nota_sync = _sync_wrap(remover_nota)

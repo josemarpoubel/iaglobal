@@ -1,12 +1,13 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
-"""MultiCoderAgent — Gera backend, frontend e database em paralelo delegando para CoderAgent."""
+"""MultiCoderAgent — Orquestrador que delega para agentes especializados e registra métricas no Bandit."""
 
-"""MultiCoderAgent — Gera backend, frontend e database em paralelo delegando para CoderAgent."""
 import asyncio
 import logging
+import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Optional
 from iaglobal.agents.coder_agent import CoderAgent
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.memory.memory_error import record_error
 
 logger = logging.getLogger("iaglobal.agents.multi_coder_agent")
@@ -29,15 +30,31 @@ class MultiCoderResult:
     total_chars: int = 0
     failures: int = 0
     errors: Dict[str, str] = field(default_factory=dict)  # Novo: Rastreia o motivo da falha
+    models_used: Dict[str, str] = field(default_factory=dict)  # Novo: Qual modelo gerou cada parte
 
-class MultiCoderAgent:
+class MultiCoderAgent(AgentBase):
+    """
+    MultiCoderAgent — Orquestrador de geração de código.
+    
+    Delega para agentes especializados (backend, frontend, database) e
+    registra métricas detalhadas no CreditAssignmentEngine para o Bandit aprender.
+    """
+    
     def __init__(self, coder_agent: Optional[CoderAgent] = None):
+        # Inicializa AgentBase com nome único
+        super().__init__(agent_name="multi_coder")
+        
         # 2. Injeção de Dependência: Instancia o CoderAgent UMA VEZ só.
         self._coder_agent = coder_agent or CoderAgent()
         # 3. Semáforo ajustado: Como são exatamente 3 partes, não faz sentido semáforo de 6.
         self._sem = asyncio.Semaphore(3) 
 
     async def generate(self, prompt: str, timeout: float = _DEFAULT_TIMEOUT) -> MultiCoderResult:
+        """
+        Gera código para backend, frontend e database em paralelo.
+        
+        Registra métricas de cada parte no CreditAssignmentEngine para o Bandit aprender.
+        """
         tasks = []
         for key, label, context in _PARTS:
             tasks.append(self._generate_part(key, label, context, prompt, timeout))
@@ -47,11 +64,13 @@ class MultiCoderAgent:
 
         parts = {}
         errors = {}
+        models_used = {}
         all_code: List[str] = []
         failures = 0
         
-        for key, code, error_msg in results:
+        for key, code, error_msg, model_used in results:
             parts[key] = code
+            models_used[key] = model_used
             if code:
                 all_code.append(f"# === {key.upper()} ===\n{code}")
             else:
@@ -61,8 +80,20 @@ class MultiCoderAgent:
 
         consolidated_code = "\n\n".join(all_code) if all_code else ""
         
-        if failures == len(_PARTS):
-            record_error("multi_coder", "Todas as partes falharam", {"prompt_len": len(prompt), "errors": errors})
+        # Registra métrica consolidada
+        if consolidated_code:
+            self._register_custom_metric(
+                model="multi_coder_orchestrator",
+                task_type="code_generation_full",
+                success=(failures == 0),
+                latency=0,  # Já registrado em cada parte
+                extra_data={
+                    "total_chars": len(consolidated_code),
+                    "parts_success": len(_PARTS) - failures,
+                    "parts_total": len(_PARTS),
+                    "models_used": models_used,
+                }
+            )
 
         if failures == 0:
             status = "full"
@@ -83,12 +114,22 @@ class MultiCoderAgent:
             total_chars=len(consolidated_code),
             failures=failures,
             errors=errors,
+            models_used=models_used,
         )
 
     async def _generate_part(
         self, part_key: str, part_label: str, context: str, prompt: str, timeout: float
-    ) -> Tuple[str, str, Optional[str]]:
+    ) -> Tuple[str, str, Optional[str], str]:
+        """
+        Gera uma parte do código e registra métricas no Bandit.
+        
+        Returns:
+            Tuple de (part_key, code, error_msg, model_used)
+        """
         async with self._sem:
+            start_time = time.time()
+            model_used = "unknown"
+            
             try:
                 # 4. Timeout: Garante que a pipeline não trave indefinidamente
                 artifact = await asyncio.wait_for(
@@ -99,18 +140,56 @@ class MultiCoderAgent:
                 # Fallback caso o artifact não tenha a propriedade .code
                 code = artifact.code if hasattr(artifact, 'code') else str(artifact)
                 
-                if code and len(code.strip()) > 30:
-                    logger.info("%s OK: %d chars", part_label, len(code))
-                    return (part_key, code, None)
+                # Registra qual modelo foi usado (se disponível no artifact)
+                model_used = getattr(artifact, 'model_used', 'coder_agent_default')
                 
-                logger.debug("%s vazio ou muito curto", part_label)
-                return (part_key, "", f"{part_label} returned empty or too short code.")
+                if code and len(code.strip()) > 30:
+                    logger.info("%s OK: %d chars (model=%s)", part_label, len(code), model_used)
+                    
+                    # Registra métrica de sucesso no CreditAssignmentEngine
+                    self._register_custom_metric(
+                        model=model_used,
+                        task_type=f"code_{part_key}",
+                        success=True,
+                        latency=time.time() - start_time,
+                        extra_data={
+                            "part": part_key,
+                            "chars": len(code),
+                            "quality": "full" if len(code) > 500 else "partial",
+                        }
+                    )
+                    
+                    return (part_key, code, None, model_used)
+                
+                logger.debug("%s vazio ou muito curto (model=%s)", part_label, model_used)
+                return (part_key, "", f"{part_label} returned empty or too short code.", model_used)
                 
             except asyncio.TimeoutError:
                 msg = f"{part_label} timed out after {timeout}s"
                 logger.warning(msg)
-                return (part_key, "", msg)
+                
+                # Registra métrica de timeout
+                self._register_custom_metric(
+                    model=model_used,
+                    task_type=f"code_{part_key}",
+                    success=False,
+                    latency=timeout,
+                    extra_data={"error": "timeout", "part": part_key}
+                )
+                
+                return (part_key, "", msg, model_used)
+                
             except Exception as e:
                 msg = f"{part_label} failed: {str(e)}"
                 logger.warning(msg, exc_info=True)
-                return (part_key, "", msg)
+                
+                # Registra métrica de falha
+                self._register_custom_metric(
+                    model=model_used,
+                    task_type=f"code_{part_key}",
+                    success=False,
+                    latency=time.time() - start_time,
+                    extra_data={"error": str(e), "part": part_key}
+                )
+                
+                return (part_key, "", msg, model_used)

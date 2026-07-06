@@ -14,6 +14,7 @@ from datetime import datetime, timezone
 
 from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.utils.logger import get_logger
 
 logger = logging.getLogger(__name__)
@@ -53,7 +54,7 @@ class ResultContract:
 # RESULT AGENT
 # ============================================================
 
-class ResultAgent:
+class ResultAgent(AgentBase):
     """
     Terminal Sink Node responsável por:
 
@@ -69,7 +70,7 @@ class ResultAgent:
     CONTRACT_VERSION = "3.0.0"
 
     def __init__(self):
-
+        super().__init__(agent_name="result")
         self._summary_extractors = {}
         self._register_default_extractors()
 

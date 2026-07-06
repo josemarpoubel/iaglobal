@@ -24,6 +24,7 @@ from enum import Enum
 from typing import Protocol, runtime_checkable
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.agents.agent_base import AgentBase
 logger = get_logger(__name__)
 
 # ---------------------------------------------------------------------------
@@ -497,7 +498,7 @@ class ReportComposer:
 # PerformanceAuditAgent — orquestrador com integração biológica
 # ---------------------------------------------------------------------------
 
-class PerformanceAuditAgent:
+class PerformanceAuditAgent(AgentBase):
     """
     Agente de auditoria de performance — Geração 8.
 

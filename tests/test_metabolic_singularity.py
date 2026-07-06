@@ -65,29 +65,39 @@ async def test_metabolic_rhythm_homeostasis():
     Deep Sleep -> Normal -> Adrenalina.
     """
     agent_id = "test_agent_energy"
-    cpu_affinity.set_cpu_budget(agent_id, 0.25)
+    await cpu_affinity.set_cpu_budget(agent_id, 0.25)
     
     # 1. Testar Deep Sleep ( la Lei do Vácuo/Repouso)
-    cpu_affinity.entrar_estase()
-    assert cpu_affinity.get_cpu_budget(agent_id) == BUDGET_DEEP_SLEEP
+    await cpu_affinity.entrar_estase()
+    budget_sleep = await cpu_affinity.get_cpu_budget(agent_id)
+    assert budget_sleep == BUDGET_DEEP_SLEEP
     logger.info("✅ Homeostase: Deep Sleep validado (5%)")
     
     # 2. Retornar ao Normal
     cpu_affinity._metabolic_state = "NORMAL" # Reset manual para teste
-    cpu_affinity.set_cpu_budget(agent_id, 0.25)
-    assert cpu_affinity.get_cpu_budget(agent_id) == 0.25
+    await cpu_affinity.set_cpu_budget(agent_id, 0.25)
+    budget_normal = await cpu_affinity.get_cpu_budget(agent_id)
+    assert budget_normal == 0.25
     
     # 3. Testar Adrenalina (Burst Mode)
-    cpu_affinity.disparar_adrenalina(agent_id, duracao=1.0)
-    assert cpu_affinity.get_cpu_budget(agent_id) == BUDGET_ADRENALINA
+    await cpu_affinity.disparar_adrenalina(agent_id, duracao=1.0)
+    budget_adrenalina = await cpu_affinity.get_cpu_budget(agent_id)
+    assert budget_adrenalina == BUDGET_ADRENALINA
     logger.info("✅ Homeostase: Adrenalina validada (50%)")
     
     # 4. Validar Expiração da Adrenalina
-    await asyncio.sleep(0.1) # Reduzido para evitar timeout do shell
+    await asyncio.sleep(0.1) 
     cpu_affinity._adrenaline_expiry = time.time() - 1 # Força expiração
-    cpu_affinity.atualizar_estado_metabolico()
+    
+    # Se atualizar_estado_metabolico também disparar warning de corrotina, adicione await nele:
+    if asyncio.iscoroutinefunction(cpu_affinity.atualizar_estado_metabolico):
+        await cpu_affinity.atualizar_estado_metabolico()
+    else:
+        cpu_affinity.atualizar_estado_metabolico()
+        
     assert cpu_affinity._metabolic_state == "NORMAL"
     logger.info("✅ Homeostase: Recuperação pós-adrenalina validada")
+
 
 @pytest.mark.asyncio
 async def test_vacuum_trigger_emission():

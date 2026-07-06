@@ -362,7 +362,7 @@ class CognitiveProxy:
         candidates = self._get_model_candidates()
         fp_vector = fingerprint.to_vector() if fingerprint else candidates[0]
         fp_intent = fingerprint.intent if fingerprint else "general"
-        model_name = self.bandit.select_model(node=fp_vector, strategy=fp_intent)
+        model_name = self.bandit.select_model(node_id=fp_vector, task_type=fp_intent, candidates=candidates)
 
         logger.debug(f"[COGNITIVE-PROXY] Route: bandit_selected={model_name} candidates={candidates}")
 

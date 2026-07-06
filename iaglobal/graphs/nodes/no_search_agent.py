@@ -32,10 +32,7 @@ def _sync_execute_and_learn(candidates: list, task_str: str) -> Tuple[str, bool]
             continue
             
         try:
-            # Como process_task e chamadas internas realizam rede/IO síncronos, 
-            # o retry roda de forma segura isolado nesta thread dedicada
-            # Nota: se retry_call original esperar receber um callable síncrono, roda nativo aqui.
-            result = _search_agent.process_task(q)
+            result = asyncio.run(_search_agent.process_task(q))
             
             if result and len(str(result).strip()) > 30:
                 result_str = str(result)

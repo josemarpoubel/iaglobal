@@ -21,20 +21,20 @@ import asyncio
 from typing import Dict, Any, List, Optional
 
 from iaglobal.validation.engine import ValidationEngine
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.providers.provider_router import async_route_generate
-from iaglobal.graphs.bandit import BanditPolicy
 from iaglobal.utils.logger import logger
 
 
-class CriticAgent:
+class CriticAgent(AgentBase):
 
-    def __init__(self, bandit: Optional[BanditPolicy] = None):
+    def __init__(self):
+        super().__init__(agent_name="critic")
         self.DANGEROUS_PATTERNS = [
             "eval(", "exec(", "os.system(", "subprocess.run(shell=True"
         ]
         self.validator = ValidationEngine()
         self._critic_degraded = False
-        self._bandit = bandit
 
     # =========================================================================
     # API PÚBLICA — CONTRATO OBRIGATÓRIO
@@ -166,11 +166,17 @@ class CriticAgent:
         """Avalia código via LLM — retorna scores, NÃO toma decisão."""
         prompt = self._montar_prompt_avaliacao(task, codigo)
 
-        if self._bandit:
+        if self.bandit:
             try:
-                model = self._bandit.select_model(node="critic", strategy="critic")
-                logger.debug(f"[CRITIC] Bandit selecionou modelo: {model}")
-                resultado = await self._bandit.async_execute_model(model, prompt, task_type="critic")
+                # Candidatos padrão: cloud primeiro, local fallback
+                candidates = [
+                    "groq/llama-3.3-70b-versatile",
+                    "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
+                    "ollama/qwen2.5:0.5b",
+                ]
+                model = self.bandit.select_model(node_id="critic", task_type="critic", candidates=candidates)
+                logger.info(f"[CRITIC] Bandit selecionou: {model}")
+                resultado = await self.bandit.async_execute_model(model, prompt, task_type="critic")
             except Exception as e:
                 logger.debug(f"[CRITIC] Bandit execução falhou: {e}")
                 resultado = None

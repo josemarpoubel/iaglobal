@@ -7,7 +7,7 @@ from typing import Dict, Any, Optional, Union, List
 from iaglobal.models.task import Task
 from iaglobal.core.assistant import Assistant
 from iaglobal.utils.logger import logger
-from iaglobal.providers.provider_router import route_generate
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.execution.executor import executar
 
 import logging
@@ -16,7 +16,7 @@ from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
 
-class PlannerAgent:
+class PlannerAgent(AgentBase):
     """
     PlannerAgent Evoluído
 
@@ -36,6 +36,8 @@ class PlannerAgent:
     MAX_ETAPAS = 6
 
     def __init__(self):
+        # Inicializa AgentBase com nome único
+        super().__init__(agent_name="planner")
 
         self.execution_history: List[Dict[str, Any]] = []
 

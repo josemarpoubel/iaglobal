@@ -1,9 +1,9 @@
 {
-  "updated_at": "2026-07-04T17:20:06.699287+00:00",
+  "updated_at": "2026-07-06T14:27:06.791426+00:00",
   "learning_errors": [
     {
-      "id": "20260704143641888960",
-      "time": "2026-07-04T14:36:41.888979Z",
+      "id": "20260706053555214815",
+      "time": "2026-07-06T05:35:55.214847Z",
       "error_type": "ValueError",
       "prompt": "prompt",
       "response_errada": "bad response",
@@ -11,8 +11,8 @@
       "codigo_corrigido": "fixed"
     },
     {
-      "id": "20260704143641891183",
-      "time": "2026-07-04T14:36:41.891202Z",
+      "id": "20260706053555217469",
+      "time": "2026-07-06T05:35:55.217489Z",
       "error_type": "TimeoutError",
       "prompt": "erro de timeout no servidor",
       "response_errada": "resp",
@@ -20,8 +20,8 @@
       "codigo_corrigido": "fix"
     },
     {
-      "id": "20260704143721776209",
-      "time": "2026-07-04T14:37:21.776234Z",
+      "id": "20260706134934443968",
+      "time": "2026-07-06T13:49:34.443991Z",
       "error_type": "ValueError",
       "prompt": "prompt",
       "response_errada": "bad response",
@@ -29,8 +29,188 @@
       "codigo_corrigido": "fixed"
     },
     {
-      "id": "20260704143721788584",
-      "time": "2026-07-04T14:37:21.788612Z",
+      "id": "20260706134934445851",
+      "time": "2026-07-06T13:49:34.445865Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706140012490288",
+      "time": "2026-07-06T14:00:12.490306Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706140012492191",
+      "time": "2026-07-06T14:00:12.492204Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706140924297497",
+      "time": "2026-07-06T14:09:24.297536Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706140924310294",
+      "time": "2026-07-06T14:09:24.310315Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706141154089194",
+      "time": "2026-07-06T14:11:54.089214Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706141154100194",
+      "time": "2026-07-06T14:11:54.100216Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706141248688480",
+      "time": "2026-07-06T14:12:48.688496Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706141248697808",
+      "time": "2026-07-06T14:12:48.697827Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706141338381574",
+      "time": "2026-07-06T14:13:38.381606Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706141338392099",
+      "time": "2026-07-06T14:13:38.392119Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706141420552644",
+      "time": "2026-07-06T14:14:20.552676Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706141420562659",
+      "time": "2026-07-06T14:14:20.562682Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706141505184823",
+      "time": "2026-07-06T14:15:05.184843Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706141505199208",
+      "time": "2026-07-06T14:15:05.199240Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706141534411738",
+      "time": "2026-07-06T14:15:34.411756Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706141534425989",
+      "time": "2026-07-06T14:15:34.426010Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706141802775527",
+      "time": "2026-07-06T14:18:02.775561Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706141802778492",
+      "time": "2026-07-06T14:18:02.778507Z",
+      "error_type": "TimeoutError",
+      "prompt": "erro de timeout no servidor",
+      "response_errada": "resp",
+      "critica_sandbox": "crit",
+      "codigo_corrigido": "fix"
+    },
+    {
+      "id": "20260706142706782825",
+      "time": "2026-07-06T14:27:06.782854Z",
+      "error_type": "ValueError",
+      "prompt": "prompt",
+      "response_errada": "bad response",
+      "critica_sandbox": "critique",
+      "codigo_corrigido": "fixed"
+    },
+    {
+      "id": "20260706142706786749",
+      "time": "2026-07-06T14:27:06.786781Z",
       "error_type": "TimeoutError",
       "prompt": "erro de timeout no servidor",
       "response_errada": "resp",
@@ -40,7 +220,87 @@
   ],
   "runtime_errors": [
     {
-      "timestamp": "2026-07-04T14:36:41.893647+00:00",
+      "timestamp": "2026-07-06T05:33:10.668784+00:00",
+      "component": "documentation",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Empty task context",
+      "details": {
+        "task": ""
+      }
+    },
+    {
+      "timestamp": "2026-07-06T05:33:10.681462+00:00",
+      "component": "search",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Empty task string",
+      "details": {
+        "task": ""
+      }
+    },
+    {
+      "timestamp": "2026-07-06T05:35:47.362439+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: prompt_intake",
+      "details": {
+        "node": "prompt_intake"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T05:35:47.363790+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: orchestrator_agent",
+      "details": {
+        "node": "orchestrator_agent"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T05:35:47.364558+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: requirements",
+      "details": {
+        "node": "requirements"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T05:35:47.369725+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: dependency",
+      "details": {
+        "node": "dependency"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T05:35:47.483938+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: critic",
+      "details": {
+        "node": "critic"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T05:35:47.487693+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "details": {
+        "node": "meta_directorevolution_knowledge"
+      }
+    },
+    {
+      "timestamp": "2026-07-06T05:35:55.220856+00:00",
       "component": "test_component",
       "severity": "ERROR",
       "execution_id": "exec-1",
@@ -50,7 +310,7 @@
       }
     },
     {
-      "timestamp": "2026-07-04T14:37:21.791303+00:00",
+      "timestamp": "2026-07-06T13:49:34.448523+00:00",
       "component": "test_component",
       "severity": "ERROR",
       "execution_id": "exec-1",
@@ -60,293 +320,103 @@
       }
     },
     {
-      "timestamp": "2026-07-04T16:31:59.134867+00:00",
-      "component": "builder",
+      "timestamp": "2026-07-06T14:00:12.495257+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "node": "meta_directorevolution_knowledge"
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:31:59.182125+00:00",
-      "component": "multi_coder",
+      "timestamp": "2026-07-06T14:09:24.312855+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "Todas as partes falharam",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "prompt_len": 61,
-        "errors": {
-          "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-          "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-          "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
-        }
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:32:42.975961+00:00",
-      "component": "immune_check",
+      "timestamp": "2026-07-06T14:11:54.103812+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:32:51.678090+00:00",
-      "component": "dependency",
+      "timestamp": "2026-07-06T14:12:48.701482+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "'str' object has no attribute 'get'",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:32:51.702209+00:00",
-      "component": "coder",
+      "timestamp": "2026-07-06T14:13:38.395798+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "task": "Crie uma API REST em FastAPI com endpoints CRUD para usuários"
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:33:44.286520+00:00",
-      "component": "result_agent",
+      "timestamp": "2026-07-06T14:14:20.567374+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "name 'asyncio' is not defined",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "task": "Crie uma API REST em FastAPI com endpoints CRUD para usuários"
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:33:48.449088+00:00",
-      "component": "builder",
+      "timestamp": "2026-07-06T14:15:05.203331+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "node": "meta_directorevolution_knowledge"
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:48:25.713832+00:00",
-      "component": "builder",
+      "timestamp": "2026-07-06T14:15:34.431075+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "Handler not found for node: meta_directorevolution_knowledge",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "node": "meta_directorevolution_knowledge"
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:48:25.757733+00:00",
-      "component": "multi_coder",
+      "timestamp": "2026-07-06T14:18:02.783779+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "Todas as partes falharam",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "prompt_len": 61,
-        "errors": {
-          "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-          "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-          "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
-        }
+        "detail": "info"
       }
     },
     {
-      "timestamp": "2026-07-04T16:48:49.241657+00:00",
-      "component": "immune_check",
+      "timestamp": "2026-07-06T14:27:06.791372+00:00",
+      "component": "test_component",
       "severity": "ERROR",
-      "execution_id": null,
-      "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
+      "execution_id": "exec-1",
+      "message": "mensagem de erro",
       "details": {
-        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T16:48:57.361630+00:00",
-      "component": "dependency",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "'str' object has no attribute 'get'",
-      "details": {
-        "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T16:48:57.384283+00:00",
-      "component": "coder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-      "details": {
-        "task": "Implemente um componente React que exiba uma lista de tarefas"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T16:49:37.897178+00:00",
-      "component": "result_agent",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "name 'asyncio' is not defined",
-      "details": {
-        "task": "Implemente um componente React que exiba uma lista de tarefas"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T16:49:42.370615+00:00",
-      "component": "builder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "Handler not found for node: meta_directorevolution_knowledge",
-      "details": {
-        "node": "meta_directorevolution_knowledge"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:00:40.235092+00:00",
-      "component": "builder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "Handler not found for node: meta_directorevolution_knowledge",
-      "details": {
-        "node": "meta_directorevolution_knowledge"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:00:40.279893+00:00",
-      "component": "multi_coder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "Todas as partes falharam",
-      "details": {
-        "prompt_len": 61,
-        "errors": {
-          "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-          "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-          "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
-        }
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:01:04.713407+00:00",
-      "component": "immune_check",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
-      "details": {
-        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:01:04.786456+00:00",
-      "component": "dependency",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "'str' object has no attribute 'get'",
-      "details": {
-        "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:01:04.811372+00:00",
-      "component": "coder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-      "details": {
-        "task": "Implemente um componente React que exiba uma lista de tarefas"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:01:05.155289+00:00",
-      "component": "result_agent",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "name 'asyncio' is not defined",
-      "details": {
-        "task": "Implemente um componente React que exiba uma lista de tarefas"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:01:05.524259+00:00",
-      "component": "builder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "Handler not found for node: meta_directorevolution_knowledge",
-      "details": {
-        "node": "meta_directorevolution_knowledge"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:18:55.693399+00:00",
-      "component": "builder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "Handler not found for node: meta_directorevolution_knowledge",
-      "details": {
-        "node": "meta_directorevolution_knowledge"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:18:55.741281+00:00",
-      "component": "multi_coder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "Todas as partes falharam",
-      "details": {
-        "prompt_len": 24,
-        "errors": {
-          "backend": "Backend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-          "frontend": "Frontend failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-          "database": "Database failed: BanditPolicy.select_top_n() got an unexpected keyword argument 'node'"
-        }
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:19:23.225471+00:00",
-      "component": "immune_check",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'",
-      "details": {
-        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/builder.py\", line 117, in _run_handler\n    result = h(ctx)\nTypeError: run_immune_check() missing 3 required positional arguments: 'context', 'output', and 'metrics'\n"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:19:31.587413+00:00",
-      "component": "dependency",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "'str' object has no attribute 'get'",
-      "details": {
-        "traceback": "   ^^^^^^^^^^^^\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/graphs/nodes/no_dependency.py\", line 49, in run_dependency\n    resolved = _DEPENDENCY_AGENT.resolve_dependencies(template, architecture_context)\n  File \"/home/kitohamachi/projeto-iaglobal/iaglobal/agents/dependency_agent.py\", line 56, in resolve_dependencies\n    frameworks = architecture_context.get(\"entities\", {}).get(\"framework\", [])\n                 ^^^^^^^^^^^^^^^^^^^^^^^^\nAttributeError: 'str' object has no attribute 'get'\n"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:19:31.610832+00:00",
-      "component": "coder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "BanditPolicy.select_top_n() got an unexpected keyword argument 'node'",
-      "details": {
-        "task": "teste de log no terminal"
-      }
-    },
-    {
-      "timestamp": "2026-07-04T17:20:06.699236+00:00",
-      "component": "builder",
-      "severity": "ERROR",
-      "execution_id": null,
-      "message": "Handler not found for node: meta_directorevolution_knowledge",
-      "details": {
-        "node": "meta_directorevolution_knowledge"
+        "detail": "info"
       }
     }
   ]

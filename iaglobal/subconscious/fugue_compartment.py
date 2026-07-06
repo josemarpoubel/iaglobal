@@ -10,9 +10,10 @@ Objetivo:
 
 import asyncio
 import time
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Optional, List
 from iaglobal.subconscious.subconscious_api import SubconsciousAPI
 from iaglobal.subconscious.delta_sleep import DeltaSleepSync
+from iaglobal.utils.logger import logger
 
 
 class FugueCompartment:
@@ -22,8 +23,13 @@ class FugueCompartment:
         self.subconscious = SubconsciousAPI()
         self.delta_sleep = DeltaSleepSync()
         self._background_tasks: Dict[str, Dict] = {}
-        
-        # Ciclo de sincronização será iniciado manualmente em ambiente de produção
+        self._latencies: List[float] = []
+
+    async def get_average_latency(self) -> float:
+        """Retorna a latência média das últimas operações (para MCPAgent)."""
+        if not self._latencies:
+            return 0.0
+        return sum(self._latencies[-10:]) / len(self._latencies[-10:])
 
     async def processar_em_segundo_plano(
         self,
@@ -33,7 +39,7 @@ class FugueCompartment:
     ) -> str:
         """Processa uma tarefa em segundo plano e registra no vault."""
         fugue_id = f"fugue_{agent_id}_{task_type}"
-        
+
         # Armazenar tarefa para referência futura
         self._background_tasks[fugue_id] = {
             "agent_id": agent_id,
@@ -41,7 +47,7 @@ class FugueCompartment:
             "task_type": task_type,
             "status": "processing",
         }
-        
+
         # Registrar no vault via SubconsciousAPI
         await self.subconscious.registrar_tarefa(
             origem="fugue_compartment",
@@ -55,24 +61,24 @@ class FugueCompartment:
                 "contexto": task_data,
             },
         )
-        
+
         # Simular processamento (async)
+        start = time.time()
         await self._simular_processamento(fugue_id)
-        
+        self._latencies.append(time.time() - start)
+
         return fugue_id
 
     async def _simular_processamento(self, fugue_id: str) -> None:
         """Simula processamento assíncrono de uma tarefa."""
-        import asyncio
         await asyncio.sleep(1)  # Simula carga de trabalho
-        
+
         # Atualizar status
         task = self._background_tasks.get(fugue_id)
         if task:
             task["status"] = "completed"
             await self.subconscious.atualizar_tarefa(
-                origem="fugue_compartment",
-                task_id=fugue_id,
+                fugue_id,
                 metadados={"status": "completed"},
             )
 
@@ -93,7 +99,7 @@ class FugueCompartment:
         while True:
             await asyncio.sleep(3600)  # Executa a cada 1 hora
             await self.delta_sleep.sincronizar_delta_rem(self)
-            
+
     async def _list_active_agents(self) -> list[str]:
         """Lista agentes com tarefas ativas (para DeltaSleepSync)."""
         return list({

@@ -60,13 +60,17 @@ class SkillExecutor:
                 task_val = getattr(output, "task", None)
                 if task_val:
                     contract_ctx["task"] = task_val
-                plan_val = getattr(output, "code", None)
-                if plan_val:
-                    contract_ctx["plan"] = plan_val
+
+                output_text = output.code if hasattr(output, "code") else (output if isinstance(output, str) else "")
+                if output_text:
+                    node_skill = self.registry.get(node_name)
+                    if node_skill:
+                        for out_name in node_skill.outputs:
+                            if out_name not in contract_ctx:
+                                contract_ctx[out_name] = output_text
             
             for key, value in node_result.items():
                 if key in skill.inputs and key not in ("output",):
-                    # Uso de copy.deepcopy impede que modificações da skill alterem a memória histórica
                     contract_ctx[key] = copy.deepcopy(value)
 
         for key in skill.inputs:

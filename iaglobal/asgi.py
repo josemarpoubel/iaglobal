@@ -1,7 +1,6 @@
 """
-ASGI application para IAGLOBAL
-===============================
-Servidor MCP + FastAPI (puro) em uma única aplicação.
+ASGI application para IAGLOBAL (modo produção - sem reload).
+Servidor MCP + FastAPI otimizado para integração com OpenCode.
 """
 
 from fastapi import FastAPI
@@ -14,15 +13,6 @@ app = FastAPI(title="IAGlobal MCP + API", version="0.1.0")
 # Montar MCP Server na rota /mcp
 app.mount("/mcp", mcp_server.app)
 
-# Middleware para logar requisições
-@app.middleware("http")
-async def log_requests(request, call_next):
-    from iaglobal.utils.logger import logger
-    logger.info(f"⚡ Request: {request.method} {request.url}")
-    response = await call_next(request)
-    logger.info(f"✅ Response: {response.status_code}")
-    return response
-
 # Endpoint de root
 @app.get("/")
 async def root():
@@ -30,11 +20,10 @@ async def root():
         "service": "iaglobal",
         "endpoints": {
             "/": "Bem-vindo ao MCP",
-            "/health": "Status do sistema",
             "/mcp/health": "Health check do MCP",
             "/mcp/audit": "Auditoria metabólica",
             "/mcp/fix": "Acionar correção",
-            "/mcp/jsonrpc": "JSON-RPC endpoint (compatibilidade)"
+            "/mcp/jsonrpc": "JSON-RPC endpoint"
         }
     }
 
@@ -46,12 +35,10 @@ application = asgi_app
 
 if __name__ == "__main__":
     import uvicorn
-    print("🚀 Iniciando MCP Server + API em http://localhost:8000")
-    print("🔮 Endpoints MCP disponíveis em http://localhost:8000/mcp")
     uvicorn.run(
         "iaglobal.asgi:application",
         host="0.0.0.0",
         port=8000,
-        reload=True,
-        access_log=True
+        log_level="info",
+        access_log=False
     )

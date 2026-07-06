@@ -5,6 +5,7 @@
 import logging
 from typing import List, Dict, Any, TypedDict, Optional, Set
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import AgentBase
 
 # --- 1. Contrato de Dados Rígido ---
 class RoutingResult(TypedDict):
@@ -47,7 +48,10 @@ _NODE_PRIORITY = [
 ]
 
 
-class OrchestratorAgent:
+class OrchestratorAgent(AgentBase):
+    def __init__(self):
+        super().__init__(agent_name="orchestrator")
+
     def route(self, enhancement: Optional[Dict[str, Any]] = None, requirements: Optional[Dict[str, Any]] = None) -> RoutingResult:
         # 1. Validação de entrada robusta (Imune a tipos errados vindos de outros agentes)
         if not enhancement or not isinstance(enhancement, dict):

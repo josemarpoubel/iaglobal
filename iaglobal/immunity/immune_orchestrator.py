@@ -25,7 +25,6 @@ from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails
 from iaglobal.evolution.metabolism.opportunity_cost_detector import OpportunityCostDetector, opportunity_cost_detector
 from iaglobal.immunity.adaptive_threat_detector import AdaptiveThreatDetector
 from iaglobal.evolution.skill_quarantine import quarantine
-from iaglobal.graphs.communication.membrane_key import MembraneKey
 from iaglobal.immunity.entropy_sentinel import EntropySentinel, entropy_sentinel
 
 logger = logging.getLogger(__name__)
@@ -90,6 +89,9 @@ class ImmuneOrchestrator:
 
         # Verificar se é simbionte autorizado via membrane_key
         if "membrane_key" in execution_context:
+            # Lazy import para evitar ciclo
+            from iaglobal.graphs.communication.membrane_key import MembraneKey
+            
             mk = MembraneKey()
             # Busca por qualquer sistema com essa chave
             for system_name in list(MembraneKey._MembraneKey__instance._keys.keys()) if hasattr(MembraneKey, '_MembraneKey__instance') else []:

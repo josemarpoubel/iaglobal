@@ -29,6 +29,7 @@ NODE_REGISTRY: dict = {
     "performance_design": lambda: create_skill_node("performance_design"),
     "observability_design": lambda: create_skill_node("observability_design"),
     "architecture_validator": lambda: create_skill_node("architecture_validator"),
+    "applied_ai_engineer": lambda: create_skill_node("applied_ai_engineer"),
     "planner": lambda: create_skill_node("planner"),
     "task_breakdown": lambda: create_skill_node("task_breakdown"),
     "execution_plan": lambda: create_skill_node("execution_plan"),

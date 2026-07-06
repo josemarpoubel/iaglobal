@@ -142,10 +142,10 @@ def github_search(query: str) -> str:
 
 
 def stackoverflow_search(query: str) -> str:
-    """Busca no Stack Overflow via API pública."""
+    """Busca no Stack Overflow via API pública (search/advanced — busca em título + corpo)."""
     try:
         query_enc = urllib.parse.quote(query)
-        url = f"https://api.stackexchange.com/2.3/search?order=desc&sort=votes&intitle={query_enc}&site=stackoverflow&filter=withbody"
+        url = f"https://api.stackexchange.com/2.3/search/advanced?order=desc&sort=relevance&q={query_enc}&site=stackoverflow&filter=withbody"
         req = urllib.request.Request(url, headers={"User-Agent": "IAGlobal/1.0"})
         with urllib.request.urlopen(req, timeout=8) as r:
             import json
@@ -281,6 +281,158 @@ def qwant_search(query: str) -> str:
         return ""
 
 
+def google_playwright_search(query: str) -> str:
+    """Busca no Google via Playwright/Chromium headless — contorna bloqueios de bot."""
+    try:
+        from playwright.sync_api import sync_playwright
+    except ImportError:
+        logger.debug("[GOOGLE_PW] playwright nao instalado")
+        return ""
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(
+                headless=True,
+                args=["--no-sandbox", "--disable-dev-shm-usage"],
+            )
+            context = browser.new_context(
+                user_agent=("Mozilla/5.0 (X11; Linux x86_64) "
+                           "AppleWebKit/537.36 (KHTML, like Gecko) "
+                           "Chrome/120.0.0.0 Safari/537.36"),
+                viewport={"width": 1280, "height": 720},
+                locale="en-US",
+            )
+            page = context.new_page()
+            # 1. Navega para Google
+            page.goto("https://www.google.com", timeout=15000)
+            # 2. Aceita cookies se aparecer
+            try:
+                btn = page.query_selector('button:has-text("Accept all")')
+                if btn:
+                    btn.click()
+                    page.wait_for_timeout(1000)
+            except Exception:
+                pass
+            # 3. Digita a query e pressiona Enter
+            search_box = page.query_selector('textarea[name="q"], input[name="q"]')
+            if not search_box:
+                browser.close()
+                return ""
+            search_box.fill(query)
+            page.keyboard.press("Enter")
+            page.wait_for_timeout(2000)
+            # 4. Extrai resultados
+            results = []
+            for item in page.query_selector_all("div.g"):
+                title_el = item.query_selector("h3")
+                link_el = item.query_selector("a")
+                snippet_el = item.query_selector("div[data-sncf], span.aCOpRe")
+                if title_el and link_el:
+                    title = title_el.inner_text().strip()
+                    url = link_el.get_attribute("href") or ""
+                    snippet = snippet_el.inner_text().strip() if snippet_el else ""
+                    if title and url:
+                        results.append(f"• {title}\n  {url}\n  {snippet[:200]}")
+                if len(results) >= 5:
+                    break
+            browser.close()
+            return "\n\n".join(results) if results else ""
+    except Exception as e:
+        logger.debug("[GOOGLE_PW] Falha: %s", e)
+        return ""
+
+
+def bing_playwright_search(query: str) -> str:
+    """Busca no Bing via Playwright/Chromium — força locale en+us."""
+    try:
+        from playwright.sync_api import sync_playwright
+        import urllib.parse
+    except ImportError:
+        logger.debug("[BING_PW] playwright nao instalado")
+        return ""
+    try:
+        with sync_playwright() as p:
+            browser = p.chromium.launch(headless=True, args=["--no-sandbox"])
+            context = browser.new_context(
+                user_agent="Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36",
+                viewport={"width": 1280, "height": 720},
+                locale="en-US",
+            )
+            page = context.new_page()
+            q = urllib.parse.quote(query)
+            page.goto(f"https://www.bing.com/search?q={q}&setlang=en&cc=us", timeout=15000)
+            page.wait_for_timeout(2500)
+            results = []
+            for item in page.query_selector_all("#b_results > li.b_algo"):
+                title_el = item.query_selector("h2 a")
+                snippet_el = item.query_selector(".b_caption p")
+                if title_el:
+                    title = title_el.inner_text().strip()
+                    url = title_el.get_attribute("href") or ""
+                    snippet = snippet_el.inner_text().strip() if snippet_el else ""
+                    if title and url:
+                        results.append(f"• {title}\n  {url}\n  {snippet[:200]}")
+                if len(results) >= 5:
+                    break
+            browser.close()
+            return "\n\n".join(results) if results else ""
+    except Exception as e:
+        logger.debug("[BING_PW] Falha: %s", e)
+        return ""
+
+
+def duckduckgo_text_search(query: str) -> str:
+    """Busca direta no DuckDuckGo via biblioteca nativa Python (sem Docker)."""
+    try:
+        from ddgs import DDGS
+        with DDGS() as ddgs:
+            results = list(ddgs.text(query, max_results=5))
+    except Exception as e:
+        logger.debug("[DDG] duckduckgo_text_search falhou: %s", e)
+        return ""
+
+    if not results:
+        return ""
+
+    lines = []
+    seen = set()
+    for item in results:
+        title = item.get("title", "")
+        href = item.get("href", "")
+        body = item.get("body", "")
+        if title in seen:
+            continue
+        seen.add(title)
+        lines.append(f"• {title}\n  {href}\n  {body[:200]}")
+    return "\n\n".join(lines)
+
+
+def youcom_search(query: str) -> str:
+    """Busca via You.com Search API (ydc-index.io/v1/search).
+    Requer YDC_API_KEY no ambiente.
+    """
+    key = os.getenv("YDC_API_KEY")
+    if not key:
+        return ""
+    try:
+        q = urllib.parse.quote(query)
+        url = f"https://ydc-index.io/v1/search?query={q}&count=5"
+        req = urllib.request.Request(url, headers={"X-API-Key": key, "Accept": "application/json"})
+        with urllib.request.urlopen(req, timeout=10) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        results = []
+        for item in (data.get("results", {}) or {}).get("web", []):
+            title = item.get("title", "")
+            url_r = item.get("url", "")
+            snippets = item.get("snippets", [])
+            snippet = snippets[0][:200] if snippets else ""
+            if title and url_r:
+                results.append(f"• {title}\n  {url_r}\n  {snippet}")
+        return "\n\n".join(results) if results else ""
+    except Exception as e:
+        logger.debug("[YOUCOM] Fail: %s", e)
+        return ""
+
+
 # Circuit breaker para SearXNG (cache de offline)
 _searxng_offline_until: float = 0.0
 _searxng_fail_count: int = 0
@@ -343,6 +495,34 @@ def searxng_search(query: str) -> str:
 
     except Exception as e:
         _mark_searxng_offline(e, base)
+        return ""
+
+
+def yacy_search(query: str, base_url: str = "http://localhost:8090") -> str:
+    """Busca via YaCy peer local (P2P search engine).
+    Requer YaCy rodando em localhost:8090 (Docker: konstin2/yacy).
+    """
+    try:
+        q = urllib.parse.quote(query)
+        url = f"{base_url}/yacysearch.json?query={q}&maximumRecords=5&resource=global&contentdom=text"
+        req = urllib.request.Request(url, headers={"User-Agent": "IAGlobal/1.0"})
+        with urllib.request.urlopen(req, timeout=15) as r:
+            data = json.loads(r.read().decode("utf-8"))
+        items = (data.get("channels") or [{}])[0].get("items") or []
+        results = []
+        seen = set()
+        for item in items:
+            title = item.get("title", "")
+            link = item.get("link", "")
+            snippet = (item.get("description") or "")[:200]
+            if title in seen:
+                continue
+            seen.add(title)
+            if title and link:
+                results.append(f"• {title}\n  {link}\n  {snippet}")
+        return "\n\n".join(results) if results else ""
+    except Exception as e:
+        logger.debug("[YACY] Fail: %s", e)
         return ""
 
 

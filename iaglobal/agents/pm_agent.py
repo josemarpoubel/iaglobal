@@ -3,6 +3,7 @@ import re
 import unicodedata
 from dataclasses import dataclass, field, asdict
 from typing import List, Dict, Any, Optional
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.utils.logger import logger
 
 # --- 1. Contrato de Dados Rígido (Essencial para Pipelines) ---
@@ -18,7 +19,7 @@ class RequirementsOutput:
         return asdict(self)
 
 
-class PMAgent:
+class PMAgent(AgentBase):
     # Padrões limpos (sem espaços no final)
     _FUNC_REQ_PATTERNS = [
         "cadastrar", "listar", "buscar", "atualizar", "deletar", "calcular",
@@ -36,6 +37,7 @@ class PMAgent:
     ]
 
     def __init__(self):
+        super().__init__(agent_name="pm")
         # --- 2. Performance: Pré-compilação de Regex ---
         # \b garante word boundary (não pega "cadastrou" quando busca "cadastrar", por exemplo)
         func_pattern = r'\b(' + '|'.join(re.escape(p) for p in self._FUNC_REQ_PATTERNS) + r')\b'

@@ -35,6 +35,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.utils.helpers import run_async_safe
 logger = get_logger(__name__)
 
@@ -1143,7 +1144,7 @@ class FrontendRules:
 # PerformanceDesignAgent v2
 # ---------------------------------------------------------------------------
 
-class PerformanceDesignAgent:
+class PerformanceDesignAgent(AgentBase):
     """
     Agente de análise de performance full-stack.
 

@@ -6,7 +6,7 @@
       "error_type": "ValueError",
       "response_preview": "bad response"
     },
-    "timestamp": 1783175801.8891873
+    "timestamp": 1783316155.2156532
   },
   {
     "type": "failed_prompt",
@@ -15,7 +15,7 @@
       "error_type": "TimeoutError",
       "response_preview": "resp"
     },
-    "timestamp": 1783175801.8913894
+    "timestamp": 1783316155.2179375
   },
   {
     "type": "failed_prompt",
@@ -24,7 +24,7 @@
       "error_type": "ValueError",
       "response_preview": "bad response"
     },
-    "timestamp": 1783175841.776459
+    "timestamp": 1783345774.444424
   },
   {
     "type": "failed_prompt",
@@ -33,6 +33,186 @@
       "error_type": "TimeoutError",
       "response_preview": "resp"
     },
-    "timestamp": 1783175841.7888527
+    "timestamp": 1783345774.4462218
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783346412.4907527
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783346412.4925892
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783346964.308711
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783346964.310741
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783347114.097592
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783347114.1007247
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783347168.6951094
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783347168.6982975
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783347218.389888
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783347218.392655
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783347260.5605493
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783347260.5634506
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783347305.1965406
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783347305.1998549
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783347334.4235756
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783347334.4266348
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783347482.7762766
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783347482.7791584
+  },
+  {
+    "type": "failed_prompt",
+    "content": "prompt",
+    "metadata": {
+      "error_type": "ValueError",
+      "response_preview": "bad response"
+    },
+    "timestamp": 1783348026.7837682
+  },
+  {
+    "type": "failed_prompt",
+    "content": "erro de timeout no servidor",
+    "metadata": {
+      "error_type": "TimeoutError",
+      "response_preview": "resp"
+    },
+    "timestamp": 1783348026.7875388
   }
 ]

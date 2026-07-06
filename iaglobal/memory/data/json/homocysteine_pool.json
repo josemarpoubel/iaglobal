@@ -1,1 +1,335 @@
-[]
+[
+  {
+    "skill_name": "auto_fix_2631",
+    "skill_description": "Corre\u00e7\u00e3o autom\u00e1tica para: Falha ao buscar c\u00f3digo na internet",
+    "generation": 0,
+    "score": 0.85,
+    "route": "production",
+    "source_gap": "Falha ao buscar c\u00f3digo na internet",
+    "created_at": 1783348794.924069
+  },
+  {
+    "skill_name": "skill_0d034884",
+    "skill_description": "Skill derivada de: test input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "test input",
+    "created_at": 1783348794.924076
+  },
+  {
+    "skill_name": "skill_0b096f77",
+    "skill_description": "Skill derivada de: lifecycle input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "lifecycle input",
+    "created_at": 1783348794.924082
+  },
+  {
+    "skill_name": "skill_ae1b6b5d",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924085
+  },
+  {
+    "skill_name": "skill_bdc71927",
+    "skill_description": "Skill derivada de: teste de consulta",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "teste de consulta",
+    "created_at": 1783348794.924088
+  },
+  {
+    "skill_name": "auto_fix_6053",
+    "skill_description": "Corre\u00e7\u00e3o autom\u00e1tica para: Falha ao buscar c\u00f3digo na internet",
+    "generation": 0,
+    "score": 0.85,
+    "route": "production",
+    "source_gap": "Falha ao buscar c\u00f3digo na internet",
+    "created_at": 1783348794.92409
+  },
+  {
+    "skill_name": "skill_cf86af50",
+    "skill_description": "Skill derivada de: test input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "test input",
+    "created_at": 1783348794.924093
+  },
+  {
+    "skill_name": "skill_bd8f7128",
+    "skill_description": "Skill derivada de: lifecycle input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "lifecycle input",
+    "created_at": 1783348794.924095
+  },
+  {
+    "skill_name": "skill_14ef0d72",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924098
+  },
+  {
+    "skill_name": "skill_cc807145",
+    "skill_description": "Skill derivada de: teste de consulta",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "teste de consulta",
+    "created_at": 1783348794.9241
+  },
+  {
+    "skill_name": "auto_fix_7132",
+    "skill_description": "Corre\u00e7\u00e3o autom\u00e1tica para: Falha ao buscar c\u00f3digo na internet",
+    "generation": 0,
+    "score": 0.85,
+    "route": "production",
+    "source_gap": "Falha ao buscar c\u00f3digo na internet",
+    "created_at": 1783348794.924102
+  },
+  {
+    "skill_name": "skill_98f374a4",
+    "skill_description": "Skill derivada de: test input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "test input",
+    "created_at": 1783348794.924105
+  },
+  {
+    "skill_name": "skill_65f3910e",
+    "skill_description": "Skill derivada de: lifecycle input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "lifecycle input",
+    "created_at": 1783348794.924107
+  },
+  {
+    "skill_name": "skill_ebebb344",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924109
+  },
+  {
+    "skill_name": "skill_535fdaeb",
+    "skill_description": "Skill derivada de: teste de consulta",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "teste de consulta",
+    "created_at": 1783348794.924112
+  },
+  {
+    "skill_name": "auto_fix_3877",
+    "skill_description": "Corre\u00e7\u00e3o autom\u00e1tica para: Falha ao buscar c\u00f3digo na internet",
+    "generation": 0,
+    "score": 0.85,
+    "route": "production",
+    "source_gap": "Falha ao buscar c\u00f3digo na internet",
+    "created_at": 1783348794.924115
+  },
+  {
+    "skill_name": "skill_4d29cc79",
+    "skill_description": "Skill derivada de: test input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "test input",
+    "created_at": 1783348794.924117
+  },
+  {
+    "skill_name": "skill_ded58905",
+    "skill_description": "Skill derivada de: lifecycle input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "lifecycle input",
+    "created_at": 1783348794.924119
+  },
+  {
+    "skill_name": "skill_1a715e66",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924122
+  },
+  {
+    "skill_name": "skill_d06efbf5",
+    "skill_description": "Skill derivada de: teste de consulta",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "teste de consulta",
+    "created_at": 1783348794.924124
+  },
+  {
+    "skill_name": "auto_fix_6743",
+    "skill_description": "Corre\u00e7\u00e3o autom\u00e1tica para: Falha ao buscar c\u00f3digo na internet",
+    "generation": 0,
+    "score": 0.85,
+    "route": "production",
+    "source_gap": "Falha ao buscar c\u00f3digo na internet",
+    "created_at": 1783348794.924126
+  },
+  {
+    "skill_name": "auto_fix_5259",
+    "skill_description": "Corre\u00e7\u00e3o autom\u00e1tica para: Falha ao buscar c\u00f3digo na internet",
+    "generation": 0,
+    "score": 0.85,
+    "route": "production",
+    "source_gap": "Falha ao buscar c\u00f3digo na internet",
+    "created_at": 1783348794.924129
+  },
+  {
+    "skill_name": "skill_ef4bd154",
+    "skill_description": "Skill derivada de: test input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "test input",
+    "created_at": 1783348794.924131
+  },
+  {
+    "skill_name": "skill_62705562",
+    "skill_description": "Skill derivada de: lifecycle input",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "lifecycle input",
+    "created_at": 1783348794.924136
+  },
+  {
+    "skill_name": "skill_59ac0952",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924138
+  },
+  {
+    "skill_name": "skill_a21bc465",
+    "skill_description": "Skill derivada de: teste de consulta",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "teste de consulta",
+    "created_at": 1783348794.92414
+  },
+  {
+    "skill_name": "skill_6d0b69d6",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924143
+  },
+  {
+    "skill_name": "skill_2e0077c4",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924145
+  },
+  {
+    "skill_name": "skill_2e711880",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924148
+  },
+  {
+    "skill_name": "skill_46ce1880",
+    "skill_description": "Skill derivada de: teste de consulta",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "teste de consulta",
+    "created_at": 1783348794.92415
+  },
+  {
+    "skill_name": "skill_60e09a85",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924153
+  },
+  {
+    "skill_name": "skill_15b217e7",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924155
+  },
+  {
+    "skill_name": "skill_3934e709",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924157
+  },
+  {
+    "skill_name": "skill_06588b4d",
+    "skill_description": "Skill derivada de: teste de consulta",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "teste de consulta",
+    "created_at": 1783348794.92416
+  },
+  {
+    "skill_name": "skill_6a9af9dd",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924161
+  },
+  {
+    "skill_name": "skill_32b2e44a",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348794.924164
+  },
+  {
+    "skill_name": "skill_b93fdfb9",
+    "skill_description": "Skill derivada de: erro de parsing no modulo de configuracao",
+    "generation": 0,
+    "score": 0.7,
+    "route": "production",
+    "source_gap": "erro de parsing no modulo de configuracao",
+    "created_at": 1783348795.009964
+  }
+]

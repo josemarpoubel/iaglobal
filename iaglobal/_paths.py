@@ -107,12 +107,19 @@ def _ensure_dirs():
     for d in critical_dirs:
         d.mkdir(parents=True, exist_ok=True)
     
-    # Garante arquivos JSON iniciais vazios para evitar logs de "não persistido"
-    for f in (KNOWLEDGE_FILE, HOMOCYSTEINE_POOL_FILE, GLUTATHIONE_POOL_FILE,
-              SAME_POOL_FILE, ERROR_LOG, META_EVOLUTION_FILE, EVOLUTION_BACKLOG_FILE):
+    # Garante arquivos JSON iniciais para evitar logs de "não persistido"
+    list_files = (KNOWLEDGE_FILE, HOMOCYSTEINE_POOL_FILE, GLUTATHIONE_POOL_FILE,
+                  SAME_POOL_FILE, META_EVOLUTION_FILE, EVOLUTION_BACKLOG_FILE)
+    for f in list_files:
         if not f.exists():
             f.parent.mkdir(parents=True, exist_ok=True)
             f.write_text("[]")
+    # errors.json requer estrutura de dict (runtime_errors + learning_errors)
+    if not ERROR_LOG.exists():
+        ERROR_LOG.parent.mkdir(parents=True, exist_ok=True)
+        ERROR_LOG.write_text(
+            '{"updated_at": "", "learning_errors": [], "runtime_errors": []}'
+        )
 
 try:
     _ensure_dirs()

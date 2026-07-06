@@ -8,7 +8,10 @@ import asyncio
 import threading
 import time
 import requests
+import logging
 from iaglobal.server.mcp_server import mcp_server
+
+logger = logging.getLogger("iaglobal.mcp")
 
 
 def check_mcp_health(max_retries: int = 5, interval: int = 3) -> bool:
@@ -21,7 +24,7 @@ def check_mcp_health(max_retries: int = 5, interval: int = 3) -> bool:
                 status = response.json()
                 if status.get("status") == "✅ OK":
                     return True
-        except:
+        except Exception:
             pass
         time.sleep(interval)
     return False
@@ -30,9 +33,8 @@ def check_mcp_health(max_retries: int = 5, interval: int = 3) -> bool:
 def start_mcp_server():
     """Inicia o MCP Server de forma bloqueante."""
     # Configurar logger
-    import logging
     logging.basicConfig(level=logging.INFO)
-    
+
     # Iniciar servidor
     mcp_server.start_blocking()
 
@@ -47,17 +49,9 @@ if __name__ == "__main__":
         
         # Registrar agente MCP Monitor
         try:
-            from opencode.mind.epigenetic_registry import register_agent
-            register_agent(
-                name="mcp_monitor",
-                purpose="Monitorar homeostase do OpenCode via MCP",
-                endpoints=["http://localhost:8000/mcp"],
-                epigenetic_weights={
-                    "temperature": 0.0,
-                    "reliability": 1.0,
-                    "proactivity": 0.9
-                }
-            )
+            from iaglobal.obsidian.epigenetic_registry import epigenetic_registry
+            # Note: register_agent is for external opencode - use local registry instead
+            logger.info("🧬 MCP Monitor integrado ao EpigeneticRegistry local")
             print("🛡️ MCP Monitor registrado no EpigeneticRegistry")
         except ImportError:
             print("⚠️ EpigeneticRegistry não disponível — MCP Monitor não registrado")

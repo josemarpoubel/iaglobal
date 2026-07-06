@@ -70,23 +70,33 @@ def _make_llm_run_fn(
             strategy = random.choice(strategies)
 
             prompt = template_prompt
-            try:
-                prompt = template_prompt.format(**ctx)
-            except KeyError:
-                for match in re.findall(r"\{([A-Za-z0-9_]+)\}", template_prompt):
-                    prompt = prompt.replace(f"{{{match}}}", str(ctx.get(match, "")))
+            if template_prompt:
+                try:
+                    prompt = template_prompt.format(**ctx)
+                except KeyError:
+                    for match in re.findall(r"\{([A-Za-z0-9_]+)\}", template_prompt):
+                        prompt = prompt.replace(f"{{{match}}}", str(ctx.get(match, "")))
+            else:
+                prompt = str(ctx.get("task") or ctx.get("code") or "")
 
             logger.info(f"[RUN-FN-LLM] Executando skill '{skill_name}' (estratégia={strategy})")
 
-            llm_output = f"<output>Resultado processado pela estratégia {strategy}</output>"
+            llm_output = ""
+            try:
+                from iaglobal.providers.provider_router import async_route_generate
+                llm_output = await async_route_generate(
+                    model=None, prompt=prompt, task_type="general"
+                )
+            except Exception as e:
+                logger.warning("[RUN-FN-LLM] Falha ao gerar via LLM para %s: %s", skill_name, e)
 
-            clean_output = llm_output
-            if "<output>" in llm_output:
-                match = re.search(r"<output>(.*?)</output>", llm_output, re.DOTALL)
+            clean_output = llm_output or ""
+            if "<output>" in clean_output:
+                match = re.search(r"<output>(.*?)</output>", clean_output, re.DOTALL)
                 if match:
                     clean_output = match.group(1).strip()
 
-            clean_output = re.sub(r"```[a-zA-Z]*\\n", "", clean_output).replace("```", "").strip()
+            clean_output = re.sub(r"```[a-zA-Z]*\n", "", clean_output).replace("```", "").strip()
 
             reward = 1.0 if clean_output else 0.0
             event = ExecutionEvent(
@@ -94,14 +104,17 @@ def _make_llm_run_fn(
                 model="dynamic/llm",
                 strategy=strategy,
                 latency=0.0,
-                success=clean_output != "",
-                reward=reward if clean_output else -1.0
+                success=bool(clean_output),
+                reward=reward if clean_output else -1.0,
             )
             credit.record(event=event)
 
             async with execution_lock:
                 if hasattr(bandit, 'update') and callable(bandit.update):
                     bandit.update(action=strategy, reward=reward)
+
+            if not clean_output:
+                return {"output": "", "success": False, "error": "LLM não retornou output válido", "strategy_used": strategy, "model_used": "dynamic/llm"}
 
             return {"output": clean_output, "success": True, "strategy_used": strategy, "model_used": "dynamic/llm"}
 

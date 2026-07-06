@@ -7,6 +7,7 @@ from dataclasses import dataclass, field
 from typing import List, Dict, Any, Optional
 from enum import Enum
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import AgentBase
 
 # --- 1. Contratos de Dados Rígidos e Priorização ---
 class Severity(str, Enum):
@@ -41,7 +42,7 @@ class SecurityReport:
         }
 
 
-class SecurityDesignAgent:
+class SecurityDesignAgent(AgentBase):
     # --- 2. Regex Pré-compiladas com Word Boundaries (\b) ---
     # Evita que "auth" dê match em "author" ou "sql" dê match em "mysql"
     _AUTH_REGEX = re.compile(r'\b(auth|authentication|oauth|jwt|login)\b', re.IGNORECASE)

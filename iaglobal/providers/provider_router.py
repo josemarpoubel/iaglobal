@@ -19,6 +19,16 @@ from iaglobal.memory import cache
 
 from iaglobal.utils.logger import logger
 
+# Import opcional da BanditPolicy Evolutiva (Geração 2)
+try:
+    from iaglobal.policy import BanditPolicyEvolutiva
+    EVOLUTIVA_DISPONIVEL = True
+    logger.info("🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!")
+except ImportError:
+    BanditPolicyEvolutiva = None
+    EVOLUTIVA_DISPONIVEL = False
+    logger.warning("⚠️  BanditPolicyEvolutiva não disponível, usando BanditPolicy clássica")
+
 from iaglobal.providers.ollama_provider import generate as ollama_generate
 from iaglobal.providers.groq_provider import generate as groq_generate
 from iaglobal.providers.openrouter_provider import generate as openrouter_generate
@@ -49,30 +59,30 @@ from iaglobal.providers.poe_provider import generate as poe_generate
 from iaglobal.providers.poe_provider import async_generate as poe_async_generate
 
 
-# Timeouts por provider
+# Timeouts por provider (aumentados para evitar falhas prematuras)
 PROVIDER_TIMEOUT = {
-    "ollama": 120,
-    "groq": 30,
-    "openrouter": 60,
-    "nvidia": 60,
-    "opencode": 60,
-    "gemini": 60,
-    "poe": 180,
-    "perplexity": 60,
-    "openai": 60,
-    "huggingchat": 60,
-    "hf_router": 60,
+    "ollama": 180,
+    "groq": 60,
+    "openrouter": 90,
+    "nvidia": 120,
+    "opencode": 90,
+    "gemini": 90,
+    "poe": 240,
+    "perplexity": 90,
+    "openai": 90,
+    "huggingchat": 90,
+    "hf_router": 90,
     "hf_video": 300,
-    "hf_router_qwen": 60,
-    "hf_router_qwenext": 60,
-    "hf_router_30b": 60,
-    "hf_router_32b": 60,
-    "hf_router_opus": 60,
-    "hf_router_llama": 60,
-    "hf_router_groq": 60,
-    "hf_router_groq8": 60,
-    "hf_router_hermes": 60,
-    "hf_router_nemotron": 60,
+    "hf_router_qwen": 90,
+    "hf_router_qwenext": 90,
+    "hf_router_30b": 90,
+    "hf_router_32b": 90,
+    "hf_router_opus": 90,
+    "hf_router_llama": 90,
+    "hf_router_groq": 90,
+    "hf_router_groq8": 90,
+    "hf_router_hermes": 90,
+    "hf_router_nemotron": 90,
     "hf_router_nemo2": 60,
     "hf_router_ultra": 60,
     "hf_router_oss": 60,
@@ -197,8 +207,16 @@ def CREDIT_CANDIDATES(task_type: str = "general"):
     ]
 
 
-_credit = CreditAssignmentEngine()
+_credit = None  # Inicializado lazy em _get_credit() para usar singleton do Bandit
 BANDIT_NODE = "model_router"
+
+
+def _get_credit() -> CreditAssignmentEngine:
+    """Retorna CreditAssignmentEngine singleton (compartilhado com BanditPolicy)."""
+    global _credit
+    if _credit is None:
+        _credit = _get_bandit().credit_engine
+    return _credit
 
 # Providers com chave de API válida no .env — podem ser desbanidos
 _PROVIDERS_WITH_KEYS = {
@@ -237,11 +255,37 @@ def _clear_circuit_breaker_bans():
 
 
 def _get_bandit():
-    """Retorna instância singleton do BanditPolicy."""
+    """
+    Retorna instância singleton do BanditPolicy.
+    
+    Se EVOLUTIVA_DISPONIVEL=True e USE_BANDIT_EVOLUTIVA=True, retorna BanditPolicyEvolutiva.
+    Caso contrário, retorna BanditPolicy clássica.
+    """
     from iaglobal.graphs.bandit import _get_bandit as get_global_bandit
+    
+    # Verifica se deve usar versão evolutiva
+    use_evolutiva = os.getenv("USE_BANDIT_EVOLUTIVA", "false").lower() in ("true", "1", "yes")
+    
+    if use_evolutiva and EVOLUTIVA_DISPONIVEL:
+        # Retorna instância singleton da BanditPolicyEvolutiva
+        if not hasattr(_get_bandit, '_bandit_evolutiva_instance'):
+            from pathlib import Path
+            _get_bandit._bandit_evolutiva_instance = BanditPolicyEvolutiva(
+                epsilon=float(os.getenv("BANDIT_EPSILON", "0.2")),
+                decay=float(os.getenv("BANDIT_DECAY", "0.995")),
+                db_path=Path("iaglobal/memory/bandit_evolutivo.json"),
+            )
+            logger.info("🧬 [GERAÇÃO 2] BanditPolicyEvolutiva inicializada!")
+        
+        bandit = _get_bandit._bandit_evolutiva_instance
+        logger.debug("[ROUTER] Usando BanditPolicy EVOLUTIVA")
+        return bandit
+    
+    # Fallback para BanditPolicy clássica
+    logger.debug("[ROUTER] Usando BanditPolicy CLÁSSICA")
     return get_global_bandit()
 
-async def _async_safe_call(provider: str, func: Callable, prompt: str, model: str, task_type: str = "general") -> Optional[str]:
+async def _async_safe_call(provider: str, func: Callable, prompt: str, model: str, task_type: str = "general", retry_count: int = 0, max_retries: int = 2) -> Optional[str]:
     """
     Executa a chamada HTTP real com enforce de timeout via asyncio.wait_for,
     cache em nível de roteador e coleta de métricas.
@@ -250,6 +294,12 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
     cached = cache.get(cache_key)
     if cached:
         logger.debug(f"[ROUTER] Cache HIT: {provider} ({model})")
+        # Registra métrica de cache hit (latência ~0)
+        latency = 0.001  # ~1ms para cache
+        cost = 0.0
+        reward = reward_aggregator.calculate_reward(RewardMetrics(success=True, latency_ms=1, cost_usd=0.0, token_count=0))
+        _get_credit().record(ExecutionEvent(node=BANDIT_NODE, success=True, latency=latency, model=model, strategy=task_type, reward=reward))
+        metrics.record(provider, model, prompt, True, latency*1000, 0, 0, 0, cost, task_type)
         return cached
 
     start = time.time()
@@ -277,6 +327,10 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
         latency = time.time() - start
 
         if not result:
+            if retry_count < max_retries:
+                logger.warning(f"[ROUTER] Resposta vazia de {provider}. Tentando retry #{retry_count + 1}/{max_retries}")
+                await asyncio.sleep(1 * (retry_count + 1))  # Backoff exponencial
+                return await _async_safe_call(provider, func, prompt, model, task_type, retry_count + 1, max_retries)
             raise ValueError("Resposta vazia do provedor.")
 
         cache.set(cache_key, result)
@@ -285,7 +339,7 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
 
         cost = estimate_cost(model, prompt_tokens, completion_tokens)
         reward = reward_aggregator.calculate_reward(RewardMetrics(success=True, latency_ms=latency*1000, cost_usd=cost, token_count=total_tokens))
-        _credit.record(ExecutionEvent(node=BANDIT_NODE, success=True, latency=latency, model=model, strategy=task_type, reward=reward))
+        _get_credit().record(ExecutionEvent(node=BANDIT_NODE, success=True, latency=latency, model=model, strategy=task_type, reward=reward))
         metrics.record(provider, model, prompt, True, latency*1000, prompt_tokens, completion_tokens, total_tokens, cost, task_type)
 
         return result
@@ -298,7 +352,7 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
         logger.warning(f"[ROUTER] Timeout: {provider} ({latency:.2f}s)")
         cost = estimate_cost(model, prompt_tokens, completion_tokens)
         reward = reward_aggregator.calculate_reward(RewardMetrics(success=False, latency_ms=latency*1000, cost_usd=cost, error_type="timeout"))
-        _credit.record(ExecutionEvent(node=BANDIT_NODE, success=False, latency=latency, model=model, strategy=task_type, error="timeout", reward=reward))
+        _get_credit().record(ExecutionEvent(node=BANDIT_NODE, success=False, latency=latency, model=model, strategy=task_type, error="timeout", reward=reward))
         return None
 
     except Exception as e:
@@ -308,7 +362,7 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
 
         cost = estimate_cost(model, prompt_tokens, completion_tokens)
         reward = reward_aggregator.calculate_reward(RewardMetrics(success=False, latency_ms=latency*1000, cost_usd=cost, error_type="execution_error"))
-        _credit.record(ExecutionEvent(node=BANDIT_NODE, success=False, latency=latency, model=model, strategy=task_type, error=error_str, reward=reward))
+        _get_credit().record(ExecutionEvent(node=BANDIT_NODE, success=False, latency=latency, model=model, strategy=task_type, error=error_str, reward=reward))
         return None
 
 async def _async_race_round(prompt: str, candidates: List[Tuple[str, str]], task_type: str, parallel_count: int) -> Optional[Tuple[str, str]]:
@@ -370,7 +424,8 @@ async def async_route_generate_parallel(prompt: str, task_type: str = "general")
     bandit = _get_bandit()
     # O BanditPolicy já removeu os modelos em Blacklist (Circuit Breaker)!
     candidates = CREDIT_CANDIDATES(task_type)
-    ranked_models = bandit.rank_models(BANDIT_NODE, task_type, candidates)
+    model_names = [m for _, m in candidates]
+    ranked_models = bandit.rank_models(BANDIT_NODE, task_type, model_names)
     
     if not ranked_models:
         raise RuntimeError("Nenhum provedor sobreviveu ao Circuit Breaker. Abortando.")
@@ -384,7 +439,14 @@ async def async_route_generate_parallel(prompt: str, task_type: str = "general")
     
     # Processamento por lotes (Ex: Tenta os Top 3. Se todos falharem, tenta os próximos 3).
     for i in range(0, len(ranked_models), RACE_SIZE):
-        batch = ranked_models[i:i + RACE_SIZE]
+        batch_ranked = ranked_models[i:i + RACE_SIZE]
+        # Converte (score, model_name) de volta para (provider, model) para _async_race_round
+        batch = []
+        for _, model_name in batch_ranked:
+            for provider, candidate_model in candidates:
+                if candidate_model == model_name:
+                    batch.append((provider, candidate_model))
+                    break
         logger.info(f"[ROUTER] 🏎️  Disparando Batch {i//RACE_SIZE + 1} com: {[p for p, m in batch]}")
         
         result = await _async_race_round(prompt, batch, task_type, parallel_count=RACE_SIZE)
@@ -457,14 +519,32 @@ async def _async_fallback_chain(prompt: str, exclude: str = None, task_type: str
         return await _async_sequential_fallback(prompt, exclude, task_type)
     return await _async_parallel_fallback(prompt, exclude, task_type)
 
+def _reconcile_ranked(ranked_scores: list, candidates: list) -> list:
+    """Converte [(score, model_name)] de volta para [(provider, model)]."""
+    result = []
+    seen = set()
+    for _, model_name in ranked_scores:
+        for provider, candidate_model in candidates:
+            if candidate_model == model_name and model_name not in seen:
+                result.append((provider, candidate_model))
+                seen.add(model_name)
+                break
+    # Append any candidates not in ranked_scores
+    for provider, model in candidates:
+        if model not in seen:
+            result.append((provider, model))
+            seen.add(model)
+    return result
+
 
 async def _async_sequential_fallback(prompt: str, exclude: str = None, task_type: str = "general") -> str:
     """Fallback sequencial original: tenta um provider por vez."""
     candidates = _filter_blacklist([c for c in CREDIT_CANDIDATES() if c[0] != exclude])
     local = [c for c in candidates if c[0] == "ollama"]
     remote = [c for c in candidates if c[0] != "ollama"]
-    ranked_remote = _get_bandit().rank_models(BANDIT_NODE, task_type, remote)
-    ranked = ranked_remote + local
+    remote_model_names = [m for _, m in remote]
+    ranked_scores = _get_bandit().rank_models(BANDIT_NODE, task_type, remote_model_names)
+    ranked = _reconcile_ranked(ranked_scores, remote) + local
     ollama_entry = next((c for c in CREDIT_CANDIDATES() if c[0] == "ollama"), None)
     if ollama_entry and ollama_entry not in ranked:
         ranked.append(ollama_entry)
@@ -483,13 +563,15 @@ async def _async_sequential_fallback(prompt: str, exclude: str = None, task_type
         logger.info("[ROUTER] _async_sequential_fallback failed provider=%s trying next", provider)
     raise RuntimeError("Todos os providers falharam.")
 
+
 async def _async_parallel_fallback(prompt: str, exclude: str = None, task_type: str = "general") -> str:
     """🏁 Fallback paralelo: dispara N providers simultaneamente, pega o primeiro sucesso."""
     candidates = _filter_blacklist([c for c in CREDIT_CANDIDATES() if c[0] != exclude])
     local = [c for c in candidates if c[0] == "ollama"]
     remote = [c for c in candidates if c[0] != "ollama"]
-    ranked_remote = _get_bandit().rank_models(BANDIT_NODE, task_type, remote)
-    ranked = ranked_remote + local
+    remote_model_names = [m for _, m in remote]
+    ranked_scores = _get_bandit().rank_models(BANDIT_NODE, task_type, remote_model_names)
+    ranked = _reconcile_ranked(ranked_scores, remote) + local
     ollama_entry = next((c for c in CREDIT_CANDIDATES() if c[0] == "ollama"), None)
     if ollama_entry and ollama_entry not in ranked:
         ranked.append(ollama_entry)

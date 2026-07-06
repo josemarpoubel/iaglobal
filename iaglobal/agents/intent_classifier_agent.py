@@ -5,6 +5,7 @@ import re
 import unicodedata
 from typing import Dict, List, TypedDict
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import AgentBase
 
 # --- 1. Contrato de Dados Rígido (Essencial para Pipelines) ---
 class ClassificationResult(TypedDict):
@@ -64,7 +65,10 @@ _ENTITY_COMPILED = {k: _build_pattern(v) for k, v in _ENTITY_PATTERNS.items()}
 _CODE_MARKERS = re.compile(r'\b(?:def|class|function|import|include)\b|=>')
 
 
-class IntentClassifierAgent:
+class IntentClassifierAgent(AgentBase):
+    def __init__(self):
+        super().__init__(agent_name="intent_classifier")
+
     @staticmethod
     def _normalize(text: str) -> str:
         """Remove acentos e normaliza para lower case (segurança == seguranca)."""

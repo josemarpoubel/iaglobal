@@ -131,23 +131,9 @@ class Skill:
             metadata=metadata,
         )
 
-def _search_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
-    from iaglobal.tools.search import search_tool
-    
-    # CORREÇÃO DE CONTRATO: Procura na raiz primeiro para respeitar self.inputs, com fallback para sub-dicionário
-    task = context.get("task")
-    if not task and "input" in context and isinstance(context["input"], dict):
-        task = context["input"].get("task", "")
-        
-    task = str(task or "").strip()
-    
-    if not task or len(task) < 5:
-        return {"output": "", "web_context": "", "success": False, "strategy_used": "search_tool"}
-    try:
-        result = search_tool(task)
-        return {"output": result, "web_context": result, "success": bool(result), "strategy_used": "search_tool"}
-    except Exception as e:
-        return {"output": "", "web_context": "", "success": False, "error": str(e), "strategy_used": "search_tool"}
+async def _search_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
+    from iaglobal.graphs.nodes.no_search import run_search
+    return await run_search({"input": {"task": context.get("task", "")}})
 
 
 def _safe_get(context: Dict[str, Any], *keys: str, default: str = "") -> str:
@@ -1390,6 +1376,16 @@ SKILL_TYPING_AGENT = Skill(
     tags=["utility", "automation"],
 )
 
+SKILL_APPLIED_AI_ENGINEER = Skill(
+    name="applied_ai_engineer",
+    version="v1",
+    description="AppliedAIEngineer – otimiza custo-benefício energético (ATP), roteia modelos, ajusta RAG e estrutura prompts com CoT",
+    inputs=["task"],
+    outputs=["model_decision", "rag_config", "structured_prompt"],
+    execution_policy=ExecutionPolicy.SINGLE_RUN,
+    tags=["pipeline", "optimization", "applied-ai"],
+)
+
 _BUILTIN_SKILLS = [
     SKILL_PLANNER,
     SKILL_INGESTION,
@@ -1469,6 +1465,7 @@ _BUILTIN_SKILLS = [
     SKILL_KNOWLEDGE_WRITER,
     SKILL_MULTI_AGENT,
     SKILL_TYPING_AGENT,
+    SKILL_APPLIED_AI_ENGINEER,
 ]
 
 def register_builtin_skills():

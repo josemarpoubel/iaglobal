@@ -139,14 +139,14 @@
         }
         
         function renderExecution(data) {
-            const statusClass = `status-${data.status}`;
+            const statusClass = `status-${data.status || 'unknown'}`;
             
             document.getElementById('executionData').innerHTML = `
                 <div class="card">
-                    <span class="status-badge ${statusClass}">${data.status}</span>
-                    <h3 style="margin-top: 1rem; color: var(--text-light);">${escapeHtml(data.task)}</h3>
+                    <span class="status-badge ${statusClass}">${data.status || 'unknown'}</span>
+                    <h3 style="margin-top: 1rem; color: var(--text-light);">${escapeHtml(data.task || data.file || 'Sem tarefa')}</h3>
                     <p style="color: var(--text-dim); margin-top: 0.5rem">
-                        ID: ${data.id} | Criado: ${new Date(data.created_at * 1000).toLocaleString()}
+                        ID: ${data.id || '-'} | Criado: ${data.datetime ? new Date(data.datetime).toLocaleString() : '-'}
                     </p>
                 </div>
             `;

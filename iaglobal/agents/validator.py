@@ -12,6 +12,7 @@ from dataclasses import dataclass, field
 from typing import Dict, Any, List, Optional
 
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import AgentBase
 
 from iaglobal.agents.semantic_validator import RuleRegistry, ScoreAggregator, LanguageDetector
 
@@ -47,8 +48,9 @@ class ValidationResult:
         }
 
 # --- 2. Agente Refatorado ---
-class SemanticValidatorAgent:
+class SemanticValidatorAgent(AgentBase):
     def __init__(self, pass_threshold: float = 80.0, registry: Optional[RuleRegistry] = None, timeout: float = 60.0):
+        super().__init__(agent_name="semanticvalidator")
         self.pass_threshold = pass_threshold
         self.registry = registry or RuleRegistry.default()
         self.timeout = timeout

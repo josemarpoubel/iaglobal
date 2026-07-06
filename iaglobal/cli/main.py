@@ -25,9 +25,7 @@ async def run_cli():
                 log_path = handler.baseFilename
                 break
         
-        print("DEBUG: Iniciando execução do CLI (Async)...")
         await _run_cli_impl()
-        print("DEBUG: Execução do CLI concluída com sucesso.")
         
     except Exception as e:
         import traceback
@@ -84,9 +82,10 @@ async def _run_cli_impl():
     # 3. Inicialização Centralizada
     # bootstrap.initialize() é assíncrono — retorna o Orchestrator diretamente
     orch = await bootstrap.initialize()
-    from iaglobal.graphs.credit import CreditAssignmentEngine
-    credit_engine = CreditAssignmentEngine()
-    bandit = BanditPolicy(credit_engine)
+    
+    # Usa o bandit e credit_engine do orchestrator (singleton global)
+    credit_engine = orch.bandit.credit_engine
+    bandit = orch.bandit
     
     # 4. Execução Assíncrona
     if args.command == "dashboard-sleep":

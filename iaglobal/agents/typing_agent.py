@@ -15,6 +15,7 @@ from typing import Optional, Callable
 from dataclasses import dataclass
 
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.utils.playwright_util import ensure_playwright_browsers
 
 
@@ -61,10 +62,11 @@ class TypingProfile:
 
 
 
-class TypingAgent:
+class TypingAgent(AgentBase):
     """Simula digitação humana em tempo real."""
 
     def __init__(self, profile: Optional[TypingProfile] = None):
+        super().__init__(agent_name="typing")
         self.profile = profile or TypingProfile()
         self._chars_typed = 0
         self._total_time = 0.0

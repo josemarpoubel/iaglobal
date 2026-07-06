@@ -1,8 +1,15 @@
 # iaglobal/cli/bootstrap.py
 
 import os
-import logging
+import sys
+from dotenv import load_dotenv
 
+# Carrega .env IMEDIATAMENTE, antes de qualquer importação do iaglobal
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+load_dotenv(os.path.join(BASE_DIR, ".env"))
+
+import asyncio
+import logging
 from iaglobal.core.orchestrator import Orchestrator
 from iaglobal.observability.health import HealthCheck
 from iaglobal.observability.metrics_collector import MetricsCollector
@@ -14,6 +21,11 @@ class Bootstrap:
     _instance = None
 
     def __init__(self):
+        self.orchestrator = None
+        self.initialized = False
+
+    def reset(self) -> None:
+        """Reseta o estado do bootstrap para permitir reinicialização."""
         self.orchestrator = None
         self.initialized = False
 
@@ -69,7 +81,27 @@ class Bootstrap:
             await self.orchestrator.initialize()
             logger.info("[BOOTSTRAP] Orchestrator async init completo")
 
-            # 5. Observabilidade (Fail-safe)
+            # 5. Chappie — Núcleo da Autonomia Computacional
+            try:
+                from iaglobal.chappie import IVMAxiom, VacuumDaemon, ErrorEnricher, LineageGuardian, _set_chappie
+                from iaglobal._paths import MEMORY_SWAP_DIR
+                self.chappie_ivm = IVMAxiom(db_path=MEMORY_SWAP_DIR / "ivm.db")
+                self.chappie_vacuum = VacuumDaemon(interval_hours=1.0)
+                self.chappie_error = ErrorEnricher()
+                self.chappie_lineage = LineageGuardian()
+                _set_chappie(ivm=self.chappie_ivm, vacuum=self.chappie_vacuum,
+                            error=self.chappie_error, lineage=self.chappie_lineage)
+                asyncio.create_task(self.chappie_vacuum.start(), name="vacuum-daemon")
+                logger.info("🧬 [CHAPPIE] 4/4 módulos ativos: IVM | Vacuum | ErrorEnricher | LineageGuardian")
+            except Exception as e:
+                logger.warning("[CHAPPIE] Bootstrap parcial: %s", e)
+                self.chappie_ivm = None
+                self.chappie_vacuum = None
+                self.chappie_error = None
+                self.chappie_lineage = None
+                _set_chappie()
+
+            # 6. Observabilidade (Fail-safe)
             try:
                 from iaglobal.observability.health import HealthCheck
                 logger.debug("📊 Health: %s", HealthCheck.summary())
@@ -82,7 +114,7 @@ class Bootstrap:
 
             # Configura CPU affinity (Fail-safe)
             try:
-                core = self.orchestrator.cpu_affinity.pin_current("bootstrap") or 0
+                core = await self.orchestrator.cpu_affinity.pin_current("bootstrap") or 0
                 logger.info("[CPU] Affinity configurado: core %d", core)
             except Exception as e:
                 logger.debug("[CPU] Affinity skip: %s", e)

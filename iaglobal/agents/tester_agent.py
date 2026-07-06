@@ -6,8 +6,8 @@ from dataclasses import dataclass
 from typing import Union, Dict, Any, List, Optional
 from iaglobal.models.task import Task
 from iaglobal.utils.logger import logger
-from iaglobal.providers.provider_router import route_generate
 from iaglobal.providers.task_router import detect_task_type
+from iaglobal.agents.agent_base import AgentBase
 
 # Timeout padrão para geração de testes (suítes de teste podem ser longas)
 _DEFAULT_TIMEOUT = 180.0
@@ -29,7 +29,7 @@ class TestGenerationResult:
         }
 
 
-class TesterAgent:
+class TesterAgent(AgentBase):
     __test__ = False
     """
     Agente responsável por gerar testes unitários robustos.
@@ -37,6 +37,9 @@ class TesterAgent:
     """
 
     def __init__(self, workdir: Optional[str] = None):
+        # Inicializa AgentBase com nome único
+        super().__init__(agent_name="tester")
+        
         self.history: List[Dict[str, Any]] = []
         self.workdir = workdir
 
@@ -75,14 +78,12 @@ class TesterAgent:
         try:
             task_type = detect_task_type(task_text)
             
-            # 3. Timeout e System Prompt adequado
-            resposta = await asyncio.wait_for(
-                route_generate(
-                    "Você é um especialista em testes automatizados e qualidade de software.", 
-                    prompt, 
-                    task_type=task_type
-                ),
-                timeout=timeout
+            # 3. Chama LLM através do BanditPolicy (via AgentBase)
+            system_prompt = "Você é um especialista em testes automatizados e qualidade de software."
+            resposta = await self._call_llm(
+                prompt=prompt,
+                task_type=f"test_{task_type}",
+                system_prompt=system_prompt,
             )
 
             if not resposta:

@@ -120,6 +120,8 @@ class PipelineEngine:
 
             # Persistência e aprendizado
             await self._async_persistence_stage(state)
+            await self._async_metabolism_stage(state)
+
             await self._async_learn_stage(state)
 
             state.current_stage = PipelineStage.COMPLETE.name
@@ -446,6 +448,41 @@ class PipelineEngine:
             },
         )
         logger.info("✅ tudo ok, aprendi mais uma lição!")
+
+    async def _async_metabolism_stage(self, state: PipelineState) -> None:
+        """Promove/rejeita candidatos de skills via ciclo de metilação."""
+        state.current_stage = PipelineStage.METABOLISM.name
+        logging.getLogger("iaglobal.pipeline").info(
+            "[METABOLISM] Ciclo de metilacao (task=%s)", state.task_id[:8]
+        )
+        try:
+            from iaglobal.evolution.metabolism import methylation_engine
+            from iaglobal.evolution.metabolism.homocysteine_pool import homocysteine_pool
+
+            candidates = await asyncio.to_thread(homocysteine_pool.get_candidates_for_methylation)
+            if not candidates:
+                logging.getLogger("iaglobal.pipeline").debug(
+                    "[METABOLISM] Sem candidatos para metilar"
+                )
+                return
+
+            for candidate in candidates:
+                decision = await methylation_engine.process_candidate(candidate)
+                logging.getLogger("iaglobal.pipeline").info(
+                    "[METABOLISM] %s -> %s (%s)",
+                    candidate.skill.name, decision.decision, decision.reason,
+                )
+                state.execution_metrics.setdefault("metabolism", []).append(decision.to_dict())
+                methylation_engine.replenish_sam_e(amount=10.0)
+
+            report = methylation_engine.get_health_report()
+            if report.get("status") == "critical":
+                logging.getLogger("iaglobal.pipeline").warning(
+                    "[METABOLISM] SAMe critico — reset homocisteina"
+                )
+                await asyncio.to_thread(methylation_engine.reset_homocysteine)
+        except Exception as e:
+            logging.getLogger("iaglobal.pipeline").warning("[METABOLISM] Stage skip: %s", e)
 
     async def _async_learn_stage(self, state: PipelineState) -> None:
         if not state.generated_code or len(state.generated_code) < 20:

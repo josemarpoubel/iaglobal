@@ -1,6 +1,6 @@
 # 🧬 AncestryTree — Mapa de Linhagens
 
-**Última Atualização**: 2026-06-28T02:28:12.140669+00:00
+**Última Atualização**: 2026-07-06T14:26:19.665650+00:00
 
 ## 📊 Estatísticas
 
@@ -16,7 +16,7 @@
 
 ## 🧬 Mutações Notáveis
 
-- **a599f5d4a306e655**: speed (impact=0.55)
+- **d9cb146f997c225c**: speed (impact=0.55)
 
 ---
 

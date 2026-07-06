@@ -1,1 +1,27 @@
-[]
+[
+  {
+    "name": "guardrail_hallucination_2860",
+    "description": "Escalamento de alucina\u00e7\u00e3o detectada",
+    "detector": "hallucination_detector"
+  },
+  {
+    "name": "guardrail_hallucination_4480",
+    "description": "Escalamento de alucina\u00e7\u00e3o detectada",
+    "detector": "hallucination_detector"
+  },
+  {
+    "name": "guardrail_hallucination_8781",
+    "description": "Escalamento de alucina\u00e7\u00e3o detectada",
+    "detector": "hallucination_detector"
+  },
+  {
+    "name": "guardrail_hallucination_8383",
+    "description": "Escalamento de alucina\u00e7\u00e3o detectada",
+    "detector": "hallucination_detector"
+  },
+  {
+    "name": "guardrail_hallucination_2775",
+    "description": "Escalamento de alucina\u00e7\u00e3o detectada",
+    "detector": "hallucination_detector"
+  }
+]

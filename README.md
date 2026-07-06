@@ -153,7 +153,93 @@ iaglobal history --stats
 
 ---
 
-## 📁 Project Structure
+## 🌐 YaCy Integration — Sovereign Decentralized Search
+
+iaglobal is integrating **YaCy**, the open-source P2P search engine, to
+replace dependency on centralized search APIs. Every node runs a YaCy
+peer, crawls a portion of the web, and shares the index with the
+network — no API keys, no rate limits, no censorship.
+
+```
+Cada nó iaglobal → um peer YaCy
+         ↓
+Crawleia domínios → índice local → compartilha via DHT
+         ↓
+Busca consulta a rede P2P → resultados distribuídos
+         ↓
+Sistema imunológico (MHC) filtra spam/malware do índice coletivo
+```
+
+| Antes (APIs centralizadas) | Depois (YaCy P2P) |
+|----------------------------|-------------------|
+| 4 APIs externas com rate limits | Fonte nativa sem limites |
+| Zero índice local | Índice local + distribuído |
+| Dependência de API keys | Zero dependências |
+| Bloqueável (Google CAPTCHA) | Impossível bloquear todos os peers |
+
+📖 Detalhes da implementação: [`docs/YaCy_iaglobal.md`](docs/YaCy_iaglobal.md)
+
+---
+
+## ⚙️ Applied AI Engineer Module
+
+O **Applied AI Engineer** é um nó especializado do pipeline que otimiza automaticamente o custo-benefício energético (ATP) de cada tarefa. Ele decide qual modelo usar, como estruturar o contexto RAG e como enriquecer prompts — tudo sem intervenção humana.
+
+### 🔧 Como Funciona
+
+O nó `applied_ai_engineer` executa 3 skills em sequência:
+
+| Skill | Arquivo | Função |
+|-------|---------|--------|
+| **Model Router** | `evolution/skills/skill_model_router.py` | Decide entre modelo local (ATP) ou nuvem baseado na criticidade da tarefa |
+| **RAG Optimizer** | `evolution/skills/skill_rag_optimizer.py` | Ajusta chunk size e número de documentos conforme o modelo selecionado |
+| **Prompt Structurer** | `evolution/skills/skill_prompt_structurer.py` | Injeta Chain-of-Thought + validação JSON no prompt |
+
+### 📊 Matriz de Decisão do Roteador
+
+```
+Score = (Precisão × 0.6) - (Latência_ms/1000 × 0.2) - (CustoToken × 0.2)
+
+Se Score_local < 0.4 → eleva para nuvem (groq, openrouter)
+Se Score_local ≥ 0.4 → mantém local (qwen2.5:0.5b, ATP preservado)
+```
+
+### 🚦 Gatilhos de Elevação para Nuvem
+
+O modelo é elevado automaticamente quando a tarefa contém palavras-chave de alta criticidade:
+`mhc`, `vulnerability`, `security`, `apoptosis`, `emergency`, `attack`, `injection`, `pathogen`
+
+### 🧪 Exemplos de Uso
+
+```bash
+# Tarefa simples → modelo local (ATP preservado)
+iaglobal run "crie uma API Flask com CRUD"
+
+# Tarefa crítica → elevado para nuvem automaticamente
+iaglobal run "analise vulnerabilidade de segurança no código"
+
+# Otimização de pesos IVM (o nó atua como central)
+iaglobal run "optimize IVM routing weights"
+```
+
+### 📈 Comportamento por Cenário
+
+| Cenário | IVM | Modelo | Chunk RAG | Ação |
+|---------|-----|--------|-----------|------|
+| Tarefa simples | ≥ 0.5 | qwen2.5:0.5b (local) | 250 tokens, 2 docs | ATP preservado |
+| Tarefa crítica | ≥ 0.5 | groq-mixtral (nuvem) | 1000 tokens, 7 docs | Precisão máxima |
+| IVM insuficiente | < 0.5 | — | — | Tarefa rejeitada |
+
+### 🔬 Testes
+
+```bash
+# Executar testes do módulo
+python -m pytest tests/test_applied_ai_engineer.py -v
+```
+
+9 cenários validados: rejeição por IVM baixo, elevação para nuvem, manutenção local, injeção CoT, validação JSON, ajuste de chunks RAG e pipeline completo.
+
+---
 
 ```
 iaglobal/
@@ -770,3 +856,4 @@ MIT — Build on it. Evolve it. Let it teach you what biology already knows.
   The difference between biology and computation is only the substrate.<br>
   The principle is the same: adapt or perish."</em>
 </p>
+

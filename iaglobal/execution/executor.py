@@ -2,31 +2,34 @@
 
 """Minimal executor module - provides blackjack_executar_local wrapper."""
 
-import requests
+import asyncio
 from typing import Optional
 
 
-def blackjack_executar_local(modelo: str, prompt: str) -> str:
-    """Execute LLM call via Ollama (wrapper for backward compatibility)."""
+async def blackjack_executar_local(modelo: str, prompt: str) -> str:
+    """Execute LLM call via Ollama (async-safe wrapper)."""
     from iaglobal.providers.provider_config import ProviderConfig
+    from iaglobal.providers.async_http import get_session
     
     url = ProviderConfig.OLLAMA_URL.rstrip("/") + "/api/generate"
     model_name = modelo or ProviderConfig.DEFAULT_OLLAMA_MODEL
-    
+
     if "/" in model_name:
         model_name = ProviderConfig.DEFAULT_OLLAMA_MODEL
-    
+
     try:
-        r = requests.post(
+        session = await get_session()
+        async with session.post(
             url,
             json={"model": model_name, "prompt": prompt, "stream": False},
-            timeout=600
-        )
-        r.raise_for_status()
-        return r.json().get("response", "")
+            timeout=600,
+        ) as r:
+            r.raise_for_status()
+            data = await r.json()
+            return data.get("response", "")
     except Exception as e:
         from iaglobal.utils.logger import logger
-        logger.warning(f"[Ollama] {e}")
+        logger.warning("[Ollama] %s", e)
         return ""
 
 
@@ -42,4 +45,4 @@ async def executar(modelo: str, payload: dict) -> str:
         return result
     
     # Fallback to local for non-auto models
-    return blackjack_executar_local(model, prompt)
+    return await blackjack_executar_local(model, prompt)

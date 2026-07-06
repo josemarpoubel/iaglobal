@@ -42,7 +42,14 @@ class MCPServer:
         # Configuração de segurança (básica)
         self.security = HTTPBasic()
         self._validate_credentials = self._make_auth_checker()
-        
+
+        # AcetylcholineBus (opcional - não falhar se não disponível)
+        self.bus = None
+        try:
+            self.bus = AcetylcholineBus()
+        except Exception as e:
+            self.logger.warning(f"AcetylcholineBus não disponível (modo standalone): {e}")
+
         # FastAPI app
         self.app = FastAPI(title="IAGlobal MCP Server", version="0.1.0")
         self._setup_routes()
@@ -120,8 +127,11 @@ class MCPServer:
         """Retorna função de validação de credenciais."""
         from os import getenv
         
-        valid_user = getenv("MCP_USER", "iaglobal")
-        valid_pass = getenv("MCP_PASSWORD", "homeostasis")
+        valid_user = getenv("MCP_USER")
+        valid_pass = getenv("MCP_PASSWORD")
+        
+        if not valid_user or not valid_pass:
+            self.logger.warning("MCP_USER/MCP_PASSWORD não configurados; endpoints protegidos indisponíveis.")
         
         async def check_credentials(credentials: HTTPBasicCredentials = Depends(self.security)):
             if credentials.username != valid_user or credentials.password != valid_pass:

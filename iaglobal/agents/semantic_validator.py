@@ -15,6 +15,7 @@ from enum import Enum
 from typing import Dict, Any, List, Optional, Pattern
 
 from iaglobal.utils.helpers import run_async_safe
+from iaglobal.agents.agent_base import AgentBase
 
 
 # =============================================================================
@@ -281,12 +282,13 @@ class ScoreAggregator:
 # Semantic Validator Agent
 # =============================================================================
 
-class SemanticValidatorAgent:
+class SemanticValidatorAgent(AgentBase):
     def __init__(
         self,
         registry: Optional[RuleRegistry] = None,
         pass_threshold: float = DEFAULT_PASS_THRESHOLD
     ):
+        super().__init__(agent_name="semantic_validator")
         self.registry = registry or RuleRegistry.default()
         self.pass_threshold = pass_threshold
 

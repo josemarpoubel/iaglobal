@@ -304,7 +304,7 @@
                 }
                 
                 const data = await response.json();
-                Terminal.log(`Tarefa criada: ${data.execution_id.substring(0, 8)}...`, 'info');
+                Terminal.log(`Tarefa criada: ${(data.execution_id || '').substring(0, 8)}...`, 'info');
                 
                 // Conecta WebSocket para acompanhar progresso
                 connectWebSocket(data.execution_id);
@@ -339,10 +339,10 @@
                 container.innerHTML = data.executions.map(exec => `
                     <div class="execution-item">
                         <div class="execution-header">
-                            <span class="execution-id">${exec.id.substring(0, 8)}...</span>
-                            <span class="status-badge status-${exec.status}">${exec.status}</span>
+                            <span class="execution-id">${escapeHtml(exec.id || exec.task_id || exec.file)}</span>
+                            <span class="status-badge status-${exec.status || 'unknown'}">${exec.status || 'unknown'}</span>
                         </div>
-                        <div class="execution-task">${escapeHtml(exec.task)}</div>
+                        <div class="execution-task">${escapeHtml(exec.task || exec.file || 'Sem tarefa')}</div>
                     </div>
                 `).join('');
             } catch (error) {

@@ -54,6 +54,11 @@ class GlutathionePool:
 
     def respond(self, threat_type: str, threat_data: Dict[str, Any]) -> Dict[str, Any]:
         if threat_type == "loop":
+            self.add_guardrail(
+                name=f"guardrail_loop_{threat_data.get('node', 'unknown')}",
+                description=f"Isolamento automático de nó em loop",
+                detector="loop_detector",
+            )
             return {
                 "response": ImmuneResponse.ISOLATE.value,
                 "action": f"Nó '{threat_data.get('node')}' em loop — isolando",
@@ -61,6 +66,11 @@ class GlutathionePool:
             }
 
         if threat_type == "regression":
+            self.add_guardrail(
+                name=f"guardrail_regression_{threat_data.get('node', 'unknown')}",
+                description=f"Correção automática de regressão",
+                detector="regression_detector",
+            )
             return {
                 "response": ImmuneResponse.CORRECT.value,
                 "action": f"Regressão em '{threat_data.get('node')}' — aplicando correção",
@@ -68,6 +78,11 @@ class GlutathionePool:
             }
 
         if threat_type == "hallucination":
+            self.add_guardrail(
+                name=f"guardrail_hallucination_{hash(str(threat_data.get('issues', ''))) % 10000:04d}",
+                description=f"Escalamento de alucinação detectada",
+                detector="hallucination_detector",
+            )
             return {
                 "response": ImmuneResponse.ESCALATE.value,
                 "action": f"Alucinação detectada — escalando",

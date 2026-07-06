@@ -24,6 +24,9 @@ _FALLBACK_RUN_FN_CACHE: Dict[str, Callable] = {}
 from iaglobal.evolution.skills.skill import register_builtin_skills
 register_builtin_skills()
 
+# Garante que o nó applied_ai_engineer registre seu run_fn específico no skill registry
+import iaglobal.graphs.nodes.no_applied_ai_engineer  # noqa: F401
+
 # =====================================================================
 # HANDLER PRINCIPAL DO NÓ (Exportado para carregamento dinâmico)
 # =====================================================================

@@ -9,6 +9,7 @@ from datetime import datetime
 from typing import Any, Dict, List, Optional
 
 from iaglobal._paths import ERROR_DIR, LOG_DIR, JSON_DIR, PROVIDER_METRICS_DIR
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.utils.logger import logger
 
 PATTERNS = {
@@ -26,7 +27,7 @@ _LOG_PATH = LOG_DIR / "app.log"
 _RESULTS_DIR = ERROR_DIR
 
 
-class FailureAnalysisAgent:
+class FailureAnalysisAgent(AgentBase):
     """Analisa logs de falha, dados reais do sistema e métricas de provedores."""
 
     @classmethod
