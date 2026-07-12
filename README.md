@@ -372,17 +372,17 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
          │
          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  TESTER + REVIEWER + CRITIC: Re-avalia                      │
-│  - Score = 85 → ✅ APROVADO                                 │
-│  - Score = 70 → ❌ REPROVADO (retry 2/3)                    │
-│  - Score = 50 → ❌ REPROVADO (retry 3/3) → FALHA CRÍTICA    │
+│  TESTER + REVIEWER + CRITIC: Re-evaluates                      │
+│  - Score = 85 → ✅ APPROVED                                 │
+│  - Score = 70 → ❌ REJECTED (retry 2/3)                    │
+│  - Score = 50 → ❌ REJECTED (retry 3/3) → CRITICAL FAILURE    │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 📊 MÉTRICAS DO FLUXO
+## 📊 FLOW METRICS
 
 ```
-| Fase | Agente Principal | Expected Latency | ATP (Cost)      |
+| Phase | Main Agent | Expected Latency | ATP (Cost)      |
 |------|------------------|-------------------|------------------|
 | 0    | User             | -                 | 0                |
 | 1    | Prompt Improver  | 1-2s              | 50 tokens        |
@@ -398,28 +398,28 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 | **TOTAL** |             | **19-33s**        | **~1250 tokens** |
 ```
 
-## 🧬 PRINCÍPIOS BIOMIMÉTICOS APLICADOS
+## 🧬 BIOMIMETIC PRINCIPLES APPLIED
 
 ```
 | Biological Process      |         Computational Equivalent       |
 |-------------------------|-----------------------------------------|
-| **Methylation**           | Prompt Improver (enriquece input bruto) |
+| **Methylation**           | Prompt Improver (enriches raw input) |
 | **Translation**            | Planner → Execution Plan                |
-| **Homeostase**          | Source Validator (filtra toxinas)       |
+| **Homeostasis**          | Source Validator (filters toxins)       |
 | **Immune System** | Critic (detects anomalies)              |
 | **Apoptosis**            | Retry Loop (eliminates bad code)        |
 | **Immune Memory** | Obsidian + MemoryVector                 |
-| **Metabolismo**         | IVM (otimiza ATP/token)                 |
+| **Metabolism**         | IVM (optimizes ATP/token)                 |
 | **Evolution**            | Reflexion (continuous learning)        |
 ```
 ================================================================================
-                        🧬 END OF FLOW BIOMIMÉTICO
+                        🧬 END OF BIOMIMETIC FLOW
 ================================================================================
 
 **Security feature** | LLM Access Architecture in iaglobal:
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   USUÁRIO / CLI                             │
+│                   USER / CLI                             │
 │              (iaglobal run "task description")              │
 └────────────────────┬────────────────────────────────────────┘
                      │
@@ -439,9 +439,9 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
                      ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                  Chappie + BanditPolicy = IVMAxiom          │
-│	Calcula, rastreia e integra IVM com BanditPolicy para     │
+│	Calculates, tracks and integrates IVM with BanditPolicy for     │
 │rewards proportional to each agent's contribution│
-│    (SEMAFORO ÚNICO — seleciona modelo, circuit breaker,     │
+│    (SINGLE SEMAPHORE — selects model, circuit breaker,     │
 │     fallback chain, credit assignment, rewards)             │
 └────────────────────┬────────────────────────────────────────┘
                      │
@@ -883,11 +883,11 @@ iaglobal run "optimize IVM routing weights"
 | Critical task | ≥ 0.5 | groq-mixtral (cloud) | 1000 tokens, 7 docs | Maximum precision |
 | IVM insuficiente | < 0.5 | — | — | Tarefa rejeitada |
 
-### 🔬 Testes
+### 🔬 Tests
 ```
-🔗 Arquitetura 
+🔗 Architecture 
 ┌────────────────────────────────────┐
-│  claim_detection.py (FONT ÚNICA)   │
+│  claim_detection.py (SINGLE SOURCE)   │
 │  - detect_architectural_claims()   │
 │  - verify_architectural_claims()   │
 │  - create_quarantine_report()      │
@@ -931,7 +931,7 @@ Selects real positive/negative examples from ToolLibrary, SkillRegistry and MTAP
 
 **File:** `iaglobal/agents/agent_base.py:19-25`
 
-Forces 4-step decomposition (ANÁLISE → PLANO DE ESTRUTURA → IMPLEMENTAÇÃO → REVISÃO) before code generation. Injected into `PEC_SYSTEM_PROMPT`, CriticAgent, DebuggerAgent and PromptImprover.
+Forces 4-step decomposition (ANALYSIS → STRUCTURE PLAN → IMPLEMENTATION → REVIEW) before code generation. Injected into `PEC_SYSTEM_PROMPT`, CriticAgent, DebuggerAgent and PromptImprover.
 
 ---
 
