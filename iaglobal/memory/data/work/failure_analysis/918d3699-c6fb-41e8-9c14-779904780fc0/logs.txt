@@ -1,0 +1,1 @@
+[15:02:39] contrato insatisfeito: Skill 'failure_analysis' requer inputs faltando: ['code_executor', 'debugger'].  — fallback

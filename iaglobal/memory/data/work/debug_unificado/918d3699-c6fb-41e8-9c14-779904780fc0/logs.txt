@@ -1,0 +1,1 @@
+[15:02:39] contrato insatisfeito: Skill 'debug_unificado' requer inputs faltando: ['lsp_errors']. Disponíveis no c — fallback

@@ -1,0 +1,1 @@
+[15:02:39] contrato insatisfeito: Skill 'compliance_audit' requer inputs faltando: ['semantic_validator']. Disponí — fallback

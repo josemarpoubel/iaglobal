@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-12T13:37:30.026586Z",
+  "updated_at": "2026-07-12T15:02:47.946146Z",
   "learning_errors": [],
   "runtime_errors": [
     {
@@ -162,6 +162,111 @@
       "source": "iaglobal",
       "message": "\ud83d\udca5 [ASYNC PIPELINE] Failure: Falha na execu\u00e7\u00e3o do grafo: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08",
       "traceback": "Traceback (most recent call last):\n  File \"/workspace/iaglobal/pipeline/engine.py\", line 271, in _async_generation_stage\n    graph_result = await state.graph.async_run(ctx)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/iaglobal/graphs/execution_graph.py\", line 432, in async_run\n    raise RuntimeError(f\"Deadlock detectado: {execution_id}\")\nRuntimeError: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/workspace/iaglobal/pipeline/engine.py\", line 113, in async_execute\n    await self._async_generation_stage(state, parallel=parallel)\n  File \"/workspace/iaglobal/pipeline/engine.py\", line 284, in _async_generation_stage\n    raise RuntimeError(f\"Falha na execu\u00e7\u00e3o do grafo: {e}\") from e\nRuntimeError: Falha na execu\u00e7\u00e3o do grafo: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08\n"
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.567109Z",
+      "component": "iaglobal.immunity.mhc_detector",
+      "source": "iaglobal.immunity.mhc_detector",
+      "message": "[MHC] PARASITE DETECTED: lineage_proof - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.605042Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_evolution_committee.py: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.605905Z",
+      "component": "graphs.nodes:no_evolution_committee.py",
+      "source": "graphs.nodes:no_evolution_committee.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.627506Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_fugue_compartment.py: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.628237Z",
+      "component": "graphs.nodes:no_fugue_compartment.py",
+      "source": "graphs.nodes:no_fugue_compartment.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.629510Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_fusion.py: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.630236Z",
+      "component": "graphs.nodes:no_fusion.py",
+      "source": "graphs.nodes:no_fusion.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.766593Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_search.py: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.767503Z",
+      "component": "graphs.nodes:no_search.py",
+      "source": "graphs.nodes:no_search.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.768712Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_search_agent.py: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.769430Z",
+      "component": "graphs.nodes:no_search_agent.py",
+      "source": "graphs.nodes:no_search_agent.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.782405Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_search_web_brain.py: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:37.783267Z",
+      "component": "graphs.nodes:no_search_web_brain.py",
+      "source": "graphs.nodes:no_search_web_brain.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:47.704119Z",
+      "component": "iaglobal.skills.python_autocomplete",
+      "source": "iaglobal.skills.python_autocomplete",
+      "message": "[AUTOCOMPLETE] jedi n\u00e3o instalado \u2014 pip install jedi",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T15:02:47.945831Z",
+      "component": "iaglobal.immunity.mhc_detector",
+      "source": "iaglobal.immunity.mhc_detector",
+      "message": "[MHC] PARASITE DETECTED: system_analysis - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}",
+      "traceback": ""
     }
   ]
 }

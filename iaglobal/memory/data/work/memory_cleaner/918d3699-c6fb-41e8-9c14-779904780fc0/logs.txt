@@ -1,0 +1,1 @@
+[15:02:45] contrato insatisfeito: Skill 'memory_cleaner' requer inputs faltando: ['memory_writer']. Disponíveis no — fallback

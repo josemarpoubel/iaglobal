@@ -1,0 +1,1 @@
+[15:02:38] contrato insatisfeito: Skill 'coder' requer inputs faltando: ['plan']. Disponíveis no contexto: ['code' — fallback

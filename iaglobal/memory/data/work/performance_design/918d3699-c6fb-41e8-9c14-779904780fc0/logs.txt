@@ -1,0 +1,1 @@
+[15:02:38] contrato insatisfeito: Skill 'performance_design' requer inputs faltando: ['architecture', 'requirement — fallback

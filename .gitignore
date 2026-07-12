@@ -1,8 +1,26 @@
 ```
-# Compiled Python files
+# Python compiled files
 *.pyc
 __pycache__/
 
-# Original rules preserved
-*.log
+# Database files
+*iaglobal/memory/data/db/*.db
+
+# Log files
+*iaglobal/memory/data/logs/*.log
+*iaglobal/memory/data/work/*/*.logs.txt
+
+# Error and result files
+*iaglobal/memory/data/error/*
+*iaglobal/memory/data/result/*
+*iaglobal/memory/data/script/*
+
+# JSON data files
+*iaglobal/memory/data/json/*
+
+# Obsidian epigenetic files
+*iaglobal/obsidian/epigenetic/*.cbor
+
+# Work directory logs
+*iaglobal/memory/data/work/*/*/*.log
 ```

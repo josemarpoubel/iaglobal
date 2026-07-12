@@ -1,0 +1,1 @@
+[15:02:39] contrato insatisfeito: Skill 'security_audit' requer inputs faltando: ['security_requirements']. Dispon — fallback

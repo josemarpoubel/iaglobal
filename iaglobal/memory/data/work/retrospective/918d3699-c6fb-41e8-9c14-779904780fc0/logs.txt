@@ -1,0 +1,1 @@
+[15:02:45] contrato insatisfeito: Skill 'retrospective' requer inputs faltando: ['metrics_report', 'execution_log' — fallback

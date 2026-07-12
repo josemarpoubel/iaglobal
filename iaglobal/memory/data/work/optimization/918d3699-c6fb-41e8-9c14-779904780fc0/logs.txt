@@ -1,0 +1,1 @@
+[15:02:45] contrato insatisfeito: Skill 'optimization' requer inputs faltando: ['execution_history']. Disponíveis  — fallback

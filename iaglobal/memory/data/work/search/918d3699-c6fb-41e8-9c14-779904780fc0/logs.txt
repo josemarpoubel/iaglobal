@@ -1,0 +1,1 @@
+[15:02:38] contrato insatisfeito: Skill 'search' requer inputs faltando: ['needs_web']. Disponíveis no contexto: [ — fallback
