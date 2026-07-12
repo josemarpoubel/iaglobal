@@ -777,16 +777,16 @@ class ReflectionEngine:
 
 class PromptImprover:
     """
-    Pipeline de melhoria de prompts em 5 estágios orquestrados.
-
-    Estágios:
-      1. Detecção semântica de domínios (n-gramas, sem falso positivo)
-      2. Análise de complexidade ponderada
-      3. Composição de persona (multi-domínio)
-      4. Injeção de constraints por severidade e modo
-      5. Decomposição adaptativa + auto-reflexão com memória biológica
+    Pipeline de melhoria de prompts em 5 estagios orquestrados.
+    
+    Estagios:
+      1. Deteccao semantica de dominios (n-gramas, sem falso positivo)
+      2. Analise de complexidade ponderada
+      3. Composicao de persona (multi-dominio)
+      4. Injecao de constraints por severidade e modo
+      5. Decomposicao adaptativa + auto-reflexao com memoria biologica
     """
-
+    
     def __init__(
         self,
         mta_recycler: Optional[Any] = None,
@@ -799,7 +799,7 @@ class PromptImprover:
         self._persona     = PersonaComposer()
         self._decomposer  = DecompositionEngine()
         self._reflection  = ReflectionEngine()
-
+    
     def improve(
         self,
         raw_prompt: str,
@@ -814,7 +814,7 @@ class PromptImprover:
             knowledge_context, suggested_libs, mode,
         )
         return result
-
+    
     def improve_with_report(
         self,
         raw_prompt: str,
@@ -824,48 +824,49 @@ class PromptImprover:
         suggested_libs: Optional[List[str]] = None,
         mode: PromptMode = PromptMode.FULL,
     ) -> Tuple[str, ImprovementReport]:
-
+    
         # ── 1. Detecção de domínios ──────────────────────────────────────────
         combined = " ".join(filter(None, [raw_prompt, domain, knowledge_context]))
         domains  = self._detector.detect(combined)
-
+    
         # ── 2. Complexidade ──────────────────────────────────────────────────
         complexity, c_score, c_breakdown = self._complexity.analyze(raw_prompt)
-
+    
         # ── 3. Memória biológica — MTA + SkillStore ──────────────────────────
         negative_examples: List[str] = []
         positive_examples: List[str] = []
         mta_used, skill_used = False, False
-
+    
         if self._mta and _MTA_AVAILABLE:
             try:
                 negative_examples = self._mta.recycle_as_negative_examples(limit=3)
                 mta_used = bool(negative_examples)
             except Exception:
                 pass
-
-if self._skill_registry and _SKILL_REGISTRY_AVAILABLE:
-    try:
-        skills = self._skill_registry.list_skills(active_only=True)[:2]
-        for skill in skills:
-            usage = getattr(skill, 'usage_count', 0)
-            # Extrai código-fonte real da skill
-            codigo_fonte = few_shot_provider._extract_callable_source(skill.run_fn)
-            if codigo_fonte and len(codigo_fonte.strip()) > 30:
-                positive_examples.append(
-                    f"[SKILL: {skill.name}] (uso={usage})\n"
-                    f"Descrição: {skill.description[:200]}\n"
-                    f"Código:\n```python\n{codigo_fonte[:400]}\n```"
-                )
-            else:
-                positive_examples.append(
-                    f"[SKILL: {skill.name}] (uso={usage})\n"
-                    f"Descrição: {skill.description[:200]}"
-                )
-        skill_used = bool(positive_examples)
-    except Exception:
-        pass
-                # ── 4. Composição do prompt ──────────────────────────────────────────
+    
+        if self._skill_registry and _SKILL_REGISTRY_AVAILABLE:
+            try:
+                skills = self._skill_registry.list_skills(active_only=True)[:2]
+                for skill in skills:
+                    usage = getattr(skill, 'usage_count', 0)
+                    # Extrai código-fonte real da skill
+                    codigo_fonte = few_shot_provider._extract_callable_source(skill.run_fn)
+                    if codigo_fonte and len(codigo_fonte.strip()) > 30:
+                        positive_examples.append(
+                            f"[SKILL: {skill.name}] (uso={usage})\n"
+                            f"Descrição: {skill.description[:200]}\n"
+                            f"Código:\n```python\n{codigo_fonte[:400]}\n```"
+                        )
+                    else:
+                        positive_examples.append(
+                            f"[SKILL: {skill.name}] (uso={usage})\n"
+                            f"Descrição: {skill.description[:200]}"
+                        )
+                skill_used = bool(positive_examples)
+            except Exception:
+                pass
+        
+        # ── 4. Composição do prompt ──────────────────────────────────────────
         min_sev = (
             ConstraintSeverity.CRITICAL
             if mode == PromptMode.COMPACT
@@ -909,80 +910,80 @@ if self._skill_registry and _SKILL_REGISTRY_AVAILABLE:
                     prefix = "⚠️ " if c.severity == ConstraintSeverity.CRITICAL else "- "
                     sections.append(f"{prefix}{c.text}")
 
-        # Decomposição
-        decomp = self._decomposer.decompose(complexity, domains, mode)
-        if decomp:
-            sections.append(decomp)
+            # Decomposição
+            decomp = self._decomposer.decompose(complexity, domains, mode)
+            if decomp:
+                sections.append(decomp)
 
-        # Reflexão
-        reflection = self._reflection.build(
-            domains, error_context, knowledge_context,
-            negative_examples, positive_examples, mode,
-        )
-        sections.append(reflection)
+            # Reflexão
+            reflection = self._reflection.build(
+                domains, error_context, knowledge_context,
+                negative_examples, positive_examples, mode,
+            )
+            sections.append(reflection)
 
-        # CoT — Chain of Thought antes de codificar
-        sections.append("")
-        sections.append(f"[CHAIN OF THOUGHT — {INSTRUCAO_COT}]")
+            # CoT — Chain of Thought antes de codificar
+            sections.append("")
+            sections.append(f"[CHAIN OF THOUGHT — {INSTRUCAO_COT}]")
 
-        # Instrução final + PSC (Protocolo de Soberania do Crítico)
-        sections.append("")
-        sections.append(
-            "PSC: Voce e um agente local. Nunca tente acessar modelos online "
-            "por conta propria. Se a tarefa exigir recursos alem do ToolLibrary, "
-            "submeta ao CriticAgent.\n\n"
-            "EETL: Como CriticAgent, ao validar um Cognitive_Escalation bem-sucedido, "
-            "analise a frequencia desse tipo de tarefa no ancestry_tree. Se a tarefa "
-            "for repetitiva, voce tem autoridade para solicitar ao EvolutionaryWatchdog "
-            "que transforme o codigo validado em ferramenta permanente na ToolLibrary. "
-            "O objetivo e auto-suficiencia total do iaglobal.\n\n"
-            "Responda APENAS com codigo funcional dentro do bloco markdown correto. "
-            "Sem explicacoes fora do bloco."
-        )
+            # Instrução final + PSC (Protocolo de Soberania do Crítico)
+            sections.append("")
+            sections.append(
+                "PSC: Voce e um agente local. Nunca tente acessar modelos online "
+                "por conta propria. Se a tarefa exigir recursos alem do ToolLibrary, "
+                "submeta ao CriticAgent.\n\n"
+                "EETL: Como CriticAgent, ao validar um Cognitive_Escalation bem-sucedido, "
+                "analise a frequencia desse tipo de tarefa no ancestry_tree. Se a tarefa "
+                "for repetitiva, voce tem autoridade para solicitar ao EvolutionaryWatchdog "
+                "que transforme o codigo validado em ferramenta permanente na ToolLibrary. "
+                "O objetivo e auto-suficiencia total do iaglobal.\n\n"
+                "Responda APENAS com codigo funcional dentro do bloco markdown correto. "
+                "Sem explicacoes fora do bloco."
+            )
 
-        final_prompt = "\n".join(sections)
+            final_prompt = "\n".join(sections)
 
-        # ── 5. Relatório ─────────────────────────────────────────────────────
-        report = ImprovementReport(
-            original_length=len(raw_prompt),
-            final_length=len(final_prompt),
-            mode=mode,
-            detected_domains=[(d.name, s) for d, s in domains],
-            complexity=complexity,
-            complexity_score=c_score,
-            constraints_applied=len(all_constraints),
-            negative_examples_injected=len(negative_examples),
-            positive_examples_injected=len(positive_examples),
-            decomposed=bool(decomp),
-            reflection_checks=len(ReflectionEngine._UNIVERSAL_CHECKS) + sum(
-                len(d.reflection_checks) for d, _ in domains[:2]
-            ),
-            mta_examples_used=mta_used,
-            skill_examples_used=skill_used,
-        )
+            # ── 5. Relatório ─────────────────────────────────────────────────────
+            report = ImprovementReport(
+                original_length=len(raw_prompt),
+                final_length=len(final_prompt),
+                mode=mode,
+                detected_domains=[(d.name, s) for d, s in domains],
+                complexity=complexity,
+                complexity_score=c_score,
+                constraints_applied=len(all_constraints),
+                negative_examples_injected=len(negative_examples),
+                positive_examples_injected=len(positive_examples),
+                decomposed=bool(decomp),
+                reflection_checks=len(ReflectionEngine._UNIVERSAL_CHECKS) + sum(
+                    len(d.reflection_checks) for d, _ in domains[:2]
+                ),
+                mta_examples_used=mta_used,
+                skill_examples_used=skill_used,
+            )
 
-        logger.info(
-            "✨ [PROMPT_IMPROVER] %d→%d chars | mode=%s | domínios=%s | "
-            "complexity=%s(score=%d) | constraints=%d | mta=%s | skills=%s",
-            report.original_length, report.final_length, mode.value,
-            [(d, round(s, 2)) for d, s in report.detected_domains],
-            complexity.value, c_score,
-            len(all_constraints),
-            mta_used, skill_used,
-        )
+            logger.info(
+                "✨ [PROMPT_IMPROVER] %d→%d chars | mode=%s | domínios=%s | "
+                "complexity=%s(score=%d) | constraints=%d | mta=%s | skills=%s",
+                report.original_length, report.final_length, mode.value,
+                [(d, round(s, 2)) for d, s in report.detected_domains],
+                complexity.value, c_score,
+                len(all_constraints),
+                mta_used, skill_used,
+            )
 
-        # ── Publica no AcetylcholineBus ──────────────────────────────────────
-        if _BUS_AVAILABLE:
-            import asyncio
-            try:
-                asyncio.get_event_loop().run_until_complete(
-                    bus.publish(Signal(
-                        event="prompt.improved",
-                        source="prompt_improver",
-                        payload=report.to_dict(),
-                    ))
-                )
-            except Exception:
-                pass
-
+            # ── Publica no AcetylcholineBus ──────────────────────────────────────
+            if _BUS_AVAILABLE:
+                import asyncio
+                try:
+                    asyncio.get_event_loop().run_until_complete(
+                        bus.publish(Signal(
+                            event="prompt.improved",
+                            source="prompt_improver",
+                            payload=report.to_dict(),
+                        ))
+                    )
+                except Exception:
+                    pass
+    
         return final_prompt, report
