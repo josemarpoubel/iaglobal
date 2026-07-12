@@ -1,22 +1,15 @@
 # Logs
 *.log
+*.json
+*.jsonl
+*.cbor
+*.pkl
 
 # Database files
 *.db
 
 # Temporary work files
-iaglobal/memory/data/work/*/logs.txt
-iaglobal/memory/data/work/*/*/logs.txt
-iaglobal/memory/data/work/*/*/*/logs.txt
-
-# Generated code files in work directory
-iaglobal/memory/data/work/*/code.py
-iaglobal/memory/data/work/*/*/code.py
-iaglobal/memory/data/work/*/*/*/code.py
-
-# Generated result and script files
-iaglobal/memory/data/result/
-iaglobal/memory/data/script/
+iaglobal/memory/data/*.*
 
 # Python cache
 __pycache__/
@@ -34,8 +27,6 @@ __pycache__/
 *.swp
 *.swo
 .kilo
-.opencode
-.opencode.json
 
 # OS files
 .DS_Store
@@ -45,15 +36,6 @@ Thumbs.db
 coverage/
 htmlcov/
 .coverage
-
-# Root artifacts from hardcoded paths (should be inside iaglobal/)
-/backup/
-/IVMAxiom/
-obsidian/
-
-# Test temp artifacts (contents ignored, dir tracked via .gitkeep)
-tests/temp/*
-!tests/temp/.gitkeep
 
 # Build artifacts
 dist/
