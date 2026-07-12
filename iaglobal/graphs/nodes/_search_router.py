@@ -96,12 +96,24 @@ def _worldbank(query: str) -> str:
 # ── 2. NOTÍCIAS ────────────────────────────────────────────────────
 
 def _fetch_rss(url: str, max_items: int = 3) -> str:
-    """Lê e formata um feed RSS."""
+    """Lê e formata um feed RSS com proteção contra XXE."""
     try:
         req = urllib.request.Request(url, headers={"User-Agent": "IAGlobal/1.0"})
+        # Validação de URL para prevenir SSRF
+        parsed = urllib.parse.urlparse(url)
+        if parsed.scheme not in ("http", "https"):
+            logger.warning(f"[RSS] Esquema de URL inválido: {parsed.scheme}")
+            return ""
+        if not parsed.hostname or parsed.hostname.endswith(".internal") or parsed.hostname.endswith(".local"):
+            logger.warning(f"[RSS] Hostname potencialmente inseguro: {parsed.hostname}")
+            return ""
+        
         with urllib.request.urlopen(req, timeout=8) as r:
             xml_data = r.read().decode("utf-8", errors="replace")
-        root = ET.fromstring(xml_data)
+        
+        # Proteção contra XXE usando parser seguro
+        parser = ET.XMLParser(resolve_entities=False, no_network=True)
+        root = ET.fromstring(xml_data, parser=parser)
         items = []
         for entry in root.iter("{http://www.w3.org/2005/Atom}entry"):
             title = entry.find("{http://www.w3.org/2005/Atom}title")

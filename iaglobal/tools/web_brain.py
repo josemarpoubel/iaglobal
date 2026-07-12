@@ -89,6 +89,15 @@ class WebBrain:
                 "srlimit": max_results
             })
             url = f"https://en.wikipedia.org/w/api.php?{params}"
+            # Validação de URL para prevenir SSRF
+            parsed = urllib.parse.urlparse(url)
+            if parsed.scheme not in ("http", "https"):
+                logger.warning(f"[WEB-BRAIN] Esquema de URL inválido: {parsed.scheme}")
+                return []
+            if not parsed.hostname or parsed.hostname.endswith(".internal") or parsed.hostname.endswith(".local"):
+                logger.warning(f"[WEB-BRAIN] Hostname potencialmente inseguro: {parsed.hostname}")
+                return []
+            
             req = urllib.request.Request(
                 url,
                 headers={

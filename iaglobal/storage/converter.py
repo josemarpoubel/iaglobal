@@ -240,6 +240,10 @@ class DataBridge:
                 if table_name not in allowed_tables:
                     logger.error(f"Tabela {table_name} não permitida")
                     return
+                # Sanitização rigorosa do nome da tabela (apenas alfanumérico e underscore)
+                if not all(c.isalnum() or c == '_' for c in table_name):
+                    logger.error(f"Nome de tabela inválido: {table_name}")
+                    return
                 cursor.execute(f"SELECT * FROM {table_name}")  # Nomes de tabela não podem usar parameter binding em SQLite
                 rows = cursor.fetchall()
         except Exception as e:

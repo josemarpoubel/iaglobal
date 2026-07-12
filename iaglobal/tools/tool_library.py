@@ -182,7 +182,7 @@ class ToolLibrary:
             pass
         try:
             compiled = compile(code, f"<{name}>", "exec")
-            ns = {}
+            ns = {"__builtins__": {}}  # Restringir builtins para segurança
             exec(compiled, ns)
             fn = None
             for k, v in ns.items():
