@@ -350,7 +350,7 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 =================================================================================================
 ```
 
-## 🔄 RETRY LOOP (Critic rejection method)
+### 🔄 RETRY LOOP (Critic rejection method)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -379,7 +379,7 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 📊 FLOW METRICS
+### 📊 FLOW METRICS
 
 ```
 | Phase | Main Agent      | Expected Latency  | ATP (Cost)       |
@@ -398,7 +398,7 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 | **TOTAL** |             | **19-33s**        | **~1250 tokens** |
 ```
 
-## 🧬 BIOMIMETIC PRINCIPLES APPLIED
+### 🧬 BIOMIMETIC PRINCIPLES APPLIED
 
 ```
 | Biological Process      |         Computational Equivalent        |
@@ -416,7 +416,7 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 ##                    🧬 END OF BIOMIMETIC FLOW
 ## ==================================================================
 
-**Security feature** | LLM Access Architecture in iaglobal:
+###**Security feature** | LLM Access Architecture in iaglobal:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                   USER / CLI                                │
