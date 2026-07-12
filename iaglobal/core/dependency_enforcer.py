@@ -82,6 +82,14 @@ class DependencyEnforcer:
         wrap_lines: List[Tuple[int, str, str]] = []
 
         for lineno, module, full_stmt in imports:
+            # Handle relative imports where module might be None
+            if not module:
+                logger.debug(
+                    "[DEPENDENCY-ENFORCER] Ignorando import relativo na linha %d",
+                    lineno,
+                )
+                continue
+                
             top_module = module.split(".")[0]
 
             if top_module in stdlib:
