@@ -1,0 +1,118 @@
+{
+  "fitness_records": {
+    "ollama_local": {
+      "provider_id": "ollama_local",
+      "total_uses": 13,
+      "successful_uses": 13,
+      "failed_uses": 0,
+      "ivm_history": [
+        0.7,
+        0.82,
+        0.94,
+        0.76,
+        0.8799999999999999,
+        0.7,
+        0.82,
+        0.94,
+        0.76,
+        0.8799999999999999,
+        0.7,
+        0.82,
+        0.94
+      ],
+      "ivm_media_movel": 0.8200000000000001,
+      "strikes_consecutivos": 0,
+      "ultimo_banimento": null,
+      "latencia_media_ms": 342.42171738251,
+      "custo_medio_creditos": 0.007458134171671,
+      "fitness_score": 0.8919999999999999
+    },
+    "groq_fast": {
+      "provider_id": "groq_fast",
+      "total_uses": 13,
+      "successful_uses": 13,
+      "failed_uses": 0,
+      "ivm_history": [
+        0.73,
+        0.85,
+        0.97,
+        0.7899999999999999,
+        0.9099999999999999,
+        0.73,
+        0.85,
+        0.97,
+        0.7899999999999999,
+        0.9099999999999999,
+        0.73,
+        0.85,
+        0.97
+      ],
+      "ivm_media_movel": 0.8499999999999999,
+      "strikes_consecutivos": 0,
+      "ultimo_banimento": null,
+      "latencia_media_ms": 379.71238824086504,
+      "custo_medio_creditos": 0.007458134171671,
+      "fitness_score": 0.9099999999999999
+    },
+    "nvidia_gpu": {
+      "provider_id": "nvidia_gpu",
+      "total_uses": 12,
+      "successful_uses": 12,
+      "failed_uses": 0,
+      "ivm_history": [
+        0.76,
+        0.8799999999999999,
+        0.7,
+        0.82,
+        0.94,
+        0.76,
+        0.8799999999999999,
+        0.7,
+        0.82,
+        0.94,
+        0.76,
+        0.8799999999999999
+      ],
+      "ivm_media_movel": 0.82,
+      "strikes_consecutivos": 0,
+      "ultimo_banimento": null,
+      "latencia_media_ms": 396.67006566580005,
+      "custo_medio_creditos": 0.00717570463519,
+      "fitness_score": 0.8919999999999999
+    },
+    "hybrid": {
+      "provider_id": "hybrid",
+      "total_uses": 12,
+      "successful_uses": 12,
+      "failed_uses": 0,
+      "ivm_history": [
+        0.7899999999999999,
+        0.9099999999999999,
+        0.73,
+        0.85,
+        0.97,
+        0.7899999999999999,
+        0.9099999999999999,
+        0.73,
+        0.85,
+        0.97,
+        0.7899999999999999,
+        0.9099999999999999
+      ],
+      "ivm_media_movel": 0.85,
+      "strikes_consecutivos": 0,
+      "ultimo_banimento": null,
+      "latencia_media_ms": 432.5485888417501,
+      "custo_medio_creditos": 0.00717570463519,
+      "fitness_score": 0.9099999999999999
+    }
+  },
+  "banned_providers": {},
+  "weights": {
+    "ollama_local": 0.9906360267675725,
+    "groq_fast": 1.0084426203298638,
+    "nvidia_gpu": 0.9915846317917791,
+    "hybrid": 1.0093367211107815
+  },
+  "updated_at": "2026-07-06T13:44:58.057498"
+}
