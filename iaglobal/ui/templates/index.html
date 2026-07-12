@@ -1,0 +1,366 @@
+<!-- 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136 -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IAGLOBAL — Agent Workspace</title>
+    <style>
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --accent: #ff6b6b;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff4444;
+            --text-light: #e8e8ff;
+            --text-dim: #a8a8c8;
+            --border: 1px solid #ff6b6b;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 2rem;
+            padding: 2rem;
+            background: var(--bg-card);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+        }
+        
+        h1 {
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        
+        .subtitle {
+            color: var(--text-dim);
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .task-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        textarea {
+            flex: 1;
+            min-height: 120px;
+            padding: 1rem;
+            background: var(--bg-primary);
+            border: var(--border);
+            border-radius: 8px;
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 1rem;
+            resize: vertical;
+        }
+        
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+        
+        button {
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            border: none;
+            background: var(--accent);
+            color: #fff;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            align-self: flex-start;
+        }
+        
+        button:hover:not(:disabled) {
+            opacity: 0.9;
+        }
+        
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+        
+        .terminal {
+            background: #000;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            border-radius: 8px;
+            min-height: 200px;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .terminal .error {
+            color: var(--error);
+        }
+        
+        .terminal .warning {
+            color: var(--warning);
+        }
+        
+        .terminal .info {
+            color: var(--text-dim);
+        }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pending { background: var(--warning); color: #000; }
+        .status-running { background: var(--accent); color: #fff; }
+        .status-completed { background: var(--success); color: #000; }
+        .status-failed { background: var(--error); color: #fff; }
+        
+        .execution-item {
+            background: var(--bg-secondary);
+            border: var(--border);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+        }
+        
+        .execution-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+        
+        .execution-id {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+        }
+        
+        .execution-task {
+            color: var(--text-light);
+            margin-bottom: 0.5rem;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🧬 IAGLOBAL — Agent Workspace</h1>
+            <p class="subtitle">Interface própria 100% gratuita — Orquestração multi-agente soberana</p>
+        </header>
+        
+        <!-- Caixa de Prompt -->
+        <section class="card">
+            <h2 style="margin-bottom: 1rem; color: var(--accent);">Nova Tarefa</h2>
+            <form id="taskForm">
+                <div class="task-form">
+                    <textarea 
+                        id="taskInput" 
+                        placeholder="Descreva a tarefa que deseja executar..."
+                        required
+                        minlength="3"
+                    ></textarea>
+                    <button type="submit" id="submitBtn">Executar</button>
+                </div>
+            </form>
+        </section>
+        
+        <!-- Área do Terminal / Logs -->
+        <section class="card">
+            <h2 style="margin-bottom: 1rem; color: var(--accent);">Terminal</h2>
+            <div id="terminal" class="terminal">[Sistema] Pronto para executar tarefas...</div>
+        </section>
+        
+        <!-- Lista de Execuções -->
+        <section class="card">
+            <h2 style="margin-bottom: 1rem; color: var(--accent);">Execuções Recentes</h2>
+            <div id="executionsList">
+                <div class="empty-state">Nenhuma execução ainda</div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const API_BASE = '/api';
+        let currentExecutionId = null;
+        let ws = null;
+        
+        // Terminal logger
+        const Terminal = {
+            el: document.getElementById('terminal'),
+            log(message, type = 'info') {
+                const line = document.createElement('div');
+                line.className = type;
+                line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                this.el.appendChild(line);
+                this.el.scrollTop = this.el.scrollHeight;
+            },
+            clear() {
+                this.el.innerHTML = '';
+            }
+        };
+        
+        // WebSocket para logs em tempo real
+        function connectWebSocket(executionId) {
+            if (ws) {
+                ws.close();
+            }
+            
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(`${protocol}//${window.location.host}/ws/progress/${executionId}`);
+            
+            ws.onopen = () => {
+                Terminal.log(`WebSocket conectado: ${executionId.substring(0, 8)}...`, 'info');
+            };
+            
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                if (data.type === 'status') {
+                    Terminal.log(`Status: ${data.status}`, data.status === 'failed' ? 'error' : 'info');
+                    if (data.message) {
+                        Terminal.log(data.message, 'info');
+                    }
+                    if (data.error) {
+                        Terminal.log(`Erro: ${data.error}`, 'error');
+                    }
+                    renderExecutions();
+                }
+            };
+            
+            ws.onerror = (error) => {
+                Terminal.log(`Erro WebSocket: ${error}`, 'error');
+            };
+            
+            ws.onclose = () => {
+                Terminal.log('WebSocket desconectado', 'warning');
+            };
+        }
+        
+        // Submeter tarefa
+        document.getElementById('taskForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const taskInput = document.getElementById('taskInput');
+            const task = taskInput.value.trim();
+            
+            if (!task || task.length < 3) {
+                Terminal.log('Tarefa deve ter pelo menos 3 caracteres', 'error');
+                return;
+            }
+            
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.textContent = 'Executando...';
+            
+            try {
+                Terminal.log(`Enviando tarefa: ${task.substring(0, 50)}...`, 'info');
+                
+                const response = await fetch(`${API_BASE}/task`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ task })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                
+                const data = await response.json();
+                Terminal.log(`Tarefa criada: ${(data.execution_id || '').substring(0, 8)}...`, 'info');
+                
+                // Conecta WebSocket para acompanhar progresso
+                connectWebSocket(data.execution_id);
+                
+                // Limpa input
+                taskInput.value = '';
+                
+                // Atualiza lista
+                renderExecutions();
+                
+            } catch (error) {
+                Terminal.log(`Erro: ${error.message}`, 'error');
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Executar';
+            }
+        });
+        
+        // Renderiza lista de execuções
+        async function renderExecutions() {
+            try {
+                const response = await fetch(`${API_BASE}/tasks`);
+                const data = await response.json();
+                
+                const container = document.getElementById('executionsList');
+                
+                if (!data.executions || data.executions.length === 0) {
+                    container.innerHTML = '<div class="empty-state">Nenhuma execução ainda</div>';
+                    return;
+                }
+                
+                container.innerHTML = data.executions.map(exec => `
+                    <div class="execution-item">
+                        <div class="execution-header">
+                            <span class="execution-id">${escapeHtml(exec.id || exec.task_id || exec.file)}</span>
+                            <span class="status-badge status-${exec.status || 'unknown'}">${exec.status || 'unknown'}</span>
+                        </div>
+                        <div class="execution-task">${escapeHtml(exec.task || exec.file || 'Sem tarefa')}</div>
+                    </div>
+                `).join('');
+            } catch (error) {
+                Terminal.log(`Erro ao carregar execuções: ${error.message}`, 'error');
+            }
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // Atualiza lista periodicamente
+        setInterval(renderExecutions, 3000);
+        
+        // Carrega execuções iniciais
+        renderExecutions();
+    </script>
+</body>
+</html>

@@ -1,0 +1,193 @@
+<!-- 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136 -->
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard — IAGLOBAL</title>
+    <style>
+        :root {
+            --bg-primary: #0f0f23;
+            --bg-secondary: #1a1a2e;
+            --bg-card: #16213e;
+            --accent: #ff6b6b;
+            --success: #00ff88;
+            --warning: #ffaa00;
+            --error: #ff4444;
+            --text-light: #e8e8ff;
+            --text-dim: #a8a8c8;
+            --border: 1px solid #ff6b6b;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        }
+        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, var(--bg-primary), var(--bg-secondary));
+            color: var(--text-light);
+            min-height: 100vh;
+            padding: 2rem;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            margin-bottom: 2rem;
+        }
+        
+        a {
+            color: var(--accent);
+            text-decoration: none;
+        }
+        
+        .card {
+            background: var(--bg-card);
+            border: var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+        
+        .terminal {
+            background: #000;
+            color: #00ff88;
+            font-family: 'Courier New', monospace;
+            padding: 1rem;
+            border-radius: 8px;
+            min-height: 300px;
+            max-height: 500px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        
+        .terminal .error { color: var(--error); }
+        .terminal .warning { color: var(--warning); }
+        .terminal .info { color: var(--text-dim); }
+        
+        .status-badge {
+            display: inline-block;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        .status-pending { background: var(--warning); color: #000; }
+        .status-running { background: var(--accent); color: #fff; }
+        .status-completed { background: var(--success); color: #000; }
+        .status-failed { background: var(--error); color: #fff; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-dim);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <a href="/">← Voltar</a>
+            <h1 style="margin-top: 1rem;">📊 Dashboard de Execução</h1>
+        </header>
+        
+        <div id="executionData">
+            <div class="empty-state">Carregando...</div>
+        </div>
+        
+        <div class="card">
+            <h2 style="margin-bottom: 1rem; color: var(--accent);">Terminal</h2>
+            <div id="terminal" class="terminal">[Sistema] Conectando...</div>
+        </div>
+    </div>
+
+    <script>
+        const pathParts = window.location.pathname.split('/');
+        const executionId = pathParts[pathParts.length - 1];
+        const API_BASE = '/api';
+        
+        const Terminal = {
+            el: document.getElementById('terminal'),
+            log(message, type = 'info') {
+                const line = document.createElement('div');
+                line.className = type;
+                line.textContent = `[${new Date().toLocaleTimeString()}] ${message}`;
+                this.el.appendChild(line);
+                this.el.scrollTop = this.el.scrollHeight;
+            },
+            clear() {
+                this.el.innerHTML = '';
+            }
+        };
+        
+        async function loadExecution() {
+            try {
+                const response = await fetch(`${API_BASE}/task/${executionId}`);
+                const data = await response.json();
+                renderExecution(data);
+            } catch (error) {
+                document.getElementById('executionData').innerHTML = 
+                    `<div class="empty-state">Erro ao carregar: ${error.message}</div>`;
+            }
+        }
+        
+        function renderExecution(data) {
+            const statusClass = `status-${data.status || 'unknown'}`;
+            
+            document.getElementById('executionData').innerHTML = `
+                <div class="card">
+                    <span class="status-badge ${statusClass}">${data.status || 'unknown'}</span>
+                    <h3 style="margin-top: 1rem; color: var(--text-light);">${escapeHtml(data.task || data.file || 'Sem tarefa')}</h3>
+                    <p style="color: var(--text-dim); margin-top: 0.5rem">
+                        ID: ${data.id || '-'} | Criado: ${data.datetime ? new Date(data.datetime).toLocaleString() : '-'}
+                    </p>
+                </div>
+            `;
+            
+            connectWebSocket();
+        }
+        
+        function connectWebSocket() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const ws = new WebSocket(`${protocol}//${window.location.host}/ws/progress/${executionId}`);
+            
+            ws.onopen = () => {
+                Terminal.log('Conectado ao WebSocket', 'info');
+            };
+            
+            ws.onmessage = (event) => {
+                const msg = JSON.parse(event.data);
+                if (msg.type === 'status') {
+                    Terminal.log(`Status: ${msg.status}`, msg.status === 'failed' ? 'error' : 'info');
+                    if (msg.message) {
+                        Terminal.log(msg.message, 'info');
+                    }
+                    if (msg.error) {
+                        Terminal.log(`Erro: ${msg.error}`, 'error');
+                    }
+                    loadExecution();
+                }
+            };
+            
+            ws.onclose = () => {
+                Terminal.log('WebSocket desconectado', 'warning');
+            };
+        }
+        
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        loadExecution();
+    </script>
+</body>
+</html>

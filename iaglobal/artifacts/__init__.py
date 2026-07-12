@@ -1,0 +1,1 @@
+from iaglobal.artifacts.artifact_factory import ArtifactFactory, artifact_factory
