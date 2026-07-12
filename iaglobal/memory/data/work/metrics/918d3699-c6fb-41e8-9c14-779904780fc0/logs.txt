@@ -1,0 +1,1 @@
+[15:02:45] contrato insatisfeito: Skill 'metrics' requer inputs faltando: ['execution_log']. Disponíveis no contex — fallback

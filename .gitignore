@@ -1,53 +1,29 @@
-# Logs
-*.log
-*.json
-*.jsonl
-*.cbor
-*.pkl
-
-# Database files
-*.db
-
-# Temporary work files
-iaglobal/memory/data/*.*
-
-# Python cache
+```
+# Python compiled files
+*.pyc
 __pycache__/
 *.pyc
 *.pyo
 *.pyd
 
-# Environment files
-.env
-.env.local
-.gitignore
+# Database files
+*iaglobal/memory/data/db/*.db
 
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-.kilo
+# Log files
+*iaglobal/memory/data/logs/*.log
+*iaglobal/memory/data/work/*/*.logs.txt
 
-# OS files
-.DS_Store
-Thumbs.db
+# Error and result files
+*iaglobal/memory/data/error/*
+*iaglobal/memory/data/result/*
+*iaglobal/memory/data/script/*
 
-# Coverage reports
-coverage/
-htmlcov/
-.coverage
+# JSON data files
+*iaglobal/memory/data/json/*
 
-# Build artifacts
-dist/
-build/
-target/
-*.egg-info/
+# Obsidian epigenetic files
+*iaglobal/obsidian/epigenetic/*.cbor
 
-# Dependencies
-node_modules/
-.venv/
-venv/
-.mypy_cache/
-.pytest_cache/
-.gradle/
+# Work directory logs
+*iaglobal/memory/data/work/*/*/*.log
+```

@@ -10,5 +10,11 @@
     "balance": 100,
     "total_earned": 0,
     "total_spent": 0
+  },
+  {
+    "agent_name": "system-analysis-evo",
+    "balance": 85,
+    "total_earned": 5,
+    "total_spent": 20
   }
 ]

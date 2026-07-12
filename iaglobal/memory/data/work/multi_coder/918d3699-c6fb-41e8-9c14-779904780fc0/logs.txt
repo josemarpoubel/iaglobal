@@ -1,0 +1,1 @@
+[15:02:38] contrato insatisfeito: Skill 'multi_coder' requer inputs faltando: ['execution_plan']. Disponíveis no c — fallback

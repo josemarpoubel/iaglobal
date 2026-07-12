@@ -1,0 +1,1 @@
+[15:02:45] contrato insatisfeito: Skill 'artifact_writer' requer inputs faltando: ['artifact']. Disponíveis no con — fallback

@@ -1,0 +1,1 @@
+[15:02:45] contrato insatisfeito: Skill 'result_agent' requer inputs faltando: ['documentation', 'release', 'metri — fallback

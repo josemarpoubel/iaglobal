@@ -1,0 +1,1 @@
+[15:02:45] contrato insatisfeito: Skill 'gap_analyzer' requer inputs faltando: ['evaluator']. Disponíveis no conte — fallback

@@ -355,7 +355,20 @@ class PipelineEngine:
         code = state.generated_code or ""
         code = self._extract_fenced_code(code)
 
+        # Detecta se é código Python ou apenas texto/report
         lang = detect_lang(code)
+        
+        # Se for tarefa de análise/auditoria, não valida como código Python
+        is_analysis_task = any(keyword in state.prompt.lower() for keyword in [
+            "analyze", "analysis", "audit", "security", "vulnerability", 
+            "review", "check", "verify", "scan"
+        ])
+        
+        if is_analysis_task and not code.startswith(("import ", "def ", "class ", "from ", "async ")):
+            logger.info("[VALIDATION] Tarefa de análise detectada — pulando validação Python AST")
+            state.syntax_valid = True
+            return
+            
         if lang is None:
             # Só roda validação Python se for código Python nativo
             result = self.validator.validate(code)

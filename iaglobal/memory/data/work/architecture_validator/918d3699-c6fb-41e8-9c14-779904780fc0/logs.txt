@@ -1,0 +1,1 @@
+[15:02:38] contrato insatisfeito: Skill 'architecture_validator' requer inputs faltando: ['technology_selection']. — fallback

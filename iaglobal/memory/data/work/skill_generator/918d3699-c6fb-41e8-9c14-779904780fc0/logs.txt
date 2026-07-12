@@ -1,0 +1,1 @@
+[15:02:46] contrato insatisfeito: Skill 'skill_generator' requer inputs faltando: ['gap_analyzer']. Disponíveis no — fallback

@@ -1,0 +1,1 @@
+[15:02:48] contrato insatisfeito: Skill 'pipeline_updater' requer inputs faltando: ['evolution_committee']. Dispon — fallback

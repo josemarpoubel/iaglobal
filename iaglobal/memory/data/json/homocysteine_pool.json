@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "skill_name": "skill_4e0461fa",
+    "skill_description": "Skill derivada de: An\u00e1lise metab\u00f3lica do sistema iaglobal:\nIVM dados: {}\nHomociste\u00edna: {}\nErros: {}\nLinhagem: {}\nV\u00e1cuo: {}\n",
+    "generation": 0,
+    "score": 0.7,
+    "route": "guardrail",
+    "source_gap": "An\u00e1lise metab\u00f3lica do sistema iaglobal:\nIVM dados: {}\nHomociste\u00edna: {}\nErros: {}\nLinhagem: {}\nV\u00e1cuo: {}\n",
+    "created_at": 1783868566.125034
+  }
+]

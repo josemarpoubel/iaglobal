@@ -1,0 +1,1 @@
+[15:02:38] contrato insatisfeito: Skill 'execution_plan' requer inputs faltando: ['architecture_validation']. Disp — fallback
