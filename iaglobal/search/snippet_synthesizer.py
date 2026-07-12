@@ -1,16 +1,16 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 """
-SnippetSynthesizer — Sintetiza múltiplos snippets em resumo coerente.
+SnippetSynthesizer — Synthesizes multiple snippets into coherent summary.
 
-Funcionalidades:
-1. synthesize(snippets) → Resumo + contradições + fontes
-2. Detecção de consistência entre fontes
-3. Resumo em português (3-4 frases)
-4. Cache de sínteses para evitar chamadas repetidas
+Functionalities:
+1. synthesize(snippets) → Summary + contradictions + sources
+2. Consistency detection between sources
+3. Summary in English (3-4 sentences)
+4. Cache of syntheses to avoid repeated calls
 
-Integra com:
-- SearchMiddleware (substitui concatenação bruta por síntese)
-- BanditPolicy (chamada LLM otimizada)
+Integrates with:
+- SearchMiddleware (replaces brute concatenation with synthesis)
+- BanditPolicy (optimized LLM call)
 """
 
 import asyncio
@@ -27,53 +27,53 @@ logger = get_logger("iaglobal.search.snippet_synthesizer")
 
 @dataclass
 class SnippetSynthesis:
-    """Resultado da síntese de snippets."""
-    summary: str  # Resumo coerente em português
-    contradictions: List[str]  # Contradições detectadas (pode ser vazio)
-    sources_used: List[str]  # URLs das fontes usadas
-    confidence: float  # 0.0 - 1.0 (confiança na síntese)
+    """Result of snippet synthesis."""
+    summary: str  # Coherent summary in English
+    contradictions: List[str]  # Detected contradictions (may be empty)
+    sources_used: List[str]  # URLs of sources used
+    confidence: float  # 0.0 - 1.0 (confidence in synthesis)
     
     def to_dict(self) -> dict:
         return asdict(self)
 
 
 class SnippetSynthesizer:
-    """Sintetiza múltiplos snippets em resumo coerente via LLM."""
+    """Synthesizes multiple snippets into coherent summary via LLM."""
 
-    # Prompt para síntese
+    # Prompt for synthesis
     SYNTHESIS_PROMPT = """
-Você é um sintetizador de informações web. Sua tarefa é analisar múltiplos snippets de busca e gerar um resumo coerente.
+You are a web information synthesizer. Your task is to analyze multiple search snippets and generate a coherent summary.
 
-DADOS DE ENTRADA:
+INPUT DATA:
 {snippets_formatted}
 
-INSTRUÇÕES:
-1. Identifique informações CONSISTENTES entre as fontes (o que todas/majoria concordam)
-2. Detecte CONTRADIÇÕES claras (informações conflitantes entre fontes)
-3. Gere um RESUMO em português de 3-4 frases com as informações principais
-4. Liste quais fontes foram usadas para o resumo
+INSTRUCTIONS:
+1. Identify CONSISTENT information across sources (what all/most agree on)
+2. Detect clear CONTRADICTIONS (conflicting information between sources)
+3. Generate an ENGLISH SUMMARY of 3-4 sentences with the main information
+4. List which sources were used for the summary
 
-IMPORTANTE:
-- Seja direto e objetivo
-- Se houver contradições, mencione de forma neutra
-- Não invente informações não presentes nos snippets
-- Mantenha o resumo em português claro e técnico
+IMPORTANT:
+- Be direct and objective
+- If there are contradictions, mention them neutrally
+- Do not invent information not present in the snippets
+- Keep the summary clear and technical in English
 
-FORMATO DE SAÍDA (JSON estrito):
+OUTPUT FORMAT (strict JSON):
 {{
-  "summary": "resumo em 3-4 frases",
-  "contradictions": ["contradição 1", null, ...],
+  "summary": "summary in 3-4 sentences",
+  "contradictions": ["contradiction 1", null, ...],
   "sources_used": ["url1", "url2", ...],
   "confidence": 0.85
 }}
 
-RESPOSTA:"""
+RESPONSE:"""
 
-    # Cache de sínteses
+    # Synthesis cache
     _cache: Dict[str, tuple] = {}
-    _cache_ttl = 300.0  # 5 minutos
+    _cache_ttl = 300.0  # 5 minutes
 
-    # Estatísticas
+    # Statistics
     _stats = {
         "calls": 0,
         "cache_hits": 0,
@@ -103,23 +103,23 @@ RESPOSTA:"""
         # Check cache
         cached = self._check_cache(cache_key)
         if cached:
-            logger.debug("[SYNTHESIS] Cache hit para %d snippets", len(snippets))
+            logger.debug("[SYNTHESIS] Cache hit for %d snippets", len(snippets))
             self._stats["cache_hits"] += 1
             return cached
 
-        # Formatrar snippets para o prompt
+        # Format snippets for prompt
         snippets_formatted = self._format_snippets(snippets)
         
         if not snippets_formatted.strip():
             return None
 
-        # Chamar LLM
+        # Call LLM
         synthesis = await self._call_llm(snippets_formatted)
         
         if not synthesis:
             return None
 
-        # Validar e retornar
+        # Validate and return
         result = SnippetSynthesis(
             summary=synthesis.get("summary", ""),
             contradictions=synthesis.get("contradictions", []),
@@ -127,10 +127,10 @@ RESPOSTA:"""
             confidence=synthesis.get("confidence", 0.5),
         )
 
-        # Salvar no cache
+        # Save to cache
         self._save_cache(cache_key, result)
 
-        # Atualizar stats
+        # Update stats
         self._stats["calls"] += 1
         self._stats["llm_calls"] += 1
         self._stats["avg_confidence"] = (
@@ -139,15 +139,15 @@ RESPOSTA:"""
         )
 
         logger.info(
-            "[SYNTHESIS] %d snippets → %d chars (confiança=%.2f)",
+            "[SYNTHESIS] %d snippets → %d chars (confidence=%.2f)",
             len(snippets), len(result.summary), result.confidence
         )
 
         return result
 
     def _cache_key(self, snippets: List[dict]) -> str:
-        """Gera hash único para os snippets."""
-        # Usar URLs + snippets para gerar key
+        """Generates unique hash for snippets."""
+        # Use URLs + snippets to generate key
         content = "|".join(
             f"{s.get('url', '')}:{s.get('snippet', '')[:100]}"
             for s in sorted(snippets, key=lambda x: x.get('url', ''))
@@ -155,7 +155,7 @@ RESPOSTA:"""
         return hashlib.sha3_512(content.encode()).hexdigest()[:32]
 
     def _check_cache(self, cache_key: str) -> Optional[SnippetSynthesis]:
-        """Verifica se síntese está em cache."""
+        """Checks if synthesis is in cache."""
         if cache_key in self._cache:
             timestamp, synthesis = self._cache[cache_key]
             if (time.time() - timestamp) < self._cache_ttl:
@@ -165,75 +165,75 @@ RESPOSTA:"""
         return None
 
     def _save_cache(self, cache_key: str, synthesis: SnippetSynthesis):
-        """Salva síntese no cache."""
+        """Saves synthesis to cache."""
         self._cache[cache_key] = (time.time(), synthesis)
         
-        # Limpar cache antigo (simples)
+        # Clear old cache (simple)
         if len(self._cache) > 100:
             oldest = min(self._cache.items(), key=lambda x: x[1][0])
             del self._cache[oldest[0]]
 
     def _format_snippets(self, snippets: List[dict]) -> str:
-        """Formata snippets para o prompt."""
+        """Formats snippets for prompt."""
         lines = []
         for i, snippet in enumerate(snippets, 1):
             url = snippet.get("url", "N/A")
-            title = snippet.get("title", "Sem título")
-            body = snippet.get("snippet", "Sem conteúdo")
+            title = snippet.get("title", "No title")
+            body = snippet.get("snippet", "No content")
             score = snippet.get("_source_score", snippet.get("score"))
             
             score_str = f" (score={score:.2f})" if score else ""
             lines.append(f"[{i}] {title}{score_str}")
             lines.append(f"    URL: {url}")
-            lines.append(f"    Conteúdo: {body}")
+            lines.append(f"    Content: {body}")
             lines.append("")
 
         return "\n".join(lines)
 
     async def _call_llm(self, snippets_formatted: str) -> Optional[dict]:
-        """Chama LLM para síntese via BanditPolicy."""
+        """Calls LLM for synthesis via BanditPolicy."""
         try:
             from iaglobal.graphs.bandit import BanditPolicy
             
             prompt = self.SYNTHESIS_PROMPT.format(snippets_formatted=snippets_formatted)
             
-            # Chamar LLM via BanditPolicy
+            # Call LLM via BanditPolicy
             result = await BanditPolicy.generate(
                 prompt=prompt,
                 model=self.model,
                 max_tokens=500,
-                temperature=0.3,  # Baixa temperatura para consistência
+                temperature=0.3,  # Low temperature for consistency
             )
 
             if not result or not result.get("response"):
-                logger.warning("[SYNTHESIS] LLM retornou vazio")
+                logger.warning("[SYNTHESIS] LLM returned empty")
                 return None
 
-            # Parse JSON da resposta
+            # Parse JSON from response
             response_text = result["response"].strip()
             synthesis = self._parse_json_response(response_text)
 
             if not synthesis:
-                logger.warning("[SYNTHESIS] Falha ao parsear JSON")
-                # Fallback: síntese básica sem LLM
+                logger.warning("[SYNTHESIS] Failed to parse JSON")
+                # Fallback: basic synthesis without LLM
                 return self._fallback_synthesis(snippets_formatted)
 
             return synthesis
 
         except Exception as e:
-            logger.error("[SYNTHESIS] Erro na chamada LLM: %s", e)
-            # Fallback para síntese básica
+            logger.error("[SYNTHESIS] Error in LLM call: %s", e)
+            # Fallback to basic synthesis
             return self._fallback_synthesis(snippets_formatted)
 
     def _parse_json_response(self, response: str) -> Optional[dict]:
-        """Parse JSON da resposta do LLM."""
+        """Parse JSON from LLM response."""
         try:
-            # Tentar JSON direto
+            # Try direct JSON
             return json.loads(response)
         except json.JSONDecodeError:
             pass
 
-        # Tentar extrair JSON de markdown
+        # Try to extract JSON from markdown
         import re
         match = re.search(r'```json\s*(.*?)\s*```', response, re.DOTALL)
         if match:
@@ -242,7 +242,7 @@ RESPOSTA:"""
             except json.JSONDecodeError:
                 pass
 
-        # Tentar extrair JSON entre chaves
+        # Try to extract JSON between braces
         match = re.search(r'\{.*\}', response, re.DOTALL)
         if match:
             try:
@@ -253,14 +253,14 @@ RESPOSTA:"""
         return None
 
     def _fallback_synthesis(self, snippets_formatted: str) -> dict:
-        """Síntese fallback sem LLM (extrai informações principais)."""
-        # Extrair URLs
+        """Fallback synthesis without LLM (extracts main information)."""
+        # Extract URLs
         urls = []
         for line in snippets_formatted.split("\n"):
             if line.startswith("    URL:"):
                 urls.append(line.replace("    URL:", "").strip())
 
-        # Extrair primeiros snippets
+        # Extract first snippets
         summaries = []
         for line in snippets_formatted.split("\n"):
             if line.startswith("["):
@@ -270,24 +270,24 @@ RESPOSTA:"""
                     if content and not content.startswith("URL:"):
                         summaries.append(content.split("(")[0].strip())
 
-        # Criar resumo básico
-        summary = " | ".join(summaries[:3]) if summaries else "Informações não disponíveis."
+        # Create basic summary
+        summary = " | ".join(summaries[:3]) if summaries else "Information not available."
         
         return {
-            "summary": summary[:300],  # Limitar tamanho
+            "summary": summary[:300],  # Limit size
             "contradictions": [],
             "sources_used": urls[:3],
-            "confidence": 0.5,  # Confiança baixa para fallback
+            "confidence": 0.5,  # Low confidence for fallback
         }
 
     def get_stats(self) -> dict:
-        """Retorna estatísticas de uso."""
+        """Returns usage statistics."""
         return self._stats.copy()
 
     def clear_cache(self):
-        """Limpa cache de sínteses."""
+        """Clears synthesis cache."""
         self._cache.clear()
-        logger.debug("[SYNTHESIS] Cache limpo")
+        logger.debug("[SYNTHESIS] Cache cleared")
 
 
 # Singleton global

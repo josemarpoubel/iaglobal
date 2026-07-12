@@ -93,12 +93,12 @@ class TaskAnalyzer:
         "smart contract": ["blockchain"],
         "contrato inteligente": ["blockchain"],
         "crypto": ["blockchain"],
-        "criptomoeda": ["blockchain"],
+        "cryptocurrency": ["blockchain"],
         "token nft": ["blockchain"],
         "nft": ["blockchain"],
         "defi": ["blockchain"],
 
-        # Comandos em Português
+        # Portuguese commands (kept for backward compatibility)
         "criar": ["web_development"],
         "crie": ["web_development"],
         "faça": ["web_development"],
