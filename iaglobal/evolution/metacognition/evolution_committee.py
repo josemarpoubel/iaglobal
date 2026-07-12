@@ -9,6 +9,10 @@ from typing import Any, Dict, List
 
 from iaglobal.evolution.skills.skill_registry import skill_registry
 from iaglobal.obsidian.omnimind import omni_mind
+try:
+    from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
+except ImportError:
+    GENESIS_HASH_OFFICIAL = None
 from iaglobal.memory.async_memory import add_ltm, add_stm, add_memory_vector
 
 logger = logging.getLogger(__name__)
@@ -97,8 +101,13 @@ class EvolutionCommittee:
                 agent_id=f"evolution_committee_{evaluations[0]['skill_name'] if evaluations else 'idle'}",
                 nome="EvolutionCommittee",
                 geracao=0,
-                linhagem="metacognition",
-                metadados={"evaluations_count": len(evaluations), "decision": decision_text, "task": task_context}
+                linhagem=GENESIS_HASH_OFFICIAL,
+                metadados={
+                    "role": "metacognition",
+                    "evaluations_count": len(evaluations),
+                    "decision": decision_text,
+                    "task": task_context,
+                }
             )
             
             # Consolidar aprendizado no LongTerm (se houver aprovações)

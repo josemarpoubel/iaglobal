@@ -5,12 +5,10 @@ import cbor2
 from datetime import datetime
 
 from iaglobal._paths import CACHE_DB
-conn = sqlite3.connect(CACHE_DB)
 
 if __name__ == "__main__":
+    conn = sqlite3.connect(CACHE_DB)
     try:
-        from iaglobal._paths import CACHE_DB
-        conn = sqlite3.connect(CACHE_DB)
         cursor = conn.cursor()
         
         cursor.execute("SELECT id, task_hash, data FROM success_registry ORDER BY id DESC")
@@ -30,7 +28,7 @@ if __name__ == "__main__":
             print(f"Código: {dados.get('codigo', '')[:50]}...")
             print("-" * 30 + "\n")
             
-        conn.close()
-        
     except Exception as e:
         print(f"Erro ao ler o banco: {e}")
+    finally:
+        conn.close()

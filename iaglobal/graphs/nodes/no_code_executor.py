@@ -19,6 +19,7 @@ from iaglobal.security.sandbox_executor import SandboxExecutor
 from iaglobal._paths import save_result_artifact, RESULTS_DIR, _detect_extension, TEMP_DIR
 from iaglobal.memory.memory_error import record_error
 from iaglobal.obsidian.omnimind import omni_mind
+from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
 from iaglobal.graphs.communication.acetylcholine_bus import AcetylcholineBus, AgentMessage
 
 logger = logging.getLogger(__name__)
@@ -80,7 +81,7 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
         agent_id="code_executor",
         nome="CodeExecutor",
         geracao=0,
-        linhagem="execution-pipeline",
+        linhagem=GENESIS_HASH_OFFICIAL,
         metadados={"purpose": "run_execute_save"}
     )
     

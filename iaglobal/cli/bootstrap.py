@@ -55,10 +55,32 @@ class Bootstrap:
         except Exception as e:
             logger.debug("[BOOTSTRAP] LifeSignalCollector skip: %s", e)
 
+        # 1.2 ErrorPersistence — persiste erros reais em errors.json + error/
+        # instalado cedo para que a métrica '0 erros' reflita a verdade
+        # (antes o app.log registrava dezenas de erros nunca persistidos).
+        try:
+            from iaglobal.immunity.error_persistence import install as install_error_persistence
+            install_error_persistence()
+            logger.info("[BOOTSTRAP] ErrorPersistence ativo — erros reais serão persistidos.")
+        except Exception as e:
+            logger.debug("[BOOTSTRAP] ErrorPersistence skip: %s", e)
+
+        # 2. ⚖️ TRIBUNAL DE GENESIS — Valida DNA ancestral + agentes antes de nascer
+        try:
+            from iaglobal.genesis.tribunal import GenesisTribunal
+            tribunal = GenesisTribunal(block_on_failure=True)
+            await tribunal.executar()
+            logger.info("⚖️ [TRIBUNAL] DNA ancestral e agentes verificados e aprovados.")
+        except SystemExit:
+            raise
+        except Exception as e:
+            logger.critical("[TRIBUNAL] Falha ao executar tribunal: %s", e)
+            raise SystemExit(f"Tribunal de Genesis falhou: {e}")
+
         logger.info("🛠️ [BOOTSTRAP] Iniciando inicialização do Orchestrator...")
         
         try:
-            # 2. Lazy Imports (Evita carregamento circular)
+            # 3. Lazy Imports (Evita carregamento circular)
             from iaglobal.core.orchestrator import Orchestrator
             from iaglobal.memory.memory_storage import storage
             from iaglobal.memory.backup_manager import MemoryManager
@@ -83,9 +105,10 @@ class Bootstrap:
 
             # 5. Chappie — Núcleo da Autonomia Computacional
             try:
-                from iaglobal.chappie import IVMAxiom, VacuumDaemon, ErrorEnricher, LineageGuardian, _set_chappie
+                from iaglobal.chappie import VacuumDaemon, ErrorEnricher, LineageGuardian, _set_chappie
+                from iaglobal.chappie.ivm_axiom import init_ivm_axiom_com_persistencia
                 from iaglobal._paths import MEMORY_SWAP_DIR
-                self.chappie_ivm = IVMAxiom(db_path=MEMORY_SWAP_DIR / "ivm.db")
+                self.chappie_ivm = init_ivm_axiom_com_persistencia(db_path=MEMORY_SWAP_DIR / "ivm.db")
                 self.chappie_vacuum = VacuumDaemon(interval_hours=1.0)
                 self.chappie_error = ErrorEnricher()
                 self.chappie_lineage = LineageGuardian()

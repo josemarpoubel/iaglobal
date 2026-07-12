@@ -18,45 +18,68 @@ classifiers = [
 ]
 
 dependencies = [
-    "accelerate",
+    "aiofiles",
     "aiohttp",
+    "attrs",
+    "autobahn",
+    "cachetools",
     "cbor2",
     "charset-normalizer",
+    "cryptography",
     "ddgs",
     "deepdiff",
+    "django",
+    "esprima",
+    "fastapi",
     "fastembed",
-    "flask",
-    "flask-sqlalchemy",
-    "fpdf2",
-    "google-ai-generativelanguage",
-    "google-genai",
+    "fastjsonschema",
     "google-generativeai",
+    "google-genai",
+    "google-ai-generativelanguage",
     "grokipedia-api",
-    "httpx",
     "huggingface_hub",
+    "httpx2",
+    "idna",
+    "jedi",
     "jsonschema",
+    "lxml",
     "mcp",
+    "msgpack",
+    "nest-asyncio",
     "numpy",
     "openai",
+    "orjson",
     "pdfminer.six",
-    "peft",
-    "playwright",
+    "prometheus-client",
     "protobuf>=5.26.1,<6.0.0",
-    "PyPDF2",
+    "psutil",
+    "pybreaker",
+    "pydantic",
     "pymupdf",
-    "pytest",
-    "pytest-asyncio",
+    "PyPDF2",
+    "pyee",
+    "pyOpenSSL",
+    "pyflakes",
     "python-dotenv",
+    "reactpy",
+    "reactpy-django",
+    "redis",
     "requests",
+    "scikit-learn",
     "scrapy",
     "sentence-transformers",
+    "service-identity",
+    "sqlalchemy",
+    "starlette",
+    "tokenizers",
     "torch",
     "tqdm",
     "transformers",
-    "trl",
-    "urllib3",
+    "twisted",
+    "ujson",
+    "uvicorn",
     "watchdog",
-    "django",
+    "websockets",
 ]
 
 [project.urls]
@@ -68,15 +91,23 @@ include = ["iaglobal*"]
 
 [project.scripts]
 iaglobal = "iaglobal.cli.main:main"
+organism = "iaglobal.core.organism_main:main"
 evolution-lab = "iaglobal.cli.evolution_lab:run_evolution_lab"
 life-signals = "iaglobal.cli.life_signals:main"
 gravar-instintos = "scripts.gravar_instintos:main"
+testar = "pytest:main"
 
 [tool.pytest.ini_options]
-# Ignora tudo que não esteja na pasta de testes
-testpaths = ["tests"]
+norecursedirs = "scripts venv .git .pytest_cache temp"
+# Altera para buscar testes a partir da raiz do repositório
+testpaths = ["."]
+# Garante que a raiz do projeto esteja no PATH do Python durante os testes
+pythonpath = ["."]
+# Só considera arquivos que começam com 'test_'
+python_files = ["test_*.py"]
 # Só considera classes que começam com 'Test'
 python_classes = ["Test*"]
 # Só considera funções que começam com 'test_'
 python_functions = ["test_*"]
 asyncio_mode = "auto"
+

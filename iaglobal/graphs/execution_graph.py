@@ -32,6 +32,7 @@ from iaglobal.execution.cpu_affinity import cpu_affinity
 from iaglobal.immunity.loop_detector import LoopDetector
 from iaglobal.evolution.homeostasis_controller import homeostasis_controller
 from iaglobal.graphs.communication.acetylcholine_bus import AcetylcholineBus, AgentMessage
+from iaglobal.sandbox.sandbox_expansion import sandbox_expansion
 
 
 class ExecutionGraph:
@@ -246,7 +247,8 @@ class ExecutionGraph:
                 )
                 
                 result_text = await bandit.async_execute_model(
-                    model_name=chosen_model, prompt=raw_task, task_type=node.strategy
+                    model_name=chosen_model, prompt=raw_task, task_type=node.strategy,
+                    node_id=node.name,
                 )
 
             # 3. Validação final do sucesso
@@ -257,6 +259,17 @@ class ExecutionGraph:
             elif contract_error:
                 last_error = contract_error
 
+        except ImportError as e:
+            last_error = str(e)
+            result_text = ""
+            await workdir.async_append_log(f"import_error: {last_error}")
+            missing_lib = sandbox_expansion.extract_missing_lib(e)
+            if missing_lib:
+                logger.warning("[PEC] ImportError detectado no no '%s': lib=%s | instalando...", node.name, missing_lib)
+                installed = sandbox_expansion.request_install(missing_lib)
+                if installed:
+                    logger.info("[PEC] Lib '%s' instalada. Re-executando no '%s'...", missing_lib, node.name)
+                    return await self._execute_node_async(node, input_data)
         except Exception as e:
             last_error = str(e)
             result_text = ""
@@ -642,3 +655,7 @@ class ExecutionGraph:
             },
             "timestamp": time.time() # Útil para controle de versão do snapshot
         }
+
+# Injetado automaticamente para resolver assinaturas ausentes
+class Node:
+    pass

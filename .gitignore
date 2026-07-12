@@ -27,13 +27,15 @@ __pycache__/
 # Environment files
 .env
 .env.local
-.env.*
 
 # IDE files
 .vscode/
 .idea/
 *.swp
 *.swo
+.kilo
+.opencode
+.opencode.json
 
 # OS files
 .DS_Store
@@ -43,6 +45,15 @@ Thumbs.db
 coverage/
 htmlcov/
 .coverage
+
+# Root artifacts from hardcoded paths (should be inside iaglobal/)
+/backup/
+/IVMAxiom/
+obsidian/
+
+# Test temp artifacts (contents ignored, dir tracked via .gitkeep)
+tests/temp/*
+!tests/temp/.gitkeep
 
 # Build artifacts
 dist/

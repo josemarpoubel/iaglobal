@@ -33,16 +33,10 @@ async def run_reviewer(ctx: Dict[str, Any]) -> Dict[str, Any]:
     output = coder_data.get("output", "") if isinstance(coder_data, dict) else str(coder_data or "")
 
     try:
-        # Inicializa o agente revisor especializado
+        # Chamada direta ao CriticAgent com pré-processamento local
+        # (LocalSummarizer dentro de avaliar() comprime o output antes do LLM)
         agent = CriticAgent()
-        
-        # Como revisões analíticas de código realizam inferências pesadas de IA,
-        # garantimos execução assíncrona nativa ou desviamos com segurança para Thread Pool
-        if asyncio.iscoroutinefunction(agent.avaliar):
-            result = await agent.avaliar(task, prompt, output)
-        else:
-            result = await asyncio.to_thread(agent.avaliar, task, prompt, output)
-            
+        result = await agent.avaliar(task, prompt, output)
         logger.info("[REVIEWER] Ciclo de revisão concluído com sucesso.")
         
         latency_ms = (time.time() - start_time) * 1000.0

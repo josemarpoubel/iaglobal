@@ -31,6 +31,7 @@ from __future__ import annotations
 
 import threading
 import time
+import hashlib
 
 from dataclasses import dataclass, field
 from typing import Any, Optional
@@ -42,6 +43,13 @@ try:
     from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
 except ImportError:
     GENESIS_HASH_OFFICIAL = None  # Modo degradado — sem validação de linhagem
+
+# Paridade com GenesisTribunal: reconstrói o ID fonético de nascimento a partir
+# do DNA oficial via Pysecurity1024 (security/pysecurity1024.py trabalha com genesis).
+try:
+    from iaglobal.security.pysecurity1024 import Pysecurity1024 as PYSECURITY1024
+except ImportError:
+    PYSECURITY1024 = None
 
 
 logger = get_logger("iaglobal")
@@ -295,30 +303,46 @@ class OmniMind:
     ) -> None:
         """Vincula um agente à OmniMind, dando-lhe propósito e identidade.
 
-        Valida a linhagem contra o DNA oficial para evitar patógenos.
+        Valida a linhagem contra o DNA oficial (GENESIS_HASH_OFFICIAL, 128 chars)
+        para evitar patógenos. Agentes nativos registram o DNA congelado; agentes
+        híbridos externos podem usar metadados={"valid_lineage": True} (futuramente
+        validado via handshake de Genesis remoto — não altera as Leis de Holliwell
+        nem os Axiomas Biológicos).
         """
+        metadados = metadados or {}
         # FIX BUG #6: GENESIS_HASH_OFFICIAL já importado no topo do módulo
         if (
             GENESIS_HASH_OFFICIAL is not None
             and linhagem != GENESIS_HASH_OFFICIAL
-            and "valid_lineage" not in (metadados or {})
+            and "valid_lineage" not in metadados
         ):
             logger.error(
                 "[OmniMind] 🚨 ALERTA DE PATÓGENO: Agente %s com DNA inválido!", nome
             )
             return
 
+        # Paridade com GenesisTribunal: reconstrói o ID fonético de nascimento
+        # a partir do DNA oficial + nome, via Pysecurity1024 (mesmo motor do tribunal).
+        phonetic_name = ""
+        try:
+            if PYSECURITY1024 is not None and GENESIS_HASH_OFFICIAL:
+                raw = hashlib.sha3_512(f"{GENESIS_HASH_OFFICIAL}:{nome}".encode()).digest()[:16]
+                phonetic_name = PYSECURITY1024.bytes_para_frase(raw)
+        except Exception as e:  # jamais bloqueia o registro
+            logger.debug("[OmniMind] Falha ao derivar phonetic_name: %s", e)
+
         self._agentes_registrados[agent_id] = {
             "nome": nome,
             "geracao": geracao,
             "linhagem": linhagem,
-            "metadados": metadados or {},
+            "phonetic_name": phonetic_name,
+            "metadados": metadados,
             "registrado_em": time.time(),
             "total_consultas": 0,
         }
         logger.info(
-            "[OmniMind] Agente registrado: %s (gen=%d, marker=%s)",
-            nome, geracao, linhagem[:8],
+            "[OmniMind] Agente registrado: %s (gen=%d, phonetic=%s)",
+            nome, geracao, phonetic_name or linhagem[:8],
         )
 
     def desregistrar_agente(self, agent_id: str) -> None:
@@ -826,6 +850,65 @@ class OmniMind:
                 "Registre este padrão no Obsidian com fitness_score elevado. "
                 "Amplifique via Lei do Aumento. O sucesso é compulsório quando "
                 "todas as leis são obedecidas — preserve o DNA deste ciclo."
+            ),
+            "timestamp": time.time(),
+        }
+
+    def emitir_gatilho_apoptose(
+        self, agent_id: str, motivo: str
+    ) -> dict[str, Any]:
+        """Implementa a Lei da Obediencia — apoptose por quebra de contrato.
+
+        Quando um agente viola o PSC (tenta acessar cloud fora do CriticAgent),
+        a OmniMind registra o patogeno e aciona apoptose contratual.
+
+        Args:
+            agent_id: ID do agente violador
+            motivo: Descricao da violacao (ex: "PSC: acesso cloud sem autorizacao")
+
+        Returns:
+            Dict com trigger de apoptose
+        """
+        from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
+        registry = EpigeneticRegistry()
+
+        task_hash = hashlib.md5(motivo.encode()).hexdigest()[:12]
+
+        # Registra falha no EpigeneticRegistry (efeito cumulativo)
+        import asyncio
+        try:
+            asyncio.get_running_loop().create_task(
+                registry.record_failure(agent_id, task_hash, "psc_violation", {
+                    "node_id": agent_id,
+                    "motivo": motivo,
+                    "omni_law_violated": "Lei da Obediencia",
+                })
+            )
+        except RuntimeError:
+            pass
+
+        self._memoria_coletiva.append({
+            "type": "apoptose_contratual",
+            "agent_id": agent_id,
+            "motivo": motivo,
+            "law": "Lei da Obediencia",
+            "timestamp": time.time(),
+        })
+
+        logger.warning(
+            "[OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente %s violou contrato — "
+            "Apoptose acionada. Motivo: %s",
+            agent_id, motivo,
+        )
+        return {
+            "trigger": "APOPTOSE_CONTRATUAL",
+            "agent_id": agent_id,
+            "law": "Lei da Obediencia",
+            "motivo": motivo,
+            "instruction": (
+                "O agente violou o Protocolo de Soberania do Critico (PSC). "
+                "A liberdade existe DENTRO dos contratos, nao apesar deles. "
+                "Registrar no MHC Detector como patogeno por desobediencia contratual."
             ),
             "timestamp": time.time(),
         }

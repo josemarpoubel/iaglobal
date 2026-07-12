@@ -18,6 +18,10 @@ from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from iaglobal.obsidian.omnimind import omni_mind, LEIS_UNIVERSAIS
+try:
+    from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
+except ImportError:
+    GENESIS_HASH_OFFICIAL = None
 from iaglobal.graphs.bandit import BanditPolicy
 from iaglobal.evolution.genomic_reflection import ExecutionMetrics
 from iaglobal.immunity.immune_memory_exchange import ImmuneMemoryExchange
@@ -162,8 +166,9 @@ class AsyncViolationDetector:
             agent_id=self.agent_id,
             nome="AsyncViolationDetector",
             geracao=self.generation,
-            linhagem=self.lineage_id,
+            linhagem=GENESIS_HASH_OFFICIAL,
             metadados={
+                "role": "iaglobal-genesis-v1",
                 "purpose": "detectar violações async/await no ecossistema",
                 "is_native": True,
                 "immunity_layer": "scanner",

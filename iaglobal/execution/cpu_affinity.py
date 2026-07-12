@@ -39,6 +39,8 @@ BUDGET_ADRENALINA = 0.50    # 50% — modo burst para emergências
 IVM_THRESHOLD_CRITICO = 0.3
 IVM_THRESHOLD_EXCELENCIA = 0.8
 FITNESS_DECAY = 0.95        # decaimento temporal do fitness a cada ciclo
+FLUSH_INTERVAL = 5.0         # intervalo (s) entre persists em lote do fitness
+FLUSH_MAX_BATCH = 50         # max registros no buffer antes de flush forçado
 
 
 # =========================================================================
@@ -163,6 +165,8 @@ class CpuAffinityManager:
         self.resource_manager = ResourceManager()
         self._metabolic_state = "NORMAL" # NORMAL, DEEP_SLEEP, ADRENALINE
         self._adrenaline_expiry = 0.0
+        self._fitness_buffer: Dict[str, float] = {}
+        self._flush_task: Optional[asyncio.Task] = None
 
     @property
     def lock(self):
@@ -384,8 +388,96 @@ class CpuAffinityManager:
         logger.info("[CPU] Agente %s restaurado ao budget padrão: 25%%", agent_id)
 
     # ==============================================================
+    # PRIVILÉGIO DE PROCESSAMENTO DINÂMICO — Boost de Prioridade
+    # ==============================================================
+
+    async def set_priority_boost(self, agent_ids: List[str], boost_percent: int = 50) -> None:
+        """Aumenta temporariamente o budget de agentes específicos em um batch crítico.
+        
+        Args:
+            agent_ids: Lista de IDs dos agentes que receberão o boost
+            boost_percent: Percentual de CPU budget (default: 50% = BUDGET_ADRENALINA)
+        """
+        # Converte para decimal e limita ao teto de adrenalina
+        boost = min(BUDGET_ADRENALINA, boost_percent / 100.0)
+        async with self.lock:
+            for aid in agent_ids:
+                metrics = self._agents.get(aid)
+                if metrics:
+                    metrics.cpu_budget = boost
+                    metrics.ultimo_ajuste = time.time()
+                    self._budgets[aid] = boost
+                    logger.info(
+                        "[CPU] ⚡ Boost de prioridade aplicado: %s → %.0f%%",
+                        aid, boost * 100
+                    )
+                else:
+                    logger.debug("[CPU] Agente %s não registrado para boost", aid)
+        
+        logger.info(
+            "[CPU] 🚀 Batch crítico com %d agentes em modo de alta prioridade (%.0f%% CPU)",
+            len(agent_ids), boost * 100
+        )
+
+    async def reset_budgets(self) -> None:
+        """Reseta todos os agentes para o padrão de 25% (homeostase)."""
+        async with self.lock:
+            for agent_id in self._budgets:
+                self._budgets[agent_id] = BUDGET_PADRAO
+                metrics = self._get_or_create_metrics(agent_id)
+                metrics.cpu_budget = BUDGET_PADRAO
+                metrics.ultimo_ajuste = time.time()
+                metrics.em_modo_sobrevivencia = False
+        logger.info("[CPU] 📉 Homeostase restaurada: todos os agentes em 25%% CPU")
+
+    # ==============================================================
+    # CONTEXT MANAGER — Boost Temporário para Batches
+    # ==============================================================
+
+    async def enter_critical_batch(self, agent_ids: List[str], boost_percent: int = 60) -> Dict[str, float]:
+        """
+        Entra em modo de batch crítico: salva budgets anteriores, aplica boost.
+        Retorna dict `{agent_id: budget_anterior}` para restore seletivo.
+
+        Exemplo:
+            saved = await cpu_affinity.enter_critical_batch(['critic', 'reviewer'])
+            try:
+                resultado = await processar_batch()
+            finally:
+                await cpu_affinity.exit_critical_batch(saved)
+        """
+        saved = {}
+        async with self.lock:
+            for aid in agent_ids:
+                if aid in self._budgets:
+                    saved[aid] = self._budgets[aid]
+                else:
+                    metrics = self._agents.get(aid)
+                    saved[aid] = metrics.cpu_budget if metrics else BUDGET_PADRAO
+        await self.set_priority_boost(agent_ids, boost_percent)
+        return saved
+
+    async def exit_critical_batch(self, saved_budgets: Dict[str, float]) -> None:
+        """
+        Restaura APENAS os agents incluídos em `saved_budgets` para seus
+        budgets anteriores. Não afeta agents não relacionados.
+        """
+        async with self.lock:
+            for aid, prev_budget in saved_budgets.items():
+                self._budgets[aid] = prev_budget
+                metrics = self._agents.get(aid)
+                if metrics:
+                    metrics.cpu_budget = prev_budget
+                    metrics.ultimo_ajuste = time.time()
+
+    # ==============================================================
     # IVM — Índice de Viabilidade Metabólica
     # ==============================================================
+    # DEPRECATED: este IVM é de uso interno do scheduler (feedback de
+    # sobrevivência/mitose). O IVM CANÔNICO do sistema é IVMAxiom
+    # (iaglobal.chappie.ivm_axiom), que agora também consome o sinal de
+    # CPU deste módulo via reportar_uso_cpu. Não use para rankings de
+    # agentes, relatórios ou rewards do BanditPolicy.
 
     async def calcular_ivm(self, agent_id: str,
                            produtividade: Optional[float] = None,
@@ -422,17 +514,24 @@ class CpuAffinityManager:
 
     async def monitorar_metabolismo(self, agent_id: str) -> dict:
         async with self.lock:
-            metrics_dict = self._get_or_create_metrics(agent_id).to_dict()
-            
-        ivm = await self.calcular_ivm(agent_id)
-        
+            metrics = self._get_or_create_metrics(agent_id)
+            metrics_dict = metrics.to_dict()
+
+        # IVM canônico via IVMAxiom (fallback para métrica local)
+        ivm = metrics.ivm_atual
+        try:
+            from iaglobal.chappie import _get_chappie
+            ivm_inst = _get_chappie().get("ivm")
+            if ivm_inst is not None:
+                ivm = ivm_inst.get_ivm(agent_id)
+        except Exception:
+            pass
+
         if ivm < IVM_THRESHOLD_CRITICO:
             acao = "apoptose"
             motivo = "baixa_viabilidade_metabolica"
             try:
                 from iaglobal.evolution.epigenetic import epigenetic_memory
-                # Assumindo que epigenetic_memory.gravar_cicatriz pode não ser async.
-                # Se for async, adicione um await. Aqui usamos to_thread para prevenir bloqueios de I/O na função.
                 await asyncio.to_thread(epigenetic_memory.gravar_cicatriz, agent_id, motivo, 0.1)
             except Exception as e:
                 logger.debug("[CPU] Falha ao gravar marca epigenética: %s", e)
@@ -442,7 +541,10 @@ class CpuAffinityManager:
         else:
             acao = "monitorar"
             motivo = "dentro_do_esperado"
-        
+
+        async with self.lock:
+            metrics.ivm_atual = ivm
+
         return {
             "acao": acao,
             "motivo": motivo,
@@ -489,28 +591,61 @@ class CpuAffinityManager:
             metrics = self._agents.get(agent_id)
             return metrics.fitness_score if metrics else 0.5
 
-    async def _persist_fitness(self, agent_id: str, score: float) -> None:
+    async def _start_flush_loop(self) -> None:
+        """Inicia o loop de flush de fundo se ainda não estiver rodando."""
+        if self._flush_task is not None and not self._flush_task.done():
+            return
+        self._flush_task = asyncio.create_task(self._flush_loop())
+
+    async def _flush_loop(self) -> None:
+        """Loop de fundo que persiste o buffer em lote a cada FLUSH_INTERVAL."""
+        while True:
+            await asyncio.sleep(FLUSH_INTERVAL)
+            async with self.lock:
+                batch = self._fitness_buffer.copy()
+                self._fitness_buffer.clear()
+            await self._flush_batch(batch)
+
+    async def _flush_batch(self, batch: Dict[str, float]) -> None:
+        """Escreve um lote de fitness scores em disco em paralelo (1 thread por arquivo)."""
+        if not batch:
+            return
+        tasks = []
+        for agent_id, score in batch.items():
+            tasks.append(self._write_single_fitness(agent_id, score))
+        if tasks:
+            await asyncio.gather(*tasks, return_exceptions=True)
+
+    async def _write_single_fitness(self, agent_id: str, score: float) -> None:
+        """Escreve um único genome.json em disco (executado em thread pool)."""
         genome_path = self._resolve_genome_path(agent_id)
         if not genome_path:
             return
         try:
-            # Operações de sistema de arquivos são delegadas para uma thread pool
             await asyncio.to_thread(genome_path.parent.mkdir, parents=True, exist_ok=True)
-            
             if genome_path.exists():
                 raw_data = await asyncio.to_thread(genome_path.read_text)
                 data = json.loads(raw_data)
             else:
                 data = {"agent_id": agent_id, "genome": {}}
-                
             data["fitness_score"] = round(score, 3)
             data["ultima_atualizacao"] = time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime())
-            
             json_str = json.dumps(data, indent=2, ensure_ascii=False)
             await asyncio.to_thread(genome_path.write_text, json_str)
-            
         except Exception as e:
             logger.debug("[CPU] Não foi possível persistir fitness: %s", e)
+
+    async def _persist_fitness(self, agent_id: str, score: float) -> None:
+        """Bufferiza fitness em memória. Flush em lote via _flush_loop."""
+        await self._start_flush_loop()
+        async with self.lock:
+            self._fitness_buffer[agent_id] = score
+            if len(self._fitness_buffer) >= FLUSH_MAX_BATCH:
+                batch = self._fitness_buffer.copy()
+                self._fitness_buffer.clear()
+        # flush forçado fora do lock para evitar deadlock
+        if batch:
+            await self._flush_batch(batch)
 
     @staticmethod
     def _resolve_genome_path(agent_id: str) -> Optional[Path]:
@@ -577,6 +712,18 @@ class CpuAffinityManager:
         async with self.lock:
             metrics = self._get_or_create_metrics(agent_id)
             metrics.cpu_usage_atual = max(0.0, min(1.0, uso))
+            budget = metrics.cpu_budget
+
+        # Revive a telemetria morta e federa o sinal de CPU para o IVM canônico
+        # (IVMAxiom). Unificação: o CpuAffinityManager é um scheduler de budget,
+        # não um índice IVM concorrente — delega E_cpu para o IVMAxiom.
+        try:
+            from iaglobal.chappie import _get_chappie
+            ivm = _get_chappie().get("ivm")
+            if ivm is not None:
+                await ivm.atualizar_metricas(agent_id, cpu_usage=uso, cpu_budget=budget)
+        except Exception as e:
+            logger.debug("[CPU] IVMAxiom indisponível para telemetria de CPU: %s", e)
 
     async def registrar_tarefa(self, agent_id: str, sucesso: bool) -> None:
         async with self.lock:

@@ -14,8 +14,9 @@ logger = logging.getLogger("iaglobal")
 class ApoptosisEngine:
     """Mecanismo de morte programada com herança epigenética."""
 
-    def __init__(self, epigenetic_path: Path = None):
-        self.epigenetic_path = epigenetic_path or Path("/home/kitohamachi/projeto-iaglobal/obsidian/epigenetic")
+    def __init__(self, epigenetic_path: Path | None = None):
+        from iaglobal._paths import PACKAGE_DIR
+        self.epigenetic_path = epigenetic_path or (PACKAGE_DIR / "obsidian" / "epigenetic")
         self.backup_path = self.epigenetic_path / "apoptosis_archive"
         self.backup_path.mkdir(parents=True, exist_ok=True)
 

@@ -76,7 +76,8 @@ class PathogenAnalyzer:
             return
         self._initialized = True
         self._patterns: Dict[str, PathogenPattern] = {}
-        self._graphs_dir = Path("/home/kitohamachi/projeto-iaglobal/iaglobal/graphs")
+        from iaglobal._paths import PACKAGE_DIR
+        self._graphs_dir = PACKAGE_DIR / "graphs"
 
     def analyze_code(self, code: str, context: str = "unknown") -> Dict[str, Any]:
         """

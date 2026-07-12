@@ -1,10 +1,10 @@
+from iaglobal import _paths
 # iaglobal/memory/memory.py
 
 import os
 import datetime
 import re
 from typing import Optional, Dict, Any, List
-from iaglobal import _paths
 
 def carregar() -> str:
     """Load memory from evolution file."""

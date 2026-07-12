@@ -39,11 +39,8 @@ class IAGlobalAPI:
         if not lazy_init:
             try:
                 loop = asyncio.get_running_loop()
-                # Se já estamos em um loop, não podemos usar run_until_complete
-                # Deixar para initialize_async ser chamado explicitamente
                 logger.debug("[API] Event loop ativo detectado — inicialização adiada para initialize_async()")
             except RuntimeError:
-                # Sem loop rodando — inicialização síncrona segura
                 self.initialize()
 
     async def initialize_async(self) -> None:
@@ -63,15 +60,10 @@ class IAGlobalAPI:
         logger.info("[API] IAGlobal pronto em %.2fs (async)", time.time() - t0)
 
     def initialize(self) -> None:
-        """Inicializa o sistema (Orchestrator, Evolution Runtime, Event Bus).
-
-        Atenção: Se já houver um event loop rodando (ex: dentro de um handler
-        FastMCP), esta chamada falhará. Use initialize_async() nesse caso.
-        """
+        """Inicializa o sistema (Orchestrator, Evolution Runtime, Event Bus)."""
         if self._initialized:
             return
 
-        # Detecta se há um event loop rodando — new_event_loop() falharia
         running_loop = False
         try:
             asyncio.get_running_loop()
@@ -114,20 +106,7 @@ class IAGlobalAPI:
     # ── Tarefas ──
 
     def run_task(self, prompt: str) -> Dict[str, Any]:
-        """Executa uma tarefa no pipeline completo.
-
-        Args:
-            prompt: Descricao da tarefa (ex: "crie um bloco genesis em sha3_512")
-
-        Returns:
-            Dict com:
-                - success (bool)
-                - response (str | None): codigo gerado
-                - script_path (str | None): caminho do arquivo salvo
-                - score (float): score final (0-1)
-                - error (str | None): mensagem de erro se falhou
-                - execution_time (float): tempo total em segundos
-        """
+        """Executa uma tarefa no pipeline completo."""
         t0 = time.time()
         try:
             result = self.orchestrator.run(prompt)
@@ -151,14 +130,7 @@ class IAGlobalAPI:
             }
 
     def run_dag(self, prompt: str) -> Dict[str, Any]:
-        """Executa apenas o DAG (sem cache, sem persistencia).
-
-        Args:
-            prompt: Descricao da tarefa
-
-        Returns:
-            Dict com resultado bruto do DAG (raw_results, final_output)
-        """
+        """Executa apenas o DAG (sem cache, sem persistencia)."""
         t0 = time.time()
         try:
             result = self.orchestrator.run_graph_task(prompt)
@@ -176,11 +148,7 @@ class IAGlobalAPI:
     # ── Status ──
 
     def get_status(self) -> Dict[str, Any]:
-        """Retorna status completo do sistema.
-
-        Returns:
-            Dict com: dag, evolution, memory, security, version
-        """
+        """Retorna status completo do sistema."""
         from iaglobal.cli.status import Dashboard
 
         graph = getattr(self.orchestrator, "graph", None)
@@ -254,17 +222,7 @@ class IAGlobalAPI:
         offset: int = 0,
         min_score: Optional[float] = None,
     ) -> List[Dict[str, Any]]:
-        """Recupera aprendizados armazenados pelos agentes.
-
-        Args:
-            agent: Filtrar por agente (ex: "reflexion", "orchestrator")
-            limit: Maximo de registros
-            offset: Paginacao
-            min_score: Score minimo
-
-        Returns:
-            Lista de dicts com id, agent, task_id, content, score, timestamp
-        """
+        """Recupera aprendizados armazenados pelos agentes."""
         from iaglobal.memory.db_manager import db
         return db.get_insights(agent=agent, limit=limit, offset=offset, min_score=min_score)
 

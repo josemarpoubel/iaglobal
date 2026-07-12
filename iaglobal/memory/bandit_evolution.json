@@ -1,0 +1,78 @@
+{
+  "fitness_records": {
+    "groq/llama-3.3-70b-versatile": {
+      "provider_id": "groq/llama-3.3-70b-versatile",
+      "total_uses": 342,
+      "successful_uses": 38,
+      "failed_uses": 304,
+      "ivm_history": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ivm_media_movel": 0.0,
+      "strikes_consecutivos": 304,
+      "ultimo_banimento": null,
+      "latencia_media_ms": 0.01218798055599315,
+      "custo_medio_creditos": 0.9999999999999994,
+      "fitness_score": 0.4
+    },
+    "unknown": {
+      "provider_id": "unknown",
+      "total_uses": 341,
+      "successful_uses": 0,
+      "failed_uses": 341,
+      "ivm_history": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      "ivm_media_movel": 0.0,
+      "strikes_consecutivos": 341,
+      "ultimo_banimento": null,
+      "latencia_media_ms": 0.013712338757184436,
+      "custo_medio_creditos": 9.999999992161026,
+      "fitness_score": 0.4
+    }
+  },
+  "banned_providers": {
+    "unknown": "2026-07-13T02:08:54.698638+00:00",
+    "groq/llama-3.3-70b-versatile": "2026-07-13T02:08:54.688895+00:00"
+  },
+  "weights": {},
+  "updated_at": "2026-07-12T02:08:54.698929+00:00"
+}

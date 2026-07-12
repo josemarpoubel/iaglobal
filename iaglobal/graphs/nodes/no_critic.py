@@ -10,12 +10,11 @@ import logging
 import asyncio
 from typing import Dict, Any
 
-from iaglobal.agents.critic_agent import CriticAgent
+from iaglobal.core.critic_batch_queue import CriticBatchQueue
 from iaglobal.memory.memory_error import record_error
 from iaglobal.graphs.communication.acetylcholine_bus import AgentMessage
 
 logger = logging.getLogger(__name__)
-_critic = CriticAgent()
 
 
 async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -67,12 +66,12 @@ async def run_critic(ctx: Dict[str, Any]) -> Dict[str, Any]:
     prompt_built = memory.get("prompt_builder", {}).get("built_prompt", "") or task
 
     try:
-        logger.info("[CRITIC] Iniciando avaliação cognitiva profunda do código...")
-        # Executa a chamada do agente avaliador (seja async ou síncrona convertida)
-        if asyncio.iscoroutinefunction(_critic.avaliar):
-            result = await _critic.avaliar(task=task, prompt=prompt_built, output=coder_output)
-        else:
-            result = await asyncio.to_thread(_critic.avaliar, task=task, prompt=prompt_built, output=coder_output)
+        logger.info("[CRITIC] Iniciando avaliação com validação cruzada...")
+        queue = await CriticBatchQueue.get_instance()
+        result = await queue.evaluate_with_context(
+            memory=memory, task=task, coder_output=coder_output,
+            prompt_built=prompt_built,
+        )
             
         approved = result.get("approved", False)
         score = result.get("score", 0)

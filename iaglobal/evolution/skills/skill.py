@@ -1414,10 +1414,10 @@ _BUILTIN_SKILLS = [
     SKILL_PERFORMANCE_DESIGN,
     SKILL_PERFORMANCE_AUDIT,
     SKILL_CODER,
-    SKILL_FRONTEND_BUILDER,
-    SKILL_BACKEND_BUILDER,
-    SKILL_DATABASE_BUILDER,
-    SKILL_API_BUILDER,
+    # SKILL_FRONTEND_BUILDER,  # ← COMENTADO: Usar node no_frontend_builder.py (gera código real)
+    # SKILL_BACKEND_BUILDER,   # ← COMENTADO: Usar node no_backend_builder.py
+    # SKILL_DATABASE_BUILDER,  # ← COMENTADO: Usar node no_database_builder.py
+    # SKILL_API_BUILDER,       # ← COMENTADO: Usar node no_api_builder.py
     SKILL_TEST_GENERATOR,
     SKILL_TESTER,
     SKILL_DEBUGGER,
@@ -1468,9 +1468,26 @@ _BUILTIN_SKILLS = [
     SKILL_APPLIED_AI_ENGINEER,
 ]
 
+# Skill Debug Unificado (importada separadamente para evitar circular)
+def _get_skill_debug_unificado():
+    from iaglobal.evolution.skills.skill_debug_unificado import skill_debug_unificado
+    return skill_debug_unificado
+
+# Skill Python Autocomplete (importada separadamente)
+def _get_skill_python_autocomplete():
+    from iaglobal.evolution.skills.skill_python_autocomplete import skill_python_autocomplete
+    return skill_python_autocomplete
+
+_BUILTIN_SKILLS_LAZY = [
+    *_BUILTIN_SKILLS,
+    _get_skill_debug_unificado,
+    _get_skill_python_autocomplete,
+]
+
 def register_builtin_skills():
     """Registra todas as skills built-in no skill_registry global."""
     from .skill_registry import skill_registry
-    for _s in _BUILTIN_SKILLS:
-        skill_registry.register(_s)
+    for _s in _BUILTIN_SKILLS_LAZY:
+        skill_obj = _s() if callable(_s) and not isinstance(_s, Skill) else _s
+        skill_registry.register(skill_obj)
 

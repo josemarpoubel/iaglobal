@@ -1,7 +1,40 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # iaglobal/server/server.py
+
+"""
+DEPRECATED — Servidor de Evolution legado (porta 8002).
+
+Este servidor foi DESCONTINUADO. Suas funcionalidades foram migradas:
+
+1. EvolutionRuntime → iaglobal/evolution/evolutionruntime.py (já existe)
+2. Tools de evolução → iaglobal/mcp/server.py (tool: evolve_strategy)
+3. Dashboard → iaglobal/mcp/server.py (tool: evolution_dashboard)
+4. Health/Metrics → Integrado no ASGI Gateway (porta 8000)
+
+Motivos da apoptose:
+- Usa MockEvolver (código de teste em produção)
+- Endpoints duplicados (/health, /metrics)
+- Sem uso em produção documentado
+
+Migre para:
+    python -m iaglobal.mcp.server --mode both
+    
+Tools MCP disponíveis:
+    - evolve_strategy: Alterna entre estratégias deep/fast
+    - evolution_status: Status do motor evolutivo
+    - evolution_dashboard: Dashboard ASCII/JSON
+"""
+
+import warnings
+warnings.warn(
+    "iaglobal/server/server.py está DEPRECADO. Use iaglobal/mcp/server.py",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 import asyncio
 import time
+from datetime import datetime, timezone
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from pydantic import BaseModel
@@ -179,3 +212,31 @@ async def dashboard_json():
             "mapas_sinapse": synapses,
         },
     }
+
+
+# =====================================================================
+# SERVER ENTRYPOINT — MODO STANDALONE
+# =====================================================================
+
+if __name__ == "__main__":
+    import os
+    import uvicorn
+    
+    # Lê configuração do ambiente
+    host = os.environ.get("EVOLUTION_HOST", "0.0.0.0")
+    port = int(os.environ.get("EVOLUTION_PORT", "8002"))
+    
+    print(f"🧬 [EVOLUTION SERVER] Iniciando em {host}:{port}")
+    print(f"📊 Status: http://{host}:{port}/evolution/health")
+    print(f"🔬 Strategies: http://{host}:{port}/evolution/strategies")
+    print(f"⚡ Trigger: http://{host}:{port}/evolution/trigger")
+    print(f"📈 Metrics: http://{host}:{port}/evolution/metrics")
+    print(f"💡 Dica: Para acessar via ASGI Gateway, use http://localhost:8000/evolution/")
+    
+    uvicorn.run(
+        "iaglobal.server.server:app",
+        host=host,
+        port=port,
+        log_level="info",
+        access_log=False
+    )

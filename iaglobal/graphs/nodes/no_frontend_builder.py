@@ -13,6 +13,7 @@ from typing import Dict, Any
 from iaglobal.agents.coder_agent import CoderAgent
 from iaglobal.agents.prompt_improver import PromptImprover, PromptMode
 from iaglobal.obsidian.omnimind import omni_mind
+from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
 from iaglobal.graphs.communication.acetylcholine_bus import AcetylcholineBus, AgentMessage
 
 logger = logging.getLogger(__name__)
@@ -55,7 +56,7 @@ async def run_frontend_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         agent_id="frontend_builder",
         nome="FrontendBuilder",
         geracao=0,
-        linhagem="web-interface-builder",
+        linhagem=GENESIS_HASH_OFFICIAL,
         metadados={"domain": "frontend"}
     )
     
@@ -75,7 +76,7 @@ async def run_frontend_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         agent_id="frontend_builder",
         nome="FrontendBuilder",
         geracao=0,
-        linhagem="web-interface-builder",
+        linhagem=GENESIS_HASH_OFFICIAL,
         metadados={"domain": "frontend", "intuicao": intuição[:100] if intuição else None}
     )
     

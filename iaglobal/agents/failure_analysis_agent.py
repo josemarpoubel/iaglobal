@@ -5,7 +5,7 @@ import json
 import logging
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Any, Dict, List, Optional
 
 from iaglobal._paths import ERROR_DIR, LOG_DIR, JSON_DIR, PROVIDER_METRICS_DIR
@@ -37,7 +37,7 @@ class FailureAnalysisAgent(AgentBase):
             "errors": cls._collect_errors(),
             "metrics": cls._collect_metrics(),
             "logs": cls._collect_logs(),
-            "collected_at": datetime.utcnow().isoformat(),
+            "collected_at": datetime.now(timezone.utc).isoformat(),
         }
 
     @classmethod
@@ -181,7 +181,7 @@ class FailureAnalysisAgent(AgentBase):
         """Salva relatório markdown e dados JSON na pasta error/."""
         try:
             _RESULTS_DIR.mkdir(parents=True, exist_ok=True)
-            ts = datetime.utcnow().strftime("%Y%m%d_%H%M%S")
+            ts = datetime.now(timezone.utc).strftime("%Y%m%d_%H%M%S")
 
             md_path = _RESULTS_DIR / f"failure_report_{ts}.md"
             md_path.write_text(report, encoding="utf-8")

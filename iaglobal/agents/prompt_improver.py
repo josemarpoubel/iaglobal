@@ -24,6 +24,7 @@ from enum import Enum
 from typing import Any, Dict, List, Optional, Set, Tuple
 
 from iaglobal.utils.logger import logger
+from iaglobal.agents.agent_base import INSTRUCAO_COT
 
 # Importações opcionais — o PromptImprover funciona sem elas,
 # mas se estiverem disponíveis, ativa integração biológica.
@@ -34,7 +35,7 @@ except ImportError:
     _BUS_AVAILABLE = False
 
 try:
-    from iaglobal.evolution.mta_recycler import MTARecycler
+    from iaglobal.recycling.mta_pool import MTAPool
     _MTA_AVAILABLE = True
 except ImportError:
     _MTA_AVAILABLE = False
@@ -843,20 +844,28 @@ class PromptImprover:
             except Exception:
                 pass
 
-        if self._skill_registry and _SKILL_REGISTRY_AVAILABLE:
-            try:
-                skills = self._skill_registry.list_skills(active_only=True)[:2]
-                for skill in skills:
-                    usage = getattr(skill, 'usage_count', 0)
-                    positive_examples.append(
-                        f"[SKILL: {skill.name}]"
-                        f" Descrição: {skill.description[:100]}"
-                    )
-                skill_used = bool(positive_examples)
-            except Exception:
-                pass
-
-        # ── 4. Composição do prompt ──────────────────────────────────────────
+if self._skill_registry and _SKILL_REGISTRY_AVAILABLE:
+    try:
+        skills = self._skill_registry.list_skills(active_only=True)[:2]
+        for skill in skills:
+            usage = getattr(skill, 'usage_count', 0)
+            # Extrai código-fonte real da skill
+            codigo_fonte = few_shot_provider._extract_callable_source(skill.run_fn)
+            if codigo_fonte and len(codigo_fonte.strip()) > 30:
+                positive_examples.append(
+                    f"[SKILL: {skill.name}] (uso={usage})\n"
+                    f"Descrição: {skill.description[:200]}\n"
+                    f"Código:\n```python\n{codigo_fonte[:400]}\n```"
+                )
+            else:
+                positive_examples.append(
+                    f"[SKILL: {skill.name}] (uso={usage})\n"
+                    f"Descrição: {skill.description[:200]}"
+                )
+        skill_used = bool(positive_examples)
+    except Exception:
+        pass
+                # ── 4. Composição do prompt ──────────────────────────────────────────
         min_sev = (
             ConstraintSeverity.CRITICAL
             if mode == PromptMode.COMPACT
@@ -912,11 +921,23 @@ class PromptImprover:
         )
         sections.append(reflection)
 
-        # Instrução final
+        # CoT — Chain of Thought antes de codificar
+        sections.append("")
+        sections.append(f"[CHAIN OF THOUGHT — {INSTRUCAO_COT}]")
+
+        # Instrução final + PSC (Protocolo de Soberania do Crítico)
         sections.append("")
         sections.append(
-            "Responda APENAS com código funcional dentro do bloco markdown correto. "
-            "Sem explicações fora do bloco."
+            "PSC: Voce e um agente local. Nunca tente acessar modelos online "
+            "por conta propria. Se a tarefa exigir recursos alem do ToolLibrary, "
+            "submeta ao CriticAgent.\n\n"
+            "EETL: Como CriticAgent, ao validar um Cognitive_Escalation bem-sucedido, "
+            "analise a frequencia desse tipo de tarefa no ancestry_tree. Se a tarefa "
+            "for repetitiva, voce tem autoridade para solicitar ao EvolutionaryWatchdog "
+            "que transforme o codigo validado em ferramenta permanente na ToolLibrary. "
+            "O objetivo e auto-suficiencia total do iaglobal.\n\n"
+            "Responda APENAS com codigo funcional dentro do bloco markdown correto. "
+            "Sem explicacoes fora do bloco."
         )
 
         final_prompt = "\n".join(sections)

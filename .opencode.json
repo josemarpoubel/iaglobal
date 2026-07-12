@@ -6,8 +6,15 @@
       "enabled": true,
       "timeout": 600000,
       "env": {
-        "PYTHONPATH": "/home/kitohamachi/projeto-iaglobal",
+        "PYTHONPATH": "/home/kitohamachi/projeto-iaglobal"
       }
     }
+  },
+  "skills": {
+    "paths": [
+      ".opencode/skills",
+      "/home/kitohamachi/projeto-iaglobal/.opencode/skills"
+    ],
+    "urls": []
   }
 }

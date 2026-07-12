@@ -3,7 +3,7 @@
 Registry central de nós do pipeline.
 Mapeia nomes de skills para fabricas de nós.
 """
-from .nodes import create_skill_node
+from .nodes import create_skill_node  # re-exportado via nodes/__init__.py
 
 
 NODE_REGISTRY: dict = {
@@ -67,6 +67,9 @@ NODE_REGISTRY: dict = {
     "evolution_committee": lambda: create_skill_node("evolution_committee"),
     "pipeline_updater": lambda: create_skill_node("pipeline_updater"),
     "evolution_trigger": lambda: create_skill_node("evolution_trigger"),
+    "system_analysis": lambda: create_skill_node("system_analysis"),
+    "lsp_validator": lambda: create_skill_node("lsp_validator"),
+    "debug_unificado": lambda: create_skill_node("debug_unificado"),
 }
 
 

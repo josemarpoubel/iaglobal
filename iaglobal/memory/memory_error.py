@@ -1,3 +1,4 @@
+from iaglobal import _paths
 # memory_error.py
 
 import json
@@ -7,7 +8,6 @@ from pathlib import Path
 from datetime import datetime, timezone
 from typing import List, Dict, Any
 
-from iaglobal import _paths
 
 
 _lock = threading.Lock()

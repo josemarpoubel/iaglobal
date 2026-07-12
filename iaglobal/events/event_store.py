@@ -59,6 +59,14 @@ class DecisionEventStore:
                 logger.debug("[DECISION_STORE] Conectado com sucesso.")
 
     def start(self):
+        # Fecha conexão anterior para evitar vazamento se start() for chamado múltiplas vezes
+        if self.conn is not None:
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+            self.conn = None
+
         # FORÇA A BUSCA DO CAMINHO DIRETAMENTE NO MÓDULO _paths
         # Se _paths.CORE_DB for None, ele constrói o caminho manualmente como backup
         path_from_module = getattr(_paths, "CORE_DB", None)
@@ -89,6 +97,14 @@ class DecisionEventStore:
         from iaglobal.models.event_bus import bus, EventType
         bus.unsubscribe(EventType.PIPELINE_STAGE, self._on_pipeline_event)
         self._subscribed = False
+        
+        # Fecha conexão SQLite para evitar ResourceWarning
+        if self.conn is not None:
+            try:
+                self.conn.close()
+            except Exception:
+                pass
+            self.conn = None
 
     # Wrapper para lidar com eventos síncronos do barramento de forma assíncrona
     def _on_pipeline_event(self, event):

@@ -9,12 +9,18 @@ Multi-Armed Bandit para seleção de provedores LLM com:
 """
 
 import asyncio
+import hashlib
 import random
 import time
 from collections import defaultdict
 from typing import Dict, List, Optional, Any
 
 from iaglobal.utils.logger import get_logger
+
+# Logger dedicado à membrana: roteia pelo logger "iaglobal" para herdar o
+# nível INFO corrigido em logger.py (observable no CLI), independente do
+# logger "bandit" usado nas métricas de bandit.
+_mem_logger = get_logger("iaglobal")
 
 # Singleton global
 _bandit_instance: Optional['BanditPolicy'] = None
@@ -42,6 +48,8 @@ def _get_bandit() -> 'BanditPolicy':
 
 class BanditPolicy:
     """Multi-Armed Bandit para seleção de provedores."""
+
+    DEFAULT_WEIGHT = 0.0
 
     # Semáforos por modelo para evitar rate limit (cada modelo responde 1 requisição por vez)
     MODEL_SEMAPHORES: Dict[str, asyncio.Semaphore] = {}
@@ -152,17 +160,33 @@ class BanditPolicy:
                 self.logger.info(f"🔒 Semáforo criado para {model_name} (concorrência={concurrency})")
             return self.MODEL_SEMAPHORES[model_name]
 
-    async def acquire_model(self, model_name: str) -> bool:
+    async def acquire_model(self, model_name: str, node_id: str = "") -> bool:
         """
         Adquire semáforo para usar o modelo.
         Retorna True se conseguiu adquirir, False se timeout.
+        
+        Para modelos locais, consulta primeiro o LocalModelGate (token bucket
+        com priorização por IVM). Se o gate negar, retorna False imediatamente
+        sem bloquear — o chamador deve usar synthetic_success.
         """
         semaphore = await self._get_model_semaphore(model_name)
         try:
-            # Timeout curto: 3s para cloud, 1s para local
             is_cloud = any(provider in model_name for provider in ["groq/", "nvidia/", "openrouter/", "gemini/"])
+
+            # Gate do token bucket para modelos locais
+            if not is_cloud:
+                from iaglobal.execution.token_bucket import LocalModelGate
+                gate = await LocalModelGate.get_instance()
+                if not await gate.try_acquire(node_id):
+                    self.logger.info(
+                        "🔒 %s rejeitado pelo LocalModelGate (synthetic_success fallback)",
+                        model_name,
+                    )
+                    return False
+
+            # Timeout curto: 3s para cloud, 1s para local
             timeout = 3.0 if is_cloud else 1.0
-            
+
             await asyncio.wait_for(semaphore.acquire(), timeout=timeout)
             self._model_in_use[model_name] = True
             self.logger.debug(f"🔒 {model_name} adquirido (timeout={timeout}s)")
@@ -259,6 +283,47 @@ class BanditPolicy:
                     self.weights[model] = new_weight
                     self.logger.info(f"📈 {model}: peso atualizado para {new_weight:.2f} (success={success_rate:.2f}, reward={avg_reward:.2f})")
 
+    def get_provider_weight(self, provider_name: str, task_type: str = "general") -> float:
+        """
+        Retorna o peso médio de todos os modelos de um provider.
+
+        Percorre self.weights agregando por prefixo do provider.
+        Útil para testes e observabilidade (ex.: monitorar degradação).
+        """
+        models = [m for m in self.weights if m.split("/", 1)[0] == provider_name]
+        if not models:
+            return self.DEFAULT_WEIGHT
+        return sum(self.weights[m] for m in models) / len(models)
+
+    def get_provider_circuit_state(self, provider_name: str) -> dict:
+        """
+        Retorna estado do circuit breaker para o provider.
+
+        Returns:
+            dict com 'state' ('open'|'closed'), 'remaining_cooldown' (segundos),
+            e 'models' com detalhe por modelo.
+        """
+        now = time.time()
+        models = {}
+        any_open = False
+        for model, cooldown_until in self.circuit_breakers.items():
+            if model.split("/", 1)[0] == provider_name:
+                remaining = max(0.0, cooldown_until - now)
+                is_open = remaining > 0
+                if is_open:
+                    any_open = True
+                models[model] = {
+                    "state": "open" if is_open else "closed",
+                    "remaining_cooldown": round(remaining, 1),
+                }
+        return {
+            "state": "open" if any_open else "closed",
+            "remaining_cooldown": max(
+                (m["remaining_cooldown"] for m in models.values()), default=0.0
+            ),
+            "models": models,
+        }
+
     def rank_models(
         self,
         node_id: str,
@@ -331,11 +396,16 @@ class BanditPolicy:
         self,
         model_name: str,
         prompt: str,
+        node_id: str = "provider_router",
         **kwargs
     ) -> str:
         """
         Executa um modelo assincronamente delegando ao provider_router.
         O provider_router gerencia semáforos e rate limiting internamente.
+
+        Antes de executar, o SearchMiddleware enriquece o prompt com
+        contexto web para agentes não-críticos (Coder, Debugger, etc.),
+        reduzindo a dependência do conhecimento limitado do modelo local.
         
         Returns:
             String com a resposta do modelo (vazia em caso de falha)
@@ -343,6 +413,14 @@ class BanditPolicy:
         from iaglobal.providers.provider_router import async_route_generate
 
         task_type = kwargs.get("task_type", "general")
+
+        # SearchMiddleware: injeta contexto web para agentes não-críticos
+        try:
+            from iaglobal.search.search_middleware import SearchMiddleware
+            prompt = await SearchMiddleware.enrich(prompt, node_id)
+        except Exception:
+            pass  # Nunca deixar busca quebrar chamadas LLM
+
         self.logger.info(f"🚀 Executando modelo {model_name} (task={task_type})...")
         
         try:
@@ -350,6 +428,7 @@ class BanditPolicy:
                 model=model_name,
                 prompt=prompt,
                 task_type=task_type,
+                node_id=node_id,
             )
             if response:
                 return str(response)
@@ -359,6 +438,189 @@ class BanditPolicy:
             self.trigger_circuit_breaker(model_name, cooldown=30.0)
         
         return ""
+
+    async def _report_phospholipid(self, success: bool, latency: float, model_name: str) -> None:
+        """Reporta métricas ao PhospholipidRegistry. Best-effort."""
+        try:
+            from iaglobal.observability.phospholipid_bridge import bridge as _pbridge
+            _pbridge.auto_report(model_name, success, latency * 1000)
+        except Exception:
+            pass
+
+    async def _report_ivm(
+        self, node_id: str, success: bool, latency: float, model: str
+    ) -> None:
+        """Registra custo metabólico (IVM) no IVMAxiom canônico.
+
+        O BanditPolicy é o portão universal de todo acesso a modelo de IA
+        (ARCHITECTURE §2), logo é o ponto único correto para telemetria IVM:
+        captura AgentBase e chamadas diretas de nós indistintamente, eliminando
+        o split-brain de observabilidade (agentes alimentavam um singleton em
+        memória que nenhum observador lia). Nunca deve quebrar a geração.
+        """
+        try:
+            from iaglobal.chappie import _get_chappie
+            ivm = _get_chappie().get("ivm")
+            if ivm is None:
+                from iaglobal.chappie.ivm_axiom import get_ivm_axiom
+                ivm = get_ivm_axiom()
+            if ivm is None:
+                return
+            await ivm.atualizar_metricas(
+                agent_name=node_id,
+                tasks_completed=1 if success else 0,
+                tasks_failed=0 if success else 1,
+                total_latency_ms=latency * 1000.0,
+                skills_exchanged=0,
+                mhc_validation_score=0.9 if success else 0.5,
+            )
+        except Exception:
+            # Telemetria metabólica é best-effort; nunca interrompe a geração.
+            pass
+
+    # ─────────────────────────────────────────────────────────────────────
+    # Membrana seletiva no chokepoint do BanditPolicy
+    # ─────────────────────────────────────────────────────────────────────
+    # ARCHITECTURE §2: todo acesso a modelo de IA passa por BanditPolicy.
+    # O ponto único correto para aplicar a membrana seletiva é AQUI, não em
+    # AgentBase._call_llm (evitaria um 2º caminho paralelo ao Bandit — a
+    # categoria de problema já resolvida em "Bandit/LoadBalancer isolados").
+    #
+    # POLÍTICA INTRÍNSECA fail-closed: só o nó crítico tem direito a nuvem;
+    # node_id ausente/não reconhecido é CONFINADO a Ollama local. É
+    # independente do gate global EXTERNAL_ACCESS_ONLY_CRITIC (que rege a
+    # membrana em provider_router), para que o modo shadow revele o que
+    # *seria* confinado mesmo com o gate global desligado.
+    def _membrane_is_critic(self, node_id: str) -> bool:
+        if not node_id:
+            return False
+        return "critic" in node_id.lower()
+
+    def _membrane_filter_candidates(self, node_id: str, candidates: List[str]) -> List[str]:
+        """Reduz candidatos a Ollama local se o nó não for crítico. Fail-closed."""
+        if self._membrane_is_critic(node_id):
+            return candidates
+        try:
+            from iaglobal.providers.provider_router import _LOCAL_PROVIDERS
+        except Exception:
+            _LOCAL_PROVIDERS = {"ollama"}
+        local = [c for c in candidates if c.split("/", 1)[0] in _LOCAL_PROVIDERS]
+        # Fail-closed: se nenhum candidato local, injeta Ollama p/ NÃO liberar nuvem.
+        return local if local else ["ollama/qwen2.5:0.5b"]
+
+    def _membrane_mode(self) -> str:
+        """'off' | 'shadow' | 'enforce'. Env MEMBRANA_MODE tem precedência.
+
+        Default é 'enforce': o BanditPolicy é o portão universal de todo
+        acesso a modelo de IA (ARCHITECTURE §2) — a membrana seletiva deve
+        estar ativa por padrão, não o GATE 2 no provider_router.
+        """
+        import os
+
+        env = os.getenv("MEMBRANA_MODE", "").strip().lower()
+        if env in ("off", "shadow", "enforce"):
+            return env
+        try:
+            from iaglobal.evolution import is_flag_enabled
+
+            if is_flag_enabled("membrana_enforce"):
+                return "enforce"
+            if is_flag_enabled("membrana_shadow"):
+                return "shadow"
+        except Exception:
+            pass
+        return "enforce"
+
+    # ── PSC Protocolo de Soberania do Crítico ──
+    class SecurityViolation(Exception):
+        """Apenas CriticAgent possui autoridade para escalonamento externo."""
+
+    def _psc_verify_caller(self, node_id: str) -> None:
+        """PSC §1: Trava de segurança — verifica identidade do chamador.
+        
+        Se violação, dispara apoptose contratual via OmniMind + registra ancestry.
+        """
+        if not self._membrane_is_critic(node_id):
+            # OmniMind enforcement — apoptose contratual (Lei da Obediência)
+            try:
+                from iaglobal.obsidian.omnimind import omni_mind
+                omni_mind.emitir_gatilho_apoptose(
+                    node_id,
+                    "PSC: acesso cloud sem autorizacao do CriticAgent"
+                )
+            except Exception as exc:
+                self.logger.debug("[PSC] OmniMind nao disponivel: %s", exc)
+
+            # Registra no ancestry como violação
+            try:
+                self._psc_register_ancestry(
+                    node_id, "BLOCKED", 0.0, False,
+                    extra={"violation": "psc_blocked", "reason": "non_critic_caller"}
+                )
+            except Exception:
+                pass
+
+            raise self.SecurityViolation(
+                f"PSC BLOQUEADO: node_id='{node_id}' não é CriticAgent. "
+                "Apenas o CriticAgent possui autoridade para escalonamento externo."
+            )
+
+    def _psc_ivm_green(self) -> bool:
+        """PSC §1.2: Semáforo IVM — se homocisteína alta, bloqueia cloud."""
+        try:
+            from iaglobal.evolution.metabolism.homocysteine_pool import homocysteine_pool
+            level = homocysteine_pool.get_current_level()
+            threshold = homocysteine_pool.get_threshold()
+            if level > threshold * 0.7:
+                self.logger.warning(
+                    "[PSC] Homocisteina alta (%.2f/%.2f) — bloqueando acesso cloud",
+                    level, threshold,
+                )
+                return False
+        except Exception:
+            pass
+        return True
+
+    def _psc_register_ancestry(self, node_id: str, model: str, latency: float, success: bool,
+                                extra: Optional[dict] = None) -> None:
+        """PSC §1.3: Registra ancestralidade de escalonamento cognitivo.
+
+        Inclui lineage_marker do genesis + lei de Holliwell aplicada.
+        """
+        try:
+            from datetime import datetime, timezone
+            # Lineage marker do genesis oficial
+            lineage = ""
+            try:
+                from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
+                lineage = GENESIS_HASH_OFFICIAL[:16]
+            except Exception:
+                lineage = "unknown"
+            record = {
+                "type": extra.get("violation", "Cognitive_Escalation") if extra else "Cognitive_Escalation",
+                "node_id": node_id,
+                "model": model,
+                "latency_ms": round(latency * 1000, 2),
+                "success": success,
+                "lineage_marker": lineage,
+                "omni_law": "Lei do Suprimento" if success else "Lei da Obediencia",
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+            }
+            if extra:
+                record.update(extra)
+            ancestry_path = None
+            try:
+                from iaglobal._paths import DATA_DIR
+                ancestry_path = DATA_DIR / "ancestry_tree.jsonl"
+            except Exception:
+                ancestry_path = Path("/tmp/iaglobal_ancestry_tree.jsonl")
+            ancestry_path.parent.mkdir(parents=True, exist_ok=True)
+            with open(str(ancestry_path), "a") as f:
+                import json
+                f.write(json.dumps(record) + "\n")
+            self.logger.debug("[PSC] Ancestry registrada: %s -> %s (ok=%s)", node_id, model, success)
+        except Exception as e:
+            self.logger.debug("[PSC] Falha no ancestry: %s", e)
 
     async def generate(
         self,
@@ -371,11 +633,14 @@ class BanditPolicy:
     ) -> str:
         """
         Método completo de geração via Bandit:
-        1. Seleciona melhor modelo (ε-greedy + pesos + credit assignment)
-        2. Adquire semáforo do modelo (controla concorrência)
-        3. Executa via provider_router
-        4. Libera semáforo
-        5. Registra métricas no CreditAssignmentEngine
+        1. PSC: Verifica identidade do chamador (só CriticAgent passa)
+        2. PSC: Verifica semáforo IVM (homocisteína baixa?)
+        3. Seleciona melhor modelo (ε-greedy + pesos + credit assignment)
+        4. Adquire semáforo do modelo (controla concorrência)
+        5. Executa via provider_router
+        6. Libera semáforo
+        7. Registra métricas no CreditAssignmentEngine
+        8. PSC: Registra ancestralidade
         
         Args:
             node_id: ID do nó/agente executando
@@ -391,10 +656,56 @@ class BanditPolicy:
         import traceback
         from datetime import datetime
         
+        # ── PSC §1.1: Trava de identidade — falha rápido se não for crítico ──
+        self._psc_verify_caller(node_id)
+
         start_time = time.time()
         model_selected = None
-        
+        latency = 0.0
+        success = False
+
         try:
+            # ── Membrana seletiva (shadow/enforce) no chokepoint ──
+            # Política intrínseca fail-closed: não-crítico -> só Ollama local.
+            mode = self._membrane_mode()
+            if mode != "off":
+                filtered = self._membrane_filter_candidates(node_id, candidates)
+                if filtered != candidates:
+                    _mem_logger.info(
+                        "[MEMBRANA] node_id='%s' confinaria %d candidato(s) a %s (modo=%s)",
+                        node_id, len(candidates) - len(filtered), filtered, mode,
+                    )
+                    try:
+                        from iaglobal.providers.provider_router import record_membrane_decision
+                        record_membrane_decision(
+                            node_id,
+                            "confined_local" if mode == "enforce" else "shadow_confined",
+                            filtered,
+                        )
+                    except Exception:
+                        pass
+                else:
+                    try:
+                        from iaglobal.providers.provider_router import record_membrane_decision
+                        record_membrane_decision(node_id, "authorized_cloud", candidates)
+                    except Exception:
+                        pass
+                if mode == "enforce":
+                    candidates = filtered
+
+            # ── PSC §1.2: Semáforo IVM antes de cloud ──
+            if any("ollama" not in c for c in candidates):
+                if not self._psc_ivm_green():
+                    self.logger.warning("[PSC] IVM vermelho — forçando fallback local")
+                    try:
+                        from iaglobal.providers.provider_router import _LOCAL_PROVIDERS
+                    except Exception:
+                        _LOCAL_PROVIDERS = {"ollama"}
+                    candidates = [
+                        c for c in candidates
+                        if c.split("/", 1)[0] in _LOCAL_PROVIDERS
+                    ] or ["ollama/qwen2.5:0.5b"]
+
             # 1. Seleciona modelo com semáforo
             model_selected = await self.select_model_with_lock(
                 node_id=node_id,
@@ -404,19 +715,28 @@ class BanditPolicy:
             )
             
             # 2. Adquire semáforo (controla concorrência por modelo)
-            acquired = await self.acquire_model(model_selected)
+            acquired = await self.acquire_model(model_selected, node_id)
             if not acquired:
                 self.logger.warning(f"⏰ Timeout aguardando semáforo para {model_selected}")
                 # Tenta fallback
                 fallback_candidates = [c for c in candidates if c != model_selected]
                 if fallback_candidates:
                     model_selected = fallback_candidates[0]
-                    acquired = await self.acquire_model(model_selected)
+                    acquired = await self.acquire_model(model_selected, node_id)
             
             if not acquired:
                 self.logger.error(f"❌ {node_id}: Não conseguiu adquirir semáforo para nenhum modelo")
                 return ""
             
+            # 2.5 SearchMiddleware — enriquece prompt com contexto web via RAG
+            # Todos os agentes (exceto critic, que avalia código) recebem
+            # contexto web para reduzir dependência do conhecimento do modelo.
+            try:
+                from iaglobal.search.search_middleware import SearchMiddleware
+                prompt = await SearchMiddleware.enrich(prompt, node_id)
+            except Exception:
+                pass
+
             # 3. Executa modelo
             self.logger.info(f"🚀 {node_id}: Executando {model_selected} (timeout={timeout}s)...")
             
@@ -427,6 +747,7 @@ class BanditPolicy:
                     model=model_selected,
                     prompt=prompt,
                     task_type=task_type,
+                    node_id=node_id,
                 ),
                 timeout=timeout
             )
@@ -456,11 +777,19 @@ class BanditPolicy:
                 self.rewards[model_selected].append(0.0)
                 self.trigger_circuit_breaker(model_selected, cooldown=30.0)
             
-            return str(response) if response else ""
+            # ── PSC §1.3: Ancestry tracking ──
+            task_hash = hashlib.sha3_512(prompt.encode()).hexdigest()[:16]
+            self._psc_register_ancestry(node_id, model_selected or "unknown", latency, success,
+                                         extra={"task_hash": task_hash, "task_summary": prompt[:80]})
             
+            return str(response) if response else ""
+
         except asyncio.TimeoutError:
             latency = time.time() - start_time
             self.logger.error(f"⏰ {node_id}: Timeout após {latency:.2f}s para {model_selected}")
+            task_hash = hashlib.sha3_512(prompt.encode()).hexdigest()[:16]
+            self._psc_register_ancestry(node_id, model_selected or "unknown", latency, False,
+                                         extra={"task_hash": task_hash, "task_summary": prompt[:80]})
             if self.credit_engine:
                 from iaglobal.graphs.telemetry import ExecutionEvent
                 event = ExecutionEvent(
@@ -473,11 +802,14 @@ class BanditPolicy:
                 )
                 self.credit_engine.record(event)
             return ""
-            
+
         except Exception as e:
             latency = time.time() - start_time
             self.logger.error(f"❌ {node_id}: Erro {type(e).__name__}: {e}")
             self.logger.debug(f"Traceback: {traceback.format_exc()}")
+            task_hash = hashlib.sha3_512(prompt.encode()).hexdigest()[:16]
+            self._psc_register_ancestry(node_id, model_selected or "unknown", latency, False,
+                                         extra={"task_hash": task_hash, "task_summary": prompt[:80]})
             if self.credit_engine:
                 from iaglobal.graphs.telemetry import ExecutionEvent
                 event = ExecutionEvent(
@@ -490,8 +822,25 @@ class BanditPolicy:
                 )
                 self.credit_engine.record(event)
             return ""
-            
+
         finally:
             # 7. SEMPRE libera o semáforo
             if model_selected:
                 self.release_model(model_selected)
+            # 8. Telemetria metabólica (IVM) — portão universal de todo acesso a
+            # modelo de IA. Captura AgentBase e chamadas diretas de nós sem
+            # distinção, curando o split-brain de observabilidade do IVMAxiom.
+            await self._report_ivm(node_id, success, latency, model_selected or "unknown")
+            # 8b. Reporta métricas ao PhospholipidRegistry para adaptive decay
+            await self._report_phospholipid(success, latency, model_selected or "unknown")
+            # 9. Reporta latência ao LocalModelGate para ajuste dinâmico do
+            # token bucket e circuit breaker (apenas modelos locais).
+            if model_selected and not any(
+                p in model_selected for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
+            ):
+                try:
+                    from iaglobal.execution.token_bucket import LocalModelGate
+                    gate = await LocalModelGate.get_instance()
+                    gate.report_latency(latency * 1000.0)
+                except Exception:
+                    pass

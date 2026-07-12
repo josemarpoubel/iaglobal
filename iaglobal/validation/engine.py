@@ -121,6 +121,27 @@ class FeedbackEngine:
             decision=decision, score=0.0, issues=issues,
         )
 
+    def validate_mcp_call(self, tool_schema: dict, arguments: dict) -> bool:
+        """Valida argumentos de chamada MCP contra schema da tool."""
+        params = tool_schema.get("parameters", {})
+        if not params:
+            return True
+
+        for key, spec in params.items():
+            if "type" in spec:
+                val = arguments.get(key)
+                expected = spec["type"]
+                if expected == "string" and not isinstance(val, (str, type(None))):
+                    logger.warning("[MCP-SCHEMA] %s esperava string, recebeu %s", key, type(val).__name__)
+                    return False
+                elif expected == "integer" and val is not None and not isinstance(val, int):
+                    logger.warning("[MCP-SCHEMA] %s esperava integer, recebeu %s", key, type(val).__name__)
+                    return False
+                elif expected == "boolean" and val is not None and not isinstance(val, bool):
+                    logger.warning("[MCP-SCHEMA] %s esperava boolean, recebeu %s", key, type(val).__name__)
+                    return False
+        return True
+
     def _decide(self, errors: List[str], context: Optional[Dict] = None) -> Decision:
         """Decide próximo passo baseado no tipo de erro e contexto."""
         error_text = " ".join(errors).lower()

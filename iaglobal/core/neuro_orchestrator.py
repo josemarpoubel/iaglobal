@@ -49,7 +49,7 @@ class NeuroOrchestrator:
         async def _run_one(model: str) -> Dict:
             t0 = time.time()
             try:
-                output = await async_route_generate(model=model, prompt=task, task_type="general")
+                output = await async_route_generate(model=model, prompt=task, task_type="general", node_id="neuro_orchestrator")
                 lat = time.time() - t0
                 valid = bool(output and len(output) > 30)
                 score = self._score_output(task, output)

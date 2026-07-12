@@ -33,15 +33,10 @@ async def run_qa(ctx: Dict[str, Any]) -> Dict[str, Any]:
     output = coder_data.get("output", "") if isinstance(coder_data, dict) else ""
 
     try:
-        # Inicializa o agente avaliador
+        # Chamada direta ao CriticAgent com pré-processamento local
+        # (LocalSummarizer dentro de avaliar() comprime o output antes do LLM)
         agent = CriticAgent()
-        
-        # Executa a avaliação cognitiva profunda do QA (LLM-driven)
-        if asyncio.iscoroutinefunction(agent.avaliar):
-            result = await agent.avaliar(task, prompt, output)
-        else:
-            result = await asyncio.to_thread(agent.avaliar, task, prompt, output)
-            
+        result = await agent.avaliar(task, prompt, output)
         logger.info("[QA] Avaliação finalizada. Resultado estruturado com sucesso.")
         
         latency_ms = (time.time() - start_time) * 1000.0

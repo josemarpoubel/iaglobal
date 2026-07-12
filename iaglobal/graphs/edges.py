@@ -49,13 +49,15 @@ EDGES = [
     ("tester", "security_audit"),
     ("security_audit", "performance_audit"),
     ("performance_audit", "compliance_audit"),
-    
-    # Fase 7: Correção
-    ("tester", "debugger"),
-    ("debugger", "debug_coder"),
-    ("debug_coder", "fix_validator"),
-    
-    # Fase 8: Integração
+
+    # Fase 7: LSP Validation (syntax + imports)
+    ("coder", "lsp_validator"),
+    ("multi_coder", "lsp_validator"),
+    ("lsp_validator", "debug_unificado"),
+
+    # Fase 8: Depuração Unificada + Integração
+    ("tester", "debug_unificado"),
+    ("debug_unificado", "fix_validator"),
     ("fix_validator", "integrator"),
     ("integrator", "rank"),
     
@@ -76,6 +78,9 @@ EDGES = [
     ("metrics", "optimization"),
     ("optimization", "retrospective"),
     ("retrospective", "result_agent"),
+
+    # Fase 11: Análise Metabólica Final
+    ("result_agent", "system_analysis"),
 ]
 
 # Mapeamento de dependências para validação

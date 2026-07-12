@@ -145,12 +145,47 @@ class MHCDetector:
             if skill_name in self._profiles:
                 self._profiles[skill_name].anomaly_score = 0.0
 
+    def whitelist_origin(self, origin: str, allowed_path_prefixes: Optional[list] = None) -> None:
+        """Registra uma origem confiável que não passará por quarentena MHC.
+
+        Args:
+            origin: Identificador da origem (ex: "ToolLibrary", "ArtifactFactory")
+            allowed_path_prefixes: Lista de prefixos de path permitidos para escrita
+        """
+        with self._rlock:
+            if not hasattr(self, "_whitelist"):
+                self._whitelist = {}
+            self._whitelist[origin] = {
+                "allowed_paths": allowed_path_prefixes or [],
+            }
+            logger.info("[MHC] Origem whitelisted: %s (paths=%s)", origin, allowed_path_prefixes)
+
+    def _is_whitelisted(self, evidence: Dict[str, Any]) -> bool:
+        origin = evidence.get("origin", "")
+        if not origin or not hasattr(self, "_whitelist"):
+            return False
+        whitelisted = self._whitelist.get(origin)
+        if not whitelisted:
+            return False
+        path = evidence.get("unauthorized_path") or ""
+        if path and whitelisted.get("allowed_paths"):
+            for prefix in whitelisted["allowed_paths"]:
+                if str(path).startswith(str(prefix)):
+                    logger.debug("[MHC] Path whitelisted: %s (prefix=%s)", path, prefix)
+                    return True
+        return bool(path) is False  # Se não tem path, aceita pela origem
+
     def quarantine_if_parasite(self, skill_name: str, evidence: Dict[str, Any]) -> bool:
         """
         Verifica se skill é 'parasita' e coloca em quarentena imediatamente.
         
         evidence = {"unauthorized_path": str, "unexpected_output": bool, "memory_leak": bool}
         """
+        # Verificar whitelist antes de qualquer ação
+        if self._is_whitelisted(evidence):
+            logger.info("[MHC] %s whitelisted — evoluçao legitima ignorada", skill_name)
+            return False
+
         should_quarantine = (
             evidence.get("unauthorized_path") is not None or
             evidence.get("unexpected_output", False) or

@@ -6,13 +6,13 @@ Test Generator Node — Desenha e gera suítes de testes automatizados para o c�
 Totalmente em conformidade com as regras e diretrizes estritas do AGENTS.md.
 """
 import time
-import logging
 import asyncio
 from typing import Dict, Any
 
 from iaglobal.agents.tester_agent import TesterAgent
+from iaglobal.utils.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger("iaglobal.graphs.nodes.test_generator")
 
 
 async def run_test_generator(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -43,10 +43,9 @@ async def run_test_generator(ctx: Dict[str, Any]) -> Dict[str, Any]:
         else:
             result = await asyncio.to_thread(agent.gerar_testes, code, task)
             
-        test_output = str(result or "")
+        test_output = result.test_code if hasattr(result, 'test_code') else str(result or "")
         
-        # Portão de segurança: se o código de teste gerado for nulo ou irrelevante, assume falha técnica
-        is_success = bool(test_output and len(test_output.strip()) > 10)
+        is_success = result.success if hasattr(result, 'success') else bool(test_output and len(test_output.strip()) > 10)
         
         if is_success:
             logger.info("[TEST_GENERATOR] Suíte de testes gerada com sucesso: %d caracteres.", len(test_output))

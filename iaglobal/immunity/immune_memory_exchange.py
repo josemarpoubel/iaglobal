@@ -120,6 +120,99 @@ class ImmuneMemoryExchange:
         # Fingerprint SHA3_512 deve ter 128 chars (64 bytes em hex)
         return len(fp) == 128 and all(c in "0123456789abcdef" for c in fp)
 
+    # ── Vacinas por linhagem (cross-reference com VaccineLedger) ──────────
+
+    async def publish_vaccine(
+        self, lineage_marker: str, patterns: List[str], node_id: str = "local"
+    ) -> bool:
+        """
+        Transmite vacinas (failure_patterns) de uma linhagem para a frota.
+
+        As vacinas são marcadas com o `lineage_marker` — apenas nós que possuem
+        (ou herdam) essa linhagem as consomem, impedindo autoimunidade entre
+        famílias evolutivas distintas.
+        """
+        payload = {
+            "lineage_marker": lineage_marker,
+            "patterns": list(patterns),
+            "node_id": node_id,
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+            "checksum": hashlib.sha3_256(
+                (lineage_marker + str(patterns)).encode()
+            ).hexdigest()[:32],
+        }
+        msg = AgentMessage(
+            sender=node_id,
+            receiver="immune_exchange",
+            type="vaccine_broadcast",
+            payload=payload,
+        )
+        await self._bus.publish(msg)
+        logger.info(
+            "[IMMUNE-EXCHANGE] Broadcasted %d vacina(s) p/ linhagem %s",
+            len(patterns), lineage_marker,
+        )
+        return True
+
+    async def import_vaccine(self, remote: Dict[str, Any], source: str) -> int:
+        """
+        Importa vacinas de uma linhagem remota.
+
+        Gating evolutivo: a vacina só é persistida no ledger Obsidian se o
+        `lineage_marker` remoto for reconhecido localmente (um EvoAgent desta
+        linhagem existe ou já foi visto). Isso impede que linhagens estranhas
+        injetem memória no subconsciente do organismo.
+
+        Returns:
+            Número de novos padrões persistidos no ledger da linhagem.
+        """
+        marker = remote.get("lineage_marker")
+        if not marker:
+            return 0
+        try:
+            from iaglobal.immunity.vaccine_ledger import vaccine_ledger
+        except Exception as e:
+            logger.debug("[IMMUNE-EXCHANGE] VaccineLedger indisponível: %s", e)
+            return 0
+
+        # Só aceita se este nó conhece a linhagem (mesmo DNA familiar)
+        if not vaccine_ledger.owns_lineage(marker):
+            logger.debug(
+                "[IMMUNE-EXCHANGE] Vacina de linhagem %s recusada (não pertence a este nó)",
+                marker,
+            )
+            return 0
+
+        conteudo = await vaccine_ledger._vault.ler_vacina(marker)
+        padroes = vaccine_ledger._parse_patterns(conteudo)
+        existentes = {p.get("pattern") for p in padroes}
+        novos = 0
+        for pat in remote.get("patterns", []):
+            if pat and pat not in existentes:
+                padroes.append({"pattern": pat, "agent": f"remote:{source}",
+                                "context": {"origin": source}})
+                novos += 1
+        if novos:
+            await vaccine_ledger._vault.escrever_vacina(
+                marker, vaccine_ledger._serialize(padroes, marker)
+            )
+            logger.info(
+                "[IMMUNE-EXCHANGE] %d vacina(s) de %s persistida(s) p/ linhagem %s",
+                novos, source, marker,
+            )
+        return novos
+
+    def _owns_lineage(self, marker: str) -> bool:
+        """Verifica se este nó possui (ou já viu) a linhagem informada."""
+        try:
+            from iaglobal.agents.agent_base import get_evo_registry
+            return any(
+                getattr(evo, "lineage_marker", "") == marker
+                for evo in get_evo_registry().values()
+            )
+        except Exception:
+            return False
+
 
 # Singleton
 immune_memory_exchange = ImmuneMemoryExchange()

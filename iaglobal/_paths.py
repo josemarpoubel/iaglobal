@@ -17,10 +17,11 @@ PACKAGE_DIR = Path(__file__).resolve().parent
 PROJECT_ROOT = PACKAGE_DIR.parent
 
 # =========================================================
-# DATA LAYER (SEMPRE DENTRO DO PACOTE iaglobal)
+# DATA LAYER (ORGANISM-SCOPED — override via env var)
 # =========================================================
 
-DATA_ROOT = PACKAGE_DIR / "memory" / "data"
+_organism_data_root = os.environ.get("ORGANISM_DATA_ROOT")
+DATA_ROOT = Path(_organism_data_root) if _organism_data_root else (PACKAGE_DIR / "memory" / "data")
 
 # Subdiretórios organizados
 JSON_DIR = DATA_ROOT / "json"

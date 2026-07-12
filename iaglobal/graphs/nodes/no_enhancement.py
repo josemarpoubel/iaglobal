@@ -48,7 +48,7 @@ async def run_enhancement(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     try:
         # Inicializa o agente de enriquecimento
-        agent = EnhancementAgent()
+        agent = EnhancementAgent(agent_name="enhancement")
         
         # Como o enriquecimento de prompts processa inferências densas,
         # desviamos para Thread Pool se o método for síncrono para proteger o AcetylcholineBus

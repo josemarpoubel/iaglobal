@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
 import uuid
-from typing import Dict, Any
+from typing import Dict, Any, Optional
 
 
 @dataclass
@@ -15,6 +15,7 @@ class Task:
     metadata: Dict[str, Any] = field(default_factory=dict)
     context: Dict[str, Any] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.now(timezone.utc).isoformat())
+    code: Optional[str] = None
 
     def __str__(self):
         return self.objective or ""

@@ -1,0 +1,151 @@
+{
+  "updated_at": "2026-07-06T19:16:43.573740+00:00",
+  "specializations": {
+    "coder_1": {
+      "agent_id": "coder_1",
+      "specialization": "python_coding",
+      "parent_agent": "coder_1",
+      "created_at": "2026-07-06T19:16:43.568219+00:00",
+      "tasks_completed": 3,
+      "tasks_failed": 0,
+      "avg_ivm": 0.89,
+      "epigenetic_config": {
+        "temperature": 0.5,
+        "max_tokens": 2048,
+        "priority": "high"
+      }
+    },
+    "coder_2": {
+      "agent_id": "coder_2",
+      "specialization": "javascript_coding",
+      "parent_agent": "coder_2",
+      "created_at": "2026-07-06T19:16:43.570807+00:00",
+      "tasks_completed": 2,
+      "tasks_failed": 0,
+      "avg_ivm": 0.895,
+      "epigenetic_config": {
+        "temperature": 0.5,
+        "max_tokens": 2048,
+        "priority": "high"
+      }
+    },
+    "security_1": {
+      "agent_id": "security_1",
+      "specialization": "security_audit",
+      "parent_agent": "security_1",
+      "created_at": "2026-07-06T19:16:43.571745+00:00",
+      "tasks_completed": 2,
+      "tasks_failed": 0,
+      "avg_ivm": 0.94,
+      "epigenetic_config": {
+        "temperature": 0.5,
+        "max_tokens": 2048,
+        "priority": "elite"
+      }
+    },
+    "architect_1": {
+      "agent_id": "architect_1",
+      "specialization": "architecture",
+      "parent_agent": "architect_1",
+      "created_at": "2026-07-06T19:16:43.572559+00:00",
+      "tasks_completed": 1,
+      "tasks_failed": 0,
+      "avg_ivm": 0.87,
+      "epigenetic_config": {
+        "temperature": 0.5,
+        "max_tokens": 2048,
+        "priority": "high"
+      }
+    },
+    "tester_1": {
+      "agent_id": "tester_1",
+      "specialization": "testing",
+      "parent_agent": "tester_1",
+      "created_at": "2026-07-06T19:16:43.572936+00:00",
+      "tasks_completed": 1,
+      "tasks_failed": 0,
+      "avg_ivm": 0.89,
+      "epigenetic_config": {
+        "temperature": 0.5,
+        "max_tokens": 2048,
+        "priority": "high"
+      }
+    },
+    "writer_1": {
+      "agent_id": "writer_1",
+      "specialization": "documentation",
+      "parent_agent": "writer_1",
+      "created_at": "2026-07-06T19:16:43.573306+00:00",
+      "tasks_completed": 1,
+      "tasks_failed": 0,
+      "avg_ivm": 0.84,
+      "epigenetic_config": {
+        "temperature": 0.5,
+        "max_tokens": 2048,
+        "priority": "high"
+      }
+    }
+  },
+  "task_patterns": {
+    "python_coding": {
+      "coder_1": 3
+    },
+    "javascript_coding": {
+      "coder_2": 2
+    },
+    "security_audit": {
+      "security_1": 2
+    },
+    "architecture": {
+      "architect_1": 1
+    },
+    "testing": {
+      "tester_1": 1
+    },
+    "documentation": {
+      "writer_1": 1
+    }
+  },
+  "epigenetic_memory": {
+    "coder_1": {
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "priority": "high"
+    },
+    "coder_2": {
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "priority": "high"
+    },
+    "security_1": {
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "priority": "elite"
+    },
+    "architect_1": {
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "priority": "high"
+    },
+    "tester_1": {
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "priority": "high"
+    },
+    "writer_1": {
+      "temperature": 0.5,
+      "max_tokens": 2048,
+      "priority": "high"
+    }
+  },
+  "stem_agents": [
+    "auditor",
+    "coder",
+    "architect",
+    "security",
+    "documenter",
+    "optimizer",
+    "tester",
+    "researcher"
+  ]
+}

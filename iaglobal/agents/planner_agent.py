@@ -6,15 +6,11 @@ from typing import Dict, Any, Optional, Union, List
 
 from iaglobal.models.task import Task
 from iaglobal.core.assistant import Assistant
-from iaglobal.utils.logger import logger
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal.execution.executor import executar
+from iaglobal.utils.logger import get_logger
 
-import logging
-
-from iaglobal.utils.logger import logger
-
-logger = logging.getLogger("ia-global")
+logger = get_logger("iaglobal.agents.planner_agent")
 
 class PlannerAgent(AgentBase):
     """

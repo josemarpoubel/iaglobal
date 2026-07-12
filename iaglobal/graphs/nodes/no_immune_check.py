@@ -10,6 +10,7 @@ from datetime import datetime, timezone
 from typing import Any, Dict
 
 from iaglobal.immunity.immune_orchestrator import immune_orchestrator
+from iaglobal.observability.entropy_interceptor import intercept_execution, get_immune_state
 from iaglobal.security.network_guard import NetworkGuard, blindar_rede_sandbox
 
 logger = logging.getLogger(__name__)
@@ -50,11 +51,18 @@ async def run_immune_check(
         metrics=metrics,
     )
     
+    # Interceptação entrópica: transforma detecção silenciosa em ação
+    if report.entropy_report:
+        entropy_action = await intercept_execution(skill_name, output, context)
+        report.entropy_report["action_taken"] = entropy_action.get("action_taken", "none")
+
     # Resultado
     result = {
         "safe": not report.threat_detected,
         "threats": report.threats,
         "quarantine_activated": report.quarantine_activated,
+        "entropy_report": report.entropy_report,
+        "immune_state": get_immune_state(),
         "execution_metrics": {
             "timestamp": datetime.now(timezone.utc).isoformat(),
             "immune_check": True,
@@ -64,5 +72,10 @@ async def run_immune_check(
     
     if report.threat_detected:
         logger.warning(f"[IMMUNE] {skill_name} detectou ameaças: {list(report.threats.keys())}")
+    if report.entropy_report and report.entropy_report.get("apoptosis_recommended"):
+        logger.warning(
+            f"[IMMUNE] {skill_name} entropia crítica — evento de apoptose publicado "
+            f"(score={report.entropy_report.get('entropy_score', '?')})"
+        )
     
     return result

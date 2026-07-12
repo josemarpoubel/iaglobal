@@ -61,11 +61,13 @@ class SubconsciousAPI:
         self.short_term_dir = self.vault_path / "02_Short_Term"
         self.long_term_dir = self.vault_path / "03_Long_Term"
         self.synapses_dir = self.vault_path / "04_Synapses"
+        # 05_Vaccines — repositório de "vacinas" (failure_patterns) por linhagem.
+        self.vaccines_dir = self.vault_path / "05_Vaccines"
 
         # Criação de diretórios é feita uma única vez no construtor —
         # mkdir é rápido e idempotente, não precisa de thread pool.
         for d in [self.instincts_dir, self.short_term_dir,
-                  self.long_term_dir, self.synapses_dir]:
+                  self.long_term_dir, self.synapses_dir, self.vaccines_dir]:
             d.mkdir(parents=True, exist_ok=True)
 
     # =================================================================
@@ -352,6 +354,19 @@ O agente executou a estratégia {strategy} com sucesso metabólico.
 
         await asyncio.to_thread(_mkdir)
         return await self.escrever_nota(vault_agents, agent_id, content)
+
+    # =================================================================
+    # VACINAS — failure_patterns por linhagem (05_Vaccines)
+    # =================================================================
+
+    async def escrever_vacina(self, lineage_marker: str, conteudo: str) -> Path:
+        """Persiste o ledger de vacinas de uma linhagem em 05_Vaccines."""
+        nome = f"linhagem_{lineage_marker}"
+        return await self.escrever_nota(self.vaccines_dir, nome, conteudo)
+
+    async def ler_vacina(self, lineage_marker: str) -> Optional[str]:
+        """Lê o ledger de vacinas de uma linhagem (None se inexistente)."""
+        return await self.ler_nota(f"linhagem_{lineage_marker}", self.vaccines_dir)
 
     # =================================================================
     # BUSCA E ATUALIZAÇÃO (async)

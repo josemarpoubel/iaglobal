@@ -85,7 +85,7 @@ def _make_llm_run_fn(
             try:
                 from iaglobal.providers.provider_router import async_route_generate
                 llm_output = await async_route_generate(
-                    model=None, prompt=prompt, task_type="general"
+                    model=None, prompt=prompt, task_type="general", node_id="skill_executor"
                 )
             except Exception as e:
                 logger.warning("[RUN-FN-LLM] Falha ao gerar via LLM para %s: %s", skill_name, e)

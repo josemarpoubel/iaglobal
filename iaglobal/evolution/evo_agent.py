@@ -47,10 +47,13 @@ import logging
 import secrets
 import time
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import Any, Optional
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.utils.hash_utils import LineageID
+from iaglobal.security.pysecurity1024 import Pysecurity1024
+from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
 
 # Imunidade
 from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails
@@ -81,6 +84,8 @@ from iaglobal.evolution.homeostasis_controller import homeostasis_controller
 from iaglobal.reflection.failure_analysis import FailureAnalyzer
 from iaglobal.reflection.self_critique import SelfCritique
 from iaglobal.reflection.learning_loop import LearningLoop
+# ReflexionEngine é importado sob demanda (ver _default_reflexion_async_fn) para
+# evitar acoplamento circular em tempo de importação do módulo.
 
 # OmniMind — espírito guia
 from iaglobal.obsidian.omnimind import omni_mind, Orientacao
@@ -123,10 +128,12 @@ class Expression:
     failure_patterns: int
     synthesis: str
     elapsed_ms: float
+    phonetic_name: str = ""               # nome fonético derivado do DNA
 
     def to_dict(self) -> dict[str, Any]:
         return {
             "agent_name": self.agent_name,
+            "phonetic_name": self.phonetic_name,
             "dna": {
                 "lineage_id": self.lineage_id[:32] + "…",   # truncado para log
                 "lineage_marker": self.lineage_marker,
@@ -184,6 +191,11 @@ class EvoAgent:
         self.parent_lineage_id = parent_lineage_id
         self.epigenetic_flags: dict[str, Any] = epigenetic_flags or {}
 
+        seed = f"{GENESIS_HASH_OFFICIAL}:{lineage_id}"
+        self.phonetic_name = Pysecurity1024.bytes_para_frase(
+            hashlib.sha3_512(seed.encode()).digest()[:16]
+        )
+
         # Subsistemas imunológicos
         self._gsh_pool = GlutathionePool()
         self._methylation = MethylationCycle()
@@ -192,6 +204,15 @@ class EvoAgent:
         # Subsistemas de reflexão
         self._failure_analyzer = FailureAnalyzer()
         self._learning_loop = LearningLoop()
+        self._self_critique_engine_obj = SelfCritique()
+
+        # ReflexionEngine (lazy) — modelo de inferência injetável.
+        # None até o primeiro uso de reflexion_fix(); o model_fn é resolvido
+        # via _reflexion_sync_fn, que usa self._reflexion_async_fn (async).
+        self._reflexion_engine = None
+        # Função de inferência assíncrona padrão (provider real) — pode ser
+        # sobrescrita por set_model_fn() para usar o LLM do agente proprietário.
+        self._reflexion_async_fn = None
 
         # Memória imunológica acumulada ao longo da vida
         self._failure_patterns: list[str] = []
@@ -242,11 +263,28 @@ class EvoAgent:
             agent_id=lineage_id,
             nome=name,
             geracao=0,
-            linhagem=lineage_marker,
-            metadados={"task_hint": task_hint},
+            linhagem=GENESIS_HASH_OFFICIAL,
+            metadados={
+                "task_hint": task_hint,
+                "phonetic_name": agent.phonetic_name,
+                "lineage_marker": lineage_marker,
+                "lineage_id": lineage_id,
+            },
         )
         agent.running = True
-        logger.info("[%s] GENESIS | lineage_id=%s…", name, lineage_id[:16])
+        # Aplica vacinas da própria linhagem (memória imunológica de longo prazo)
+        try:
+            from iaglobal.evolution import is_flag_enabled
+            if is_flag_enabled("evo_vaccine_persist"):
+                from iaglobal.immunity.vaccine_ledger import vaccine_ledger
+                vaccine_ledger.registrar_linhagem(agent.lineage_marker)
+                await vaccine_ledger.aplicar_vacina(agent)
+        except Exception as e:
+            logger.debug("[%s] VaccineLedger (apply) indisponível: %s", name, e)
+        logger.info(
+            "[%s] GENESIS | lineage_id=%s… | phonetic=%s",
+            name, lineage_id[:16], agent.phonetic_name,
+        )
         return agent
 
     async def replicate(self, mutation_hint: str = "") -> "EvoAgent":
@@ -296,14 +334,20 @@ class EvoAgent:
             agent_id=child_lineage_id,
             nome=child_name,
             geracao=self.generation + 1,
-            linhagem=child_marker,
-            metadados={"parent": self.name, "mutation_hint": mutation_hint},
+            linhagem=GENESIS_HASH_OFFICIAL,
+            metadados={
+                "parent": self.name,
+                "mutation_hint": mutation_hint,
+                "phonetic_name": child.phonetic_name,
+                "lineage_marker": child_marker,
+                "lineage_id": child_lineage_id,
+            },
         )
         child.running = True
 
         logger.info(
-            "[%s] → filho [%s] | gen=%d | marker=%s (herdado)",
-            self.name, child_name, child.generation, child_marker,
+            "[%s] → filho [%s] | gen=%d | marker=%s | fonetic=%s",
+            self.name, child_name, child.generation, child_marker, child.phonetic_name,
         )
         return child
 
@@ -461,6 +505,117 @@ class EvoAgent:
             logger.debug("[%s] SelfCritique indisponível: %s", self.name, e)
             return {"score": 0.5, "skipped": True}
 
+    # ── 4b. REFLEXION ENGINE (loop de geração/auto-correção) ──────────────
+
+    @staticmethod
+    def _default_reflexion_async_fn(prompt: str) -> "str":
+        """
+        Função de inferência assíncrona padrão para o ReflexionEngine.
+
+        Usa o provider_router real do iaglobal (respeita BanditPolicy / fallback).
+        Importada sob demanda para evitar acoplamento circular em tempo de
+        importação do módulo evo_agent.
+        """
+        from iaglobal.providers.provider_router import async_route_generate
+        import asyncio
+        try:
+            return asyncio.new_event_loop().run_until_complete(
+                async_route_generate("", prompt, task_type="reflection", node_id="evo_agent")
+            ) or ""
+        except Exception as e:  # degradação graceful — não interrompe o ciclo
+            logger.debug("[%s] Reflexion model_fn indisponível: %s", "evo_agent", e)
+            return ""
+
+    def set_model_fn(self, fn) -> None:
+        """
+        Injeta uma função de inferência assíncrona `Callable[[str], Awaitable[str]]`
+        para o ReflexionEngine (ex: o `_call_llm` do agente proprietário).
+        """
+        self._reflexion_async_fn = fn
+
+    def _reflexion_sync_fn(self, prompt: str) -> str:
+        """
+        Shim síncrono exigido pelo `ReflexionEngine.model_fn` (Callable[[str], str]).
+        Executa a função assíncrona injetada (ou a padrão) num loop isolado.
+        Deve ser chamado de dentro de `asyncio.to_thread` para não conflitar com
+        o event loop principal.
+        """
+        async_fn = self._reflexion_async_fn or self._default_reflexion_async_fn
+        import asyncio
+        loop = asyncio.new_event_loop()
+        try:
+            return loop.run_until_complete(async_fn(prompt)) or ""
+        except Exception as e:
+            logger.debug("[%s] Reflexion sync shim falhou: %s", self.name, e)
+            return ""
+        finally:
+            loop.close()
+
+    async def reflexion_fix(self, prompt: str, code: str | None = None) -> str:
+        """
+        Executa o ciclo de reflexão/auto-correção via ReflexionEngine real.
+
+        Gera código, valida em sandbox, analisa o erro real e propõe correção
+        iterativamente (até `max_iterations`). Retorna o código final (ou melhor
+        esforço). O `model_fn` é resolvido por `_reflexion_sync_fn`.
+
+        Args:
+            prompt: descrição da tarefa / código a refletir.
+            code: código inicial opcional (ignorado pelo loop atual que gera do zero).
+
+        Returns:
+            Código resultante do ciclo de reflexão.
+        """
+        from iaglobal.reflection.reflexion_engine import ReflexionEngine
+        if self._reflexion_engine is None:
+            self._reflexion_engine = ReflexionEngine(model_fn=self._reflexion_sync_fn)
+        try:
+            result = await asyncio.to_thread(self._reflexion_engine.reflect, prompt)
+            return result.get("code", "") if isinstance(result, dict) else str(result)
+        except Exception as e:
+            logger.debug("[%s] ReflexionEngine indisponível: %s", self.name, e)
+            return ""
+
+    # ── 4c. API PÚBLICA DE REFLEXÃO (consumida por todos os agentes) ──────
+
+    async def self_critique(self, output: str) -> dict[str, Any]:
+        """Auto-crítica estruturada do output (heurística pura, sem LLM)."""
+        try:
+            result = await asyncio.to_thread(self._self_critique_engine_obj.evaluate, output)
+            return result if isinstance(result, dict) else {"score": 0.5, "raw": str(result)}
+        except Exception as e:
+            logger.debug("[%s] self_critique falhou: %s", self.name, e)
+            return {"score": 0.5, "skipped": True}
+
+    async def analyze_failure(self, error: Exception, context: dict) -> dict[str, Any]:
+        """Análise de falha → memória imunológica acumulada no agente."""
+        try:
+            analysis = await asyncio.to_thread(self._failure_analyzer.analyze, error, context)
+            pattern = analysis.get("error_type", str(error))
+            self._failure_patterns.append(pattern)
+            # Persiste o padrão no vault Obsidian + publica vacina (mesma linhagem)
+            try:
+                from iaglobal.evolution import is_flag_enabled
+                if is_flag_enabled("evo_vaccine_persist"):
+                    from iaglobal.immunity.vaccine_ledger import vaccine_ledger
+                    await vaccine_ledger.registrar_falha(self, pattern, context)
+            except Exception as e:
+                logger.debug("[%s] VaccineLedger indisponível: %s", self.name, e)
+            return analysis
+        except Exception as e:
+            logger.debug("[%s] analyze_failure falhou: %s", self.name, e)
+            return {"error_type": type(error).__name__, "error_message": str(error), "skipped": True}
+
+    async def learning_iterate(
+        self, agent_func, task, evaluator
+    ) -> dict[str, Any]:
+        """Loop de aprendizado contínuo (1 iteração) com avaliador externo."""
+        try:
+            return await asyncio.to_thread(self._learning_loop.iterate, agent_func, task, evaluator)
+        except Exception as e:
+            logger.debug("[%s] learning_iterate falhou: %s", self.name, e)
+            return {"iteration": 0, "score": 0.0, "result": None, "skipped": True}
+
     # ── 5. SÍNTESE ────────────────────────────────────────────────────────
 
     async def _synthesize(self, sig: Signal, critique: dict[str, Any]) -> str:
@@ -592,7 +747,17 @@ class EvoAgent:
             return f"[AUTOFAGIA:{reason}] Input processado e reciclado pelo ciclo metabólico."
 
         if sig.urgency == "critical":
-            # Tenta loop de aprendizado com reflexão
+            # ReflexionEngine: geração + validação em sandbox + auto-correção
+            try:
+                fixed_code = await self.reflexion_fix(sig.raw)
+                logger.info(
+                    "[%s] ReflexionEngine | code_len=%d",
+                    self.name, len(fixed_code),
+                )
+            except Exception as e:
+                logger.debug("[%s] ReflexionEngine indisponível: %s", self.name, e)
+
+            # Loop de aprendizado com reflexão
             def _agent_func(task: Any) -> str:
                 return f"resposta-reflexion:{task}"
             def _evaluator(result: Any) -> float:
@@ -635,6 +800,7 @@ class EvoAgent:
             failure_patterns=len(self._failure_patterns),
             synthesis=result,
             elapsed_ms=elapsed_ms,
+            phonetic_name=self.phonetic_name,
         )
 
     # ── HANDLE — pipeline completo ────────────────────────────────────────
@@ -739,7 +905,7 @@ class EvoAgent:
             "reason": reason,
         }
 
-        state_file = f"{self.name}_genome.json"
+        state_file = str(Path(__file__).resolve().parents[2] / "iaglobal" / "memory" / "data" / "json" / f"{self.name}_genome.json")
         await asyncio.to_thread(self._persist_state, state, state_file)
 
         # --- Integração com ApoptosisEngine ---
@@ -764,7 +930,9 @@ class EvoAgent:
 
     def _persist_state(self, state: dict[str, Any], path: str) -> None:
         try:
-            with open(path, "w", encoding="utf-8") as fh:
+            path_obj = Path(path)
+            path_obj.parent.mkdir(parents=True, exist_ok=True)
+            with path_obj.open("w", encoding="utf-8") as fh:
                 json.dump(state, fh, ensure_ascii=False, indent=2)
         except Exception as e:
             logger.error("[%s] Falha ao persistir genoma: %s", self.name, e)

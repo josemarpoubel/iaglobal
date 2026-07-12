@@ -39,7 +39,8 @@ class GitWorkspace:
     """
 
     def __init__(self, base_path: Optional[Path] = None, repo_url: Optional[str] = None):
-        self.base_path = base_path or Path("/home/kitohamachi/projeto-iaglobal")
+        from iaglobal._paths import PROJECT_ROOT
+        self.base_path = base_path or PROJECT_ROOT
         self.repo_url = repo_url
         self._workspace_dir: Optional[Path] = None
         self._repo = None

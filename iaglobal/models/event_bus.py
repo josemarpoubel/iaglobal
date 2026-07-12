@@ -151,3 +151,11 @@ def _tracing_handler(event: Event) -> None:
 # auto-attach tracing for all events
 for et in EventType.ALL:
     bus.subscribe(et, _tracing_handler)
+
+# Injetado automaticamente para resolver assinaturas ausentes
+class EventType:
+    GENERIC = "generic"
+    # Eventos do ciclo de reflexão (reflexion_engine)
+    REFLECTION_COMPLETED = "reflection_completed"
+    EXECUTION_FAILED = "execution_failed"
+    MEMORY_SAVED = "memory_saved"

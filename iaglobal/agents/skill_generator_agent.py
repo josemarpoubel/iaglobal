@@ -4,32 +4,21 @@
 import re
 import json
 import sqlite3
-import logging  # <--- ADICIONE ESTA LINHA
-
 from pathlib import Path
-
 from typing import List, Dict, Optional, Union
-
 from datetime import datetime, timezone
-
 from collections import Counter
 
 from iaglobal._paths import CORE_DB, get_db_connection as _norm_path
 from iaglobal.agents.agent_base import AgentBase
-
 from iaglobal.evolution.skills.skill import Skill
-
 from iaglobal.evolution.skills.skill import ExecutionPolicy
-
 from iaglobal.evolution.skills.run_fn_factory import make_dynamic_run_fn
-
 from iaglobal.evolution.skills.dynamic_registry import dynamic_registry
-
 from iaglobal.memory.fusion_engine import KnowledgeGraph
+from iaglobal.utils.logger import get_logger
 
-from iaglobal.utils.logger import logger
-
-logger = logging.getLogger("ia-global")
+logger = get_logger("iaglobal.agents.skill_generator_agent")
 
 class SkillGeneratorAgent(AgentBase):
     """Gera skills automaticamente da base de conhecimento."""

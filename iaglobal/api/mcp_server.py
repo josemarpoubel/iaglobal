@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # iaglobal/api/mcp_server.py
 
 """
 MCP Server para iaglobal — permite que opencode (ou qualquer cliente MCP)
 execute tarefas de geracao de codigo, consulte status e aprendizado.
 
+DEPRECATED: Este servidor foi consolidado em iaglobal/mcp/server.py
+
 Uso direto:
-    python -m iaglobal.api.mcp_server
+    python -m iaglobal.mcp.server --mode both
 
 Registro no opencode.json:
     {
         "mcp": {
             "iaglobal": {
                 "type": "local",
-                "command": ["python", "-m", "iaglobal.api.mcp_server"],
+                "command": ["python", "-m", "iaglobal.mcp.server", "--mode", "both"],
                 "enabled": true,
                 "timeout": 300000
             }
@@ -28,9 +31,12 @@ import logging
 import faulthandler
 from mcp.server.fastmcp import FastMCP
 
+# WARNING: DEPRECATED - Este servidor foi consolidado em iaglobal/mcp/server.py
+# Use: python -m iaglobal.mcp.server --mode both
+# Este arquivo será removido em futura versão.
+
 from iaglobal.api import IAGlobalAPI
 from iaglobal.core.orchestrator import get_orchestrator
-from iaglobal.graphs.communication.acetylcholine_bus import AcetylcholineBus
 from iaglobal.providers.provider_metrics import metrics
 from iaglobal.graphs.bandit import BanditPolicy
 from iaglobal.graphs.credit import CreditAssignmentEngine
@@ -403,8 +409,8 @@ async def load_system_components():
     """Carrega os componentes pesados em background."""
     orchestrator = get_orchestrator()
     await orchestrator.initialize()
-    bus = AcetylcholineBus.get_instance()
-    bus.start_background_purger(interval_sec=10.0)
+    logger = logging.getLogger("iaglobal.api.mcp_server")
+    logger.info("Componentes IAGlobal carregados em background.")
     
     logging.warning("Sistema IAGlobal carregado com sucesso em background.")
 

@@ -30,6 +30,14 @@ COST_VALIDATION_BASIC = 5
 COST_VALIDATION_DEEP = 15
 COST_AUTO_CORRECTION = 25
 
+MCP_RATE_LIMITS = {
+    "web_search": {"calls_per_minute": 10, "cooldown_seconds": 6},
+    "web_fetch": {"calls_per_minute": 15, "cooldown_seconds": 4},
+    "execute_code": {"calls_per_minute": 5, "cooldown_seconds": 12},
+    "read_file": {"calls_per_minute": 30, "cooldown_seconds": 2},
+    "write_file": {"calls_per_minute": 10, "cooldown_seconds": 6},
+}
+
 
 class GlutathioneGuardrails:
     """Sistema imunológico — valida código contra padrões perigosos antes da execução com integração SAMe."""
@@ -146,6 +154,36 @@ class GlutathioneGuardrails:
                 corrected = re.sub(r'\bpickle\.loads\s*\([^)]*\)', '# pickle.loads BLOCKED - segurança', corrected)
                 
         return corrected
+
+    @classmethod
+    def check_mcp_rate_limit(cls, tool_name: str, agent_name: str = "unknown") -> Dict[str, Any]:
+        """Verifica rate limit de chamadas MCP para um agente."""
+        limits = MCP_RATE_LIMITS.get(tool_name)
+        if not limits:
+            return {"allowed": True, "reason": "Sem limite configurado"}
+
+        if not hasattr(cls, "_mcp_call_log"):
+            cls._mcp_call_log = {}
+
+        from collections import defaultdict
+        import time
+
+        if not hasattr(cls, "_mcp_call_log_store"):
+            cls._mcp_call_log_store = defaultdict(list)
+
+        now = time.time()
+        window = 60.0
+        key = f"{agent_name}:{tool_name}"
+        calls = [t for t in cls._mcp_call_log_store[key] if now - t < window]
+        cls._mcp_call_log_store[key] = calls
+
+        if len(calls) >= limits["calls_per_minute"]:
+            logger.warning("[GLUTATHIONE-RATE] %s excedeu limite MCP %s: %d/min",
+                           agent_name, tool_name, len(calls))
+            return {"allowed": False, "reason": f"Rate limit: {limits['calls_per_minute']}/min"}
+
+        cls._mcp_call_log_store[key].append(now)
+        return {"allowed": True, "calls_in_window": len(calls) + 1}
 
     @classmethod
     def register_guardrail(cls, rule: Dict[str, Any]):

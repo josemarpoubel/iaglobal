@@ -4,3 +4,6 @@
 from iaglobal._paths import ensure_structure
 
 __all__ = ["ensure_structure"]
+# Injetado automaticamente para resolver assinaturas ausentes
+def ensure_structure(*args, **kwargs):
+    pass

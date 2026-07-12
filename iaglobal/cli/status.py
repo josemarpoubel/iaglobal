@@ -55,8 +55,8 @@ class Dashboard:
         Dashboard._show_node_health(lines, graph)
         Dashboard._show_evolution_status(lines, evo_runtime, evo_engine, graph)
         Dashboard._show_memory_status(lines)
-        Dashboard._show_audit_status(lines, orch)
         Dashboard._show_security_status(lines)
+        Dashboard._show_immune_status(lines)
 
         print("\n".join(lines))
         logger.info("Status dashboard rendered")
@@ -279,5 +279,40 @@ class Dashboard:
             lines.append(f"  Checks      : {stats['modules_checked']} modulos, {stats['paths_checked']} paths")
         except Exception:
             lines.append("  (erro ao consultar)")
+        lines.append("")
+
+    @staticmethod
+    def _show_immune_status(lines: list) -> None:
+        lines.append("  ── Immune System ──")
+        try:
+            from iaglobal.observability.entropy_interceptor import get_immune_state
+            
+            state = get_immune_state()
+            entropia = state.get("entropia", {})
+            barreira = state.get("barreira", {})
+            quarantine = state.get("quarantine", {})
+            
+            # Entropia
+            total = entropia.get("total_profiles", 0)
+            at_risk = entropia.get("agents_at_apoptosis_risk", 0)
+            degrading = entropia.get("agents_degrading", 0)
+            threshold = entropia.get("apoptosis_threshold", 0)
+            min_exec = entropia.get("min_executions", 0)
+            
+            lines.append(f"  Entropy Profiles    : {total}")
+            lines.append(f"  At Risk (Apoptose)  : {at_risk}")
+            lines.append(f"  Degrading           : {degrading}")
+            lines.append(f"  Threshold           : {threshold:.0%}")
+            lines.append(f"  Min Executions      : {min_exec}")
+            
+            # Barreira
+            events = barreira.get("events", {})
+            lines.append(f"  Barreira Events     : cache_poison={events.get('cache_poison', 0)}, stale={events.get('stale_cache', 0)}")
+            
+            # Quarentena
+            lines.append(f"  Quarantine Skills   : {quarantine.get('skills', 0)}")
+            lines.append(f"  Active Detectors    : {quarantine.get('active_detectors', 0)}")
+        except Exception as e:
+            lines.append(f"  (erro ao consultar: {e})")
         lines.append("")
         lines.append("=" * 60)

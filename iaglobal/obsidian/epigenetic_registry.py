@@ -41,10 +41,9 @@ class EpigeneticMarker:
 class EpigeneticRegistry:
     """Registra e recupera configurações epigenéticas via Obsidian Vault."""
 
-    def __init__(self, base_path: Path = None):
-        self.base_path = base_path or Path(
-            "/home/kitohamachi/projeto-iaglobal/obsidian/epigenetic"
-        )
+    def __init__(self, base_path: Path | None = None):
+        from iaglobal._paths import PACKAGE_DIR
+        self.base_path = base_path or (PACKAGE_DIR / "obsidian" / "epigenetic")
         self.base_path.mkdir(parents=True, exist_ok=True)
         self._memory_cache: Dict[str, EpigeneticMarker] = {}
         

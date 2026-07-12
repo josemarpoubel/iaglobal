@@ -65,19 +65,24 @@ async def async_generate(prompt: str, model: str = None, timeout: int = 600, tok
 
     base_url = ProviderConfig.OLLAMA_URL.strip().rstrip('/')
     system_msg = "Responda SEMPRE em português brasileiro. Se for código, use a linguagem apropriada (HTML, Python, etc)."
+    # Parâmetros otimizados para qwen2.5:0.5b:
+    # - temperature=0.1 → determinístico, evita alucinação de sintaxe
+    # - num_ctx=4096    → janela de atenção compatível com o modelo pequeno
+    ollama_options = {"temperature": 0.1, "num_ctx": 4096, "keep_alive": "10m"}
     endpoints_payloads = [
         (urljoin(base_url + "/", "v1/chat/completions"), {
             "model": model,
             "messages": [{"role": "system", "content": system_msg}, {"role": "user", "content": prompt}],
-            "stream": False, "options": {"keep_alive": "10m"},
+            "stream": False, "options": ollama_options,
         }),
         (urljoin(base_url + "/", "api/chat"), {
             "model": model,
             "messages": [{"role": "system", "content": system_msg}, {"role": "user", "content": prompt}],
-            "stream": False,
+            "stream": False, "options": ollama_options,
         }),
         (urljoin(base_url + "/", "api/generate"), {
             "model": model, "prompt": prompt, "system": system_msg, "stream": False,
+            "options": ollama_options,
         }),
     ]
 

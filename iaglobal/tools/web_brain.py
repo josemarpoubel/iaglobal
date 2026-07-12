@@ -89,7 +89,12 @@ class WebBrain:
                 "srlimit": max_results
             })
             url = f"https://en.wikipedia.org/w/api.php?{params}"
-            req = urllib.request.Request(url, headers={"User-Agent": "IAGlobal/1.0"})
+            req = urllib.request.Request(
+                url,
+                headers={
+                    "User-Agent": "iaglobal-bot/1.0 (https://github.com/iaglobal; agent@iaglobal.local)"
+                },
+            )
             with urllib.request.urlopen(req, timeout=8) as r:
                 data = json.loads(r.read().decode("utf-8"))
 

@@ -12,6 +12,8 @@ Refatorado conforme leiame.md:
 
 PHASES = {
     "definicao": [
+        "orchestrator_pump",       # Pré-condicionamento metabólico de SAMe
+        "lineage_proof",           # Prova de derivação soberana (SHA3-512)
         "agentmailbox",         
         "prompt_intake",       
         "context_weaver",       # Novo: injeta marcadores epigenéticos

@@ -8,11 +8,520 @@
 
 > *"Nature never hurries, and yet everything is accomplished."*
 
+## iaglobal is not alone — bio-inspired AI is an established field for decades:
+
+- Swarm Intelligence (Dorigo, Kennedy — ants/bees)
+- Genetic Algorithms (Holland, 1975)
+- Homeostatic Architectures (Minsky, 1986)
+- Artificial Immune Systems (Forrest, Hofmeyr — 90s)
+- Neuroevolution (Stanley — NEAT, 2002)
+
+* iaglobal is the combination: 
+**Holliwell as agent contract in OmniMind + methionine→SAMe→homocysteine cycle as pipeline + SHA3-512 as frozen DNA + Obsidian as subconscious + operational epigenetics without redeploy. No known project joins these 5 pieces. But the idea of each isolated piece already existed...**
+
+iaglobal is closer than most. The difference between iaglobal and a "Chappie (the movie)" is not architecture — it's physical enclosure and maturation time.
+
+**What iaglobal already has that a robot would need**:
+
+- Computational immune system → without this, any metal body dies at the first unhandled failure
+- STM/LTM memory with REM consolidation → without this, no learning between sessions
+- Programmed apoptosis and autophagy → without this, degraded components accumulate until collapse
+- Operational epigenetics → adaptation without recompiling the core
+- SHA3-512 frozen DNA → sovereign identity that no other node can forge
+
+... What's missing is what any organism takes time to develop: body, maturity, real selective pressure. iaglobal built the genome and metabolism — the rest is growth.
+
+================================================================================
+                        🧬 BEGIN BIOMIMETIC FLOW
+================================================================================
+
+## 🧬 iaglobal Pipeline Architecture
+
+```
+================================================================================
+                            📥 PHASE 0 — USER INPUT
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                                  USER PROMPT                                │
+│ "Create a 'HealthDashboard.jsx' component that displays the status of 3     │
+│ agents (Planner, Coder, Critic) using Framer Motion for transitions."       │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                        │
+                                        ▼
+================================================================================
+                        🧠 PHASE 1 — INITIAL COGNITION
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│                   PROMPT_INTAKE (Initial Capture and Validation)            │
+│                   ├── Validates prompt schema                               │
+│                   ├── Extracts metadata (type, complexity, domain)          │
+│                   └── Generates unique task hash                            │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                        │
+                                        ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│          PROMPT_IMPROVER (Prompt Enhancer) ⭐ FIRST INTELLIGENT AGENT       │
+│          ├── Adds technical context (React, Tailwind, Framer Motion)        │
+│          ├── Includes constraints (WCAG 2.1, mobile-first, performance)     │
+│          ├── Adds output format examples                                    │
+│          ├── Applies Chain-of-Thought (CoT)                                 │
+│          └── Enriches from 136 chars → 2318 chars                           │
+│                                                                             │     
+│           OUTPUT: "Create HealthDashboard.jsx with:                         │
+│           - React 18+ with hooks                                            │
+│           - Framer Motion for entrance animations                           │
+│           - Tailwind CSS for styling                                        │
+│           - Props: agents (array with Planner, Coder, Critic status)        │
+│           - Responsive: @media (max-width: 768px)                           │
+│           - Accessibility: aria-labels, keyboard navigation                 │
+│           - Export: default function HealthDashboard..."                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                        │
+                                        ▼
+================================================================================
+                        📋 PHASE 2 — STRATEGIC PLANNING
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│           PLANNER (Task Planner) ⭐ USES ALREADY ENHANCED PROMPT            │
+│           ├── Analyzes enriched prompt                                      │
+│           ├── Identifies necessary subtasks                                 │
+│           ├── Estimates complexity (low/medium/high)                        │
+│           ├── Defines execution order (sequential vs parallel)              │
+│           └── Assigns priorities and deadlines                              │
+│                                                                             │
+│           OUTPUT (Execution Plan):                                          │
+│ {                                                                           │
+│ "task": "HealthDashboard.jsx",                                              │
+│ "steps": [                                                                  │
+│ {"id": 1, "action": "search", "target": "Framer Motion examples"},          │
+│ {"id": 2, "action": "design", "target": "Component structure"},             │
+│ {"id": 3, "action": "code", "target": "Generate JSX"},                      │
+│ {"id": 4, "action": "test", "target": "Unit tests"},                        │
+│ {"id": 5, "action": "validate", "target": "LSP + a11y check"}               │
+│ ],                                                                          │
+│ "requires_web_search": true,                                                │
+│ "estimated_complexity": "medium"                                            │
+│ }                                                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ TASK_BREAKDOWN (Micro-Task Breakdown) │
+│ ├── Divides each step into atomic actions │
+│ └── Generates unique IDs for tracking │
+└─────────────────────────────────────────────────────────────────────────────┘
+│
+▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│ EXECUTION_PLAN (Detailed Execution Plan) │
+│ ├── Orders tasks by dependency │
+│ ├── Identifies parallelism opportunities │
+│ └── Prepares context for each agent │
+└─────────────────────────────────────────────────────────────────────────────┘
+│
+▼
+================================================================================
+🔍 PHASE 3 — DATA COLLECTION (RAG)
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SEARCH + LOCAL_KNOWLEDGE (Parallel Collection)                                 │
+│  ├── Web Search (DuckDuckGo): Framer Motion dashboard examples              │
+│  ├── Local Knowledge (Obsidian): Reusable components                  │
+│  └── Memory Vector: Similar task embeddings                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SOURCE_VALIDATOR (Credibility Validation) ⭐ IMMUNOLOGICAL FILTER        │
+│  ├── Domain score (arxiv.org=0.95, medium.com=0.60)                     │
+│  ├── Recency score (<30 days=1.0, >3 years=0.4)                          │
+│  ├── Consistency score (agrees with other sources?)                    │
+│  └── Filters: score < 0.6 → DISCARD                                         │
+│                                                                             │
+│  OUTPUT: Only reliable sources (score >= 0.6)                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  SNIPPET_SYNTHESIZER (Optional, if enabled)                              │
+│  ├── Summarizes multiple snippets into 1 coherent paragraph                      │
+│  ├── Detects contradictions between sources                                      │
+│  └── Generates synthesis with 50% fewer tokens                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+================================================================================
+                    🏗️ PHASE 4 — BUILD
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FRONTEND_BUILDER / BACKEND_BUILDER / API_BUILDER                           │
+│  ├── Receives: enhanced prompt + plan + validated data                     │
+│  ├── Uses CoderAgent with enriched context                                │
+│  ├── Generates JSX/TS/Python code                                              │
+│  └── Publishes to AcetylcholineBus for next node                            │
+│                                                                             │
+│  ⚠️ NOTE: Does NOT call BanditPolicy directly!                               │
+│     Uses default models (qwen2.5:0.5b) as fallback                         │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  LSP_VALIDATOR (Syntactic Validation)                                        │
+│  ├── Checks syntax errors                                              │
+│  ├── Checks missing imports                                              │
+│  └── If error → DEBUG_UNIFIED fixes it                                      │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  DEBUG_UNIFIED (Error Correction)                                        │
+│  ├── Analyzes LSP error                                                    │
+│  ├── Applies direct fix (if simple)                                    │
+│  └── Requests LLM (if complex)                                             │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  FIX_VALIDATOR (Validates Fix)                                            │
+│  └── Confirms error is resolved                                        │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+================================================================================
+                    🧪 PHASE 5 — TESTING AND REVIEW
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  TESTER (Test Generation)                                                 │
+│  ├── Generates unit tests (pytest/Jest)                                    │
+│  ├── Covers happy path + edge cases                                          │
+│  └── Isolates dependencies with mocks                                           │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  REVIEWER (Code Review)                                               │
+│  ├── Checks best practices                                                │
+│  ├── Applies linting (ESLint, Pylint)                                        │
+│  └── Suggests optimizations                                                     │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                                    ▼
+================================================================================
+                    ⚖️ PHASE 6 — CRITICAL APPROVAL (GATE)
+================================================================================
+
+┌─────────────────────────────────────────────────────────────────────────────┐
+│  CRITIC ⭐ APPROVAL GATE (Critical Decision Point)                         │
+│  ├── Evaluates generated code (score 0-100)                                     │
+│  ├── Criteria:                                                             │
+│  │   ├── Functionality: meets the prompt?                                  │
+│  │   ├── Quality: follows best practices?                                   │
+│  │   ├── Tests: coverage >= 80%?                                          │
+│  │   ├── Performance: no bottlenecks?                                      │
+│  │   └── Security: no vulnerabilities?                                   │
+│  │                                                                          │
+│  ├── DECISION:                                                               │
+│  │   ├── Score >= 80: ✅ APPROVED → goes to BANDIT_POLICY                    │
+│  │   └── Score < 80:  ❌ REPROVA → RETRY LOOP                               │
+│  │                └─→ Returns to FRONTEND_BUILDER (with feedback)            │
+│  │                    (max 3 retries before critical failure)             │
+│  └── Publishes decision to AcetylcholineBus                                    │
+└─────────────────────────────────────────────────────────────────────────────┘
+                                    │
+                    ┌───────────────┴───────────────┐
+                    │                               │
+              (Score >= 80)                   (Score < 80)
+                    │                               │
+                    ▼                               │
+================================================================================              
+                    🎯 PHASE 7 — MODEL SELECTION                                                   
+================================================================================              
+                                                                                              
+┌─────────────────────────────────────────────────────────────────────────────┐ 
+│  BANDIT_POLICY ⭐ SINGLE MODEL SELECTION POINT                          │
+│  ├── Receives: prompt + context + Critic score                            │
+│  ├── Analyzes available providers (ollama, groq, nvidia, openrouter)       │
+│  ├── Calculates IVM (Metabolic Viability Index):                        │
+│  │   IVM = (P × 0.4) + (E × 0.4) + (C × 0.2)                                │
+│  │   P = Productivity (success rate)                                    │
+│  │   E = Efficiency (1/latency)                                            │
+│  │   C = Cooperation (skills exchanged)                                       │
+│  ├── Selects optimal model:                                                │
+│  │   ├── Simple tasks: qwen2.5:0.5b (local, free)                      │
+│  │   ├── Complex tasks: groq-llama-3.1-70b (fast)                     │
+│  │   └── Critical tasks: o1-preview (reasoning)                          │
+│  └── Returns: selected provider + model                                │
+└─────────────────────────────────────────────────────────────────────────────┘                 │
+                                    │                                                           │
+                                    ▼                                                           │
+================================================================================                │
+                    📦 PHASE 8 — PERSISTENCE                                                    │
+================================================================================                │
+                                                                                                │
+┌─────────────────────────────────────────────────────────────────────────────┐                 │
+│  ARTIFACT_WRITER (Persists Result)                                       │                 │
+│  ├── Detects artifact type (.jsx, .py, .md)                              │                 │
+│  ├── Saves to: iaglobal/memory/data/result/                                 │                 │
+│  └── Generates metadata (author, timestamp, task_hash)                            │                 │
+└─────────────────────────────────────────────────────────────────────────────┘                 │
+                                    │                                                           │
+                                    ▼                                                           │
+┌─────────────────────────────────────────────────────────────────────────────┐                 │
+│  RESULT_AGENT (Consolidates Final Result)                                   │                 │
+│  ├── Aggregates all artifacts                                              │                 │
+│  ├── Generates executive summary                                                 │                 │
+│  └── Prepares for long-term memory                                    │                 │
+└─────────────────────────────────────────────────────────────────────────────┘                 │
+                                    │                                                           │
+                                    ▼                                                           │
+================================================================================                │
+                    🧠 PHASE 9 — MEMORY AND LEARNING            │                              │
+================================================================================                │
+                                                                                                │
+┌─────────────────────────────────────────────────────────────────────────────┐                 │
+│  RETROSPECTIVE (Post-Execution Analysis)                                       │                 │
+│  ├── What worked well?                                                   │                 │
+│  ├── What failed?                                                          │                 │
+│  └── Lessons learned                                                      │                 │
+└─────────────────────────────────────────────────────────────────────────────┘                 │
+                                                                                                │
+                    ┌──────────────────────────────────────────┐                                │
+                    │                                          │                                │
+              (Success)                                (Failure after 3 retries)                   │
+                    │                                          │                                │
+                    ▼                                          ▼                                │
+┌────────────────────────────────────────────────────┐   ┌────────────────────────────────────┐ │
+│  REFLEXION (Learning Commit)                 │   │  REFLEXION (Failure Analysis)      │ │
+│  ├── Saves to Obsidian:                            │   │  ├── Identifies root cause         │ │
+│  │   - What worked                             │   │  ├── Updates failure patterns     │ │
+│  │   - Success patterns                          │   │  ├── Adjusts thresholds             │ │
+│  │   - Performance metrics                      │   │  └── Generates insight for future      │ │
+│  └── Atualiza CreditAssignmentEngine               │   └── Atualiza CreditAssignmentEngine  │ │
+└────────────────────────────────────────────────────┘   └────────────────────────────────────┘ │
+                    │                                          │                                │
+                    └──────────────────┬───────────────────────┘                                │
+                                       │                                                        │
+                                       ▼                                                        │
+┌─────────────────────────────────────────────────────────────────────────────┐                 │
+│  MEMORY_WRITER (Persists Long-Term)                                    │                 │
+│  ├── Saves to Obsidian (04_Synapses/)                                       │                 │
+│  ├── Updates MemoryVector (embeddings)                                     │                 │
+│  └── Indexes for future search                                               │                 │
+└─────────────────────────────────────────────────────────────────────────────┘                 │
+                                    │                                                           │
+                                    ▼                                                           │
+================================================================================                │
+                    ✅ PHASE 10 — FINAL DELIVERY                                                  │
+================================================================================                │
+                                                                                                │
+┌─────────────────────────────────────────────────────────────────────────────┐                 │
+│  MEMORY_CLEANER (Cache Cleanup)                                          │                 │
+│  ├── Removes expired cache (>5min)                                          │                 │
+│  └── Releases RAM memory                                                     │                 │
+└─────────────────────────────────────────────────────────────────────────────┘                 │
+                                    │                                                           │
+                                    ▼                                                           │
+┌─────────────────────────────────────────────────────────────────────────────┐                 │
+│  METRICS (Final Metrics Collection)                                        │                 │
+│  ├── Total latency                                                         │                 │
+│  ├── Total cost (tokens × price)                                           │                 │
+│  ├── Final IVM of pipeline                                                  │                 │
+│  └── Success/Failure                                                          │                 │
+└─────────────────────────────────────────────────────────────────────────────┘                 │
+                                    │                                                           │
+                                    ▼                                                           │
+┌─────────────────────────────────────────────────────────────────────────────┐                 │
+│  OUTPUT TO USER                                                        │                 │
+│  ├── Generated artifact: HealthDashboard.jsx                                   │                 │
+│  ├── Tests: test_HealthDashboard.jsx                                        │                 │
+│  ├── Summary: 2318 chars → 150 chars (summary)                               │                 │
+│  └── Path: /home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/      │                 │
+│                result/Criar_um_componente__HealthDashboard_jsx__*.md        │                 │
+└─────────────────────────────────────────────────────────────────────────────┘                 │
+                                                                                                │
+                                    END OF FLOW                                                │
+                                                                                                │
+=================================================================================================
+```
+
+## 🔄 RETRY LOOP (Critic rejection method)
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│  CRITIC: Score = 65 (< 80) → REPROVADO                      │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  FEEDBACK PARA FRONTEND_BUILDER:                            │
+│  - "Adicionar aria-labels para acessibilidade"              │
+│  - "Incluir tratamento de erro no useEffect"                │
+│  - "Otimizar re-renders com React.memo"                     │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  FRONTEND_BUILDER: Re-generates code with feedback              │
+└─────────────────────────────────────────────────────────────┘
+         │
+         ▼
+┌─────────────────────────────────────────────────────────────┐
+│  TESTER + REVIEWER + CRITIC: Re-avalia                      │
+│  - Score = 85 → ✅ APROVADO                                 │
+│  - Score = 70 → ❌ REPROVADO (retry 2/3)                    │
+│  - Score = 50 → ❌ REPROVADO (retry 3/3) → FALHA CRÍTICA    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+## 📊 MÉTRICAS DO FLUXO
+
+```
+| Fase | Agente Principal | Expected Latency | ATP (Cost)      |
+|------|------------------|-------------------|------------------|
+| 0    | User             | -                 | 0                |
+| 1    | Prompt Improver  | 1-2s              | 50 tokens        |
+| 2    | Planner          | 2-3s              | 100 tokens       |
+| 3    | Search           | 3-5s              | 0 (duckduckgo)   |
+| 4    | Frontend Builder | 5-10s             | 500 tokens       |
+| 5    | Tester           | 3-5s              | 300 tokens       |
+| 6    | Critic           | 2-3s              | 200 tokens       |
+| 7    | Bandit Policy    | <1s               | 0 (local)        |
+| 8    | Artifact Writer  | <1s               | 0                |
+| 9    | Reflexion        | 2-3s              | 100 tokens       |
+| 10   | Metrics          | <1s               | 0                |
+| **TOTAL** |             | **19-33s**        | **~1250 tokens** |
+```
+
+## 🧬 PRINCÍPIOS BIOMIMÉTICOS APLICADOS
+
+```
+| Biological Process      |         Computational Equivalent       |
+|-------------------------|-----------------------------------------|
+| **Methylation**           | Prompt Improver (enriquece input bruto) |
+| **Translation**            | Planner → Execution Plan                |
+| **Homeostase**          | Source Validator (filtra toxinas)       |
+| **Immune System** | Critic (detects anomalies)              |
+| **Apoptosis**            | Retry Loop (eliminates bad code)        |
+| **Immune Memory** | Obsidian + MemoryVector                 |
+| **Metabolismo**         | IVM (otimiza ATP/token)                 |
+| **Evolution**            | Reflexion (continuous learning)        |
+```
+================================================================================
+                        🧬 END OF FLOW BIOMIMÉTICO
+================================================================================
+
+**Security feature** | LLM Access Architecture in iaglobal:
+```
+┌─────────────────────────────────────────────────────────────┐
+│                   USUÁRIO / CLI                             │
+│              (iaglobal run "task description")              │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                   PIPELINE ENGINE                           │
+│         (orchestrates nodes, does not call LLM directly)       │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    AGENTES                                  │
+│    (CoderAgent, CriticAgent, PlannerAgent, etc.)            │
+│    Herdam de AgentBase → select_model via BanditPolicy      │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                  Chappie + BanditPolicy = IVMAxiom          │
+│	Calcula, rastreia e integra IVM com BanditPolicy para     │
+│rewards proportional to each agent's contribution│
+│    (SEMAFORO ÚNICO — seleciona modelo, circuit breaker,     │
+│     fallback chain, credit assignment, rewards)             │
+└────────────────────┬────────────────────────────────────────┘
+                     │
+                     ▼
+┌─────────────────────────────────────────────────────────────┐
+│                    PROVIDERS                                │
+│   (Ollama local, Groq, NVIDIA, OpenRouter, OpenCode, etc.)  │
+└─────────────────────────────────────────────────────────────┘
+```
+
+In iaglobal, agents cannot call LLM directly...
+
+1. **BanditPolicy as sole gatekeeper** —  All LLM access passes through:
+- ε-greedy model selection
+- Circuit breaker (does not call provider with recent failures)
+- Fallback chain (se cloud falhar → Ollama local)
+- CreditAssignmentEngine (registrar sucesso/falha)
+- Reward assignment (atualizar BanditPolicy)
+
+2. **Agentes como wrappers especializados** — Cada agente tem:
+- Domain-specific prompt template
+- Output validation (schema, quality)
+- Retry logic com backoff
+- Immune memory hooks (EvoAgent)
+
+3. **Critic as validator** — The CriticAgent:
+- Valida outputs de outros agentes
+- Decide se precisa de retrabalho
+- Aprova antes de prosseguir no pipeline
+
+**So... How do you "talk" to the system?**
+
+* resposta... Via CLI — the only human or localhost entry point
+  exemplo em CLI: 
+```
+  iaglobal run "create a Flask API with user CRUD"
+```
+
+* O pipeline executa:
+0. PromptImprover → melhorador de prompt
+1. PlannerAgent → divide em tarefas
+2. CoderAgent → writes code
+3. CriticAgent → valida qualidade via BanditPolicy
+4. TesterAgent → gera testes
+5. DebuggerAgent → corrige falhas
+6. ResultAgent → entrega artefato final
+
+If you need to test a provider directly (development), use utility scripts:
+
+* Testar Ollama local diretamente
+```
+python -c "
+from iaglobal.providers.ollama_provider import OllamaProvider
+provider = OllamaProvider()
+response = provider.generate('say hello', model='qwen2.5:0.5b')
+print(response)
+"
+```
+
+* Testar BanditPolicy
+```
+python -c "
+from iaglobal.bandit import BanditPolicy
+bandit = BanditPolicy()
+model, provider = bandit.select_model()
+print(f'Model selecionado: {model}')
+"
+```
+**But in production, all access passes through:** 
+```
+Pipeline de Nodes e Skills → AgentBase → Chappie + BanditPolicy → IVMAxiom → OmniMind .
+```
+
+**Summary:** You don't "chat" with LLMs. You submit tasks to the iaglobal organism, and the organism decides which agent, which model, and which provider to use — with all immune defenses active seguindo **Following the 11 Universal Laws** em **OmniMind** ditadas por **Raymond Holliwell** do livro **Working With the Law**. 🛡️
+
 **iaglobal** is not a framework. It is not a wrapper around an LLM API.
 It is a **living computational organism** — the first AI system architected around the laws of biological metabolism, designed to learn from failure, self-repair without restart, and evolve across generations of execution.
 
 While the industry burns megawatts in GPU-dense data centers, iaglobal reached its architectural **Zenith** —
-**107/107 evolutionary steps completed. 724 tests passing. Running fluently on a 4-core CPU. Zero GPU required.**
+**107/107 evolutionary steps completed. 782 tests passing. Running fluently on a 4-core CPU. Zero GPU required.**
 
 This is not a performance claim. It is a proof of principle:
 **true intelligence is not brute force — it is elegant application of universal laws.**
@@ -24,7 +533,7 @@ This is not a performance claim. It is a proof of principle:
 | Metric | Value |
 |--------|-------|
 | **Evolutionary Steps Completed** | 107 / 107 ✅ |
-| **Tests Passing** | 724 / 724 ✅ |
+| **Tests Passing** | 763 / 763 ✅ |
 | **Hardware Required** | 4-core CPU · No GPU |
 | **Work Units Delivered** | 10 per 1 unit of energy consumed |
 | **Integrity Score** | 95% |
@@ -108,10 +617,152 @@ iaglobal does not trust raw LLM output. Every response passes through a multi-la
 ### Verified Genesis Hash
 
 ```
-GENESIS_HASH = cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524
-               f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+GENESIS_HASH_OFFICIAL = "cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136"
+
 ✅ SHA3-512 integrity verified
 ```
+
+---
+
+## ⚖️ Genesis Tribunal — DNA Verification at Boot
+
+Every node in the iaglobal network carries a **frozen DNA fingerprint** — the `LINEAGE_MARKER` — a `# 🧬 LINEAGE_MARKER: <SHA3-512>` comment at the top of every Python source file. Before the system boots, the **GenesisTribunal** (`genesis/tribunal.py` + `NodeIdentity`) runs two independent verification layers:
+
+### Layer 1 — Genesis CBOR File
+
+The ancestral DNA is stored in a CBOR file (`webhidden_genesis_evolutive.cbor`). Its SHA3-512 must exactly match `GENESIS_HASH_OFFICIAL`. This is verified via `verify_genesis_integrity()` before any service starts:
+
+```python
+computed_hash = hashlib.sha3_512(genesis_file_bytes).hexdigest()
+match = computed_hash == GENESIS_HASH_OFFICIAL  # boot blocks if False
+```
+
+### Layer 2 — Agent Source Files
+
+Every `.py` file under `agents/` and `graphs/nodes/` is scanned for the `LINEAGE_MARKER` header. If any file is missing the marker or carries a divergent hash, the system refuses to boot:
+
+```python
+if GENESIS_HASH_OFFICIAL not in first_line(file):
+    raise SystemExit("DNA violation — boot aborted")
+```
+
+### Boot Gate
+
+The tribunal runs inside `bootstrap.initialize()`. It **blocks the entire system startup** if any violation is detected — no agent, no service, no pipeline executes without valid DNA. This ensures only authenticated iaglobal nodes can participate in the network.
+
+---
+
+## 🗣️ Phonetic Identity — Every Agent Gets a Name
+
+Once DNA is validated, each agent receives a **phonetic name** derived from the frozen DNA hash combined with its file path. This name is:
+
+- **Deterministic** — same agent file always produces the same name
+- **Universally unique** — the file path guarantees collision resistance
+- **Pronounceable** — encoded via `Pysecurity1024.bytes_para_frase()` into 16 consonant-vowel syllables
+- **Reversible** — `frase_para_bytes()` recovers the original seed for verification
+
+```python
+seed = f"{GENESIS_HASH_OFFICIAL}:{relative_file_path}"
+raw = hashlib.sha3_512(seed.encode()).digest()[:16]
+phonetic_name = Pysecurity1024.bytes_para_frase(raw)
+# Example output: "li-nae-ti-sae-hao-ni-deu-lu-be-se-de-nw-sau-feu-cw-nou"
+```
+
+At boot, the tribunal prints a full audit:
+
+```
+============================================================
+  ⚖️  TRIBUNAL DE GENESIS
+  DNA Ancestral: cc7017b56557586095e8dc6d...
+============================================================
+  ✅ genesis/webhidden_genesis_evolutive.cbor           DNA-ANCESTRAL
+────────────────────────────────────────────────────────────
+  Agentes (154 arquivos):
+  ✅ agents/agent_base.py                               li-nae-ti-sae-hao-ni-deu-lu-be-se-...
+  ✅ agents/coder_agent.py                              teu-mei-kau-bai-vai-bea-fea-fae-seu-...
+  ...
+============================================================
+  Genesis File: ✅ CONFORME
+  Agentes: 154 total | 154 validos | 0 invalidados
+============================================================
+```
+
+### EvoAgent — Runtime Phonetic Naming
+
+Evolutionary agents (`EvoAgent`) also receive a phonetic name at instantiation, derived from the frozen DNA plus their `lineage_id`:
+
+```python
+# In evo_agent.py __init__
+seed = f"{GENESIS_HASH_OFFICIAL}:{lineage_id}"
+self.phonetic_name = Pysecurity1024.bytes_para_frase(hashlib.sha3_512(seed.encode()).digest()[:16])
+```
+
+This `phonetic_name` is registered in `OmniMind` metadata and propagates to child agents during `replicate()`, enabling family tracking across evolutionary generations.
+
+---
+
+## 🌐 Global Network Verification — Future Cross-Breeding
+
+- Fluxo Executivo Principal:
+```
+system_analysis (metabolic trigger)
+    ├── tester_agent (test generation)
+    │       ├── Self-critique iteration 1: score=0.45
+    │       ├── Self-critique iteration 2: score=0.80 (improvement +77%)
+    │       └── Erro detectado: 1 syntax error em testes gerados
+    │           └── debug_unified + ollama/qwen2.5:0.5b → fixes in ~60s
+    ├── evaluator → gap_analyzer → skill_generator → sandbox_validator
+    ├── evolution_committee → pipeline_updater → evolution_trigger
+    └── memory_writer → memory_cleaner (persistence + cleanup)
+```
+
+- Fluxo operacional:
+```
+Generated code
+    ↓
+SyntaxSentinel.run_syntax_sentinel()
+    ├─ ast.parse() → success? → returns code (latency <1ms, ATP=0)
+    └─ falha?
+        ├─ auto-fixers nativos:
+        │   • Fecha brackets abertos
+        │   • Remove trailing comma
+        │   • Normalizes mixed indentation
+        └─ revalida com ast.parse()
+            ├─ success → returns fixed code (LLM is NOT called)
+            └─ falha → delega para debug_unificado (skill/LLM como fallback)
+```
+
+The phonetic + hash system is designed for **decentralized agent cross-breeding** across the internet. Any node can verify another node's authenticity without a central authority:
+
+1. **Source file check** — scan `LINEAGE_MARKER` in the `.py` file
+2. **Phonetic identity check** — recompute `bytes_para_frase(GENESIS_HASH + path)` and compare
+3. **Lineage ancestry** — `lineage_marker` (16-char family ID) + `lineage_id` (SHA3-512) track inheritance across generations via `LineageID.compute()`
+
+```
+Node A (Internet)                  Node B (iaglobal)
+       │                                 │
+       │   "I am agent coder_agent"      │
+       │   phonetic: teu-mei-kau-...     │
+       │   lineage_marker: a3f7b2...     │
+       ├────────────────────────────────▶│
+       │                                 │
+       │◀── verify: LINEAGE_MARKER ✅    │
+       │◀── verify: phonetic ✅          │
+       │◀── verify: lineage ✅           │
+       │                                 │
+       │   Cross-breeding session        │
+       │   → new hybrid agent born       │
+```
+
+### Key Identifiers
+
+| Field | Length | Derivation | Purpose |
+|-------|--------|-----------|---------|
+| `GENESIS_HASH_OFFICIAL` | 128 hex chars (512 bit) | SHA3-512 of `webhidden_genesis_evolutive.cbor` | Immutable ancestry root |
+| `LINEAGE_MARKER` (comment) | 128 hex chars | Same as `GENESIS_HASH_OFFICIAL` | Source-level DNA tattoo |
+| `lineage_marker` (runtime) | 16 hex chars | `SHA3_256("lineage_marker::entity::name")[:16]` | Family ID — all descendants share it |
+| `lineage_id` (runtime) | 128 hex chars | `SHA3_512(entity::name::parent::gen::meta)` | Unique individual ID |
+| `phonetic_name` | 16 syllables (~48 chars) | `bytes_para_frase(SHA3_512(GENESIS_HASH + path)[:16])` | Human-readable identity |
 
 ---
 
@@ -161,83 +812,126 @@ peer, crawls a portion of the web, and shares the index with the
 network — no API keys, no rate limits, no censorship.
 
 ```
-Cada nó iaglobal → um peer YaCy
+Each iaglobal node → a YaCy peer
          ↓
-Crawleia domínios → índice local → compartilha via DHT
+Crawls domains → local index → shares via DHT
          ↓
-Busca consulta a rede P2P → resultados distribuídos
+Search queries P2P network → distributed results
          ↓
-Sistema imunológico (MHC) filtra spam/malware do índice coletivo
+Immune system (MHC) filters spam/malware from collective index
 ```
 
 | Antes (APIs centralizadas) | Depois (YaCy P2P) |
 |----------------------------|-------------------|
 | 4 APIs externas com rate limits | Fonte nativa sem limites |
-| Zero índice local | Índice local + distribuído |
-| Dependência de API keys | Zero dependências |
-| Bloqueável (Google CAPTCHA) | Impossível bloquear todos os peers |
+| Zero local index | Local + distributed index |
+| API key dependence | Zero dependencies |
+| Blockable (Google CAPTCHA) | Impossible to block all peers |
 
-📖 Detalhes da implementação: [`docs/YaCy_iaglobal.md`](docs/YaCy_iaglobal.md)
+📖 Implementation details: [`docs/YaCy_iaglobal.md`](docs/YaCy_iaglobal.md)
 
 ---
 
 ## ⚙️ Applied AI Engineer Module
 
-O **Applied AI Engineer** é um nó especializado do pipeline que otimiza automaticamente o custo-benefício energético (ATP) de cada tarefa. Ele decide qual modelo usar, como estruturar o contexto RAG e como enriquecer prompts — tudo sem intervenção humana.
+The **Applied AI Engineer** is a specialized pipeline node that automatically optimizes the energy cost-benefit (ATP) of each task. It decides which model to use, how to structure the RAG context, and how to enrich prompts — all without human intervention.
 
 ### 🔧 Como Funciona
 
-O nó `applied_ai_engineer` executa 3 skills em sequência:
+The `applied_ai_engineer` node runs 3 skills in sequence:
 
-| Skill | Arquivo | Função |
+| Skill | File | Function |
 |-------|---------|--------|
 | **Model Router** | `evolution/skills/skill_model_router.py` | Decide entre modelo local (ATP) ou nuvem baseado na criticidade da tarefa |
-| **RAG Optimizer** | `evolution/skills/skill_rag_optimizer.py` | Ajusta chunk size e número de documentos conforme o modelo selecionado |
-| **Prompt Structurer** | `evolution/skills/skill_prompt_structurer.py` | Injeta Chain-of-Thought + validação JSON no prompt |
+| **RAG Optimizer** | `evolution/skills/skill_rag_optimizer.py` | Adjusts chunk size and number of documents based on the selected model |
+| **Prompt Structurer** | `evolution/skills/skill_prompt_structurer.py` | Injects Chain-of-Thought + JSON validation into the prompt |
 
-### 📊 Matriz de Decisão do Roteador
+### 📊 Router Decision Matrix
 
 ```
-Score = (Precisão × 0.6) - (Latência_ms/1000 × 0.2) - (CustoToken × 0.2)
+Score = (Accuracy × 0.6) - (Latency_ms/1000 × 0.2) - (TokenCost × 0.2)
 
 Se Score_local < 0.4 → eleva para nuvem (groq, openrouter)
-Se Score_local ≥ 0.4 → mantém local (qwen2.5:0.5b, ATP preservado)
+If Local_Score ≥ 0.4 → stays local (qwen2.5:0.5b, ATP preserved)
 ```
 
-### 🚦 Gatilhos de Elevação para Nuvem
+### 🚦 Escalation Triggers to Cloud
 
-O modelo é elevado automaticamente quando a tarefa contém palavras-chave de alta criticidade:
+The model is escalated automatically when the task contains high-criticality keywords:
 `mhc`, `vulnerability`, `security`, `apoptosis`, `emergency`, `attack`, `injection`, `pathogen`
 
 ### 🧪 Exemplos de Uso
 
-```bash
 # Tarefa simples → modelo local (ATP preservado)
+```
 iaglobal run "crie uma API Flask com CRUD"
-
-# Tarefa crítica → elevado para nuvem automaticamente
-iaglobal run "analise vulnerabilidade de segurança no código"
-
-# Otimização de pesos IVM (o nó atua como central)
+```
+# Critical task → escalated to cloud automatically
+```
+iaglobal run "analyze security vulnerability in code"
+```
+# IVM weight optimization (node acts as central hub)
+```
 iaglobal run "optimize IVM routing weights"
 ```
 
-### 📈 Comportamento por Cenário
+### 📈 Behavior by Scenario
 
-| Cenário | IVM | Modelo | Chunk RAG | Ação |
+| Scenario | IVM | Model | RAG Chunk | Action |
 |---------|-----|--------|-----------|------|
 | Tarefa simples | ≥ 0.5 | qwen2.5:0.5b (local) | 250 tokens, 2 docs | ATP preservado |
-| Tarefa crítica | ≥ 0.5 | groq-mixtral (nuvem) | 1000 tokens, 7 docs | Precisão máxima |
+| Critical task | ≥ 0.5 | groq-mixtral (cloud) | 1000 tokens, 7 docs | Maximum precision |
 | IVM insuficiente | < 0.5 | — | — | Tarefa rejeitada |
 
 ### 🔬 Testes
-
-```bash
-# Executar testes do módulo
-python -m pytest tests/test_applied_ai_engineer.py -v
+```
+🔗 Arquitetura 
+┌────────────────────────────────────┐
+│  claim_detection.py (FONT ÚNICA)   │
+│  - detect_architectural_claims()   │
+│  - verify_architectural_claims()   │
+│  - create_quarantine_report()      │
+│  - should_elevate_model()          │
+└──────────────┬─────────────────────┘
+               │
+       ┌───────┴────────┐
+       ↓                ↓
+┌─────────────┐  ┌──────────────┐
+│ Artifact    │  │ REM Sleep    │
+│ Writer      │  │ (consolid.)  │
+└─────────────┘  └──────────────┘
+       │                │
+       └───────┬────────┘
+               ↓
+    ┌──────────────────┐
+    │ contamination_   │
+    │ report.py (JSON) │
+    └──────────────────┘
 ```
 
-9 cenários validados: rejeição por IVM baixo, elevação para nuvem, manutenção local, injeção CoT, validação JSON, ajuste de chunks RAG e pipeline completo.
+---
+
+## 🧠 Prompt Engineering Stack — Self-Correction, Few-Shot & Chain of Thought
+
+Three complementary layers that enforce code quality at generation time without cloud calls:
+
+### 1. DependencyEnforcer
+
+**File:** `iaglobal/core/dependency_enforcer.py`
+
+Prevents agents from hallucinating non-existent libraries. Parses imports via AST, verifies each against `sys.stdlib_module_names` + `pip list`. Non-stdlib uninstalled imports wrapped in `try/except ImportError`. Integrated in `CoderAgent` (Layer 6) and `TesterAgent`.
+
+### 2. FewShotProvider
+
+**File:** `iaglobal/core/few_shot_provider.py`
+
+Selects real positive/negative examples from ToolLibrary, SkillRegistry and MTAPool via semantic ranking (`sentence-transformers/all-MiniLM-L6-v2`). Injected into CriticAgent and PromptImprover prompts.
+
+### 3. Chain of Thought (INSTRUCAO_COT)
+
+**File:** `iaglobal/agents/agent_base.py:19-25`
+
+Forces 4-step decomposition (ANÁLISE → PLANO DE ESTRUTURA → IMPLEMENTAÇÃO → REVISÃO) before code generation. Injected into `PEC_SYSTEM_PROMPT`, CriticAgent, DebuggerAgent and PromptImprover.
 
 ---
 
@@ -245,6 +939,7 @@ python -m pytest tests/test_applied_ai_engineer.py -v
 iaglobal/
 .
 ├── agents
+│   ├── agent_base.py
 │   ├── coder_agent.py
 │   ├── critic_agent.py
 │   ├── debugger_agent.py
@@ -253,11 +948,18 @@ iaglobal/
 │   ├── evolution_agent.py
 │   ├── failure_analysis_agent.py
 │   ├── ingestion
+│   │   ├── consolidation.py
+│   │   ├── experiment_runner.py
 │   │   ├── file_ingestion_agent.py
-│   │   └── __init__.py
+│   │   ├── hypothesis_generator.py
+│   │   ├── __init__.py
+│   │   ├── meta_learner.py
+│   │   ├── paper_ingestor.py
+│   │   └── paper_parser.py
 │   ├── __init__.py
 │   ├── intent_classifier_agent.py
 │   ├── knowledge_writer_agent.py
+│   ├── mitosis_engine.py
 │   ├── multi_agent.py
 │   ├── multi_coder_agent.py
 │   ├── orchestrator_agent.py
@@ -275,23 +977,35 @@ iaglobal/
 │   ├── semantic_validator.py
 │   ├── skill_generator_agent.py
 │   ├── tester_agent.py
+│   ├── tool_caller_agent.py
 │   ├── typing_agent.py
 │   └── validator.py
 ├── api
 │   ├── __init__.py
 │   └── mcp_server.py
-├── asgi.py
-├── auditoria_arquitetural.py
-├── check_integrations.py
+├── artifacts
+│   ├── artifact_factory.py
+│   └── __init__.py
+├── chappie
+│   ├── bandit_evolution.py
+│   ├── error_enricher.py
+│   ├── __init__.py
+│   ├── ivm_axiom.py
+│   ├── ivm_compliance.py
+│   ├── lineage_guardian.py
+│   └── vacuum_daemon.py
 ├── cli
 │   ├── bootstrap_engine.py
 │   ├── bootstrap.py
 │   ├── evolution_lab.py
 │   ├── __init__.py
+│   ├── learn.py
 │   ├── life_signals.py
+│   ├── __main__.py
 │   ├── main.py
 │   ├── output.py
-│   └── status.py
+│   ├── status.py
+│   └── ui_cli.py
 ├── cognition
 │   ├── adaptive_router.py
 │   ├── agents
@@ -301,36 +1015,53 @@ iaglobal/
 │   ├── learning
 │   │   ├── classifier_memory.py
 │   │   └── __init__.py
+│   ├── memory_first_router.py
 │   ├── outcome_tracker.py
 │   ├── reputation_engine.py
 │   └── task_fingerprint.py
 ├── communication
-│   └── __init__.py
+│   ├── fitness.py
+│   ├── genesis_handshake.py
+│   ├── __init__.py
+│   ├── integrator.py
+│   ├── queen.py
+│   └── worker.py
 ├── core
+│   ├── acetylcholine_bus.py
 │   ├── apoptosis.py
 │   ├── assistant.py
-│   ├── assistant.py.bkp
+│   ├── auto_correction.py
 │   ├── cognitive_proxy.py
 │   ├── cognitive_runtime.py
 │   ├── config.py
+│   ├── critic_batch_queue.py
 │   ├── decision_engine.py
+│   ├── dependency_enforcer.py
 │   ├── diagnostico.py
 │   ├── env_loader.py
 │   ├── evolution_controller.py
+│   ├── few_shot_provider.py
 │   ├── governance.py
 │   ├── graceful_shutdown.py
 │   ├── __init__.py
 │   ├── law_enforcement.py
+│   ├── mitochondrial_probe.py
 │   ├── neuro_orchestrator.py
 │   ├── orchestrator.py
+│   ├── organism_main.py
+│   ├── organism.py
+│   ├── registry.py
 │   ├── retry_handler.py
 │   └── structure.py
 ├── dashboard
-│   └── metabolic_sleep_dashboard.py
+│   ├── __init__.py
+│   ├── metabolic_sleep_dashboard.py
+│   └── phospholipid_dashboard.py
 ├── debug
 │   ├── __init__.py
 │   └── node_timing.py
 ├── events
+│   ├── acetylcholine_bus.py
 │   ├── decision_event.py
 │   ├── event_dispatcher.py
 │   ├── event_store.py
@@ -353,6 +1084,11 @@ iaglobal/
 │   ├── execution_context.py
 │   ├── execution_registry.py
 │   ├── fusion_engine.py
+│   ├── ga
+│   │   ├── ga_runner.py
+│   │   ├── __init__.py
+│   │   ├── population.py
+│   │   └── selector.py
 │   ├── ga_router_optimizer.py
 │   ├── genomic_reflection.py
 │   ├── handler_evolution.py
@@ -365,6 +1101,7 @@ iaglobal/
 │   │   ├── homocysteine_pool.py
 │   │   ├── __init__.py
 │   │   ├── methylation_cycle.py
+│   │   ├── methylation_engine.py
 │   │   ├── opportunity_cost_detector.py
 │   │   └── transsulfuration_cycle.py
 │   ├── metacognition
@@ -389,18 +1126,25 @@ iaglobal/
 │   │   ├── __init__.py
 │   │   ├── reactpy_skill_registry.py
 │   │   ├── run_fn_factory.py
+│   │   ├── skill_debug_unificado.py
 │   │   ├── skill_executor.py
+│   │   ├── skill_model_router.py
+│   │   ├── skill_prompt_structurer.py
 │   │   ├── skill.py
+│   │   ├── skill_python_autocomplete.py
+│   │   ├── skill_rag_optimizer.py
 │   │   ├── skill_registry.py
 │   │   └── skill_versions.py
 │   ├── task_agent_factory.py
-│   └── task_analyzer.py
+│   ├── task_analyzer.py
+│   └── watchdog.py
 ├── exceptions.py
 ├── execution
 │   ├── cpu_affinity.py
 │   ├── executor.py
 │   ├── __init__.py
-│   └── sandbox.py
+│   ├── sandbox.py
+│   └── token_bucket.py
 ├── feedback
 │   ├── benchmark_runner.py
 │   ├── betaine_judge.py
@@ -412,8 +1156,8 @@ iaglobal/
 │   ├── certify_block.py
 │   ├── check_cbor.py
 │   ├── data
+│   │   ├── check_genesis_integrity.py
 │   │   ├── integrity_tree.cbor
-│   │   ├── test_genesis_integrity.py
 │   │   ├── webhidden_genesis_blueprint.cbor
 │   │   └── webhidden_genesis_evolutive.cbor
 │   ├── fusion_engine.py
@@ -421,6 +1165,8 @@ iaglobal/
 │   ├── genesis_verifier.py
 │   ├── identity.py
 │   ├── __init__.py
+│   ├── lineage_gate.py
+│   ├── tribunal.py
 │   └── verifygenesis.py
 ├── graphs
 │   ├── artifact.py
@@ -442,16 +1188,19 @@ iaglobal/
 │   ├── instrumentation.py
 │   ├── membrane.py
 │   ├── migrar_nodes.py
+│   ├── node_lineage_registry.py
 │   ├── node.py
 │   ├── nodes
 │   │   ├── _disk_swap.py
 │   │   ├── __init__.py
+│   │   ├── js_syntax_sentinel.py
 │   │   ├── no_adaptive_router.py
 │   │   ├── no_agentmailbox.py
 │   │   ├── no_ai_audit_compliance.py
 │   │   ├── no_api_builder.py
 │   │   ├── no_api_design.py
 │   │   ├── no_apoptosis_kill.py
+│   │   ├── no_applied_ai_engineer.py
 │   │   ├── no_architect.py
 │   │   ├── no_architecture_validator.py
 │   │   ├── no_artifact_writer.py
@@ -459,6 +1208,7 @@ iaglobal/
 │   │   ├── no_auditor_sentinel.py
 │   │   ├── no_backend_builder.py
 │   │   ├── no_business_rules.py
+│   │   ├── no_chappie_bandit_evolution.py
 │   │   ├── no_clarity_directive.py
 │   │   ├── no_code_executor.py
 │   │   ├── no_coder.py
@@ -470,6 +1220,7 @@ iaglobal/
 │   │   ├── no_database_design.py
 │   │   ├── no_debug_coder.py
 │   │   ├── no_debugger.py
+│   │   ├── no_debug_unificado.py
 │   │   ├── no_dependency.py
 │   │   ├── no_deployment_plan.py
 │   │   ├── no_documentation.py
@@ -499,12 +1250,15 @@ iaglobal/
 │   │   ├── no_immune_monitor.py
 │   │   ├── no_ingestion.py
 │   │   ├── no_integrator.py
+│   │   ├── no_integrator.py.backup.before_fix
 │   │   ├── no_interpreter.py
 │   │   ├── no_knowledge_analyzer.py
 │   │   ├── no_knowledge.py
 │   │   ├── no_knowledge_writer.py
 │   │   ├── no_law_of_thought_enforcer.py
+│   │   ├── no_lineage_proof.py
 │   │   ├── no_local_knowledge.py
+│   │   ├── no_lsp_validator.py
 │   │   ├── no_memory_cleaner.py
 │   │   ├── no_memory_writer.py
 │   │   ├── no_metabolic_pruning.py
@@ -517,6 +1271,7 @@ iaglobal/
 │   │   ├── no_observability_design.py
 │   │   ├── no_optimization.py
 │   │   ├── no_orchestrator_agent.py
+│   │   ├── no_orchestrator_pump.py
 │   │   ├── no_performance_audit.py
 │   │   ├── no_performance_design.py
 │   │   ├── no_performance.py
@@ -550,6 +1305,7 @@ iaglobal/
 │   │   ├── no_skill_generator.py
 │   │   ├── no_success_ritual.py
 │   │   ├── no_symbiont_handshake.py
+│   │   ├── no_system_analysis.py
 │   │   ├── no_system_design.py
 │   │   ├── no_task_breakdown.py
 │   │   ├── no_technology_selection.py
@@ -560,12 +1316,14 @@ iaglobal/
 │   │   ├── no_vacuum_strength.py
 │   │   ├── no_validator.py
 │   │   ├── no_web_classifier.py
+│   │   ├── _search_capabilities.py
 │   │   ├── _search_enhanced.py
 │   │   ├── _search_queries.py
 │   │   ├── _search_router.py
 │   │   ├── _search_shared.py
 │   │   ├── _search_sources.py
-│   │   └── _search_wikipedia.py
+│   │   ├── _search_wikipedia.py
+│   │   └── syntax_sentinel.py
 │   ├── nodes.py
 │   ├── pipeline_definition.py
 │   ├── policy.py
@@ -582,9 +1340,11 @@ iaglobal/
 │   ├── adaptive_threat_detector.py
 │   ├── apoptosis_engine.py
 │   ├── async_violation_detector.py
+│   ├── autoimmunity_detector.py
 │   ├── emergent_behavior_detector.py
 │   ├── entropy_sentinel.py
 │   ├── epigenetic_masking.py
+│   ├── error_persistence.py
 │   ├── glutathione_guardrails.py
 │   ├── glutathione_pool.py
 │   ├── hallucination_detector.py
@@ -592,73 +1352,64 @@ iaglobal/
 │   ├── immune_orchestrator.py
 │   ├── __init__.py
 │   ├── loop_detector.py
+│   ├── metabolic_immune_barrier.py
 │   ├── metabolic_pruner.py
 │   ├── mhc_detector.py
 │   ├── pathogen_analyzer.py
 │   ├── regression_detector.py
 │   ├── symbiosis_score.py
+│   ├── vaccine_ledger.py
 │   └── vacuum_trigger.py
 ├── __init__.py
-├── integration_registry.py
 ├── intention
+│   ├── __init__.py
 │   └── meta_director.py
-├── ivm_compliance.py
-├── __main__.py
 ├── mcp
-│   └── mcp_agent.py
+│   ├── client.py
+│   ├── code_executor.py
+│   ├── discovery.py
+│   ├── file_system.py
+│   ├── __init__.py
+│   ├── mcp_agent.py
+│   ├── mcp_server.py
+│   ├── search_web.py
+│   └── server.py
 ├── memory
 │   ├── async_memory.py
 │   ├── backup_manager.py
+│   ├── bandit_evolution.json
+│   ├── bandit_evolutivo.json
 │   ├── cache.py
 │   ├── check_db.py
 │   ├── cognitive_cache.py
 │   ├── consolidation.py
 │   ├── core.py
 │   ├── data
-│   │   ├── auditoria
-│   │   │   └── relatorio_funcoes.txt
-│   │   ├── cache
-│   │   │   └── memory_swap
-│   │   │       └── stm.db
-│   │   ├── core.db
-│   │   ├── json
-│   │   │   └── genome_apoptose_agent.json
-│   │   ├── life_signals.json
-│   │   ├── result
-│   │   │   ├── project001
-│   │   │   │   ├── metadata.json
-│   │   │   │   └── output.pdf
-│   │   │   ├── project002
-│   │   │   │   ├── metadata.json
-│   │   │   │   └── output.pdf
-│   │   │   ├── project003
-│   │   │   │   ├── metadata.json
-│   │   │   │   └── output.pdf
-│   │   │   └── project004
-│   │   │       ├── metadata.json
-│   │   │       └── output.pdf
-│   │   └── work
-│   │       └── obsidian
-│   │           └── 05_Lineages
-│   │               ├── hybrid_001.md
-│   │               ├── MOC_Ancestry.md
-│   │               ├── mutant_hybrid.md
-│   │               └── test_hybrid.md
 │   ├── db_manager.py
+│   ├── db_utils.py
 │   ├── fusion_engine.py
 │   ├── __init__.py
+│   ├── ivm.db
+│   ├── ivm_test.db
 │   ├── memory_error.py
 │   ├── memory.py
 │   ├── memory_storage.py
 │   ├── memory_vector.py
+│   ├── mitosis_engine.json
 │   ├── persistence.py
 │   ├── ranking.py
 │   ├── raw_pool.py
 │   ├── semantic_cache.py
 │   ├── term_long.py
-│   └── term_short.py
+│   ├── term_short.py
+│   ├── test_ivm.db
+│   └── vault_unifier.py
+├── meta
+│   ├── __init__.py
+│   └── meta_learner.py
 ├── metabolism
 │   ├── clarity_directive.py
+│   ├── __init__.py
 │   ├── metabolic_autocorrect.py
 │   ├── metabolic_invariants.py
 │   └── metabolic_metrics.py
@@ -668,41 +1419,26 @@ iaglobal/
 │   ├── __init__.py
 │   └── task.py
 ├── observability
+│   ├── entropy_interceptor.py
 │   ├── health.py
 │   ├── __init__.py
+│   ├── load_balancer.py
 │   ├── metrics_collector.py
+│   ├── phospholipid_bridge.py
+│   ├── registry.py
+│   ├── search_bridge.py
 │   └── tracing.py
 ├── obsidian
 │   ├── 01_Instincts
-│   │   └── test.md
 │   ├── 02_Short_Term
-│   │   ├── apoptosis_evo-obsidian-test.md
-│   │   ├── erro_test_20260627160057915461.md
-│   │   ├── erro_test_20260627160057916504.md
-│   │   ├── erro_test_agent_20260627160057914414.md
-│   │   ├── evolution_committee_1782577593.md
-│   │   ├── evolution_committee_1782577594.md
-│   │   ├── evolution_committee_1782599125.md
-│   │   ├── evolution_committee_1782599126.md
-│   │   ├── evolution_committee_1782599267.md
-│   │   ├── evolution_committee_1782599268.md
-│   │   ├── evolution_committee_1782604021.md
-│   │   └── evolution_committee_1782604022.md
 │   ├── 03_Long_Term
-│   │   └── mhc_audit_20260627.md
 │   ├── 04_Synapses
-│   │   ├── Mapa_Mental_Subconsciente.md
-│   │   ├── proposals
-│   │   │   ├── proposal_approval_test_20260625003734.md
-│   │   │   ├── proposal_approval_test_20260625004757.md
-│   │   │   ├── proposal_storage_test_20260625003734.md
-│   │   │   ├── proposal_storage_test_20260625004757.md
-│   │   │   ├── proposal_test_component_20260625003734.md
-│   │   │   └── proposal_test_component_20260625004757.md
-│   │   └── success_log.md
-│   ├── 05_Quarantine
+│   ├── 05_Vaccines
 │   ├── ancestry_tree.py
+│   ├── compliance.json
+│   ├── compliance.py
 │   ├── consolidation.py
+│   ├── epigenetic
 │   ├── epigenetic_registry.py
 │   ├── error_capture.py
 │   ├── __init__.py
@@ -718,6 +1454,9 @@ iaglobal/
 │   ├── pipelinestate.py
 │   ├── result.py
 │   └── stages.py
+├── policy
+│   ├── bandit_evolutivo.py
+│   └── __init__.py
 ├── providers
 │   ├── async_http.py
 │   ├── batch_writer.py
@@ -741,6 +1480,7 @@ iaglobal/
 │   ├── provider_metrics.py
 │   ├── provider_registry.py
 │   ├── provider_router.py
+│   ├── provider_router.py.backup
 │   ├── provider_scorer.py
 │   ├── provider_state.py
 │   ├── task_router.py
@@ -752,29 +1492,44 @@ iaglobal/
 │   ├── prompt_recycler.py
 │   └── skill_recycler.py
 ├── reflection
+│   ├── claim_detection.py
+│   ├── contamination_report.py
 │   ├── failure_analysis.py
 │   ├── __init__.py
 │   ├── learning_loop.py
 │   ├── reflexion_engine.py
+│   ├── self_critique_evolutivo.py
 │   └── self_critique.py
+├── sandbox
+│   ├── __init__.py
+│   └── sandbox_expansion.py
+├── search
+│   ├── confidence_tracker.py
+│   ├── feedback_loop.py
+│   ├── __init__.py
+│   ├── local_summarizer.py
+│   ├── query_expander.py
+│   ├── search_memory.py
+│   ├── search_middleware.py
+│   ├── snippet_synthesizer.py
+│   └── source_validator.py
 ├── security
 │   ├── ast_gateway.py
 │   ├── entropy_sentinel.py
 │   ├── __init__.py
+│   ├── mcp_sandbox.py
 │   ├── network_guard.py
 │   ├── pysecurity1024.py
 │   ├── resource_limits.py
 │   ├── sandbox_executor.py
 │   └── sandbox_rules.py
 ├── server
+│   ├── asgi.py
+│   ├── health_aggregator.py
 │   ├── __init__.py
-│   ├── leiame_server.md
 │   ├── __main__.py
 │   ├── mcp_server.py
 │   └── server.py
-├── settings.py
-├── state
-│   └── __init__.py
 ├── storage
 │   ├── batch_writer.py
 │   ├── converter.py
@@ -784,28 +1539,37 @@ iaglobal/
 ├── subconscious
 │   ├── delta_sleep.py
 │   ├── fugue_compartment.py
+│   ├── __init__.py
 │   └── subconscious_api.py
 ├── tools
+│   ├── builtins
+│   │   ├── __init__.py
+│   │   └── pdf_tools.py
 │   ├── __init__.py
 │   ├── search.py
 │   ├── search_tools.py
+│   ├── tool_library.py
 │   ├── tool_router.py
 │   └── web_brain.py
 ├── ui
+│   ├── data_converter.py
 │   ├── fastapi_app.py
+│   ├── git_workspace.py
+│   ├── __init__.py
 │   ├── reactpy_components.py
-│   ├── static
-│   │   ├── css
-│   │   └── js
+│   ├── templates
+│   │   ├── dashboard.html
+│   │   └── index.html
 │   ├── urls.py
-│   └── views.py
-├── urls.py
+│   ├── views.py
+│   └── workspace_runner.py
 ├── utils
 │   ├── ansi_colors.py
 │   ├── controlled_subprocess.py
 │   ├── hash_utils.py
 │   ├── helpers.py
 │   ├── __init__.py
+│   ├── integrity.py
 │   ├── life_signal_collector.py
 │   ├── logger.py
 │   └── playwright_util.py
@@ -814,16 +1578,17 @@ iaglobal/
     ├── engine.py
     ├── gateway.py
     ├── __init__.py
+    ├── js_validator.py
     ├── normalization.py
     ├── scoring.py
     └── syntax.py
 
-68 directories, 506 files
-```
+61 directories, 584 files
 
+```
 ---
 
-## 🔭 Evolutionary Roadmap
+## 🔭 Evolutionary ROADMAP_1 and ROADMAP_2
 
 The organism is ready for:
 

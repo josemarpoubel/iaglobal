@@ -40,7 +40,8 @@ class SubconsciousAPI:
 
     def __init__(self):
         self.vault = ObsidianSubconscious()
-        self.vault_path = Path("/home/kitohamachi/projeto-iaglobal/obsidian/03_Long_Term/FugueTasks")
+        from iaglobal._paths import PACKAGE_DIR
+        self.vault_path = PACKAGE_DIR / "obsidian" / "03_Long_Term" / "FugueTasks"
 
     async def registrar_tarefa(
         self,

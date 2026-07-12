@@ -1,3 +1,4 @@
+from iaglobal import _paths
 # iaglobal/memory/db_manager.py
 
 import asyncio
@@ -7,7 +8,6 @@ import threading
 from pathlib import Path
 from typing import Any, Optional
 from iaglobal.utils.logger import logger
-from iaglobal import _paths
 
 class DatabaseManager:
     """Gerenciador de banco de dados unificado para insights e conhecimento. (Singleton thread-safe)"""

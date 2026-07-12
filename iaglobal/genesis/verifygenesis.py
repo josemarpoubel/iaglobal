@@ -13,6 +13,11 @@ from iaglobal.utils.logger import get_logger
 
 logger = logging.getLogger("iaglobal")
 
+# Cache de validação — o blueprint/evolutive não muda durante o runtime.
+_frozen_authority_validated: bool = False
+_frozen_authority_hash: str | None = None
+_validation_error: str | None = None
+
 
 class VerifyGenesis:
     """
@@ -50,10 +55,20 @@ class VerifyGenesis:
         """
         ⚖️ SENTENÇA DE SOBERANIA:
         Valida se a alma (Evolutive) e o certificado (Blueprint) são um só.
+        Resultado é cacheado em módulo: o blueprint/evolutive não muda em runtime.
         """
+        global _frozen_authority_validated, _frozen_authority_hash, _validation_error
+
+        if _frozen_authority_validated:
+            return True
+
+        if _validation_error is not None:
+            return False
+
         logger.info("⚖️ Invocando o Tribunal: Validando nascimento do nó...")
 
         if not self.blueprint_path.exists() or not self.evolutive_path.exists():
+            _validation_error = "DNA ausente — blueprint ou evolutive não localizado."
             logger.critical("🚨 [DNA AUSENTE] Gênese não localizada. O nó não pode nascer.")
             return False
 
@@ -65,6 +80,7 @@ class VerifyGenesis:
             # O Tribunal exige a presença da chave 'hash'
             expected_hash = blueprint_data.get("hash")
             if not expected_hash:
+                _validation_error = "Blueprint inválido — chave 'hash' ausente."
                 logger.error("🚨 [BLUEPRINT INVÁLIDO] Chave 'hash' ausente no certificado.")
                 return False
 
@@ -73,6 +89,10 @@ class VerifyGenesis:
 
             # 3. O Veredito de Realidade
             if actual_hash != expected_hash:
+                _validation_error = (
+                    f"VIOLAÇÃO DE REALIDADE — esperado {expected_hash[:32]}..., "
+                    f"obtido {actual_hash[:32]}..."
+                )
                 logger.critical(
                     f"❌ [VIOLAÇÃO DE REALIDADE] O nó não pertence a este universo!\n"
                     f"   Esperado: {expected_hash[:32]}...\n"
@@ -84,14 +104,18 @@ class VerifyGenesis:
             # Se houver um manifesto, ele deve ser íntegro.
             manifesto = blueprint_data.get("manifesto", {})
             if manifesto and not isinstance(manifesto, dict):
+                _validation_error = "Blueprint inválido — manifesto corrompido."
                 logger.error("🚨 [BLUEPRINT INVÁLIDO] Estrutura de manifesto corrompida.")
                 return False
 
             self.validated_hash = actual_hash
+            _frozen_authority_hash = actual_hash
+            _frozen_authority_validated = True
             logger.info("✅ [SOBERANIA CONFIRMADA] DNA validado. Nó autorizado a ingressar na malha.")
             return True
 
         except Exception as e:
+            _validation_error = f"Falha crítica na análise de DNA: {e}"
             logger.error(f"💥 [COLAPSO] Falha crítica na análise de DNA: {e}")
             return False
 
@@ -106,7 +130,7 @@ class VerifyGenesis:
         proteger o Multiverso de injeção de dados falsos.
         """
         if not self.verify_frozen_authority():
-            print("\n🛑 [TRIBUNAL] ACESSO NEGADO. Integridade do Genesis violada.")
-            print("🛑 O Multiverso rejeitou a assinatura deste nó.\n")
+            logger.critical("\n🛑 [TRIBUNAL] ACESSO NEGADO. Integridade do Genesis violada.")
+            logger.critical("🛑 O Multiverso rejeitou a assinatura deste nó.\n")
             sys.exit(1)
         return True

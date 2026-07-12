@@ -9,10 +9,10 @@ import re
 import time
 
 from dataclasses import dataclass
-from typing import Optional
+from typing import Optional, Dict, Any
 
 from iaglobal.execution.executor import executar
-from iaglobal.agents.agent_base import AgentBase
+from iaglobal.agents.agent_base import AgentBase, INSTRUCAO_COT
 from iaglobal.graphs.policy import PolicyRegistry
 from iaglobal.models.task import Task
 from iaglobal.security.ast_gateway import ASTGateway
@@ -58,13 +58,16 @@ class DebuggerAgent(AgentBase):
         re.IGNORECASE,
     )
 
+    MAX_SELF_CRITIQUE_ITERATIONS = 2
+
     def __init__(
         self,
-        max_attempts: int = 5,
+        max_attempts: int = 3,
         enable_self_healing: bool = True,
     ):
         self.max_attempts = max_attempts
         self.enable_self_healing = enable_self_healing
+        self._self_critique_count = 0
 
         self.ast_gateway = ASTGateway()
 
@@ -81,8 +84,10 @@ class DebuggerAgent(AgentBase):
         """
 
         start_time = time.perf_counter()
+        self._self_critique_count = 0
 
-        code = task.code
+        # Código pode estar em task.code (atributo dinâmico) ou task.context["code"]
+        code = getattr(task, "code", None) or task.context.get("code", "")
 
         previous_versions = set()
 
@@ -177,14 +182,30 @@ class DebuggerAgent(AgentBase):
         code: str,
         error: str,
     ) -> tuple[str, Optional[str]]:
-
-        prompt = self.build_fix_prompt(
+        """
+        Repara código usando LLM + autocomplete Jedi (se disponível) + Auto-crítica.
+        
+        Fluxo:
+          1. Usa Jedi para análise estática e sugestões
+          2. Constrói prompt enriquecido com análise do Jedi
+          3. Chama LLM para correção
+          4. Auto-crítica avalia código corrigido
+          5. Se score < 0.6, tenta refinar
+          6. Valida código corrigido
+        """
+        
+        # Fase 1: Análise estática com Jedi (se disponível)
+        jedi_analysis = await self._analyze_with_jedi(code, error)
+        
+        # Fase 2: Constrói prompt enriquecido
+        prompt = self.build_fix_prompt_enhanced(
             task=task,
             error=error,
             code=code,
+            jedi_analysis=jedi_analysis,
         )
-
-        # Candidatos padrão: cloud primeiro, local fallback
+        
+        # Fase 3: Seleciona modelo e executa
         candidates = [
             "groq/llama-3.3-70b-versatile",
             "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
@@ -195,22 +216,82 @@ class DebuggerAgent(AgentBase):
             task_type="debug",
             candidates=candidates,
         )
-
-        logger.info(
-            "Repair model=%s",
-            model,
-        )
+        
+        logger.info("Repair model=%s", model)
         try:
             response = await self.bandit.async_execute_model(
-                model_name=model, prompt=prompt, task_type="debug",
+                model_name=model, prompt=prompt, task_type="debug", node_id="debugger_agent",
             )
             fixed_code = self._extract_code(response)
             if not fixed_code:
-                logger.warning(
-                    "[DebuggerAgent] Empty model response"
-                )
+                logger.warning("[DebuggerAgent] Empty model response")
                 return code, model
+            
+            # Fase 4: Auto-crítica evolutiva
+            auto_critica = await self._auto_critica_codigo(
+                code=fixed_code,
+                error=error,
+                context={"jedi_analysis": jedi_analysis},
+            )
+            
+            score = auto_critica.get("score", 0.0)
+            precisa_refinar = auto_critica.get("precisa_refinar", False)
+            
+            # Fase 5: Se score baixo, tenta refinar (máx 1 iteração)
+            if precisa_refinar and score < 0.6:
+                logger.info(
+                    "[DebuggerAgent] Auto-crítica: score=%.2f < 0.6, refinando...",
+                    score,
+                )
+                
+                sugestoes = auto_critica.get("sugestoes", [])
+                if sugestoes:
+                    prompt_refinamento = f"""
+Você é um especialista em Python refinando código corrigido.
 
+==================== CÓDIGO ATUAL ====================
+{fixed_code}
+
+==================== ERRO ORIGINAL ====================
+{error}
+
+==================== CRÍTICA ====================
+Forças: {auto_critica.get('forças', [])}
+Fraquezas: {auto_critica.get('fraquezas', [])}
+
+==================== SUGESTÕES DE MELHORIA ====================
+{chr(10).join(f'- {s}' for s in sugestoes)}
+
+==================== TAREFA ====================
+Refine o código para abordar as fraquezas acima.
+Mantenha a funcionalidade, mas melhore:
+- Sintaxe e imports
+- Tratamento de erros
+- Legibilidade
+
+Retorne APENAS o código Python refinado, sem explicações ou markdown.
+"""
+                    
+                    response_refinada = await self.bandit.async_execute_model(
+                        model_name=model, prompt=prompt_refinamento, task_type="debug", node_id="debugger_agent",
+                    )
+                    fixed_code_refinado = self._extract_code(response_refinada)
+                    
+                    if fixed_code_refinado and len(fixed_code_refinado.strip()) > 10:
+                        # Re-avalia código refinado
+                        auto_critica_refinada = await self._auto_critica_codigo(
+                            code=fixed_code_refinado,
+                            error=error,
+                        )
+                        
+                        if auto_critica_refinada.get("score", 0.0) > score:
+                            logger.info(
+                                "[DebuggerAgent] Refinamento melhorou score: %.2f → %.2f",
+                                score, auto_critica_refinada["score"],
+                            )
+                            fixed_code = fixed_code_refinado
+                            score = auto_critica_refinada["score"]
+            
             try:
                 self._validate(fixed_code)
             except Exception as e:
@@ -219,17 +300,17 @@ class DebuggerAgent(AgentBase):
                     e,
                 )
                 return code, model
-
+            
             self.bandit.update_policy(
                 node="debugger_agent",
                 model=model,
                 strategy="debug",
                 success=True,
                 latency=0.5,
-                reward=0.75,
+                reward=0.75 + (score * 0.25),  # Bonus por score alto
             )
             return fixed_code, model
-
+            
         except Exception as e:
             logger.exception(
                 "[DebuggerAgent] Self-healing failure"
@@ -279,31 +360,62 @@ class DebuggerAgent(AgentBase):
         error: str,
         code: str,
     ) -> str:
+        """
+        Constrói prompt específico baseado no tipo de erro.
+        
+        Detecta:
+          - Erros de sintaxe (parênteses, indentação)
+          - Imports não encontrados
+          - Variáveis indefinidas
+          - Outros erros de execução
+        """
+        error_lower = error.lower()
+        
+        # Detecta tipo de erro e dá instrução específica
+        if "syntax" in error_lower or "'('" in error or "parêntese" in error_lower:
+            tipo = "ERRO DE SINTAXE"
+            instrucao = "Corrija a sintaxe Python. Verifique:\n  - Parênteses, colchetes e chaves fechados\n  - Indentação correta\n  - Dois-pontos após def, if, for, etc."
+        elif "import" in error_lower or "módulo" in error_lower:
+            tipo = "ERRO DE IMPORT"
+            instrucao = "Corrija os imports. Verifique:\n  - Nomes de módulos corretos\n  - Remova imports não utilizados\n  - Use nomes válidos do Python"
+        elif "undefined" in error_lower or "não definido" in error_lower:
+            tipo = "VARIÁVEL INDEFINIDA"
+            instrucao = "Defina todas as variáveis antes de usá-las. Verifique nomes e escopo."
+        elif "name" in error_lower and "not defined" in error_lower:
+            tipo = "NOME INDEFINIDO"
+            instrucao = "A variável/função não está definida. Crie-a ou corrija o nome."
+        else:
+            tipo = "ERRO DE EXECUÇÃO"
+            instrucao = "Analise o erro e corrija o código para que execute sem exceptions."
+        
+        # Pega descrição da tarefa
+        task_desc = getattr(task, "objective", "") or task.context.get("task", "Corrigir código Python")
+        
+        return f"""Você é um especialista em Python.
 
-        return f"""
-Você é um especialista em Python.
+{INSTRUCAO_COT}
 
-Corrija o código abaixo.
+TIPO DE PROBLEMA: {tipo}
+INSTRUÇÃO: {instrucao}
 
-Retorne SOMENTE código Python válido.
+TAREFA: {task_desc}
 
 ========================
-CÓDIGO
+CÓDIGO COM ERRO
 ========================
-
 {code}
 
 ========================
-ERRO
+ERRO DETECTADO
 ========================
-
 {error}
 
 ========================
-TAREFA ORIGINAL
+SAÍDA ESPERADA
 ========================
-
-{getattr(task, "description", "N/A")}
+Siga as 4 etapas (Análise → Plano → Implementação → Revisão) antes de gerar o código final.
+Retorne APENAS o código Python corrigido e válido.
+NÃO inclua explicações, texto ou blocos markdown (```).
 """
 
     # ==========================================================
@@ -329,6 +441,186 @@ TAREFA ORIGINAL
         return hashlib.sha256(
             content.encode("utf-8")
         ).hexdigest()
+
+    async def _analyze_with_jedi(
+        self,
+        code: str,
+        error: str,
+    ) -> Dict[str, Any]:
+        """
+        Usa Jedi para análise estática do código.
+        
+        Retorna:
+            - issues: Problemas detectados
+            - symbols: Símbolos disponíveis
+            - type_hints: Dicas de tipo
+        """
+        analysis = {
+            "issues": [],
+            "symbols": [],
+            "type_hints": {},
+            "available": False,
+        }
+        
+        try:
+            import jedi
+        except ImportError:
+            logger.debug("[DebuggerAgent] Jedi não disponível")
+            return analysis
+        
+        try:
+            script = jedi.Script(code=code, path="example.py")
+            
+            # Analisa símbolos
+            completions = script.complete()
+            for c in list(completions)[:20]:
+                analysis["symbols"].append({
+                    "name": c.name,
+                    "type": c.type,
+                })
+            
+            # Detecta problemas básicos
+            if "undefined" in error.lower() or "not defined" in error.lower():
+                # Tenta encontrar símbolo similar
+                error_name = error.split("'")[1] if "'" in error else ""
+                if error_name:
+                    for c in completions:
+                        if error_name.lower() in c.name.lower():
+                            analysis["type_hints"][error_name] = {
+                                "suggestion": c.name,
+                                "type": c.type,
+                            }
+                            break
+            
+            analysis["available"] = True
+            
+        except Exception as e:
+            logger.debug("[DebuggerAgent] Jedi análise falhou: %s", e)
+        
+        return analysis
+
+    async def _auto_critica_codigo(
+        self,
+        code: str,
+        error: str,
+        context: Dict[str, Any] = None,
+    ) -> Dict[str, Any]:
+        """
+        Auto-crítica evolutiva: avalia código corrigido antes de retornar.
+        
+        Fluxo:
+          1. SelfCritiqueEvolutivo avalia código
+          2. Verifica se erros foram resolvidos
+          3. Se score < 0.6, sugere nova correção
+        
+        Args:
+            code: Código corrigido
+            error: Erro original que motivou correção
+            context: Contexto adicional
+        
+        Returns:
+            Dict com score, problemas_resolvidos, precisa_refinar
+        """
+        self._self_critique_count += 1
+        if self._self_critique_count >= self.MAX_SELF_CRITIQUE_ITERATIONS:
+            logger.warning(
+                "[DebuggerAgent] Limite de auto-crítica atingido (%d), forçando saída",
+                self.MAX_SELF_CRITIQUE_ITERATIONS,
+            )
+            return {
+                "score": 0.6,
+                "problemas_resolvidos": True,
+                "precisa_refinar": False,
+                "sugestoes": [],
+                "critica": {},
+            }
+
+        try:
+            from iaglobal.reflection.self_critique_evolutivo import SelfCritiqueEvolutivo
+            
+            critique_engine = SelfCritiqueEvolutivo()
+            
+            # Avalia código
+            critica = critique_engine.evaluate(
+                code,
+                contexto={
+                    "tipo": "codigo",
+                    "erro_original": error,
+                },
+            )
+            
+            score = critica.get("score", 0.0)
+            forcas = critica.get("forças", [])
+            fraquezas = critica.get("fraquezas", [])
+            
+            logger.info(
+                "[DebuggerAgent] Auto-crítica | score=%.2f | forcas=%s | fraquezas=%s",
+                score, forcas, fraquezas,
+            )
+            
+            # Verifica se erro foi resolvido
+            erros_persistem = any(
+                e in str(fraquezas).lower() 
+                for e in ["erro_sintaxe", "imports_problematicos"]
+            )
+            
+            return {
+                "score": score,
+                "problemas_resolvidos": not erros_persistem,
+                "precisa_refinar": score < 0.6 or erros_persistem,
+                "sugestoes": critique_engine.gerar_sugestoes_refinamento(critica),
+                "critica": critica,
+            }
+            
+        except Exception as e:
+            logger.warning("[DebuggerAgent] Auto-crítica falhou: %s", e)
+            return {
+                "score": 0.0,
+                "problemas_resolvidos": False,
+                "precisa_refinar": True,
+                "sugestoes": [],
+                "critica": {},
+            }
+
+    def build_fix_prompt_enhanced(
+        self,
+        task: Task,
+        error: str,
+        code: str,
+        jedi_analysis: Dict[str, Any],
+    ) -> str:
+        """
+        Constrói prompt enriquecido com análise do Jedi.
+        
+        Inclui:
+          - Tipo de erro detectado
+          - Símbolos disponíveis (do Jedi)
+          - Sugestões de correção baseadas em tipos
+        """
+        # Prompt base (do build_fix_prompt original)
+        base_prompt = self.build_fix_prompt(task=task, error=error, code=code)
+        
+        # Enriquece com análise do Jedi
+        jedi_info = ""
+        
+        if jedi_analysis.get("available"):
+            jedi_info = "\n\n========================\nANÁLISE ESTÁTICA (Jedi)\n========================\n"
+            
+            # Símbolos disponíveis
+            symbols = jedi_analysis.get("symbols", [])
+            if symbols:
+                jedi_info += "Símbolos disponíveis:\n"
+                for s in symbols[:10]:
+                    jedi_info += f"  - {s['name']} ({s['type']})\n"
+            
+            # Type hints
+            type_hints = jedi_analysis.get("type_hints", {})
+            if type_hints:
+                jedi_info += "\nSugestões:\n"
+                for name, hint in type_hints.items():
+                    jedi_info += f"  - '{name}' → use '{hint['suggestion']}' ({hint['type']})\n"
+        
+        return base_prompt + jedi_info
 
     def _reward_success(
         self,

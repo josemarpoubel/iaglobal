@@ -6,7 +6,6 @@ from __future__ import annotations
 import hashlib
 import json
 import asyncio
-import logging
 
 from dataclasses import dataclass, asdict
 
@@ -17,7 +16,7 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal.utils.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger("iaglobal.agents.result_agent")
 
 # ============================================================
 # DOMAIN CONTRACTS

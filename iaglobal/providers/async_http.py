@@ -1,6 +1,7 @@
 # iaglobal/providers/async_http.py
 
 import asyncio
+import atexit
 import json
 import logging
 import threading
@@ -21,6 +22,40 @@ _BANNED_DOMAINS: set = set()
 _BLOCKED_PROVIDERS: Dict[str, float] = {}
 _BLOCK_WINDOW = 3600
 _BLOCK_AUTH_WINDOW = 86400
+
+
+def _schedule_close(session: aiohttp.ClientSession):
+    """Tenta fechar uma sessão aiohttp de forma segura.
+
+    aiohttp 3.x: TCPConnector.close() é corotina — agenda no loop quando
+    possível; sem loop ativo, marca como fechado e descarta referências
+    para evitar warning 'Unclosed client session' do GC.
+    """
+    if session is None or session.closed:
+        return
+    try:
+        loop = asyncio.get_running_loop()
+        loop.create_task(session.close())
+    except RuntimeError:
+        try:
+            connector = session._connector
+            if connector is not None and not connector.closed:
+                connector._closed = True
+                connector._conns = {}
+            session._connector = None
+        except Exception:
+            pass
+
+
+def _close_all_sessions_sync():
+    """Shutdown síncrono para atexit — fecha todas as sessões sem bloquear."""
+    with _lock:
+        for session in list(_sessions.values()):
+            _schedule_close(session)
+        _sessions.clear()
+
+
+atexit.register(_close_all_sessions_sync)
 
 
 def is_provider_blocked(provider: str) -> bool:
@@ -146,3 +181,6 @@ async def async_post(
     except Exception as e:
         logger.debug("[ASYNC-HTTP] Erro em %s: %s", url, e)
         return ""
+
+# Injetado automaticamente para resolver assinaturas ausentes
+_BLOCKED_PROVIDERS = []

@@ -1,5 +1,6 @@
 import logging
 import sys
+
 from iaglobal import _paths
 
 # Configura o logging root-level no import do módulo (garante visibilidade em todas as camadas)
@@ -51,9 +52,13 @@ def setup_logger(name="iaglobal"):
     # Evita propagação para o root logger (previne duplicação)
     logger.propagate = False
     
-    # Garante nível DEBUG para capturar todos os logs internos
-    if logger.level == logging.WARNING:
-        logger.setLevel(logging.DEBUG)
+    # Garante nível INFO para sinais de observabilidade (ex: [MEMBRANA]).
+    # Corrige bug: logger recém-criado tem nível NOTSET (0), nunca == WARNING,
+    # então a subida de nível nunca ocorria e INFO era silenciosamente
+    # suprimido (nível efetivo = WARNING do root) — escondendo decisões de
+    # membrana/IVM em produção. INFO é o piso de visibilidade do CLI.
+    if logger.level < logging.INFO:
+        logger.setLevel(logging.INFO)
     
     # Evita handlers duplicados
     if not logger.handlers:

@@ -115,7 +115,35 @@ class GracefulShutdown:
             except Exception:
                 pass  # Skip logging to avoid handler closed issues
 
+        # Executa callbacks assíncronos registrados (ex: apoptose de EvoAgent,
+        # fechamento de sessões aiohttp). Cria event loop temporário se não houver
+        # loop ativo, pois atexit roda em contexto síncrono.
+        self._run_async_callbacks()
+
         # Skip final logging to avoid ValueError on closed file
+
+    def _run_async_callbacks(self) -> None:
+        """Executa callbacks assíncronos em um event loop temporário."""
+        if not self._async_callbacks:
+            return
+
+        async def _run_all():
+            for callback in self._async_callbacks:
+                try:
+                    await callback()
+                except Exception:
+                    pass
+
+        try:
+            loop = asyncio.get_running_loop()
+            # Se já houver loop rodando, cria tarefa (não bloqueia atexit)
+            loop.create_task(_run_all())
+        except RuntimeError:
+            # Sem loop ativo — cria loop temporário para cleanup
+            try:
+                asyncio.run(_run_all())
+            except Exception:
+                pass
 
     # ============================================================
     # CLEANUP ASSÍNCRONO

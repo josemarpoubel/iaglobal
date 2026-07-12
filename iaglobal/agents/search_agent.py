@@ -1,27 +1,22 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # agentes/search_agent.py
 
-import os
 import re
-import requests
+import threading
 
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal.tools.search_tools import SearchTools
 from iaglobal.memory.memory_vector import store
 from iaglobal.memory.db_manager import db
 from iaglobal.utils.logger import logger
-from iaglobal.providers.provider_router import route_generate
+
+# Flag de validação one-shot do contrato de retorno do ddgs (title/href/body)
+_DDGS_SHAPE_VALIDADO = False
+_SHAPE_LOCK = threading.Lock()
 
 class SearchAgent(AgentBase):
     def __init__(self):
         super().__init__(agent_name="search")
-        # Endpoint HTML estável que não exige JavaScript e evita telas de desafio anti-bot
-        self.search_url = "https://duckduckgo.com?"
-        self.headers = {
-            "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-            "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-            "Accept-Language": "pt-BR,pt;q=0.8,en-US;q=0.5,en;q=0.3"
-        }
 
     def pesquisar_e_aprender(self, termo_busca: str) -> bool:
         """Busca na web estruturada, limpa o texto relevante e consolida no core.db/cbor2."""
@@ -42,50 +37,33 @@ class SearchAgent(AgentBase):
         
         logger.info(f"🛰️ [SEARCH AGENT]: Termo refinado para o buscador: '{query_limpa}'")
         
+        search_success = False
         try:
-            # 2. Montagem e envio da requisição HTTP usando biblioteca nativa
-            params = urllib.parse.urlencode({"q": query_limpa})
-            req = urllib.request.Request(self.search_url + params, headers=self.headers)
-            
-            with urllib.request.urlopen(req, timeout=10) as response:
-                html = response.read().decode("utf-8")
-
-            # 3. Captura dos blocos de resultados (Suporta layouts clássicos e de tabelas simplificadas)
-            blocos_resultados = re.findall(r'<div class="[^"]*results_links_deep.*?">.*?</div>\s*</div>\s*</div>', html, re.DOTALL)
-            if not blocos_resultados:
-                blocos_resultados = re.findall(r'<td class="result-snippet">.*?</td>', html, re.DOTALL)
-
-            if not blocos_resultados:
-                logger.warning("⚠️ [SEARCH AGENT]: DuckDuckGo não retornou nenhum snippet estruturado.")
+            # 2. Busca estruturada via ddgs (lib mantida) — elimina scraping regex frágil.
+            # Chamada síncrona de rede: segura pois pesquisar_e_aprender roda dentro de
+            # _sync_execute_and_learn (despachado via asyncio.to_thread no node).
+            resultados = SearchTools.search_and_fetch_raw(query_limpa, max_results=3)
+            if not resultados:
+                logger.warning("⚠️ [SEARCH AGENT]: ddgs não retornou resultados para a query.")
                 return False
+
+            # Validação one-shot do contrato de retorno (title/href/body)
+            SearchAgent._validar_shape_ddgs(resultados)
 
             # Limita a 3 resultados para manter o contexto do prompt limpo e performático
             resultados_processados = 0
             max_resultados = 3
-            
-            for bloco in blocos_resultados[:max_resultados]:
-                # Regex adaptativas para capturar URL, Título e Snippet de conteúdo
-                match_url = re.search(r'href="([^"]*?uddg=[^"]*?)"', bloco) or re.search(r'href="([^"]*?)"', bloco)
-                match_title = re.search(r'class="result__url"[^>]*>(.*?)</a>', bloco, re.DOTALL) or re.search(r'<a class="result-link"[^>]*>(.*?)</a>', bloco, re.DOTALL)
-                match_snippet = re.search(r'class="result__snippet"[^>]*>(.*?)</a>', bloco, re.DOTALL) or re.search(r'<td class="result-snippet"[^>]*>(.*?)</td>', bloco, re.DOTALL)
 
-                # Tratamento e decodificação segura da URL final de destino
-                url_bruta = match_url.group(1) if match_url else "Sem URL"
-                if "uddg=" in url_bruta:
-                    try:
-                        url_bruta = url_bruta.split("uddg=")[1].split("&")[0]
-                    except IndexError:
-                        pass
-                
-                url = urllib.parse.unquote(url_bruta)
-                title = re.sub(r'<[^>]+>', '', match_title.group(1)).strip() if match_title else "Sem título"
-                snippet = re.sub(r'<[^>]+>', '', match_snippet.group(1)).strip() if match_snippet else "Sem conteúdo"
+            for item in resultados[:max_resultados]:
+                url = str(item.get("href", "")).strip()
+                title = str(item.get("title", "")).strip() or "Sem título"
+                snippet = str(item.get("body", "")).strip()
 
                 # Evita salvar blocos sem substância semântica
-                if snippet == "Sem conteúdo" or len(snippet) < 15:
+                if not url or snippet in ("", "Sem conteúdo") or len(snippet) < 15:
                     continue
 
-                # 4. Formatação e injeção direta no pipeline de memória persistente
+                # 3. Formatação e injeção direta no pipeline de memória persistente
                 conhecimento_formatado = (
                     f"FONTE WEB CONSOLIDADA ({url})\n"
                     f"ASSUNTO: {title}\n"
@@ -97,15 +75,47 @@ class SearchAgent(AgentBase):
                 resultados_processados += 1
 
             if resultados_processados == 0:
-                logger.warning("⚠️ [SEARCH AGENT]: Blocos HTML analisados, mas nenhum continha dados válidos.")
+                logger.warning("⚠️ [SEARCH AGENT]: Resultados ddgs analisados, mas nenhum continha dados válidos.")
                 return False
 
+            search_success = True
             logger.info(f"✅ [SEARCH AGENT]: Sucesso! {resultados_processados} novos dados sincronizados no cbor2.")
             return True
-            
+
         except Exception as e:
-            logger.error(f"❌ [SEARCH AGENT]: Falha crítica ao aprender via DuckDuckGo: {e}")
+            logger.error(f"❌ [SEARCH AGENT]: Falha crítica ao aprender via ddgs: {e}")
             return False
+
+        finally:
+            try:
+                from iaglobal.observability.search_bridge import search_bridge as _sb
+                _sb.auto_report_search(search_success, termo_busca)
+            except Exception:
+                pass
+
+    @staticmethod
+    def _validar_shape_ddgs(resultados: list) -> None:
+        """Validação one-shot do contrato de retorno do ddgs (title/href/body).
+
+        Protege contra regressão silenciosa: se a lib mudar o shape, logamos ANTES
+        de persistir lixo no core.db (conforme alerta de shape do ciclo metabólico).
+        """
+        global _DDGS_SHAPE_VALIDADO
+        with _SHAPE_LOCK:
+            if _DDGS_SHAPE_VALIDADO:
+                return
+            _DDGS_SHAPE_VALIDADO = True
+        if not isinstance(resultados, list):
+            logger.error("⚠️ [SHAPE] ddgs retornou tipo inesperado: %s", type(resultados).__name__)
+            return
+        amostra = resultados[0] if resultados else {}
+        chaves_esperadas = {"title", "href", "body"}
+        if not isinstance(amostra, dict) or not chaves_esperadas.issubset(amostra.keys()):
+            actual = sorted(amostra.keys()) if isinstance(amostra, dict) else type(amostra).__name__
+            logger.error("⚠️ [SHAPE] ddgs retornou contrato inesperado: %s (esperado: %s)",
+                         actual, sorted(chaves_esperadas))
+        else:
+            logger.info("[SHAPE] Contrato ddgs validado: %s", sorted(amostra.keys()))
 
     async def process_task(self, task: str) -> str:
         cache_key = f"search:{hash(task)}"

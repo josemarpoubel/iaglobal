@@ -5,11 +5,12 @@
 Manter apenas para compatibilidade reversa.
 """
 
-import logging
 import warnings
 from typing import Any, Dict, List
 
-logger = logging.getLogger(__name__)
+from iaglobal.utils.logger import get_logger
+
+logger = get_logger("iaglobal.agents.evolution_agent")
 
 warnings.warn(
     "iaglobal.agents.evolution_agent está obsoleto. "

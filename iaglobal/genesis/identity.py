@@ -10,7 +10,7 @@ Responsável por:
 - Expurgar memória na morte (anti-forense)
 - Fornecer health check (homeostase)
 
-v2.0 - Organismo Computacional Completo:
+- Organismo Computacional Completo:
 - Tribunal Genesis HABILITADO (conformidade obrigatória)
 - Circuit breaker para proteção contra falhas
 - Telemetria completa (Tracer + batch_writer)
@@ -529,6 +529,22 @@ class NodeIdentity:
     def get_public_bytes(self) -> bytes:
         """Retorna os bytes públicos (ID binário como chave pública)."""
         return self.node_id
+
+    def derive_node_lineage(self, node_uid: str) -> str:
+        """
+        Deriva Lineage_Hash para um nó específico via SHA3-512(G0 + node_uid).
+        
+        Cada nó do pipeline recebe uma prova de derivação única baseada
+        no Genesis oficial. O hash é mantido em memória — não persiste em disco.
+        
+        Args:
+            node_uid: Identificador único efêmero do nó.
+        
+        Returns:
+            str: Hash SHA3-512 de 128 hex chars.
+        """
+        g0 = bytes.fromhex(GENESIS_HASH_OFFICIAL)
+        return hashlib.sha3_512(g0 + node_uid.encode()).hexdigest()
 
 
 # =====================================================================

@@ -67,7 +67,7 @@ class SkillRegistry:
         """Registra ou atualiza incluindo corretamente a nova versão no histórico."""
         # Validação preventiva antes de travar o registro
         if not callable(skill.run_fn):
-            logger.error(f"[SKILL] Tentativa de registro de skill inválida: {skill.name}")
+            logger.warning(f"[SKILL] Tentativa de registro de skill inválida: {skill.name}")
             return False
 
         with self._lock:

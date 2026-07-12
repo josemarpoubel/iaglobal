@@ -15,6 +15,7 @@ from .stages import PipelineStage
 
 from iaglobal._paths import SCRIPTS_DIR, RESULTS_DIR
 from iaglobal.validation.engine import ValidationEngine
+from iaglobal.validation.js_validator import detect_lang
 from iaglobal.providers.provider_router import CREDIT_CANDIDATES as credit_candidates_fn
 
 from iaglobal.utils.logger import get_logger
@@ -354,10 +355,9 @@ class PipelineEngine:
         code = state.generated_code or ""
         code = self._extract_fenced_code(code)
 
-        is_python = not any(
-            marker in code for marker in ("<%@", "<?php", "<html", "<!", "<%=")
-        )
-        if is_python:
+        lang = detect_lang(code)
+        if lang is None:
+            # Só roda validação Python se for código Python nativo
             result = self.validator.validate(code)
             if not result.valid:
                 state.errors.extend(result.errors)
@@ -366,9 +366,11 @@ class PipelineEngine:
             state.generated_code = result.code
             state.syntax_valid = True
         else:
-            logger.info("[VALIDATION] Código não-Python (%d chars)", len(code))
+            logger.info("[VALIDATION] Código %s detectado — pulando validação Python AST (%d chars)", lang, len(code))
             state.generated_code = code
             state.syntax_valid = len(code.strip()) > 10
+            if not self._detected_lang and lang in ("js", "jsx", "ts", "css", "html", "json"):
+                self._detected_lang = lang
 
     def _extract_fenced_code(self, code: str) -> str:
         m = re.search(r"```(\w+)?\n(.+?)\n```", code, re.DOTALL)
@@ -405,7 +407,7 @@ class PipelineEngine:
 
     LANG_EXT = {
         "asp": ".asp", "aspx": ".aspx", "php": ".php", "html": ".html",
-        "htm": ".html", "css": ".css", "js": ".js", "ts": ".ts",
+        "htm": ".html", "css": ".css", "js": ".js", "jsx": ".jsx", "ts": ".ts",
         "py": ".py", "python": ".py", "rb": ".rb", "java": ".java",
         "go": ".go", "rs": ".rs", "c": ".c", "cpp": ".cpp", "h": ".h",
         "sql": ".sql", "xml": ".xml", "json": ".json", "yaml": ".yaml",

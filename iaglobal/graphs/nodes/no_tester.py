@@ -6,13 +6,13 @@ Tester Node — Componente de geração de suítes de testes do iaglobal.
 Gera validações automatizadas com telemetria ativa para o Bandit Policy.
 """
 import time
-import logging
 import asyncio
 from typing import Dict, Any
 
 from iaglobal.agents.tester_agent import TesterAgent
+from iaglobal.utils.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger("iaglobal.graphs.nodes.tester")
 
 
 async def run_tester(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -54,27 +54,27 @@ async def run_tester(ctx: Dict[str, Any]) -> Dict[str, Any]:
             }
         }
 
+    contexto_busca = memory.get("prompt_builder", {}).get("built_prompt", "")
+
     try:
         logger.info("[TESTER] Inicializando geração inteligente de suítes de teste...")
         agent = TesterAgent()
         
-        # Assegura execução assíncrona ou desvia para thread pool se gerar_testes for síncrono
         if asyncio.iscoroutinefunction(agent.gerar_testes):
-            test_output = await agent.gerar_testes(codigo=code, task=task_str)
+            test_output = await agent.gerar_testes(codigo=code, task=task_str, contexto=contexto_busca)
         else:
             test_output = await asyncio.to_thread(agent.gerar_testes, codigo=code, task=task_str)
             
-        test_len = len(test_output) if test_output else 0
+        test_code = test_output.test_code if hasattr(test_output, 'test_code') else (test_output or "")
+        test_len = len(test_code)
         logger.info("[TESTER] Ciclo finalizado com sucesso! Gerados %d caracteres de testes.", test_len)
         
-        # Validação do portão de segurança (código de teste vazio ou nulo é considerado falha técnica)
-        is_success = test_len > 10
+        is_success = test_output.success if hasattr(test_output, 'success') else (test_len > 10)
         latency_ms = (time.time() - start_time) * 1000.0
 
-        # Retorno higienizado cumprindo estritamente as Regras 1, 3 e 5 do AGENTS.md
         return {
-            "output": test_output or "",
-            "test_output": test_output or "",
+            "output": test_code,
+            "test_output": test_code,
             "execution_metrics": {
                 "model": resolved_model,
                 "success": is_success,

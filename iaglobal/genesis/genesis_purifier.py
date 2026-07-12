@@ -75,7 +75,8 @@ class GenesisPurifier:
         ]
 
         for target in targets:
-            target_path = Path(f"/home/kitohamachi/projeto-iaglobal/{target}")
+            from iaglobal._paths import PACKAGE_DIR
+            target_path = PACKAGE_DIR / ".." / target
 
             def _exists(p=target_path):
                 return p.exists()

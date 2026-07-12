@@ -1,82 +1,61 @@
-# FastAPI / API
-fastapi
-uvicorn
-pydantic
-pydantic-core
-
-# IAGlobal — Dependências (Versões Estabilizadas)
-
-accelerate
+aiofiles
 aiohttp
+attrs
+autobahn
+cachetools
 cbor2
 charset-normalizer
+cryptography
 ddgs
 deepdiff
+django
+esprima
+fastapi
 fastembed
-flask
-flask-sqlalchemy
-fpdf2
-google-ai-generativelanguage
-google-genai
-google-generativeai
-googlesearch-python
-grokipedia-api
-httpx
+fastjsonschema
+fastmcp
+httpx2
+httpx-sse
 huggingface_hub
+idna
+jedi
 jsonschema
+lxml
 mcp
-nest_asyncio
+msgpack
+nest-asyncio
 numpy
 openai
+orjson
 pdfminer.six
-peft
-playwright
+prometheus-client
 protobuf>=5.26.1,<6.0.0
+psutil
+pybreaker
+pydantic
+PyMuPDF
 PyPDF2
-pymupdf
-pytest
-pytest-asyncio
+pyee
+pyOpenSSL
+pyflakes
 python-dotenv
+python-lsp-server[all]
+reactpy
+reactpy-django
+redis
 requests
+scikit-learn
 scrapy
 sentence-transformers
+service-identity
+sqlalchemy
+starlette
+tokenizers
 torch
 tqdm
 transformers
-trl
-urllib3
+Twisted
+ujson
+uvicorn
 watchdog
-
-selenium
-torch
-torchvision
-pillow
-safetensors
-tokenizers
-bandit
-safety
-beautifulsoup4
-playwright
-cachetools
-redis
-podman-compose
-
-# ==============================================================================
-# BASE CORE (Se o prompt pedir para usar Django)
-# ==============================================================================
-reactpy
-django
-reactpy-django
-daphne
-channels[daphne]
-
-# ==============================================================================
-# BASE MICROSERVICE / FASTAPI (Se o prompt pedir para isolar em FastAPI)
-# ==============================================================================
-reactpy[fastapi]
-uvicorn[standard]
-
-# ==============================================================================
-# EXTRAS PARA PRODUÇÃO AVANÇADA (WebSockets distribuídos)
-# ==============================================================================
-channels-redis
+websockets

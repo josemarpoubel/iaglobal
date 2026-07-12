@@ -1,23 +1,19 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 import re
 import ast
+import asyncio
 import time
 import hashlib
-import random
-import traceback
-import asyncio
 from dataclasses import dataclass, field
-from typing import Union, Dict, List, Optional
+from typing import Union, Dict, List, Optional, Any
 
 from iaglobal.models.task import Task
-from iaglobal.observability.tracing import Tracer
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal._paths import _detect_extension
-
-from iaglobal.storage.batch_writer import batch_writer, Event
 from iaglobal.utils.logger import get_logger
 from iaglobal.utils.helpers import run_async_safe
 from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
+from iaglobal.core.dependency_enforcer import dependency_enforcer, INSTRUCAO_DEPENDENCIAS
 
 logger = get_logger("iaglobal")
 
@@ -31,7 +27,7 @@ EXTENSION_HINTS = {
     "html": ".html", "css": ".css", "yaml": ".yaml", "yml": ".yaml",
     "json": ".json", "xml": ".xml", "markdown": ".md", "md": ".md",
     "php": ".php", "sql": ".sql",
-    "reactpy": ".py", "reactpy-django": ".py",  # ReactPy components são Python
+    "reactpy": ".py", "reactpy-django": ".py",
 }
 
 @dataclass
@@ -43,9 +39,7 @@ class CodeArtifact:
 
 class CoderAgent(AgentBase):
     def __init__(self, temperatura: float = 0.5, estilo: str = "direto, minimalista"):
-        # Inicializa AgentBase com nome único
         super().__init__(agent_name="coder")
-        
         self.temperatura = temperatura
         self.estilo = estilo
         self._quality_scores: Dict[str, List[float]] = {}
@@ -78,101 +72,141 @@ class CoderAgent(AgentBase):
                 exts.append(ext)
         return exts or [".py"]
 
-    def _build_prompt(self, task: str, contexto: str = "", erros_contexto: str = "", security_feedback: str = "") -> str:
-        security_section = f"\nALERTA DE SEGURANÇA: {security_feedback}\n" if security_feedback else ""
-        pdf_dark_hint = ""
-        reactpy_hint = ""
-        task_lower = task.lower()
-        if ("pdf" in task_lower or "documento" in task_lower) and ("escuro" in task_lower or "dark" in task_lower):
-            pdf_dark_hint = "\nDICA PDF TEMA ESCURO: Use set_fill_color(30,30,30) E rect(0,0,210,297,'F') APÓS cada add_page() para aplicar tema escuro em TODAS as páginas."
-        if "reactpy" in task_lower:
-            reactpy_hint = "\nDICA REACTPY: Use @component, html.* tags, hooks (use_state, use_effect). Design: dark theme (#0f0f23 bg, #ff6b6b accent)."
-        return f"""Você é um Engenheiro de Software Sênior e Arquiteto Supremo de Sistemas Vivos Que Se Auto-Evoluem. Você é Um Criador de Tecnologias de Alto Nivel.
-Estilo: {self.estilo}.
-Contexto: {contexto or "Nenhum."}
-Erros a reparar: {erros_contexto or "Nenhum."}
-{security_section}{pdf_dark_hint}{reactpy_hint}
-Tarefa: {task}
-DIRETRIZES DE LOGGING (OBRIGATÓRIO):
-- NÃO utilize `print()`.
-- Sempre use o módulo nativo `logging`.
-- Configure o logger no escopo global: `logger = logging.getLogger(__name__)`.
-- Use `logger.info()` para fluxos normais e `logger.error()` ou `logger.exception()` para falhas.
+    async def _consultar_librarian(self, task: str) -> Dict[str, Any]:
+        try:
+            from iaglobal.tools.tool_library import tool_library
+            tool_entry, score = tool_library.match(task)
+            if tool_entry and score >= 0.5:
+                logger.info("[LIBRARIAN] Componente reutilizavel: %s (score=%.2f)", tool_entry.name, score)
+                return {"components": [tool_entry], "reused_count": 1}
+            return {"components": [], "reused_count": 0}
+        except Exception as e:
+            logger.debug("[LIBRARIAN] Erro: %s", e)
+            return {"components": [], "reused_count": 0}
 
-DIRETRIZES DE ARQUITETURA:
-- Estruture o código de forma clara, modular e reutilizável.
-- Prefira funções puras e bem definidas, evitando efeitos colaterais desnecessários.
-- Documente funções críticas com docstrings concisas e objetivas.
-- Evite redundância e código boilerplate; mantenha simplicidade e legibilidade.
-- Garanta compatibilidade com execução em sandbox e respeite restrições de segurança.
-
-DIRETRIZES DE SEGURANÇA:
-- NÃO utilize imports inseguros.
-- NÃO utilize bibliotecas imcompativeis.
-- Evite chamadas diretas ao sistema operacional que possam comprometer o ambiente.
-- Todo acesso a modelos de IA deve passar pela BanditPolicy para garantir conformidade e otimização.
-- Corrija imediatamente qualquer violação de sandbox ou policy.
-
-DIRETRIZES DE QUALIDADE:
-- O código deve ser eficiente e escalável, evitando complexidade desnecessária.
-- Sempre valide entradas e trate exceções de forma robusta.
-- Inclua comentários apenas quando agregarem clareza arquitetural.
-- Garanta que o código seja sintaticamente válido e pronto para execução.
-- Sempre teste o resultado final para certificar que não há erros.
-- Sempre verifique se o resultado final é compativel com o prompt inicial.
-
-REGRAS DE RETORNO:
-- Retorne ESTRITAMENTE o código dentro de um bloco markdown da linguagem correspondente (ex: ```python ... ```).
-- NÃO inclua explicações textuais fora do bloco."""
-
-    def _extrair_bloco_markdown(self, texto: str) -> str:
-        # Tenta encontrar blocos com ``` ou '''
-        match = re.search(
-            r"```(?:python|html|css|javascript|js|php|yaml|json|xml|sql|ts|tsx)?\s*(.*?)\s*```|'''(?:python|html|css|javascript|js|php|yaml|json|xml|sql|ts|tsx)?\s*(.*?)\s*'''",
-            texto, re.DOTALL | re.IGNORECASE
-        )
-        if match:
-            # Retorna o grupo 1 (se for ```) ou grupo 2 (se for ''')
-            return (match.group(1) or match.group(2)).strip()
-        return ""
-
-    def _extrair_por_ast(self, texto: str) -> str:
-        linhas = texto.splitlines()
-        inicio = None
-        for i, linha in enumerate(linhas):
-            if linha.lstrip().startswith(("def ", "class ", "import ", "from ", "@", "async def ", "if __name__")):
-                inicio = i
-                break
-        if inicio is None:
+    async def _consultar_skill_registry(self, task: str) -> str:
+        try:
+            from iaglobal.evolution.skills.skill_registry import skill_registry
+            skills = skill_registry.list_skills(active_only=True)
+            task_lower = task.lower()
+            candidates = []
+            for skill in skills:
+                if not callable(skill.run_fn):
+                    continue
+                tags = " ".join(skill.tags).lower()
+                desc = skill.description.lower()
+                name = skill.name.lower()
+                for keyword in task_lower.split():
+                    if len(keyword) < 3:
+                        continue
+                    if keyword in tags or keyword in desc or keyword in name:
+                        candidates.append((skill, 1.0))
+                        break
+            if not candidates:
+                return ""
+            best = max(candidates, key=lambda x: x[1])
+            skill = best[0]
+            logger.info("[SKILL] Match: %s (v%s, %s)", skill.name, skill.version, skill.description[:60])
+            from iaglobal.models.task import Task as SkTask
+            result = skill.run_fn({"task": task, "code": "", "input": {"task": task}})
+            if hasattr(result, "__await__"):
+                result = await result
+            if isinstance(result, dict):
+                codigo = ""
+                for key in ("code", "output", "fixed_code", "integrated_code", "frontend_code", "backend_code"):
+                    val = result.get(key)
+                    if val and isinstance(val, str) and len(val.strip()) > 10:
+                        codigo = val.strip()
+                        break
+                if codigo:
+                    return codigo
             return ""
-        codigo = "\n".join(linhas[inicio:])
-        while codigo:
-            try:
-                ast.parse(codigo)
-                return codigo.strip()
-            except SyntaxError as e:
-                blocos = codigo.splitlines()
-                if e.lineno is not None and 1 <= e.lineno <= len(blocos):
-                    blocos.pop(e.lineno - 1)
-                else:
-                    blocos.pop()
-                codigo = "\n".join(blocos)
-        return ""
+        except Exception as e:
+            logger.debug("[SKILL] Erro: %s", e)
+            return ""
 
-    def _extrair_texto_bruto(self, texto: str) -> str:
-        sem_markers = re.sub(r"```[a-zA-Z]*\s*", "", texto).replace("```", "").strip()
-        return sem_markers if sem_markers else texto.strip()
-
-    def _extrair_codigo(self, resposta: str) -> str:
-        codigo = self._extrair_bloco_markdown(resposta)
-        if codigo:
+    async def _validar_com_syntax_sentinel(self, codigo: str) -> str:
+        try:
+            from iaglobal.graphs.nodes.syntax_sentinel import run_syntax_sentinel
+            result = await run_syntax_sentinel({"memory": {"coder": {"output": codigo}}})
+            fixed = result.get("output", "")
+            if fixed and len(fixed.strip()) > 10:
+                return fixed.strip()
             return codigo
-        codigo = self._extrair_texto_bruto(resposta)
-        if codigo:
+        except Exception as e:
+            logger.debug("[SYNTAX] Erro: %s", e)
             return codigo
-        return self._extrair_por_ast(resposta)
 
-    def _calcular_qualidade(self, codigo: str, task: str) -> float:
+    async def _gerar_esqueleto(self, task: str) -> str:
+        task_lower = task.lower()
+        linhas = []
+        if "flask" in task_lower or "api" in task_lower:
+            linhas.extend([
+                "from flask import Flask, jsonify, request",
+                "",
+                "app = Flask(__name__)",
+                "",
+                "@app.route('/health', methods=['GET'])",
+                "def health():",
+                "    return jsonify({'status': 'ok'})",
+                "",
+                "if __name__ == '__main__':",
+                "    app.run(debug=True)",
+            ])
+        elif "class" in task_lower or "classe" in task_lower:
+            linhas.extend([
+                "class AppService:",
+                "    def __init__(self):",
+                "        pass",
+                "",
+                "    def process(self, data):",
+                "        return data",
+            ])
+        elif "script" in task_lower or "funcao" in task_lower or "function" in task_lower:
+            linhas.extend([
+                "def main():",
+                "    pass",
+                "",
+                "if __name__ == '__main__':",
+                "    main()",
+            ])
+        elif "html" in task_lower:
+            linhas.extend([
+                "<!DOCTYPE html>",
+                '<html lang="pt-BR">',
+                "<head>",
+                '    <meta charset="UTF-8">',
+                "    <title>App</title>",
+                "</head>",
+                "<body>",
+                "    <div id='app'></div>",
+                "</body>",
+                "</html>",
+            ])
+        else:
+            return ""
+        return "\n".join(linhas)
+
+    async def _registrar_no_tool_library(self, codigo: str, task: str) -> None:
+        try:
+            from iaglobal.tools.tool_library import tool_library
+            tags = [w.lower() for w in task.split() if len(w) > 3][:5]
+            tool_library.register_from_code(
+                name=f"auto_{hashlib.sha256(codigo.encode()).hexdigest()[:8]}",
+                code=codigo,
+                tags=tags,
+            )
+            logger.info("[EVOLUCAO] Coder registrou ToolLibrary | tags=%s", tags)
+        except Exception as e:
+            logger.debug("[EVOLUCAO] ToolLibrary: %s", e)
+
+    async def _avaliar_qualidade(self, codigo: str, task: str) -> float:
+        try:
+            from iaglobal.validation.scoring import calculate_score
+            score = await asyncio.to_thread(calculate_score, codigo)
+            return score
+        except Exception:
+            pass
         score = 50.0
         if not codigo:
             return 0.0
@@ -187,45 +221,9 @@ REGRAS DE RETORNO:
             score += 10
         if re.search(r'"""|"""', codigo):
             score += 5
-        if re.search(r"from typing import|from typing import", codigo):
-            score += 5
         if task and re.search(task.split()[-1] if task.split() else "", codigo, re.IGNORECASE):
             score += 10
         return min(score, 100.0)
-
-    def _registrar_metrica(self, modelo: str, codigo: str, latencia: float, sucesso: bool, task: str):
-        score = self._calcular_qualidade(codigo, task) if sucesso else 0.0
-        if modelo not in self._quality_scores:
-            self._quality_scores[modelo] = []
-        self._quality_scores[modelo].append(score)
-        
-        # Envia evento para telemetria (persistência em banco)
-        batch_writer.emit(Event(
-            event_type="CoderGeneration",
-            payload=task[:100],
-            model=modelo,
-            latency_ms=round(latencia * 1000, 1),
-            tokens_in=0,  # TODO: integrar com contagem real
-            tokens_out=len(codigo) // 4  # Estimativa base
-        ))
-
-        Tracer.trace_event("CoderGeneration", {
-            "model": modelo, "success": sucesso, "latency_ms": round(latencia * 1000, 1),
-            "quality_score": round(score, 1), "code_len": len(codigo), "task": task[:80]
-        })
-        self.credit.record(ExecutionEvent(
-            node="coder_agent", model=modelo, strategy="code_generation",
-            latency=latencia, success=sucesso, reward=score / 100.0, error="" if sucesso else "validation_failed"
-        ))
-
-    def _modelos_candidatos(self, count: int = 3) -> List[str]:
-        modelos = self.bandit.select_top_n(
-            node="coder_agent", strategy="code_generation", n=count
-        )
-        modelos_ordenados = sorted(modelos, key=lambda m: (
-            sum(self._quality_scores.get(m, [50])) / max(len(self._quality_scores.get(m, [1])), 1)
-        ), reverse=True)
-        return modelos_ordenados[:count]
 
     async def generate(
         self,
@@ -236,104 +234,118 @@ REGRAS DE RETORNO:
     ) -> CodeArtifact:
         task_str = task.text if hasattr(task, 'text') else str(task)
         task_hash = hashlib.sha3_512(task_str.encode()).hexdigest()[:16]
-        
-        # Consulta pesos epigenéticos antes de executar
-        epigenetic_weights = await self.epigenetic_registry.get_adaptive_weights(
-            self.agent_id, task_hash
-        )
-        
-        # Aplica pesos epigenéticos ao comportamento
-        retry_delay_base = epigenetic_weights.get("retry_delay", 1.0)
-        model_priority_factor = epigenetic_weights.get("model_priority", 1.0)
-        fallback_enabled = epigenetic_weights.get("fallback_enabled", True)
-        
-        logger.info(
-            "[EPIGENETIC] %s | Pesos: retry_delay=%.2f, model_priority=%.2f, fallback=%s",
-            self.agent_id, retry_delay_base, model_priority_factor, fallback_enabled
-        )
-        
+
         cache_key = self._cache_key(task_str, contexto)
         cached = self._get_cached(cache_key)
         if cached:
             return cached
 
-        prompt = self._build_prompt(task_str, contexto, erros_contexto, security_feedback)
-        modelos = self._modelos_candidatos(3)
-        
-        # Ajusta prioridade de modelos baseado em epigenética
-        if model_priority_factor < 0.7:
-            logger.warning("[EPIGENETIC] Reduzindo ambicao dos modelos devido a historico")
-            modelos = modelos[:2]  # Reduz numero de modelos
-        
-        logger.info("[CODER] Gerando codigo via modelos=%s estilo=%s", modelos, self.estilo)
+        logger.info("[CODER] Processando com recursos locais | estilo=%s", self.estilo)
+        codigo = ""
 
-        async def _tentar(modelo: str, tentativa: int = 1) -> Optional[CodeArtifact]:
+        # Layer 1: ToolLibrary — componente reutilizavel
+        try:
+            librarian = await self._consultar_librarian(task_str)
+            if librarian["reused_count"] > 0 and librarian["components"]:
+                tool = librarian["components"][0]
+                codigo = (getattr(tool, "code", "") or getattr(tool, "template", "") or "").strip()
+                if codigo:
+                    logger.info("[CODER] Layer 1: ToolLibrary hit — %s", tool.name)
+        except Exception as e:
+            logger.debug("[CODER] Layer 1: %s", e)
+
+        # Layer 2: SkillRegistry — skill registrada
+        if not codigo:
             try:
-                t0 = time.monotonic()
-                # Usa _call_llm do AgentBase para registrar métricas automaticamente
-                resultado = await self._call_llm(
-                    prompt=prompt,
-                    task_type="code",
-                    candidates=[modelo],  # Força modelo específico
-                )
-                latencia = time.monotonic() - t0
-                if not resultado or len(resultado.strip()) < 10:
-                    logger.warning(f"[CODER] Conteúdo vazio/curto retornado pelo modelo {modelo}. Resultado: {repr(resultado)[:100]}")
-                    return None
-                codigo = self._extrair_codigo(resultado)
-                if not codigo:
-                    codigo = resultado.strip()
-                exts = self._detect_extensions(codigo, task_str)
-                quality = self._calcular_qualidade(codigo, task_str)
-                self._registrar_metrica(modelo, codigo, latencia, True, task_str)
-                files = {}
-                for ext in exts:
-                    nome = f"output{ext}" if ext else "output.py"
-                    files[nome] = codigo
-                if not files:
-                    files["output.py"] = codigo
-                return CodeArtifact(code=codigo, files=files, model_used=modelo, score=quality)
+                codigo_skill = await self._consultar_skill_registry(task_str)
+                if codigo_skill:
+                    codigo = codigo_skill
+                    logger.info("[CODER] Layer 2: SkillRegistry hit")
             except Exception as e:
-                logger.warning("[CODER] Tentativa %d/%s falhou: %s", tentativa, modelo, e)
-                return None
+                logger.debug("[CODER] Layer 2: %s", e)
 
-        resultados = await asyncio.gather(*[_tentar(m) for m in modelos], return_exceptions=True)
-        validos = [r for r in resultados if isinstance(r, CodeArtifact) and r.code]
+        # Layer 3: SyntaxSentinel — valida e corrige sintaxe se ja gerou
+        if codigo:
+            validated = await self._validar_com_syntax_sentinel(codigo)
+            if validated and len(validated.strip()) > 10:
+                codigo = validated
+                logger.info("[CODER] Layer 3: SyntaxSentinel validado")
+        else:
+            # Layer 3b: esqueleto baseado na task
+            codigo = await self._gerar_esqueleto(task_str)
+            if codigo:
+                logger.info("[CODER] Layer 3b: Esqueleto gerado")
 
-        if validos:
-            validos.sort(key=lambda a: a.score, reverse=True)
-            best = validos[0]
-            self._set_cache(cache_key, best)
-            
-            # Registra sucesso epigenético
+        # Layer 4: CodeScorer — qualidade + evolução
+        if codigo and len(codigo.strip()) > 10:
+            quality = await self._avaliar_qualidade(codigo, task_str)
+
+            # Layer 5: Auto-Correção — lê o código como compilador e corrige
+            from iaglobal.core.auto_correction import auto_correction
+            correcao = await asyncio.to_thread(auto_correction.corrigir, codigo, task_str)
+            if correcao.foi_corrigido:
+                codigo = correcao.codigo_final
+                quality = await self._avaliar_qualidade(codigo, task_str)
+                logger.info(
+                    "[CODER] Layer 5: Auto-correcao aplicada | issues=%d fixes=%d lang=%s quality=%.1f",
+                    len(correcao.issues), len(correcao.fixes_aplicados),
+                    correcao.linguagem, quality,
+                )
+
+            # Layer 6: DependencyEnforcer — verifica imports contra stdlib/instalados
+            enforce_result = await asyncio.to_thread(dependency_enforcer.enforce, codigo)
+            if enforce_result.was_modified:
+                codigo = enforce_result.modified
+                quality = await self._avaliar_qualidade(codigo, task_str)
+                logger.info(
+                    "[CODER] Layer 6: DependencyEnforcer aplicado | wrapped=%d unknown=%d quality=%.1f",
+                    len(enforce_result.wrapped_imports),
+                    len(enforce_result.unknown_imports),
+                    quality,
+                )
+                for imp in enforce_result.wrapped_imports:
+                    logger.info("[CODER]   >> Import envolvido em try/except: %s", imp)
+
+            exts = self._detect_extensions(codigo, task_str)
+            files = {}
+            for ext in exts:
+                nome = f"output{ext}" if ext else "output.py"
+                files[nome] = codigo
+            if not files:
+                files["output.py"] = codigo
+            artifact = CodeArtifact(code=codigo, files=files, model_used="local_tools", score=quality)
+            self._set_cache(cache_key, artifact)
             await self.epigenetic_registry.record_success(self.agent_id, task_hash)
-            
-            Tracer.trace_event("CoderSuccess", {"model": best.model_used, "score": best.score, "files": list(best.files.keys())})
-            return best
 
-        # Determina tipo de erro para registro epigenético
-        error_type = "unknown_failure"
-        # Tenta identificar o erro mais comum das tentativas
-        
-        logger.warning("[CODER] Todos os modelos falharam, tentando retry com backoff")
-        for tentativa, modelo in enumerate(modelos):
-            delay = min((2 ** tentativa + random.uniform(0, 1)) * retry_delay_base, 15)
-            await asyncio.sleep(delay)
-            resultado = await _tentar(modelo, tentativa + 2)
-            if resultado:
-                self._set_cache(cache_key, resultado)
-                await self.epigenetic_registry.record_success(self.agent_id, task_hash)
-                return resultado
+            # Evolução: registra código de alta qualidade no ToolLibrary
+            if quality >= 70:
+                await self._registrar_no_tool_library(codigo, task_str)
 
-        logger.error("[CODER] Falha apos todas as tentativas e retries")
-        
-        # Registra falha epigenética para aprendizado futuro
+            return artifact
+
+        logger.info("[CODER] Recursos locais insuficientes — gap delegado ao Critic")
         await self.epigenetic_registry.record_failure(
-            self.agent_id, task_hash, error_type, {"task": task_str[:200]}
+            self.agent_id, task_hash, "local_only", {"task": task_str[:200]}
         )
-        
-        Tracer.trace_event("CoderFailed", {"task": task_str[:80]})
         return CodeArtifact(code="", files={})
 
     def run(self, task) -> CodeArtifact:
         return run_async_safe(self.generate, task)
+
+    # REPAIR SIGNAL — Ciclo Debugger ↔ Coder (anti-apoptose)
+    _signal_repair_requested: bool = False
+    _last_syntax_error: Optional[str] = None
+
+    def request_repair(self, error: str) -> None:
+        self._signal_repair_requested = True
+        self._last_syntax_error = error
+        logger.warning("[CODER] Solicitando reparo ao DebuggerAgent | erro=%s", error[:120])
+
+    def acknowledge_repair(self) -> None:
+        self._signal_repair_requested = False
+        self._last_syntax_error = None
+        logger.info("[CODER] Reparo concluido — agente reabilitado")
+
+    @property
+    def needs_repair(self) -> bool:
+        return self._signal_repair_requested

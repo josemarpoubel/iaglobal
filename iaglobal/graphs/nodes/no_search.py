@@ -27,6 +27,7 @@ from iaglobal.graphs.nodes._search_enhanced import (
     playwright_search,
     bs4_deep_search,
 )
+from iaglobal.graphs.nodes._search_capabilities import get_search_skip_list
 from iaglobal.memory.memory_error import record_error
 from iaglobal.agents.agent_base import AgentBase
 
@@ -37,6 +38,14 @@ SOURCE = "search"
 _web_brain = WebBrain()
 _search_agent = SearchAgent()
 _search_llm_agent = AgentBase(agent_name="search_node")
+
+# DECISÃO (Defect 2 — FECHADO como não-issue): o search_node NÃO precisa de um
+# node_id explícito. O SearchAgent herda de AgentBase -> bandit.generate recebe
+# node_id="search_agent" (não-crítico); e route_generate() cai em node_id
+# "provider_router" (também não-crítico). Em ambos os caminhos a membrana
+# confina a Ollama local pelo flag global external_access_only_critic (default
+# True). Busca não é tarefa cloud-crítica, logo nenhum node_id adicional é
+# necessário — adicionar um seria ruído sem ganho de fitness.
 
 
 async def _try_source(name: str, fn: Callable, task: str, timeout: int = 12) -> str:
@@ -88,7 +97,7 @@ SOURCES: List[Tuple[str, Callable, int]] = [
 
 _BATCH_SIZE = 4
 _BATCH_DELAY = 1.0
-_MIN_RESULTS = 33000
+_MIN_RESULTS = 2000  # Early-stop após acumular contexto web suficiente (ATP 10:1)
 
 
 async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -109,6 +118,15 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "execution_metrics": {"model": resolved_model, "success": False, "latency": latency_ms, "cost": 0.0}
         }
 
+    # Skip-list de capacidade: fontes pesadas (Playwright/YaCy) ausentes no ambiente
+    # são eliminadas ANTES do agendamento, poupando ATP e threads (ver _search_capabilities).
+    # Também responde à medição sugerida: quantas vezes as fontes pesadas seriam tentadas.
+    skip = await get_search_skip_list()
+    active_sources = [(n, fn, t) for (n, fn, t) in SOURCES if n not in skip]
+    if skip:
+        logger.info("[SEARCH] skip-list ativo: %s — %d/%d fontes ativas (economia de ATP)",
+                    sorted(skip), len(active_sources), len(SOURCES))
+
     # Isolamento 1: Desvia a leitura síncrona do cache em disco para Thread Pool
     cached = await asyncio.to_thread(load_search, SOURCE, task)
     if cached:
@@ -126,12 +144,12 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
             }
         }
 
-    logger.info("[SEARCH] Cache Miss. Iniciando orquestração em lote de %d fontes de busca...", len(SOURCES))
+    logger.info("[SEARCH] Cache Miss. Iniciando orquestração em lote de %d fontes de busca...", len(active_sources))
     all_results = []
 
     try:
-        for batch_start in range(0, len(SOURCES), _BATCH_SIZE):
-            batch = SOURCES[batch_start:batch_start + _BATCH_SIZE]
+        for batch_start in range(0, len(active_sources), _BATCH_SIZE):
+            batch = active_sources[batch_start:batch_start + _BATCH_SIZE]
             
             # Agenda a execução concorrente do lote atual
             tasks = [_try_source(name, fn, task, timeout) for name, fn, timeout in batch]
@@ -150,7 +168,7 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 break
                 
             # Staggering delay assíncrono controlado entre lotes
-            if batch_start + _BATCH_SIZE < len(SOURCES):
+            if batch_start + _BATCH_SIZE < len(active_sources):
                 await asyncio.sleep(_BATCH_DELAY)
 
         combined = "\n\n".join(all_results)
@@ -160,7 +178,7 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
             # Isolamento 3: Persistência do agregado consolidado em background
             await asyncio.to_thread(save_search, SOURCE, task, combined)
             logger.info("[SEARCH] Varredura concluída. Total: %d caracteres de %d/%d fontes ativas.", 
-                        len(combined), len(all_results), len(SOURCES))
+                        len(combined), len(all_results), len(active_sources))
             
             return {
                 "output": combined,
@@ -175,7 +193,7 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
             }
 
         # Fallback: todas as fontes de busca falharam (sandbox bloqueia rede)
-        logger.warning("[SEARCH] Todas as %d fontes falharam. Gerando contexto via LLM local...", len(SOURCES))
+        logger.warning("[SEARCH] Todas as %d fontes falharam. Gerando contexto via LLM local...", len(active_sources))
         await asyncio.to_thread(record_error, SOURCE, "All sources empty or timed out, using LLM fallback", {"task": task[:100]})
         try:
             # Usa AgentBase para chamar BanditPolicy com semáforo

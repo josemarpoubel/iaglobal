@@ -78,6 +78,15 @@ class HomocysteinePool:
                     with open(self.path) as f:
                         data = json.load(f)
                         self.candidates = [CandidateSkill.from_dict(d) for d in data]
+                        # Saneamento: reverte promoções inválidas já persistidas
+                        # (ex.: skill lixo promovido a production por dump de IVM).
+                        dirty = False
+                        for c in self.candidates:
+                            if c.route == "production" and not self._is_production_worthy(c)[0]:
+                                c.route = "guardrail"
+                                dirty = True
+                        if dirty:
+                            self._save()
             except Exception as e:
                 logger.debug("[HOMOCYSTEINE] Erro ao carregar: %s", e)
 
@@ -97,6 +106,32 @@ class HomocysteinePool:
 
     PROMOTION_THRESHOLD = 85
 
+    # Gate de honestidade: só sobe para produção skill real e executável.
+    MIN_PRODUCTION_DESC_LEN = 40
+    MIN_PRODUCTION_SOURCE_LEN = 40
+
+    def _is_production_worthy(self, candidate: CandidateSkill) -> tuple:
+        """Valida se um candidato merece rota 'production' (anti-falso-positivo).
+
+        Rejeita skills sem run_fn (mortas), descrições/fontes truncadas ou
+        curtas, dumps crus de telemetria/IVM e baixa entropia. Sem isso, o
+        ciclo de metilação promovia ruído (ex.: dump de IVM) a produção.
+        """
+        desc = (candidate.skill.description or "").strip()
+        src = (candidate.source_gap or "").strip()
+        # Dump bruto de telemetria/IVM (dict literal, ex.: diagnóstico do sistema)
+        # não é skill funcional — rejeita para não promover ruído a produção.
+        if "{" in desc or "{" in src:
+            return False, "descrição/fonte contém dump de dicionário (ruído)"
+        if len(desc) < self.MIN_PRODUCTION_DESC_LEN:
+            return False, f"descrição curta ({len(desc)}<{self.MIN_PRODUCTION_DESC_LEN})"
+        if len(src) < self.MIN_PRODUCTION_SOURCE_LEN:
+            return False, f"fonte de gap curta ({len(src)}<{self.MIN_PRODUCTION_SOURCE_LEN})"
+        words = desc.split()
+        if words and len(set(words)) < min(8, len(words)):
+            return False, "baixa entropia / descrição redundante"
+        return True, ""
+
     def _promotion_threshold(self) -> float:
         scores = [c.score for c in self.candidates if isinstance(c.score, (int, float))]
         if scores and max(scores) <= 1.0:
@@ -104,6 +139,15 @@ class HomocysteinePool:
         return float(self.PROMOTION_THRESHOLD)
 
     def route_to_production(self, candidate: CandidateSkill) -> bool:
+        worthy, reason = self._is_production_worthy(candidate)
+        if not worthy:
+            # Disposição segura: manda para guardrail em vez de 'production' falso.
+            logger.warning(
+                "[HOMOCYSTEINE] Promoção NEGADA para '%s': %s",
+                candidate.skill.name, reason,
+            )
+            self.route_to_guardrail(candidate)
+            return False
         try:
             promoted = Skill(
                 name=candidate.skill.name,

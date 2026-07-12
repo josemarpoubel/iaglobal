@@ -395,11 +395,25 @@ async def api_get_task(execution_id: str):
 # SERVER ENTRYPOINT
 # =====================================================================
 
-def run_server(host: str = "0.0.0.0", port: int = 8000):
-    """Run the ReactPy FastAPI server."""
-    print(f"🚀 Starting IAGLOBAL UI server on http://{host}:{port}")
-    print(f"📊 Dashboard: http://{host}:{port}/@/AgentDashboard")
-    print(f"📁 Results: http://{host}:{port}/result")
+def run_server(host: str = "0.0.0.0", port: int = 8765):
+    """
+    Inicia o servidor UI FastAPI + ReactPy.
+    
+    Args:
+        host: Host para binding (default: 0.0.0.0)
+        port: Porta para o servidor UI (default: 8765 para evitar conflito com ASGI Gateway em 8000)
+    
+    A UI fica acessível em:
+      - http://localhost:8765/ (dashboard standalone)
+      - http://localhost:8000/@/ (montado no ASGI Gateway)
+    """
+    logger.info(f"🌐 [UI SERVER] Iniciando em {host}:{port}")
+    logger.info(f"📊 Dashboard: http://{host}:{port}/")
+    logger.info(f"🔌 WebSocket: ws://{host}:{port}/ws")
+    logger.info(f"🏥 Health: http://{host}:{port}/health")
+    logger.info(f"📁 Results: http://{host}:{port}/result")
+    logger.info(f"💡 Dica: Para acessar via ASGI Gateway, use http://localhost:8000/@/")
+    
     uvicorn.run(app, host=host, port=port)
 
 

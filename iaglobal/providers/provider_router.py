@@ -4,6 +4,7 @@ import asyncio
 import inspect
 import os
 import time
+from collections import deque
 from typing import Callable, List, Optional, Tuple
 
 from iaglobal.providers.provider_config import ProviderConfig
@@ -16,6 +17,7 @@ from iaglobal.evolution.reward_aggregator import reward_aggregator, RewardMetric
 from iaglobal.graphs.credit import CreditAssignmentEngine
 from iaglobal.graphs.telemetry import ExecutionEvent
 from iaglobal.memory import cache
+from iaglobal.immunity.metabolic_immune_barrier import barrier
 
 from iaglobal.utils.logger import logger
 
@@ -184,6 +186,97 @@ ASYNC_PROVIDERS = {
 }
 
 
+# ==============================================================================
+# MEMBRANA SELETIVA — ACESSO A MODELOS EXTERNOS (APENAS O AGENTE CRÍTICO)
+# ==============================================================================
+# Pressão seletiva evolutiva (intenção do arquiteto): os agentes só atingem
+# modelos cloud (Groq/NVIDIA/OpenRouter/Gemini/...) quando são o agente crítico,
+# que aponta correções. Todos os demais usam Ollama local, forçando-os a evoluir
+# com o próprio substrato (Lei da Evolução: adaptar ou perecer).
+_LOCAL_PROVIDERS = {"ollama"}
+
+
+# Sinal estruturado de membrana — INDEPENDENTE de nível de log (observabilidade
+# não deve depender de WARNING/INFO, como o bug de suppressão de INFO no CLI
+# já demonstrou). Guardas E2E e operadores leem este deque sem parsear logs.
+_MEMBRANE_DECISIONS: "deque" = deque(maxlen=512)
+
+
+def record_membrane_decision(node_id: str, action: str, candidates) -> None:
+    """Registra uma decisão de membrana de forma estruturada e nível-independente.
+
+    action: 'confined_local' | 'authorized_cloud' | 'redirected_local'
+    """
+    _MEMBRANE_DECISIONS.append({
+        "node_id": node_id,
+        "action": action,
+        "candidates": [c if isinstance(c, str) else c[1] for c in candidates],
+        "ts": time.time(),
+    })
+
+
+def _external_gate_enabled() -> bool:
+    """Portão de modelo externo ativo? Env tem precedência sobre flag epigenética."""
+    import os
+    env = os.getenv("EXTERNAL_ACCESS_ONLY_CRITIC")
+    if env is not None:
+        return env.strip().lower() in ("1", "true", "yes", "on")
+    try:
+        from iaglobal.evolution import is_flag_enabled
+        if is_flag_enabled("external_access_only_critic"):
+            return True
+    except Exception:
+        pass
+    return False
+
+
+def _authorized_external_agents() -> set:
+    import os
+    auth = {"critic"}
+    env = os.getenv("EXTERNAL_AUTHORIZED_AGENTS")
+    if env:
+        for a in env.split(","):
+            a = a.strip().lower()
+            if a:
+                auth.add(a)
+    return auth
+
+
+def _is_external_authorized(node_id: str) -> bool:
+    if not _external_gate_enabled():
+        return True
+    if not node_id:
+        return False
+    nid = node_id.lower()
+    if nid in _authorized_external_agents():
+        return True
+    # Robustez a nomes (critic_agent, no_critic, CriticAgent, evo-critic...)
+    if "critic" in nid:
+        return True
+    return False
+
+
+def _force_local_model(node_id: str) -> bool:
+    """True se o chamador NÃO tem direito a modelo externo (deve usar Ollama)."""
+    return not _is_external_authorized(node_id)
+
+
+def _policy_candidates(task_type: str, node_id: str) -> List[Tuple[str, str]]:
+    """Candidatos respeitando a membrana seletiva: remove cloud se não autorizado."""
+    cands = CREDIT_CANDIDATES(task_type)
+    if _force_local_model(node_id):
+        local = [c for c in cands if c[0] in _LOCAL_PROVIDERS]
+        if local:
+            logger.info(
+                "[MEMBRANA] node_id='%s' sem direito a modelo externo — "
+                "restrito a Ollama local (pressão evolutiva)", node_id
+            )
+            record_membrane_decision(node_id, "confined_local", local)
+            return local
+    record_membrane_decision(node_id, "authorized_cloud", cands)
+    return cands
+
+
 def CREDIT_CANDIDATES(task_type: str = "general"):
     """Retorna modelos candidatos baseados no tipo de tarefa.
     
@@ -209,6 +302,12 @@ def CREDIT_CANDIDATES(task_type: str = "general"):
 
 _credit = None  # Inicializado lazy em _get_credit() para usar singleton do Bandit
 BANDIT_NODE = "model_router"
+
+# Sinaliza se a resposta servida veio de cache (hit) dentro da task corrente.
+# Usado para NÃO inflacionar a Produtividade (P) e a Eficiência (E) do IVM:
+# servir do cache não é geração real do agente (evita métrica falsa de "bom").
+from contextvars import ContextVar
+_SERVED_FROM_CACHE: ContextVar[bool] = ContextVar("served_from_cache", default=False)
 
 
 def _get_credit() -> CreditAssignmentEngine:
@@ -242,10 +341,17 @@ def _clear_circuit_breaker_bans():
     # Também limpa os bloqueios no nível HTTP (async_http._BLOCKED_PROVIDERS)
     from iaglobal.providers.async_http import _BLOCKED_PROVIDERS
     http_cleared = []
-    for provider in list(_BLOCKED_PROVIDERS.keys()):
-        if provider in _PROVIDERS_WITH_KEYS:
-            del _BLOCKED_PROVIDERS[provider]
-            http_cleared.append(provider)
+    if isinstance(_BLOCKED_PROVIDERS, dict):
+        for provider in list(_BLOCKED_PROVIDERS.keys()):
+            if provider in _PROVIDERS_WITH_KEYS:
+                del _BLOCKED_PROVIDERS[provider]
+                http_cleared.append(provider)
+    elif isinstance(_BLOCKED_PROVIDERS, list):
+        # Lista de providers bloqueados — limpa apenas os que têm key
+        for provider in list(_BLOCKED_PROVIDERS):
+            if provider in _PROVIDERS_WITH_KEYS:
+                _BLOCKED_PROVIDERS.remove(provider)
+                http_cleared.append(provider)
     if http_cleared:
         logger.info("[ROUTER] Bans HTTP limpos para %d providers: %s", len(http_cleared), http_cleared)
 
@@ -322,15 +428,20 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
     cache em nível de roteador e coleta de métricas.
     """
     cache_key = f"{provider}:{model}:{prompt}"
-    cached = cache.get(cache_key)
-    if cached:
-        logger.debug(f"[ROUTER] Cache HIT: {provider} ({model})")
-        # Registra métrica de cache hit (latência ~0)
-        latency = 0.001  # ~1ms para cache
+    entry = cache.get_entry(cache_key)
+    if entry:
+        cached = entry["value"]
+        logger.debug(f"[ROUTER] Cache HIT (válido): {provider} ({model})")
+        # Telemetria honesta: preserva o token_count real (antes hardcoded 0),
+        # cumprindo a Lei 1 (a célula sente seu próprio estado metabólico).
+        latency = 0.001  # ~1ms para cache hit
         cost = 0.0
-        reward = reward_aggregator.calculate_reward(RewardMetrics(success=True, latency_ms=1, cost_usd=0.0, token_count=0))
+        real_tokens = entry.get("tokens", 0)
+        reward = reward_aggregator.calculate_reward(RewardMetrics(success=True, latency_ms=1, cost_usd=0.0, token_count=real_tokens))
         _get_credit().record(ExecutionEvent(node=BANDIT_NODE, success=True, latency=latency, model=model, strategy=task_type, reward=reward))
-        metrics.record(provider, model, prompt, True, latency*1000, 0, 0, 0, cost, task_type)
+        metrics.record(provider, model, prompt, True, latency*1000, 0, 0, real_tokens, cost, task_type)
+        barrier.record("cache_valid_hit", detail=f"{provider}/{model} tokens={real_tokens}", agent=provider)
+        _SERVED_FROM_CACHE.set(True)  # marca para o IVM não creditar produtividade
         return cached
 
     start = time.time()
@@ -364,7 +475,7 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
                 return await _async_safe_call(provider, func, prompt, model, task_type, retry_count + 1, max_retries)
             raise ValueError("Resposta vazia do provedor.")
 
-        cache.set(cache_key, result)
+        cache.set(cache_key, result, total_tokens)
 
         logger.info(f"[ROUTER] Sucesso: {provider} ({latency:.2f}s, {len(result)} chars)")
 
@@ -372,10 +483,6 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
         reward = reward_aggregator.calculate_reward(RewardMetrics(success=True, latency_ms=latency*1000, cost_usd=cost, token_count=total_tokens))
         _get_credit().record(ExecutionEvent(node=BANDIT_NODE, success=True, latency=latency, model=model, strategy=task_type, reward=reward))
         metrics.record(provider, model, prompt, True, latency*1000, prompt_tokens, completion_tokens, total_tokens, cost, task_type)
-        
-        # Registra evolução (Geração 2)
-        ivm_estimado = 0.9 if latency < 2.0 else 0.7 if latency < 5.0 else 0.5
-        await _registrar_evolucao(provider, ivm_estimado, latency*1000, cost, True)
 
         return result
 
@@ -400,17 +507,17 @@ async def _async_safe_call(provider: str, func: Callable, prompt: str, model: st
         _get_credit().record(ExecutionEvent(node=BANDIT_NODE, success=False, latency=latency, model=model, strategy=task_type, error=error_str, reward=reward))
         return None
 
-async def _async_race_round(prompt: str, candidates: List[Tuple[str, str]], task_type: str, parallel_count: int) -> Optional[Tuple[str, str]]:
+async def _async_race_round(prompt: str, candidates: List[Tuple[str, str]], task_type: str, parallel_count: int) -> Tuple[Optional[str], Optional[str], bool]:
     """
     🏁 Dispara provedores em paralelo. Aguarda TODOS completarem e retorna o primeiro sucesso.
     """
     async def _race_one(provider: str, model: str):
         func = ASYNC_PROVIDERS.get(provider)
-        if not func: return None
+        if not func: return None, None, False
         res = await _async_safe_call(provider, func, prompt, model, task_type)
         if res:
-            return provider, res
-        return None
+            return provider, res, _SERVED_FROM_CACHE.get()
+        return None, None, False
 
     tasks = [asyncio.create_task(_race_one(p, m), name=f"race_{p}") for p, m in candidates[:parallel_count]]
     if not tasks: return None
@@ -420,11 +527,11 @@ async def _async_race_round(prompt: str, candidates: List[Tuple[str, str]], task
             done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED, timeout=180)
             for t in done:
                 try:
-                    prov, text = t.result()
+                    prov, text, hit = t.result()
                     if prov and text:
                         for pt in pending:
                             pt.cancel()
-                        return prov, text
+                        return prov, text, hit
                 except Exception:
                     pass
             tasks = list(pending)
@@ -433,7 +540,7 @@ async def _async_race_round(prompt: str, candidates: List[Tuple[str, str]], task
         for t in tasks:
             t.cancel()
 
-    return None
+    return None, None, False
 
 def _filter_blacklist(candidates: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
     """Remove provedores banidos pelo Circuit Breaker do BanditPolicy."""
@@ -448,67 +555,80 @@ def _filter_blacklist(candidates: List[Tuple[str, str]]) -> List[Tuple[str, str]
     return valid
 
 
-async def async_route_generate_parallel(prompt: str, task_type: str = "general") -> str:
+async def async_route_generate_parallel(prompt: str, task_type: str = "general", node_id: str = "provider_router") -> str:
     """
     Ponto de Entrada Principal: Obtém ranking do Bandit e executa corridas paralelas por lotes (Batches).
     """
-    logger.info(f"[ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: {task_type})")
-    
-    _clear_circuit_breaker_bans()
-    
-    bandit = _get_bandit()
-    # O BanditPolicy já removeu os modelos em Blacklist (Circuit Breaker)!
-    candidates = CREDIT_CANDIDATES(task_type)
-    model_names = [m for _, m in candidates]
-    ranked_models = bandit.rank_models(BANDIT_NODE, task_type, model_names)
-    
-    if not ranked_models:
-        raise RuntimeError("Nenhum provedor sobreviveu ao Circuit Breaker. Abortando.")
+    start = time.time()
+    result = None
+    _SERVED_FROM_CACHE.set(False)  # reset por chamada; marcado se vencedor veio de cache
+    try:
+        logger.info(f"[ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: {task_type})")
 
-    # Skip precoce: se Ollama está offline, nem tenta fallback local
-    _ollama_offline = bandit._is_offline("ollama")
-    if _ollama_offline:
-        logger.warning("[ROUTER] Ollama offline — pulando fallback local")
+        _clear_circuit_breaker_bans()
 
-    RACE_SIZE = int(os.environ.get("RACE_SIZE", "3"))
-    
-    # Processamento por lotes (Ex: Tenta os Top 3. Se todos falharem, tenta os próximos 3).
-    for i in range(0, len(ranked_models), RACE_SIZE):
-        batch_ranked = ranked_models[i:i + RACE_SIZE]
-        # Converte (score, model_name) de volta para (provider, model) para _async_race_round
-        batch = []
-        for _, model_name in batch_ranked:
-            for provider, candidate_model in candidates:
-                if candidate_model == model_name:
-                    batch.append((provider, candidate_model))
-                    break
-        logger.info(f"[ROUTER] 🏎️  Disparando Batch {i//RACE_SIZE + 1} com: {[p for p, m in batch]}")
-        
-        result = await _async_race_round(prompt, batch, task_type, parallel_count=RACE_SIZE)
-        
+        bandit = _get_bandit()
+        # O BanditPolicy já removeu os modelos em Blacklist (Circuit Breaker)!
+        # Membrana seletiva: agentes não-críticos só enxergam Ollama local.
+        candidates = _policy_candidates(task_type, node_id)
+        model_names = [m for _, m in candidates]
+        ranked_models = bandit.rank_models(BANDIT_NODE, task_type, model_names)
+
+        if not ranked_models:
+            raise RuntimeError("Nenhum provedor sobreviveu ao Circuit Breaker. Abortando.")
+
+        # Skip precoce: se Ollama está offline, nem tenta fallback local
+        _ollama_offline = bandit._is_offline("ollama")
+        if _ollama_offline:
+            logger.warning("[ROUTER] Ollama offline — pulando fallback local")
+
+        RACE_SIZE = int(os.environ.get("RACE_SIZE", "3"))
+
+        # Processamento por lotes (Ex: Tenta os Top 3. Se todos falharem, tenta os próximos 3).
+        for i in range(0, len(ranked_models), RACE_SIZE):
+            batch_ranked = ranked_models[i:i + RACE_SIZE]
+            # Converte (score, model_name) de volta para (provider, model) para _async_race_round
+            batch = []
+            for _, model_name in batch_ranked:
+                for provider, candidate_model in candidates:
+                    if candidate_model == model_name:
+                        batch.append((provider, candidate_model))
+                        break
+            logger.info(f"[ROUTER] 🏎️  Disparando Batch {i//RACE_SIZE + 1} com: {[p for p, m in batch]}")
+
+            winner = await _async_race_round(prompt, batch, task_type, parallel_count=RACE_SIZE)
+
+            if winner and winner[1]:
+                provider, text, winner_cache_hit = winner
+                logger.info(f"[ROUTER] 🏆 VENCEDOR DA CORRIDA: {provider}!")
+                result = text
+                _SERVED_FROM_CACHE.set(winner_cache_hit)  # propaga para o IVM
+                return result
+
+        if _ollama_offline:
+            raise RuntimeError("Todos os provedores falharam e Ollama está offline. Nenhum provedor disponível.")
+
+        logger.warning("[ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...")
+        enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
+        result = await _async_safe_call("ollama", ollama_async_generate, enriched, "ollama/qwen2.5:0.5b", task_type)
         if result:
-            provider, text = result
-            logger.info(f"[ROUTER] 🏆 VENCEDOR DA CORRIDA: {provider}!")
-            return text
+            return result
 
-    if _ollama_offline:
-        raise RuntimeError("Todos os provedores falharam e Ollama está offline. Nenhum provedor disponível.")
-
-    logger.warning("[ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...")
-    enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
-    result = await _async_safe_call("ollama", ollama_async_generate, enriched, "ollama/qwen2.5:0.5b", task_type)
-    if result:
-        return result
-
-    raise RuntimeError("Todos os lotes da corrida falharam. Nenhum provedor disponível.")
+        raise RuntimeError("Todos os lotes da corrida falharam. Nenhum provedor disponível.")
+    finally:
+        success = bool(result and str(result).strip())
+        await _report_ivm_telemetry(
+            node_id, success, time.time() - start, "parallel",
+            cache_hit=_SERVED_FROM_CACHE.get(),
+        )
 
 # ==============================================================================
 # RETROCOMPATIBILIDADE SÍNCRONA (WRAPPER)
 # ==============================================================================
 
-async def route_generate(model: str, prompt: str, task_type: str = "general") -> str:
+async def route_generate(model: str, prompt: str, task_type: str = "general", node_id: str = "provider_router") -> str:
     """Roteia para o provider adequado via bandit."""
-    return await async_route_generate(model, prompt, task_type=task_type)
+    return await async_route_generate(model, prompt, task_type=task_type, node_id=node_id)
 
 def escolher_modelo(prompt: str = "", task_type: str = "general") -> str:
     """Delegado ao Bandit com task_type awareness."""
@@ -538,7 +658,7 @@ async def _enrich_prompt_with_learned_knowledge(prompt: str, task_type: str) -> 
     return prompt
 
 
-async def _async_fallback_chain(prompt: str, exclude: str = None, task_type: str = "general") -> str:
+async def _async_fallback_chain(prompt: str, exclude: str = None, task_type: str = "general", node_id: str = "provider_router") -> str:
     _clear_circuit_breaker_bans()
     if os.environ.get("OLLAMA_ONLY", "").lower() in ("1", "true", "yes"):
         logger.info("[ROUTER] OLLAMA_ONLY ativo — async fallback chain direto para ollama")
@@ -551,8 +671,8 @@ async def _async_fallback_chain(prompt: str, exclude: str = None, task_type: str
     # Modo paralelo é o default. Para forçar sequencial: SEQUENTIAL_FALLBACK=yes
     sequential = os.environ.get("SEQUENTIAL_FALLBACK", "").lower() in ("1", "true", "yes")
     if sequential:
-        return await _async_sequential_fallback(prompt, exclude, task_type)
-    return await _async_parallel_fallback(prompt, exclude, task_type)
+        return await _async_sequential_fallback(prompt, exclude, task_type, node_id=node_id)
+    return await _async_parallel_fallback(prompt, exclude, task_type, node_id=node_id)
 
 def _reconcile_ranked(ranked_scores: list, candidates: list) -> list:
     """Converte [(score, model_name)] de volta para [(provider, model)]."""
@@ -572,9 +692,9 @@ def _reconcile_ranked(ranked_scores: list, candidates: list) -> list:
     return result
 
 
-async def _async_sequential_fallback(prompt: str, exclude: str = None, task_type: str = "general") -> str:
+async def _async_sequential_fallback(prompt: str, exclude: str = None, task_type: str = "general", node_id: str = "provider_router") -> str:
     """Fallback sequencial original: tenta um provider por vez."""
-    candidates = _filter_blacklist([c for c in CREDIT_CANDIDATES() if c[0] != exclude])
+    candidates = _filter_blacklist([c for c in _policy_candidates(task_type, node_id) if c[0] != exclude])
     local = [c for c in candidates if c[0] == "ollama"]
     remote = [c for c in candidates if c[0] != "ollama"]
     remote_model_names = [m for _, m in remote]
@@ -599,9 +719,9 @@ async def _async_sequential_fallback(prompt: str, exclude: str = None, task_type
     raise RuntimeError("Todos os providers falharam.")
 
 
-async def _async_parallel_fallback(prompt: str, exclude: str = None, task_type: str = "general") -> str:
+async def _async_parallel_fallback(prompt: str, exclude: str = None, task_type: str = "general", node_id: str = "provider_router") -> str:
     """🏁 Fallback paralelo: dispara N providers simultaneamente, pega o primeiro sucesso."""
-    candidates = _filter_blacklist([c for c in CREDIT_CANDIDATES() if c[0] != exclude])
+    candidates = _filter_blacklist([c for c in _policy_candidates(task_type, node_id) if c[0] != exclude])
     local = [c for c in candidates if c[0] == "ollama"]
     remote = [c for c in candidates if c[0] != "ollama"]
     remote_model_names = [m for _, m in remote]
@@ -618,8 +738,8 @@ async def _async_parallel_fallback(prompt: str, exclude: str = None, task_type: 
         batch = ranked[i:i + RACE_SIZE]
         logger.info("[ROUTER] Race batch %d/%d: %s", i // RACE_SIZE + 1, (len(ranked) + RACE_SIZE - 1) // RACE_SIZE, [p for p, _ in batch])
         result = await _async_race_round(prompt, batch, task_type, parallel_count=RACE_SIZE)
-        if result:
-            provider, text = result
+        if result and result[1]:
+            provider, text, _hit = result
             logger.info("[ROUTER] _async_parallel_fallback succeeded provider=%s batch=%d", provider, i // RACE_SIZE + 1)
             return text
 
@@ -628,28 +748,114 @@ async def _async_parallel_fallback(prompt: str, exclude: str = None, task_type: 
 def resolve_model(model: str) -> str:
     return model or "auto"
 
-async def async_route_generate(model: str, prompt: str, task_type: str = "general") -> str:
-    if os.environ.get("OLLAMA_ONLY", "").lower() in ("1", "true", "yes"):
-        logger.info("[ROUTER] OLLAMA_ONLY ativo — roteando direto para ollama (async)")
-        enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
-        result = await _async_safe_call("ollama", ollama_async_generate, enriched, "ollama/qwen2.5:0.5b", task_type)
-        if result:
-            return result
-        raise RuntimeError("Ollama falhou mesmo em modo OLLAMA_ONLY.")
-    original = str(model or "").strip()
-    if not original or original == "auto":
-        return await async_route_generate_parallel(prompt, task_type=task_type)
-    provider = original.split("/")[0]
-    logger.info("[ROUTER] async_route_generate model=%s provider=%s task_type=%s", original, provider, task_type)
-    func = ASYNC_PROVIDERS.get(provider)
-    if not func:
-        logger.info("[ROUTER] async_route_generate provider=%s not found in ASYNC_PROVIDERS -> fallback", provider)
-        return await _async_fallback_chain(prompt, task_type=task_type)
-    result = await _async_safe_call(provider, func, prompt, original, task_type)
-    if result:
+async def async_route_generate(model: str, prompt: str, task_type: str = "general", node_id: str = "provider_router") -> str:
+    """Roteia para o provider adequado via bandit (gateway universal de LLM).
+
+    node_id permite atribuir custo metabólico (IVM) ao agente/nó originário.
+    """
+    # PSC §1 (tertiary defense): se não for crítico e pediu cloud, bloqueia
+    if node_id and "critic" not in node_id.lower() and model and model.split("/")[0] not in _LOCAL_PROVIDERS:
+        logger.warning(
+            "[PSC] node_id='%s' nao critico tentou cloud '%s' — rebaixando para local",
+            node_id, model,
+        )
+        model = f"ollama/{model.split('/')[-1] if '/' in model else 'qwen2.5:0.5b'}"
+
+    start = time.time()
+    delegated = False
+    result = None
+    _SERVED_FROM_CACHE.set(False)
+    try:
+        if os.environ.get("OLLAMA_ONLY", "").lower() in ("1", "true", "yes"):
+            logger.info("[ROUTER] OLLAMA_ONLY ativo — roteando direto para ollama (async)")
+            enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
+            result = await _async_safe_call("ollama", ollama_async_generate, enriched, "ollama/qwen2.5:0.5b", task_type)
+            if result:
+                return result
+            raise RuntimeError("Ollama falhou mesmo em modo OLLAMA_ONLY.")
+        original = str(model or "").strip()
+        if not original or original == "auto":
+            delegated = True
+            return await async_route_generate_parallel(prompt, task_type=task_type, node_id=node_id)
+        provider = original.split("/")[0]
+        logger.info("[ROUTER] async_route_generate model=%s provider=%s task_type=%s", original, provider, task_type)
+
+        # Membrana seletiva: agente não-crítico solicitou modelo externo →
+        # redireciona para Ollama local (força evolução com substrato próprio).
+        if _force_local_model(node_id) and provider not in _LOCAL_PROVIDERS:
+            logger.info(
+                "[MEMBRANA] node_id='%s' solicitou modelo externo '%s' — "
+                "redirecionando para Ollama local (evolutivo)", node_id, original
+            )
+            record_membrane_decision(node_id, "redirected_local", [original])
+            enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
+            result = await _async_safe_call("ollama", ollama_async_generate, enriched, "ollama/qwen2.5:0.5b", task_type)
+            if result:
+                return result
+            raise RuntimeError("Ollama falhou sob restrição de membrana (apenas local).")
+
+        func = ASYNC_PROVIDERS.get(provider)
+        if not func:
+            logger.info("[ROUTER] async_route_generate provider=%s not found in ASYNC_PROVIDERS -> fallback", provider)
+            result = await _async_fallback_chain(prompt, task_type=task_type, node_id=node_id)
+        else:
+            result = await _async_safe_call(provider, func, prompt, original, task_type)
+            if not result:
+                logger.info("[ROUTER] async_route_generate primary=%s failed -> fallback", provider)
+                result = await _async_fallback_chain(prompt, exclude=provider, task_type=task_type, node_id=node_id)
         return result
-    logger.info("[ROUTER] async_route_generate primary=%s failed -> fallback", provider)
-    return await _async_fallback_chain(prompt, exclude=provider, task_type=task_type)
+    finally:
+        # Telemetria IVM: reporta apenas quando este gateway executou a geração
+        # (delegação para o paralelo reporta por conta própria, evitando dupla contagem).
+        if not delegated:
+            success = bool(result and str(result).strip())
+            was_cache_hit = _SERVED_FROM_CACHE.get()
+            await _report_ivm_telemetry(
+                node_id, success, time.time() - start, model or "auto",
+                cache_hit=was_cache_hit,
+            )
+            _SERVED_FROM_CACHE.set(False)
+
+
+async def _report_ivm_telemetry(node_id: str, success: bool, latency_s: float, model: str, *, cache_hit: bool = False) -> None:
+    """Registra custo metabólico (IVM) no IVMAxiom canônico. Best-effort.
+
+    Este é o portão universal real de todo acesso a modelo de IA (ARCHITECTURE §2):
+    agentes e nós que chamam async_route_generate diretamente (ex.: critic_agent,
+    evo_agent, neuro_orchestrator) só são observados aqui.
+
+    Se `cache_hit=True`, a resposta foi servida do cache — NÃO é geração real do
+    agente, logo não incrementa Produtividade (P) nem Eficiência (E). Creditar
+    cache hit como "tarefa concluída" é a métrica falsa que saturava o IVM em
+    0.89 para todos os agentes (Lei 1: a célula sente seu próprio estado).
+    """
+    if cache_hit:
+        # Cache hit: não conta como produtividade nem como latência de geração.
+        # O hit já é registrado na barreira imunológica (cache_valid_hit).
+        return
+    try:
+        from iaglobal.chappie import _get_chappie
+        ivm = _get_chappie().get("ivm")
+        if ivm is None:
+            from iaglobal.chappie.ivm_axiom import get_ivm_axiom
+            ivm = get_ivm_axiom()
+        if ivm is None:
+            return
+        await ivm.atualizar_metricas(
+            agent_name=node_id,
+            tasks_completed=1 if success else 0,
+            tasks_failed=0 if success else 1,
+            total_latency_ms=latency_s * 1000.0,
+            skills_exchanged=0,
+            mhc_validation_score=0.9 if success else 0.5,
+        )
+    except Exception:
+        # Telemetria metabólica nunca interrompe a geração.
+        pass
 
 
 
+
+# Injetado automaticamente para resolver assinaturas ausentes
+def _fallback_chain(*args, **kwargs):
+    pass

@@ -11,12 +11,26 @@ from typing import Dict, List, Any
 PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
 
     # ======================================================
+    # PHASE 0 — METABOLIC PRE-CONDITIONING
+    # ======================================================
+
+    ("orchestrator_pump", {
+        "strategy": "fast",
+        "depends_on": []
+    }),
+
+    ("lineage_proof", {
+        "strategy": "fast",
+        "depends_on": []
+    }),
+
+    # ======================================================
     # PHASE 1 — DISCOVERY & UNDERSTANDING
     # ======================================================
 
     ("agentmailbox", {
         "strategy": "fast",
-        "depends_on": []
+        "depends_on": ["orchestrator_pump"]
     }),
 
     ("prompt_intake", {
@@ -82,7 +96,7 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
 
     ("search", {
         "strategy": "research",
-        "depends_on": ["local_knowledge"]
+        "depends_on": ["business_rules"]
     }),
 
     ("knowledge", {
@@ -114,7 +128,8 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
 
     ("prompt_improver", {
         "strategy": "general",
-        "depends_on": ["prompt_builder"]
+        "depends_on": ["prompt_intake"],  # ← Corrige: depende do prompt BRUTO do usuário
+        "critical": True
     }),
 
     ("technology_selection", {
@@ -205,7 +220,8 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
 
     ("planner", {
         "strategy": "general",
-        "depends_on": ["applied_ai_engineer"]
+        "depends_on": ["prompt_improver"],  # ← Corrige: planner usa prompt MELHORADO
+        "critical": True
     }),
 
     ("task_breakdown", {
@@ -231,26 +247,26 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
     ("coder", {
         "strategy": "general",
         "critical": True,
-        "depends_on": ["execution_plan"]
+        "depends_on": ["execution_plan", "prompt_builder"]
     }),
 
     ("frontend_builder", {
-        "strategy": "general",
+        "strategy": "frontend",  # ← Evita colisão com SKILL_FRONTEND_BUILDER
         "depends_on": ["coder"]
     }),
 
     ("backend_builder", {
-        "strategy": "general",
+        "strategy": "backend",  # ← Evita colisão com SKILL_BACKEND_BUILDER
         "depends_on": ["coder"]
     }),
 
     ("database_builder", {
-        "strategy": "general",
+        "strategy": "database",  # ← Evita colisão com SKILL_DATABASE_BUILDER
         "depends_on": ["coder"]
     }),
 
     ("api_builder", {
-        "strategy": "general",
+        "strategy": "api",  # ← Evita colisão com SKILL_API_BUILDER
         "depends_on": ["backend_builder"]
     }),
 
@@ -341,24 +357,27 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
         "depends_on": ["qa"]
     }),
 
-    ("debugger", {
+    ("debug_unificado", {
         "strategy": "general",
-        "depends_on": ["tester"]
-    }),
-
-    ("validator", {
-        "strategy": "general",
-        "depends_on": ["debugger"]
+        "critical": True,
+        "depends_on": ["tester", "lsp_validator"]
     }),
 
     ("fix_validator", {
         "strategy": "general",
-        "depends_on": ["validator"]
+        "depends_on": ["debug_unificado"]
     }),
 
-    ("debug_coder", {
+    # ======================================================
+    # PHASE 7.5 — CRITICAL APPROVAL GATE
+    # ======================================================
+
+    ("critic", {
         "strategy": "general",
-        "depends_on": ["fix_validator"]
+        "critical": True,
+        "depends_on": ["fix_validator", "tester"],
+        "approval_gate": True,  # Se reprovar, volta para coder/frontend_builder
+        "retry_nodes": ["frontend_builder", "backend_builder", "coder"]
     }),
 
     # ======================================================
@@ -423,11 +442,7 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
         "depends_on": ["retrospective"]
     }),
 
-    ("critic", {
-        "strategy": "general",
-        "critical": True,
-        "depends_on": ["result_agent"]
-    }),
+    # Critic foi movido para PHASE 7.5 (approval gate)
 
     ("memory_writer", {
         "strategy": "fast",
@@ -501,6 +516,26 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
         "strategy": "fast",
         "depends_on": ["prompt_intake"]
     }),
+
+    # ======================================================
+    # PHASE 7.5 — LSP VALIDATION (static analysis)
+    # ======================================================
+
+    ("lsp_validator", {
+        "strategy": "fast",
+        "critical": True,
+        "depends_on": ["multi_coder", "coder"]
+    }),
+
+    # ======================================================
+    # PHASE 12 — SYSTEM HEALTH ANALYSIS
+    # ======================================================
+
+    ("system_analysis", {
+        "strategy": "general",
+        "critical": False,
+        "depends_on": ["result_agent"]
+    }),
 ]
 
 # ==========================================================
@@ -516,3 +551,5 @@ PIPELINE_NAMES = [
     name
     for name, _ in PIPELINE_SKILLS
 ]
+
+# Injetado automaticamente para resolver assinaturas ausentes

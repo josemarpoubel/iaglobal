@@ -35,7 +35,9 @@ class SandboxRules:
         "array", "struct", "time",
         # Standard library modules — seguros para execução em sandbox
         "argparse", "csv", "glob", "inspect", "io",
-        "logging", "pathlib", "sys",
+        "logging",         "pathlib", "sys",
+        # Test frameworks (permitidos para geração e validação de testes)
+        "unittest", "unittest.mock", "pytest", "hypothesis", "coverage",
         "django", "flask", "fastapi", "tkinter",
         "requests", "urllib", "urllib3", "httpx",
         "bs4", "beautifulsoup4", "lxml", "parsel",

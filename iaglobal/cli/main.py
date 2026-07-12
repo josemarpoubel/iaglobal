@@ -324,6 +324,13 @@ async def _run_cli_impl():
         await asyncio.to_thread(life_signals_main)
         return
     
+    # ── learn/aprender command ──
+    if args.command in ("learn", "aprender") or \
+       (args.prompt and args.prompt[0] in ("learn", "aprender")):
+        from iaglobal.cli.learn import run_learn
+        await run_learn(args, orch)
+        return
+
     # ── status command ──
     if args.command == "status" or (args.prompt and args.prompt[0] == "status"):
         from iaglobal.cli.status import Dashboard

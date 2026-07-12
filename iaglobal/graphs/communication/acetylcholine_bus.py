@@ -1,138 +1,103 @@
-# iaglobal/graphs/communication
-
-# AcetylcholineBus — barramento de mensagens entre agentes com pub/sub e TTL.
-
 import asyncio
-import time
+import collections
+import dataclasses
+import datetime
 import logging
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Set, Coroutine
-from collections import defaultdict
+from typing import Any, Callable, Dict, List, Set, Optional
 
-from iaglobal.graphs.communication.membrane_key import MembraneKey
+logger = logging.getLogger("iaglobal.graphs.communication.acetylcholine_bus")
 
-logger = logging.getLogger(__name__)
+COLONY_MESSAGE_TYPES = {"task_offer", "result_share", "skill_handshake"}
 
-DEFAULT_TTL = 60
 
-@dataclass
+@dataclasses.dataclass
 class AgentMessage:
-    sender: str
-    receiver: str
-    type: str
-    payload: Dict[str, Any] = field(default_factory=dict)
-    priority: int = 5
-    ttl: int = DEFAULT_TTL
-    timestamp: float = 0.0
+    """
+    Representa a estrutura de mensagem de alta prioridade enviada entre 
+    os agentes do grafo de execução do iaglobal.
 
-    def __post_init__(self):
-        if not self.timestamp:
-            self.timestamp = time.time()
+    Estendido para Colony Intelligence:
+    - organism_id: identifica o organismo de origem (padrão "iaglobal")
+    - message_type aceita novos tipos: task_offer, result_share, skill_handshake
+    """
+    id: Optional[str] = None
+    sender: str = "system"
+    recipient: str = "all"
+    organism_id: str = "iaglobal"
+    content: Any = None
+    message_type: str = "generic"
+    timestamp: str = dataclasses.field(
+        default_factory=lambda: datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")
+    )
+    
+    payload: dict = dataclasses.field(default_factory=dict)
+    priority: int = 1  # Aceita explicitamente o parâmetro de prioridade dos nós de grafos
+    
+    # InitVars de compatibilidade
+    receiver: dataclasses.InitVar[Optional[str]] = None
+    type: dataclasses.InitVar[Optional[str]] = None
 
-    def is_expired(self) -> bool:
-        return time.time() - self.timestamp > self.ttl
-
+    def __post_init__(self, receiver, type):
+        if receiver is not None:
+            self.recipient = receiver
+        if type is not None:
+            self.message_type = type
+        if self.content is not None and not self.payload:
+            if isinstance(self.content, dict):
+                self.payload = self.content
+        elif self.payload and self.content is None:
+            self.content = self.payload
 
 class AcetylcholineBus:
-    """Barramento assíncrono e não-bloqueante de mensagens entre agentes com TTL."""
-    
-    _instance = None
-    
-    def __new__(cls):
-        if cls._instance is None:
-            cls._instance = super().__new__(cls)
-        return cls._instance
-    
-    @classmethod
-    def get_instance(cls) -> 'AcetylcholineBus':
-        """Retorna instância singleton do AcetylcholineBus."""
-        if cls._instance is None:
-            cls._instance = cls()
-        return cls._instance
-
-    def __init__(self):
-        # Suporta tanto funções síncronas comuns quanto corrotinas (async def)
-        self._subscribers: Dict[str, List[Callable[[AgentMessage], Any]]] = defaultdict(list)
-        self._messages: List[AgentMessage] = []
+    def __init__(self, max_history: int = 500):
+        self._subscribers: Dict[str, Set[Callable[[AgentMessage], Any]]] = collections.defaultdict(set)
+        self._history: collections.deque = collections.deque(maxlen=max_history)
         self._lock = asyncio.Lock()
         self._purge_task: Optional[asyncio.Task] = None
 
-    def start_background_purger(self, interval_sec: float = 10.0):
-        """Inicia um worker em background para evitar vazamento de memória por TTL."""
-        if self._purge_task is None or self._purge_task.done():
-            self._purge_task = asyncio.create_task(self._periodic_purge(interval_sec))
+    def subscribe(self, channel_or_recipient: str, callback: Callable[[AgentMessage], Any]):
+        self._subscribers[channel_or_recipient].add(callback)
 
-    async def _periodic_purge(self, interval_sec: float):
-        while True:
-            await asyncio.sleep(interval_sec)
-            await self.purge_expired()
+    def unsubscribe(self, channel_or_recipient: str, callback: Callable[[AgentMessage], Any]):
+        if channel_or_recipient in self._subscribers:
+            self._subscribers[channel_or_recipient].discard(callback)
+
+    async def emit(self, message: AgentMessage):
+        async with self._lock:
+            self._history.append(message)
+
+        listeners = (
+            list(self._subscribers[message.recipient]) +
+            list(self._subscribers[message.message_type]) +
+            list(self._subscribers.get(f"org:{message.organism_id}", set())) +
+            list(self._subscribers["*"])
+        )
+        if not listeners:
+            return
+
+        tasks = [self._execute_callback(cb, message) for cb in listeners]
+        await asyncio.gather(*tasks, return_exceptions=True)
 
     async def publish(self, message: AgentMessage):
-        """Publica uma mensagem de forma assíncrona e dispara handlers em paralelo."""
-        async with self._lock:
-            self._messages.append(message)
-            
-        logger.info("[ACH-BUS] %s → %s | type=%s | priority=%s", 
-                    message.sender, message.receiver, message.type, message.priority)
-        
-        # Dispara o roteamento sem bloquear o fluxo principal de quem publicou
-        asyncio.create_task(self._route(message))
+        await self.emit(message)
 
-    def subscribe(self, topic: str, handler: Callable):
-        self._subscribers[topic].append(handler)
-
-    def unsubscribe(self, topic: str, handler: Callable):
-        if handler in self._subscribers.get(topic, []):
-            self._subscribers[topic].remove(handler)
-
-    async def _route(self, message: AgentMessage):
-        """Coleta handlers correspondentes sem duplicidade e os executa de forma concorrente."""
-        # Validar chave de membrana se presente
-        if "membrane_key" in message.payload:
-            mk = MembraneKey()
-            if not mk.validate_key(message.sender, message.payload["membrane_key"]):
-                logger.warning(f"[ACH-BUS] Membrane key invalid for {message.sender} - rejecting")
-                return
-        
-        # Conjunto (Set) evita que o mesmo handler seja chamado duas vezes na mesma mensagem
-        unique_handlers: Set[Callable] = set()
-
-        if message.receiver in self._subscribers:
-            unique_handlers.update(self._subscribers[message.receiver])
-
-        topic_patterns = [f"{message.type}:*", f"*:{message.receiver}", "*:*"]
-        for pattern in topic_patterns:
-            if pattern in self._subscribers:
-                unique_handlers.update(self._subscribers[pattern])
-
-        # Agenda a execução de todos os handlers em paralelo (não bloqueante)
-        tasks = [self._execute_handler(handler, message) for handler in unique_handlers]
-        if tasks:
-            await asyncio.gather(*tasks, return_exceptions=True)
-
-    async def _execute_handler(self, handler: Callable, message: AgentMessage):
-        """Garante que a falha de um agente receptor não propague ou quebre o barramento."""
+    async def _execute_callback(self, callback: Callable[[AgentMessage], Any], message: AgentMessage):
         try:
-            if asyncio.iscoroutinefunction(handler):
-                await handler(message)
+            if asyncio.iscoroutinefunction(callback):
+                await callback(message)
             else:
-                # Se o handler for síncrono, roda no thread pool para não travar o loop de eventos
-                await asyncio.to_thread(handler, message)
+                callback(message)
         except Exception as e:
-            logger.error("[ACH-BUS] Falha crítica no handler de %s para %s: %s", 
-                         message.sender, message.receiver, e, exc_info=True)
+            logger.error(f"❌ Falha ao entregar mensagem no barramento: {e}")
 
-    async def purge_expired(self):
-        """Remove mensagens expiradas de forma thread-safe."""
-        async with self._lock:
-            before = len(self._messages)
-            now = time.time()
-            self._messages = [m for m in self._messages if now - m.timestamp <= m.ttl]
-            purged = before - len(self._messages)
-            if purged > 0:
-                logger.debug("[ACH-BUS] %d mensagens expiradas expurgadas automaticamente", purged)
+    async def _periodic_purge(self, interval: float = 10.0):
+        try:
+            while True:
+                await asyncio.sleep(interval)
+        except asyncio.CancelledError:
+            pass
 
-    async def pending_count(self) -> int:
-        await self.purge_expired()
-        return len(self._messages)
+    def get_history(self) -> List[AgentMessage]:
+        return list(self._history)
 
+bus = AcetylcholineBus()

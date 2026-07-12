@@ -1,3 +1,4 @@
+from iaglobal import _paths
 # iaglobal/memory/memory_storage.py
 
 import sqlite3
@@ -7,7 +8,6 @@ import threading
 
 from datetime import datetime, timezone
 from typing import Optional, Dict, Any, List
-from iaglobal import _paths
 from iaglobal.utils.logger import logger
 
 class MemoryStorage:

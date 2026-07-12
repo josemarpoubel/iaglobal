@@ -36,7 +36,8 @@ class WorkspaceRunner:
     """
 
     def __init__(self, default_base_path: Optional[Path] = None):
-        self.default_base_path = default_base_path or Path("/home/kitohamachi/projeto-iaglobal")
+        from iaglobal._paths import PROJECT_ROOT
+        self.default_base_path = default_base_path or PROJECT_ROOT
         self._active_workspaces: Dict[str, GitWorkspace] = {}
         self._active_graphs: Dict[str, ExecutionGraph] = {}
 

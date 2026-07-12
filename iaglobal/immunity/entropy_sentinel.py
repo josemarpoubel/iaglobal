@@ -27,12 +27,17 @@ Padrão Singleton — existe um único EntropySentinel para todo o ecossistema.
 
 from __future__ import annotations
 
+import asyncio
+import cbor2
+import json
 import logging
+import os
 import re
 import hashlib
 import threading
 from datetime import datetime, timezone
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, asdict
+from pathlib import Path
 from typing import Any, Tuple, Dict, List, Optional, Set
 
 from iaglobal.utils.logger import get_logger
@@ -110,7 +115,9 @@ class EntropySentinel:
     _TOKEN_BLOAT_LIMIT = 10000   # Limite de tokens para alertar redundância
     _LOOP_THRESHOLD = 3          # 3+ repetições consecutivas = loop
     _ENTROPY_APOPTOSIS_THRESHOLD = 0.8  # 80% de caos = trigger apoptose
-    _HISTORY_MAX_SIZE = 20       # Manter últimas 20 execuções no histórico
+    _MIN_EXECUTIONS_FOR_APOPTOSIS = 30   # Mínimo de execuções antes de recomendar apoptose
+    _HISTORY_MAX_SIZE = 100      # Manter últimas 100 execuções no histórico
+    _PROFILES_PATH: Optional[Path] = None
 
     def __new__(cls, *args, **kwargs) -> "EntropySentinel":
         if cls._instance is None:
@@ -127,9 +134,68 @@ class EntropySentinel:
         self._dependency_graph: Dict[str, Set[str]] = {}  # agente → dependências
         
         logger.info(
-            "[EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=%.2f | history_size=%d",
-            self._ENTROPY_APOPTOSIS_THRESHOLD, self._HISTORY_MAX_SIZE,
+            "[EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=%.2f | min_exec=%d | history=%d",
+            self._ENTROPY_APOPTOSIS_THRESHOLD, self._MIN_EXECUTIONS_FOR_APOPTOSIS, self._HISTORY_MAX_SIZE,
         )
+        self._load_profiles()
+
+    def _get_profiles_path(self) -> Path:
+        if self._PROFILES_PATH is None:
+            from iaglobal._paths import PACKAGE_DIR
+            self._PROFILES_PATH = PACKAGE_DIR / "memory" / "data" / "json" / "entropy_profiles.cbor"
+        return self._PROFILES_PATH
+
+    def _load_profiles(self) -> None:
+        path = self._get_profiles_path()
+        if not path.exists():
+            return
+        try:
+            data = cbor2.loads(path.read_bytes())
+            for name, pd in data.items():
+                profile = EntropyProfile(
+                    agent_name=name,
+                    total_executions=pd.get("total_executions", 0),
+                    chaotic_executions=pd.get("chaotic_executions", 0),
+                    redundancy_violations=pd.get("redundancy_violations", 0),
+                    loop_violations=pd.get("loop_violations", 0),
+                    circular_dependency_violations=pd.get("circular_dependency_violations", 0),
+                    structural_chaos_violations=pd.get("structural_chaos_violations", 0),
+                    last_entropy_score=pd.get("last_entropy_score", 0.0),
+                    last_activity=pd.get("last_activity", datetime.now(timezone.utc).isoformat()),
+                    entropy_history=pd.get("entropy_history", []),
+                )
+                self._profiles[name] = profile
+            logger.info("[EntropySentinel] Carregados %d perfis entrópicos de disco (CBOR)", len(data))
+        except Exception as e:
+            logger.debug("[EntropySentinel] Falha ao carregar perfis: %s", e)
+
+    def _save_profiles(self) -> None:
+        path = self._get_profiles_path()
+        try:
+            path.parent.mkdir(parents=True, exist_ok=True)
+            data = {}
+            for name, p in self._profiles.items():
+                data[name] = {
+                    "total_executions": p.total_executions,
+                    "chaotic_executions": p.chaotic_executions,
+                    "redundancy_violations": p.redundancy_violations,
+                    "loop_violations": p.loop_violations,
+                    "circular_dependency_violations": p.circular_dependency_violations,
+                    "structural_chaos_violations": p.structural_chaos_violations,
+                    "last_entropy_score": p.last_entropy_score,
+                    "last_activity": p.last_activity,
+                    "entropy_history": p.entropy_history,
+                }
+            path.write_bytes(cbor2.dumps(data))
+        except Exception as e:
+            logger.debug("[EntropySentinel] Falha ao salvar perfis: %s", e)
+
+    def _schedule_save(self) -> None:
+        try:
+            loop = asyncio.get_running_loop()
+            loop.create_task(asyncio.to_thread(self._save_profiles))
+        except RuntimeError:
+            self._save_profiles()
 
     def analyze_payload(self, payload: Any) -> Tuple[float, bool]:
         """
@@ -250,8 +316,9 @@ class EntropySentinel:
             # Calcular penalty
             penalty = entropy_score * 0.5  # Penalty de até 50% no fitness
             
-            # Verificar se recomenda apoptose
-            apoptosis_recommended = (
+            # Verificar se recomenda apoptose (apenas após mínimo de execuções)
+            execs_suficientes = profile.total_executions >= self._MIN_EXECUTIONS_FOR_APOPTOSIS
+            apoptosis_recommended = execs_suficientes and (
                 profile.chaotic_executions / profile.total_executions > self._ENTROPY_APOPTOSIS_THRESHOLD
                 or entropy_score >= self._ENTROPY_APOPTOSIS_THRESHOLD
             )
@@ -261,6 +328,13 @@ class EntropySentinel:
                     "[EntropySentinel] 🚨 APOPTOSE RECOMENDADA: %s (entropia %.2f, %d/%d caóticas, trend=%s)",
                     agent_name, entropy_score, profile.chaotic_executions, profile.total_executions, profile.entropy_trend,
                 )
+            elif entropy_score >= self._ENTROPY_APOPTOSIS_THRESHOLD and not execs_suficientes:
+                logger.info(
+                    "[EntropySentinel] ⏳ Entropia alta mas execuções insuficientes para apoptose: %s (%d/%d execs)",
+                    agent_name, profile.total_executions, self._MIN_EXECUTIONS_FOR_APOPTOSIS,
+                )
+
+        self._schedule_save()
         
         return {
             "entropy_score": round(entropy_score, 3),
@@ -335,18 +409,20 @@ class EntropySentinel:
                 if profile.total_executions > 0 else 0.0
             )
             
+            execs_suficientes = profile.total_executions >= self._MIN_EXECUTIONS_FOR_APOPTOSIS
             return {
                 "agent_name": profile.agent_name,
                 "total_executions": profile.total_executions,
                 "chaotic_executions": profile.chaotic_executions,
                 "chaos_rate": round(chaos_rate, 3),
+                "min_executions_met": execs_suficientes,
                 "redundancy_violations": profile.redundancy_violations,
                 "loop_violations": profile.loop_violations,
                 "circular_dependency_violations": profile.circular_dependency_violations,
                 "structural_chaos_violations": profile.structural_chaos_violations,
                 "last_entropy_score": round(profile.last_entropy_score, 3),
                 "entropy_trend": profile.entropy_trend,
-                "apoptosis_risk": chaos_rate > self._ENTROPY_APOPTOSIS_THRESHOLD,
+                "apoptosis_risk": execs_suficientes and chaos_rate > self._ENTROPY_APOPTOSIS_THRESHOLD,
             }
 
     def reset_profile(self, agent_name: str) -> None:

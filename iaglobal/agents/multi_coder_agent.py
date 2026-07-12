@@ -2,15 +2,15 @@
 """MultiCoderAgent — Orquestrador que delega para agentes especializados e registra métricas no Bandit."""
 
 import asyncio
-import logging
 import time
 from dataclasses import dataclass, field
 from typing import Dict, List, Tuple, Optional
 from iaglobal.agents.coder_agent import CoderAgent
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal.memory.memory_error import record_error
+from iaglobal.utils.logger import get_logger
 
-logger = logging.getLogger("iaglobal.agents.multi_coder_agent")
+logger = get_logger("iaglobal.agents.multi_coder_agent")
 
 # 1. Contextos enriquecidos (Instruções claras para o LLM, sem espaços fantasmas)
 _PARTS: List[Tuple[str, str, str]] = [

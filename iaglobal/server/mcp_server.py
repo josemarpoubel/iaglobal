@@ -1,18 +1,27 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # iaglobal/server/mcp_server.py
 """
 MCP Server — Meta-Circular Protocol Server para auto-reparo metabólico.
+
+DEPRECATED: Este servidor foi consolidado em iaglobal/mcp/server.py
 
 Endpoints:
 - GET /health   → Status do servidor
 - GET /audit    → Auditoria metabólica em tempo real
 - POST /fix     → Acionar correção imediata
 - GET /metrics  → Métricas Prometheus
+
+Use: python -m iaglobal.mcp.server --mode both
 """
 
 import asyncio
 import logging
 import json
 from typing import Dict, Any
+
+# WARNING: DEPRECATED - Este servidor foi consolidado em iaglobal/mcp/server.py
+# Use: python -m iaglobal.mcp.server --mode both
+# Este arquivo será removido em futura versão.
 
 from fastapi import FastAPI, HTTPException, Depends, Request
 from fastapi.security import HTTPBasic, HTTPBasicCredentials
@@ -323,7 +332,7 @@ class MCPServer:
             # Aguardar próximo ciclo (5 minutos)
             await asyncio.sleep(300)
 
-    def start_blocking(self, host: str = "127.0.0.1", port: int = 8000):
+    def start_blocking(self, host: str = "127.0.0.1", port: int = 8101):
         """Inicia o servidor MCP de forma bloqueante."""
         import uvicorn
         

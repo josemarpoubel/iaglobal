@@ -15,6 +15,15 @@ DEFAULT_FLAGS = {
     "enable_reflexion_loop": True,
     "strict_homeostasis": False,
     "evolution_deep_mode": False,
+    # Integração EvoAgent ↔ AgentBase (ver agent_base.py)
+    "evo_self_critique": True,        # auto-crítica heurística pós-LLM (barata, sem LLM)
+    "evo_reflexion_enabled": False,   # ReflexionEngine (consome ATP/LLM) — off por padrão
+    "evo_learning_enabled": False,    # LearningLoop automático — off por padrão
+    "evo_vaccine_persist": True,      # persistir failure_patterns no Obsidian + vacinas
+    # Membrana seletiva: só o agente crítico (critic) tem direito a modelo externo
+    # (cloud). Demais agentes usam Ollama local, forçando-os a evoluir com o
+    # próprio substrato. Env EXTERNAL_ACCESS_ONLY_CRITIC=false desativa.
+    "external_access_only_critic": True,
 }
 
 _flags = DEFAULT_FLAGS.copy()

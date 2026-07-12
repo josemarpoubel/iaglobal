@@ -18,6 +18,13 @@ from typing import Dict, Any, Callable, Optional, List
 
 logger = logging.getLogger(__name__)
 
+# Barreira imunológica do telemetry/cache. Import defensivo para não criar
+# dependência circular no boot do singleton Nodes.
+try:
+    from iaglobal.immunity.metabolic_immune_barrier import barrier
+except Exception:
+    barrier = None  # noqa: type ignore
+
 class Nodes:
     """
     Pipeline Director — Node Director do IAGlobal V3+.
@@ -92,7 +99,6 @@ class Nodes:
                                      setattr(self, attr_name, functools.partial(func))
                                      loaded_count += 1
 
-                            
                             # Cenário 2: Suporta os arquivos que foram fatiados como classe (ex: No_Integrator)
                             elif attr_name.startswith("No_") or attr_name.endswith("Scheduler") or attr_name.endswith("Mixin"):
                                 cls_target = getattr(module, attr_name)
@@ -104,6 +110,22 @@ class Nodes:
                                             loaded_count += 1
                 except Exception as e:
                     self.logger.error("❌ Falha crítica ao carregar nó modular do arquivo %s: %s", filename, e)
+                    # Não engolir silenciosamente: registra na barreira imunológica
+                    # para que o relatório de saúde reflita a falha real de import
+                    # (antes o barrier reportava import_failure=0 mesmo com nós quebrados).
+                    if barrier is not None:
+                        barrier.record(
+                            "import_failure",
+                            detail=f"{filename}: {e}",
+                            agent=filename,
+                        )
+                    # Persiste também na store estruturada de erros (errors.json +
+                    # error/) para que a métrica '0 erros' seja verdadeira.
+                    try:
+                        from iaglobal.immunity.error_persistence import record_runtime_error
+                        record_runtime_error(component=f"graphs.nodes:{filename}", message=f"Falha ao carregar nó: {e}")
+                    except Exception:
+                        pass
         
         self.logger.info("📦 Mapeamento dinâmico concluído! Métodos acoplados ao Singleton: %d", loaded_count)
 
@@ -206,4 +228,3 @@ def create_skill_node(name: str, depends_on: Optional[List[str]] = None) -> Any:
         node_type="general",
         strategy="general",
     )
-

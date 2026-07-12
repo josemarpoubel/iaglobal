@@ -1,12 +1,12 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
-import logging
 import re
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 
 from iaglobal._paths import TEMP_DIR
+from iaglobal.utils.logger import get_logger
 
-logger = logging.getLogger(__name__)
+logger = get_logger("iaglobal.agents.ingestion.file_ingestion_agent")
 
 SUPPORTED_EXTENSIONS = {
     ".txt": "text", ".md": "markdown", ".py": "python",

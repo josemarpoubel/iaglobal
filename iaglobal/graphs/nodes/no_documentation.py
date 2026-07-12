@@ -17,6 +17,32 @@ from iaglobal.graphs.communication.acetylcholine_bus import AgentMessage
 logger = logging.getLogger(__name__)
 
 
+# Palavras-chave que ativam schema de saída estruturado (análise, não código)
+_ANALYSIS_KEYWORDS = {"analise", "análise", "analisar", "diagnóstico", "diagnostico",
+                      "gargalo", "melhorar", "revisão", "revisao", "avaliar", "avalie"}
+
+# Schema de saída para tarefas de análise
+_ANALYSIS_SYSTEM_PROMPT = (
+    "Voce e um analista tecnico gerando relatorios estruturados.\n"
+    "NAO gere codigo. Siga EXATAMENTE o schema de saida abaixo:\n"
+    "\n"
+    "# Titulo do Relatorio\n"
+    "\n"
+    "## Diagnostico\n"
+    "(analise tecnica detalhada do estado atual)\n"
+    "\n"
+    "## Gargalos Identificados\n"
+    "(lista priorizada de problemas e limitacoes)\n"
+    "\n"
+    "## Plano de Acao\n"
+    "(passos concretos para resolucao, ordenados por impacto)\n"
+    "\n"
+    "## Conclusao\n"
+    "(sintese das recomendacoes)\n"
+    "\n"
+    "Preencha CADA seção com conteudo substancial baseado na tarefa."
+)
+
 # Instância singleton do agent para reutilização
 _documentation_agent = None
 
@@ -70,13 +96,18 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
     specialization = ctx.get("input", {}).get("_specialization", {}).get("coder", "")
     base_content = coder_output or built_prompt or task
 
-    system = (
-        "Voce e um redator tecnico gerando documentos formatados e prontos para publicacao.\n"
-        "Formate o documento de forma limpa, bem estruturada, com secoes claras.\n"
-        "Nao gere codigo — gere o documento final completo.\n"
-        "Se o formato solicitado for PDF, inclua a estrutura completa do documento "
-        "(titulo, introducao, secoes, conclusao) em formato texto rico."
-    )
+    is_analysis = any(kw in task.lower() for kw in _ANALYSIS_KEYWORDS)
+
+    if is_analysis:
+        system = _ANALYSIS_SYSTEM_PROMPT
+    else:
+        system = (
+            "Voce e um redator tecnico gerando documentos formatados e prontos para publicacao.\n"
+            "Formate o documento de forma limpa, bem estruturada, com secoes claras.\n"
+            "Nao gere codigo — gere o documento final completo.\n"
+            "Se o formato solicitado for PDF, inclua a estrutura completa do documento "
+            "(titulo, introducao, secoes, conclusao) em formato texto rico."
+        )
     if specialization:
         system = specialization
 
