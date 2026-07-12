@@ -31,9 +31,9 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 
 ... What's missing is what any organism takes time to develop: body, maturity, real selective pressure. iaglobal built the genome and metabolism — the rest is growth.
 
-##==============================================================================
+## =============================================================================
 ##                        🧬 BEGIN BIOMIMETIC FLOW
-##==============================================================================
+## =============================================================================
 
 ## 🧬 iaglobal Pipeline Architecture
 
@@ -106,8 +106,8 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 │ "estimated_complexity": "medium"                                            │
 │ }                                                                           │
 └─────────────────────────────────────────────────────────────────────────────┘
-│
-▼
+                                        │
+                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │ TASK_BREAKDOWN (Micro-Task Breakdown)                                       │
 │ ├── Divides each step into atomic actions                                   │
@@ -345,9 +345,9 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 │                result/Criar_um_componente__HealthDashboard_jsx__*.md        │                 │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                                                                                 │
-##                                  END OF FLOW                                                 │
+                                    END OF FLOW                                                 │
                                                                                                 │
-##===============================================================================================
+=================================================================================================
 ```
 
 ## 🔄 RETRY LOOP (Critic rejection method)
@@ -412,9 +412,9 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 | **Metabolism**          | IVM (optimizes ATP/token)               |
 | **Evolution**           | Reflexion (continuous learning)         |
 ```
-================================================================================
-                        🧬 END OF BIOMIMETIC FLOW
-================================================================================
+## =============================================================================
+##                    🧬 END OF BIOMIMETIC FLOW
+## =============================================================================
 
 **Security feature** | LLM Access Architecture in iaglobal:
 ```
