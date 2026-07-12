@@ -457,14 +457,14 @@ In iaglobal, agents cannot call LLM directly...
 1. **BanditPolicy as sole gatekeeper** —  All LLM access passes through:
 - ε-greedy model selection
 - Circuit breaker (does not call provider with recent failures)
-- Fallback chain (se cloud falhar → Ollama local)
-- CreditAssignmentEngine (registrar sucesso/falha)
-- Reward assignment (atualizar BanditPolicy)
+- Fallback chain (if cloud fails → Ollama local)
+- CreditAssignmentEngine (register success/failure)
+- Reward assignment (update BanditPolicy)
 
-2. **Agentes como wrappers especializados** — Cada agente tem:
+2. **Agents as specialized wrappers** — Each agent has:
 - Domain-specific prompt template
 - Output validation (schema, quality)
-- Retry logic com backoff
+- Retry logic with backoff
 - Immune memory hooks (EvoAgent)
 
 3. **Critic as validator** — The CriticAgent:
@@ -480,18 +480,18 @@ In iaglobal, agents cannot call LLM directly...
   iaglobal run "create a Flask API with user CRUD"
 ```
 
-* O pipeline executa:
-0. PromptImprover → melhorador de prompt
-1. PlannerAgent → divide em tarefas
+* The pipeline executes:
+0. PromptImprover → prompt enhancer
+1. PlannerAgent → divides into tasks
 2. CoderAgent → writes code
-3. CriticAgent → valida qualidade via BanditPolicy
-4. TesterAgent → gera testes
-5. DebuggerAgent → corrige falhas
-6. ResultAgent → entrega artefato final
+3. CriticAgent → validates quality via BanditPolicy
+4. TesterAgent → generates tests
+5. DebuggerAgent → fixes failures
+6. ResultAgent → delivers final artifact
 
 If you need to test a provider directly (development), use utility scripts:
 
-* Testar Ollama local diretamente
+* Test Ollama local directly
 ```
 python -c "
 from iaglobal.providers.ollama_provider import OllamaProvider
@@ -501,21 +501,21 @@ print(response)
 "
 ```
 
-* Testar BanditPolicy
+* Test BanditPolicy
 ```
 python -c "
 from iaglobal.bandit import BanditPolicy
 bandit = BanditPolicy()
 model, provider = bandit.select_model()
-print(f'Model selecionado: {model}')
+print(f'Selected model: {model}')
 "
 ```
 **But in production, all access passes through:** 
 ```
-Pipeline de Nodes e Skills → AgentBase → Chappie + BanditPolicy → IVMAxiom → OmniMind .
+Pipeline of Nodes and Skills → AgentBase → Chappie + BanditPolicy → IVMAxiom → OmniMind .
 ```
 
-**Summary:** You don't "chat" with LLMs. You submit tasks to the iaglobal organism, and the organism decides which agent, which model, and which provider to use — with all immune defenses active seguindo **Following the 11 Universal Laws** em **OmniMind** ditadas por **Raymond Holliwell** do livro **Working With the Law**. 🛡️
+**Summary:** You don't "chat" with LLMs. You submit tasks to the iaglobal organism, and the organism decides which agent, which model, and which provider to use — with all immune defenses active following **the 11 Universal Laws** in **OmniMind** dictated by **Raymond Holliwell** from the book **Working With the Law**. 🛡️
 
 **iaglobal** is not a framework. It is not a wrapper around an LLM API.
 It is a **living computational organism** — the first AI system architected around the laws of biological metabolism, designed to learn from failure, self-repair without restart, and evolve across generations of execution.
@@ -677,13 +677,13 @@ At boot, the tribunal prints a full audit:
 ============================================================
   ✅ genesis/webhidden_genesis_evolutive.cbor           DNA-ANCESTRAL
 ────────────────────────────────────────────────────────────
-  Agentes (154 arquivos):
+  Agents (154 files):
   ✅ agents/agent_base.py                               li-nae-ti-sae-hao-ni-deu-lu-be-se-...
   ✅ agents/coder_agent.py                              teu-mei-kau-bai-vai-bea-fea-fae-seu-...
   ...
 ============================================================
-  Genesis File: ✅ CONFORME
-  Agentes: 154 total | 154 validos | 0 invalidados
+  Genesis File: ✅ COMPLIANT
+  Agents: 154 total | 154 valid | 0 invalidated
 ============================================================
 ```
 
@@ -703,33 +703,33 @@ This `phonetic_name` is registered in `OmniMind` metadata and propagates to chil
 
 ## 🌐 Global Network Verification — Future Cross-Breeding
 
-- Fluxo Executivo Principal:
+- Main Executive Flow:
 ```
 system_analysis (metabolic trigger)
     ├── tester_agent (test generation)
     │       ├── Self-critique iteration 1: score=0.45
     │       ├── Self-critique iteration 2: score=0.80 (improvement +77%)
-    │       └── Erro detectado: 1 syntax error em testes gerados
+    │       └── Error detected: 1 syntax error in generated tests
     │           └── debug_unified + ollama/qwen2.5:0.5b → fixes in ~60s
     ├── evaluator → gap_analyzer → skill_generator → sandbox_validator
     ├── evolution_committee → pipeline_updater → evolution_trigger
     └── memory_writer → memory_cleaner (persistence + cleanup)
 ```
 
-- Fluxo operacional:
+- Operational Flow:
 ```
 Generated code
     ↓
 SyntaxSentinel.run_syntax_sentinel()
     ├─ ast.parse() → success? → returns code (latency <1ms, ATP=0)
-    └─ falha?
-        ├─ auto-fixers nativos:
-        │   • Fecha brackets abertos
-        │   • Remove trailing comma
+    └─ failure?
+        ├─ native auto-fixers:
+        │   • Closes open brackets
+        │   • Removes trailing comma
         │   • Normalizes mixed indentation
-        └─ revalida com ast.parse()
+        └─ revalidates with ast.parse()
             ├─ success → returns fixed code (LLM is NOT called)
-            └─ falha → delega para debug_unificado (skill/LLM como fallback)
+            └─ failure → delegates to debug_unified (skill/LLM as fallback)
 ```
 
 The phonetic + hash system is designed for **decentralized agent cross-breeding** across the internet. Any node can verify another node's authenticity without a central authority:
@@ -842,7 +842,7 @@ The `applied_ai_engineer` node runs 3 skills in sequence:
 
 | Skill | File | Function |
 |-------|---------|--------|
-| **Model Router** | `evolution/skills/skill_model_router.py` | Decide entre modelo local (ATP) ou nuvem baseado na criticidade da tarefa |
+| **Model Router** | `evolution/skills/skill_model_router.py` | Decides between local model (ATP) or cloud based on task criticality |
 | **RAG Optimizer** | `evolution/skills/skill_rag_optimizer.py` | Adjusts chunk size and number of documents based on the selected model |
 | **Prompt Structurer** | `evolution/skills/skill_prompt_structurer.py` | Injects Chain-of-Thought + JSON validation into the prompt |
 
@@ -851,7 +851,7 @@ The `applied_ai_engineer` node runs 3 skills in sequence:
 ```
 Score = (Accuracy × 0.6) - (Latency_ms/1000 × 0.2) - (TokenCost × 0.2)
 
-Se Score_local < 0.4 → eleva para nuvem (groq, openrouter)
+If Local_Score < 0.4 → escalate to cloud (groq, openrouter)
 If Local_Score ≥ 0.4 → stays local (qwen2.5:0.5b, ATP preserved)
 ```
 
@@ -860,11 +860,11 @@ If Local_Score ≥ 0.4 → stays local (qwen2.5:0.5b, ATP preserved)
 The model is escalated automatically when the task contains high-criticality keywords:
 `mhc`, `vulnerability`, `security`, `apoptosis`, `emergency`, `attack`, `injection`, `pathogen`
 
-### 🧪 Exemplos de Uso
+### 🧪 Usage Examples
 
-# Tarefa simples → modelo local (ATP preservado)
+# Simple task → local model (ATP preserved)
 ```
-iaglobal run "crie uma API Flask com CRUD"
+iaglobal run "create a Flask API with CRUD"
 ```
 # Critical task → escalated to cloud automatically
 ```
@@ -879,9 +879,9 @@ iaglobal run "optimize IVM routing weights"
 
 | Scenario | IVM | Model | RAG Chunk | Action |
 |---------|-----|--------|-----------|------|
-| Tarefa simples | ≥ 0.5 | qwen2.5:0.5b (local) | 250 tokens, 2 docs | ATP preservado |
+| Simple task | ≥ 0.5 | qwen2.5:0.5b (local) | 250 tokens, 2 docs | ATP preserved |
 | Critical task | ≥ 0.5 | groq-mixtral (cloud) | 1000 tokens, 7 docs | Maximum precision |
-| IVM insuficiente | < 0.5 | — | — | Tarefa rejeitada |
+| Insufficient IVM | < 0.5 | — | — | Task rejected |
 
 ### 🔬 Tests
 ```
