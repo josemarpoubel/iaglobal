@@ -8,7 +8,7 @@
 
 > *"Nature never hurries, and yet everything is accomplished."*
 
-## iaglobal is not alone — bio-inspired AI is an established field for decades:
+### iaglobal is not alone — bio-inspired AI is an established field for decades:
 
 - Swarm Intelligence (Dorigo, Kennedy — ants/bees)
 - Genetic Algorithms (Holland, 1975)
