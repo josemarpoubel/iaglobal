@@ -29,27 +29,27 @@ class TestSnippetSynthesis:
     """Testes da dataclass SnippetSynthesis."""
 
     def test_snippet_synthesis_creation(self):
-        """SnippetSynthesis deve criar com campos obrigatórios."""
+        """SnippetSynthesis should create with required fields."""
         synthesis = SnippetSynthesis(
-            summary="Resumo coerente em português.",
+            summary="Coherent summary in English.",
             contradictions=[],
             sources_used=["https://arxiv.org/abs/123"],
             confidence=0.85,
         )
-        assert synthesis.summary == "Resumo coerente em português."
+        assert synthesis.summary == "Coherent summary in English."
         assert synthesis.confidence == 0.85
 
     def test_snippet_synthesis_to_dict(self):
-        """to_dict deve serializar corretamente."""
+        """to_dict should serialize correctly."""
         synthesis = SnippetSynthesis(
-            summary="Teste",
-            contradictions=["contradição"],
+            summary="Test",
+            contradictions=["contradiction"],
             sources_used=["url1"],
             confidence=0.7,
         )
         data = synthesis.to_dict()
-        assert data["summary"] == "Teste"
-        assert data["contradictions"] == ["contradição"]
+        assert data["summary"] == "Test"
+        assert data["contradictions"] == ["contradiction"]
         assert data["confidence"] == 0.7
 
 

@@ -43,27 +43,27 @@ class QueryExpander:
     """Gera queries relacionadas via LLM para expandir busca."""
 
     PROMPT_TEMPLATE = """
-Dada esta query de busca: "{query}"
+Given this search query: "{query}"
 
-Gere 2-3 queries relacionadas que podem encontrar informações complementares.
-Requisitos:
-1. Cada query deve ser independente e autocontida
-2. Evite sinônimos óbvios (ex: "Python" → "linguagem Python")
-3. Inclua ângulos diferentes (ex: tutorial, documentação, exemplos práticos)
-4. Mantenha as queries em português (se a original estiver)
+Generate 2-3 related queries that can find complementary information.
+Requirements:
+1. Each query must be independent and self-contained
+2. Avoid obvious synonyms (e.g., "Python" → "Python language")
+3. Include different angles (e.g., tutorial, documentation, practical examples)
+4. Keep queries in the same language as the original
 
-Formato de saída (JSON estrito):
+Output format (strict JSON):
 {{
   "queries": [
-    "query relacionada 1",
-    "query relacionada 2",
-    "query relacionada 3"
+    "related query 1",
+    "related query 2",
+    "related query 3"
   ]
 }}
 
-Exemplo:
-Query original: "como criar API REST em Python"
-Resposta: {{"queries": ["tutorial API REST Flask passo a passo", "documentação FastAPI endpoints", "exemplo código API Python GitHub"]}}
+Example:
+Original query: "how to create REST API in Python"
+Response: {{"queries": ["step by step Flask REST API tutorial", "FastAPI endpoints documentation", "Python API code example GitHub"]}}
 """
 
     def __init__(self, model: str = "ollama/qwen2.5:0.5b"):

@@ -211,23 +211,23 @@ class DecisionReplaySystem:
         )
 
         prompt = (
-            "### Papel\n"
-            "Você é um Engenheiro de IA Sênior especializado em observabilidade de pipelines. "
-            "Sua função é realizar um 'post-mortem' técnico rápido e preciso de uma execução de pipeline.\n\n"
+            "### Role\n"
+            "You are a Senior AI Engineer specialized in pipeline observability. "
+            "Your role is to perform a quick and accurate technical 'post-mortem' of a pipeline execution.\n\n"
             
-            "### Instruções de Análise\n"
-            "1. Sintetize a execução em português técnico, porém acessível.\n"
-            "2. Justifique a escolha do modelo com base nos scores e na ambiguidade.\n"
-            "3. Avalie se o trade-off entre latência e performance foi satisfatório.\n"
-            "4. Se a evolução foi acionada, indique o motivo crítico.\n"
-            "5. Use o formato: [Resumo Geral] -> [Análise de Decisão] -> [Impacto de Performance].\n"
-            "6. **Limite estritamente a 5 frases.**\n\n"
+            "### Analysis Instructions\n"
+            "1. Synthesize the execution in technical but accessible English.\n"
+            "2. Justify the model choice based on scores and ambiguity.\n"
+            "3. Evaluate whether the trade-off between latency and performance was satisfactory.\n"
+            "4. If evolution was triggered, indicate the critical reason.\n"
+            "5. Use the format: [General Summary] -> [Decision Analysis] -> [Performance Impact].\n"
+            "6. **Strictly limit to 5 sentences.**\n\n"
             
-            "### Dados da Execução\n"
-            f"- ID: {execution_id} | Tipo: {summary.get('task_type', '?')}\n"
-            f"- Ambiguidade: {summary.get('ambiguity', 0)} | Cache: {summary.get('cache', '?')}\n"
-            f"- Modelo Escolhido: {summary.get('model', '?')} (Small Model: {summary.get('small_model', False)})\n"
-            f"- Performance: Latência {summary.get('latency_ms', '?')}ms | Recompensa: {summary.get('reward_signal', '?')}\n"
+            "### Execution Data\n"
+            f"- ID: {execution_id} | Type: {summary.get('task_type', '?')}\n"
+            f"- Ambiguity: {summary.get('ambiguity', 0)} | Cache: {summary.get('cache', '?')}\n"
+            f"- Model Chosen: {summary.get('model', '?')} (Small Model: {summary.get('small_model', False)})\n"
+            f"- Performance: Latency {summary.get('latency_ms', '?')}ms | Reward: {summary.get('reward_signal', '?')}\n"
             f"- Exploração: {summary.get('exploration', '?')} | Evolução Acionada: {summary.get('evolution_triggered', '?')}\n"
             f"- Scores Candidatos: {scores_str}\n\n"
             

@@ -205,14 +205,14 @@ class PlannerAgent(AgentBase):
                 except (ValueError, TypeError):
                     st["id"] = i + 1
 
-                # Espelhamento polimórfico de campos (Tradução e Fallback de chaves)
-                st["titulo"] = str(st.get("titulo", st.get("title", "Etapa de Implementação Técnica"))).strip()
-                st["description"] = str(st.get("description", st.get("descricao", "Desenvolver lógica funcional conforme plano."))).strip()
-                st["descricao"] = st["description"]  # Garante paridade em português para os agentes locais
+                # Polymorphic field mirroring (Translation and Fallback keys)
+                st["titulo"] = str(st.get("titulo", st.get("title", "Technical Implementation Stage"))).strip()
+                st["description"] = str(st.get("description", st.get("descricao", "Develop functional logic according to plan."))).strip()
+                st["descricao"] = st["description"]  # Ensures parity for local agents
                 
-                st["validacao_runtime"] = str(st.get("validacao_runtime", "Executar asserções básicas de runtime.")).strip()
+                st["validacao_runtime"] = str(st.get("validacao_runtime", "Execute basic runtime assertions.")).strip()
                 
-                # Normalização da lista de erros esperados
+                # Normalization of expected errors list
                 erros = st.get("possiveis_erros", st.get("possible_errors", []))
                 if not isinstance(erros, list):
                     erros = [str(erros)] if erros else ["Exception"]
@@ -220,20 +220,20 @@ class PlannerAgent(AgentBase):
                 if not st["possiveis_erros"]:
                     st["possiveis_erros"] = ["TypeError", "ValueError", "RuntimeError"]
 
-                st["alertas_seguranca"] = str(st.get("alertas_seguranca", "Modo Sandbox ativado.")).strip()
+                st["alertas_seguranca"] = str(st.get("alertas_seguranca", "Sandbox mode enabled.")).strip()
                 subtarefas_limpas.append(st)
                 
             plano["subtarefas"] = subtarefas_limpas
         else:
-            # Se o campo de subtarefas veio corrompido da nuvem, injeta uma estrutura básica padrão
+            # If the subtasks field came corrupted from the cloud, inject a basic default structure
             plano["subtarefas"] = [
                 {
                     "id": 1,
-                    "titulo": "Geração Modular",
-                    "descricao": "Desenvolver a lógica principal do componente.",
-                    "validacao_runtime": "Compilar no interpretador e capturar tracebacks.",
+                    "titulo": "Modular Generation",
+                    "descricao": "Develop the main logic of the component.",
+                    "validacao_runtime": "Compile in interpreter and capture tracebacks.",
                     "possiveis_erros": ["TypeError", "ValueError", "RuntimeError"],
-                    "alertas_seguranca": "Modo Sandbox ativo."
+                    "alertas_seguranca": "Sandbox mode active."
                 }
             ]
 
@@ -242,24 +242,24 @@ class PlannerAgent(AgentBase):
 
     def _fallback_plan(self, task_text: str) -> Dict[str, Any]:
         """
-        Plano de contingência resiliente com higienização de string para evitar 
-        truncamento em logs ou agentes subsequentes.
+        Resilient contingency plan with string sanitization to avoid 
+        truncation in logs or subsequent agents.
         """
-        logger.warning("⚠️ [PLANNER AGENT]: Ativando modo de contingência resiliente.")
+        logger.warning("⚠️ [PLANNER AGENT]: Activating resilient contingency mode.")
 
-        # 1. Higienização e Proteção de Integridade
-        # Garante que não teremos strings vazias ou cortes parciais por quebras de linha
+        # 1. Sanitization and Integrity Protection
+        # Ensures we don't have empty strings or partial cuts due to line breaks
         enunciado_base = str(task_text).strip().replace('\n', ' ')
-        enunciado_limpo = enunciado_base if len(enunciado_base) > 5 else "Desenvolver função solicitada pelo usuário."
+        enunciado_limpo = enunciado_base if len(enunciado_base) > 5 else "Develop the function requested by the user."
 
-        # Debug seguro: log apenas o início para evitar spam no console
-        logger.debug(f"DEBUG: Enunciado sanitizado ({len(enunciado_limpo)} chars): {enunciado_limpo[:50]}...")
+        # Safe debug: log only the beginning to avoid console spam
+        logger.debug(f"DEBUG: Sanitized statement ({len(enunciado_limpo)} chars): {enunciado_limpo[:50]}...")
 
-        # 2. Definição da estrutura com chaves espelhadas
-        # Blindagem contra KeyError em diferentes ambientes de LLM
+        # 2. Structure definition with mirrored keys
+        # Shielding against KeyError in different LLM environments
         return {
-            "complexidade": "DESCONHECIDA",
-            "arquitetura_proposta": "Design defensivo baseado em execução direta e traceback Sandbox.",
+            "complexidade": "UNKNOWN",
+            "arquitetura_proposta": "Defensive design based on direct execution and Sandbox traceback.",
             "estrategia_validacao": {
                 "usar_ast": True,
                 "usar_execucao_real": True,
@@ -269,14 +269,14 @@ class PlannerAgent(AgentBase):
             "subtarefas": [
                 {
                     "id": 1,
-                    # Bloco em Português
-                    "titulo": "Execução Direta",
-                    "descricao": f"Codifique uma solução Python robusta para cumprir a seguinte meta: {enunciado_limpo}",
-                    "validacao_runtime": "Compilar em sandbox e capturar exceções reais.",
+                    # Block in English (primary)
+                    "titulo": "Direct Execution",
+                    "descricao": f"Code a robust Python solution to achieve the following goal: {enunciado_limpo}",
+                    "validacao_runtime": "Compile in sandbox and capture real exceptions.",
                     "possiveis_erros": ["TypeError", "ValueError", "NameError", "SyntaxError", "RuntimeError", "Exception"],
-                    "alertas_seguranca": "Modo contingência: Sandbox ativado.",
+                    "alertas_seguranca": "Contingency mode: Sandbox enabled.",
                     
-                    # Chaves espelhadas em Inglês (Blindagem de Agentes)
+                    # Mirrored keys in English (Agent Shielding)
                     "title": "Direct Code Implementation and Generation",
                     "description": f"Write a robust Python script to solve the following objective: {enunciado_limpo}",
                     "possible_errors": ["TypeError", "ValueError", "NameError", "SyntaxError", "RuntimeError"]

@@ -64,10 +64,10 @@ async def async_generate(prompt: str, model: str = None, timeout: int = 600, tok
     from iaglobal.providers.async_http import get_session
 
     base_url = ProviderConfig.OLLAMA_URL.strip().rstrip('/')
-    system_msg = "Responda SEMPRE em português brasileiro. Se for código, use a linguagem apropriada (HTML, Python, etc)."
-    # Parâmetros otimizados para qwen2.5:0.5b:
-    # - temperature=0.1 → determinístico, evita alucinação de sintaxe
-    # - num_ctx=4096    → janela de atenção compatível com o modelo pequeno
+    system_msg = "Always respond in English. If it's code, use the appropriate language (HTML, Python, etc)."
+    # Optimized parameters for qwen2.5:0.5b:
+    # - temperature=0.1 → deterministic, avoids syntax hallucination
+    # - num_ctx=4096    → attention window compatible with small model
     ollama_options = {"temperature": 0.1, "num_ctx": 4096, "keep_alive": "10m"}
     endpoints_payloads = [
         (urljoin(base_url + "/", "v1/chat/completions"), {
