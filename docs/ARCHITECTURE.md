@@ -1,52 +1,56 @@
-# 🧬 iaglobal — Arquitetura do Sistema
+# 🧬 iaglobal — System Architecture
 
-## Sumário
+## Table of Contents
 
-1. [Visão Geral](#1-visão-geral) e (MAPEAMENTO DE ESPECIALIZAÇÕES)
-2. [Princípios Fundamentais](#2-princípios-fundamentais-o-dna-do-sistema)
-3. [Verificação Genômica (Genesis & Lineage)](#3-verificação-genômica-genesis--lineage)
-4. [Sistema Imunológico](#4-sistema-imunológico)
-5. [Ciclos Metabólicos (Pipeline de Dados)](#5-ciclos-metabólicos-pipeline-de-dados)
-6. [Pipeline de Execução (DAG)](#6-pipeline-de-execução-dag)
-7. [Protocolo de Soberania do Crítico (PSC)](#7-protocolo-de-soberania-do-crítico-psc)
-8. [Motor Evolutivo (Genomic Reflection)](#8-motor-evolutivo-genomic-reflection)
-9. [Leis Universais Aplicadas — Fusão, Simbiose, Vácuo, Ancestralidade](#9-leis-universais-aplicadas)
-10. [Módulo Obsidian — Subconsciente](#10-módulo-obsidian--subconsciente)
-11. [Comunicação Assíncrona](#11-comunicação-assíncrona)
-12. [Validação sob Carga](#12-validação-sob-carga)
-13. [Débito Técnico e Inconsistências Detectadas](#13-débito-técnico-e-inconsistências-detectadas)
-14. [Vetor Evolutivo (Roadmap Consolidado)](#14-vetor-evolutivo-roadmap-consolidado)
-15. [SearchMiddleware — Acesso Inteligente a Contexto com RAG Duplo (Web + Local)](#15-searchmiddleware--acesso-inteligente-a-contexto-com-rag-duplo-web--local)
-16. [MCP Protocol Expansion](#16-mcp-protocol-expansion)
+1. [Overview](#1-overview) and (SPECIALIZATION MAPPING)
+2. [Fundamental Principles](#2-fundamental-principles-the-systems-dna)
+3. [Genomic Verification (Genesis & Lineage)](#3-genomic-dna-verification-genesis--lineage)
+4. [Immune System](#4-immune-system)
+4.5 [Epigenetic Evolution of ToolLibrary](#45-epigenetic-evolution-of-toollibrary-eetl)
+5. [Metabolic Cycles (Data Pipeline)](#5-metabolic-cycles-data-pipeline)
+6. [Execution Pipeline (DAG)](#6-execution-pipeline-dag)
+7. [Critic Sovereignty Protocol (CSP)](#7-critic-sovereignty-protocol-csp)
+8. [Evolutionary Engine (Genomic Reflection)](#8-evolutionary-engine-genomic-reflection)
+9. [Universal Laws Applied](#9-universal-laws-applied)
+10. [Obsidian Module — Subconscious](#10-obsidian-module--subconscious)
+10.11 [Project Synapse — Reactive Nervous System](#1011-project-synapse--reactive-nervous-system)
+10.12 [Dynamic Processing Privilege — CPU Boost for Critical Batches](#1012-dynamic-processing-privilege--cpu-boost-for-critical-batches)
+11. [Asynchronous Communication](#11-asynchronous-communication)
+12. [Validation Under Load](#12-validation-under-load)
+13. [Technical Debt and Detected Inconsistencies](#13-technical-debt-and-detected-inconsistencies)
+14. [Evolutionary Vector (Consolidated Roadmap)](#14-evolutionary-vector)
+15. [SearchMiddleware — Intelligent Context Access with Dual RAG (Web + Local)](#15-searchmiddleware--intelligent-context-access-with-dual-rag-web--local)
+16. [SERVERS and MCP Protocol Expansion](#16-servers-and-mcp-protocol-expansion)
 17. [Colony Intelligence Communication](#17-colony-intelligence-communication)
-18. [Engenharia de Prompt Local](#18-engenharia-de-prompt-local--self-correction-few-shot-e-chain-of-thought)
-    - [18.6.4 Ciclo DLQ → FewShotProvider (Memória Imunológica Adaptativa)](#1864-ciclo-dlq--fewshotprovider-memória-imunológica-adaptativa)
-19. [Apêndice A — Árvore Completa de Diretórios](#apêndice-a--árvore-completa-de-diretórios)
-20. [Nota de Curadoria](#nota-de-curadoria)
-21. [Genetic Algorithm Tuning](#21-genetic-algorithm-tuning--otimização-evolutiva-de-pesos-ivm)
+18. [Genetic Algorithm Tuning — Evolutionary Optimization of IVM Weights](#18-genetic-algorithm-tuning--evolutionary-optimization-of-ivm-weights)
+19. [Local Prompt Engineering — Self-Correction, Few-Shot and Chain of Thought](#19-local-prompt-engineering--self-correction-few-shot-and-chain-of-thought)
+    - [19.6.4 DLQ → FewShotProvider Cycle (Adaptive Immune Memory)](#1964-dlq--fewshotprovider-cycle-adaptive-immune-memory)
+20. [Appendix A — Complete Directory Tree](#appendix-a--complete-directory-tree)
+21. [Curator's Note](#curators-note)
+22. [ROADMAP_2.md — Evolution History](#-roadmap_2md--evolution-history)
 
 ---
 
-## 1. Visão Geral
+## 1. Overview
 
-**iaglobal** é um sistema multi-agente assíncrono cuja arquitetura é modelada sobre ciclos de metabolismo celular (metilação, glutationa, autofagia, mitose, apoptose, epigenética, sinalização celular) em vez dos padrões convencionais de orquestração de agentes. Roda 100% em CPU (4 núcleos, sem GPU), usando Ollama como provider local de LLM com fallback para provedores em nuvem primeiro via `BanditPolicy`.
+**iaglobal** is an asynchronous multi-agent system whose architecture is modeled on cellular metabolism cycles (methylation, glutathione, autophagy, mitosis, apoptosis, epigenetics, cell signaling) instead of conventional agent orchestration patterns. It runs 100% on CPU (4 cores, no GPU), using Ollama as the local LLM provider with fallback to cloud providers first via `BanditPolicy`.
 
-### Snapshot de status (conforme documento original)
+### Status Snapshot (as per original document)
 
-| Métrica | Valor reportado | Observação |
+| Metric | Reported Value | Observation |
 |---|---|---|
-| Testes de linhagem de DNA | 153/153 ✅ | Cobre genesis (6), agentes (32), nós (115), constante identity (1) |
-| Sistema imunológico | "12 camadas ativas" | Ver §4 — a enumeração explícita no texto original lista apenas 5; a árvore de diretórios permite reconstruir a lista completa |
-| Testes totais (marco "Zenith") | 724/724 | Depois ampliado para 832 após Fase 9 (+99) e Fase 12 (+9) |
-| Hardware | CPU 4 núcleos, 0 GPU | — |
-| Passos evolutivos | 107/107 → depois "116/107" | Ver §12, item 6 — número inconsistente no original |
-| Estrutura de nós do DAG | "55 nós" (síntese inicial) → 115 nós (cobertura de testes) | Ver §12, item 1 — o projeto cresceu entre uma seção e outra do próprio documento |
+| DNA lineage tests | 153/153 ✅ | Covers genesis (6), agents (32), nodes (115), identity constant (1) |
+| Immune system | "12 active layers" | See §4 — explicit enumeration in original text lists only 5; directory tree allows reconstructing full list |
+| Total tests ("Zenith" milestone) | 724/724 | Later expanded to 832 after Phase 9 (+99) and Phase 12 (+9) |
+| Hardware | CPU 4 cores, 0 GPU | — |
+| Evolutionary steps | 107/107 → later "116/107" | See §12, item 6 — inconsistent number in original |
+| DAG node structure | "55 nodes" (initial synthesis) → 115 nodes (test coverage) | See §12, item 1 — project grew between sections of the document itself |
 
 ======================================================================
-🧬 MAPEAMENTO DE ESPECIALIZAÇÕES - 115 AGENTS (desatualizado)
+🧬 SPECIALIZATION MAPPING - 115 AGENTS (outdated)
 ======================================================================
 
-🔧 Outros: 62 agents
+🔧 Others: 62 agents
   • adaptive_router
   • agentmailbox
   • apoptosis_kill
@@ -55,9 +59,9 @@
   • business_rules
   • clarity_directive
   • context_weaver
-  ... e mais 54
+  ... and 54 more
 
-🏗️ Arquitetura: 9 agents
+🏗️ Architecture: 9 agents
   • api_builder
   • api_design
   • architect
@@ -66,9 +70,9 @@
   • observability_design
   • performance_design
   • security_design
-  ... e mais 1
+  ... and 1 more
 
-📚 Documentação: 8 agents
+📚 Documentation: 8 agents
   • artifact_writer
   • documentation
   • evolution_knowledge
@@ -78,7 +82,7 @@
   • local_knowledge
   • memory_writer
 
-✅ Testes: 7 agents
+✅ Tests: 7 agents
   • fix_validator
   • qa
   • sandbox_validator
@@ -87,7 +91,7 @@
   • tester
   • validator
 
-🛡️ Segurança: 7 agents
+🛡️ Security: 7 agents
   • ai_audit_compliance
   • auditor_sentinel
   • compliance_audit
@@ -96,7 +100,7 @@
   • security_audit
   • threat_modeling
 
-🧬 Evolução: 6 agents
+🧬 Evolution: 6 agents
   • evolution_committee
   • evolution_dynamic_registry
   • evolution_homocysteine
@@ -104,7 +108,7 @@
   • evolution_trigger
   • ga_router_evolve
 
-🧑‍💻 Código: 6 agents
+🧑‍💻 Code: 6 agents
   • code_executor
   • coder
   • debug_coder
@@ -112,7 +116,7 @@
   • evolution_skill_executor
   • multi_coder
 
-🦠 Imunologia: 4 agents
+🦠 Immunology: 4 agents
   • immune_check
   • immune_check_build
   • immune_exchange
@@ -129,197 +133,197 @@
   • performance
 
 ======================================================================
-TOTAL GERAL: 115 agents especializados
+TOTAL: 115 specialized agents
 ======================================================================
 
 ---
 
-## 2. Princípios Fundamentais (o DNA do sistema)
+## 2. Fundamental Principles (the System's DNA)
 
-- **Async-first absoluto**: toda operação de I/O passa por `asyncio`; nada de chamadas bloqueantes no event loop principal.
-- **`BanditPolicy` como portão único para o crítico**: todo acesso a modelo de IA **externo** (cloud providers) passa exclusivamente pelo agente *critic*. Os demais agentes (coder, debugger, tester, planner, etc.) seguem rota local otimizada — ver §14.
-- **`SearchMiddleware` como fonte de contexto para agentes não-críticos**: antes de chamar o LLM local, cada agente enriquece seu prompt via busca simultânea em web (DuckDuckGo) e RAG local (MemoryVector). O prompt é comprimido em formato ultra-direto para máxima eficiência com modelos locais pequenos (qwen2.5:0.5b).
-- **Ollama local como provider padrão**: agentes não-críticos usam exclusivamente Ollama com `temperature=0.1`, `num_ctx=4096` e formato de prompt compacto. Sem overhead de fallback chain, sem latência de cloud.
+- **Absolute async-first**: every I/O operation goes through `asyncio`; no blocking calls in the main event loop.
+- **`BanditPolicy` as the single gate for critical operations**: all access to **external** AI models (cloud providers) goes exclusively through the *critic* agent. Other agents (coder, debugger, tester, planner, etc.) follow an optimized local route — see §14.
+- **`SearchMiddleware` as context source for non-critical agents**: before calling the local LLM, each agent enriches its prompt via simultaneous search on the web (DuckDuckGo) and local RAG (MemoryVector). The prompt is compressed into an ultra-direct format for maximum efficiency with small local models (qwen2.5:0.5b).
+- **Local Ollama as default provider**: non-critical agents use exclusively Ollama with `temperature=0.1`, `num_ctx=4096`, and compact prompt format. No fallback chain overhead, no cloud latency.
 
-🧬 Arquitetura Correta BanditPolicy e AgentBase (agente crítico):
+🧬 Correct Architecture: BanditPolicy and AgentBase (critical agent):
 
 AgentBase._call_llm() dna
     ↓
-BanditPolicy.select_and_generate()  ← SEMÁFORO AQUI!
+BanditPolicy.select_and_generate()  ← SEMAPHORE HERE!
     ↓
-async_route_generate()  ← Apenas executa
+async_route_generate()  ← Executes only
     ↓
 Provider
 
-📦 FLUXO COMPLETO:
+📦 COMPLETE FLOW:
 
-Agent (herda de AgentBase)
+Agent (inherits from AgentBase)
     ↓
 await self._call_llm(prompt, task_type)
     ↓
 BanditPolicy.generate()
-    ├─ 1. Seleciona modelo (ε-greedy + pesos)
-    ├─ 2. Adquire semáforo (controla concorrência)
-    ├─ 3. Executa via async_route_generate()
-    ├─ 4. Libera semáforo
-    ├─ 5. Registra métricas no CreditAssignmentEngine
-    └─ 6. Atualiza rewards do bandit
+    ├─ 1. Selects model (ε-greedy + weights)
+    ├─ 2. Acquires semaphore (controls concurrency)
+    ├─ 3. Executes via async_route_generate()
+    ├─ 4. Releases semaphore
+    ├─ 5. Registers metrics in CreditAssignmentEngine
+    └─ 6. Updates bandit rewards
     ↓
 Provider (Groq/NVIDIA/Ollama)
 
-### 🧬 **3. Ciclo Metabólico de Cada Lógica**
+### 🧬 **3. Metabolic Cycle of Each Logic**
 
-#### **`async_route_generate_parallel`** → **Sistema Imunológico Inato**
+#### **`async_route_generate_parallel`** → **Innate Immune System**
 
 ```
 📥 PROMPT
      ↓
 🧠 BanditPolicy rank_models()
      ↓
-🏎️ BATCH 1 (Top 3 providers em paralelo)
-     ↓ (se falhar)
-🏎️ BATCH 2 (Próximos 3)
-     ↓ (se falhar)
+🏎️ BATCH 1 (Top 3 providers in parallel)
+     ↓ (if fails)
+🏎️ BATCH 2 (Next 3)
+     ↓ (if fails)
 🏠 FALLBACK: Ollama local
-     ↓ (se falhar)
-💥 RuntimeError: "Todos falharam"
+     ↓ (if fails)
+💥 RuntimeError: "All failed"
 ```
 
-**Metabolismo:** ATP 10:1 — máxima eficiência energética
+**Metabolism:** ATP 10:1 — maximum energy efficiency
 
-**DNA:** Adaptabilidade + Paralelismo + Fallback local
+**DNA:** Adaptability + Parallelism + Local fallback
 
 ---
 
-#### **`async_route_generate`** → **Sistema Imunológico Adaptativo**
+#### **`async_route_generate`** → **Adaptive Immune System**
 
 ```
-📥 PROMPT + MODELO
+📥 PROMPT + MODEL
      ↓
 🔒 Check OLLAMA_ONLY (sandbox)
-     ↓ (se "auto")
-🔄 Delega para async_route_generate_parallel
-     ↓ (se modelo específico)
-🎯 Provider direto (ex: "groq/llama-3.3")
-     ↓ (se falhar)
-🔁 Fallback chain (sequencial ou paralelo)
-     ↓ (se falhar)
-💥 RuntimeError: "Todos falharam"
+     ↓ (if "auto")
+🔄 Delegates to async_route_generate_parallel
+     ↓ (if specific model)
+🎯 Direct provider (e.g., "groq/llama-3.3")
+     ↓ (if fails)
+🔁 Fallback chain (sequential or parallel)
+     ↓ (if fails)
+💥 RuntimeError: "All failed"
 ```
 
-**Metabolismo:** ATP 5:1 — menos eficiente, mas necessário para casos específicos
+**Metabolism:** ATP 5:1 — less efficient, but necessary for specific cases
 
-**DNA:** Determinismo + Controle manual + Sandbox
+**DNA:** Determinism + Manual control + Sandbox
 
-- **Modularidade radical (regra de ouro)**: `iaglobal/graphs/nodes.py` é um *proxy dinâmico* — nunca acumula lógica. Cada nó operacional vive em seu próprio arquivo `no_<nome>.py` dentro de `graphs/nodes/`, exportando uma função assíncrona `run_<nome>`.
-- **Sistema imunológico multicamada**: `GlutathionePool`, `GlutathioneGuardrails` e `ImmuneResponse` como defesa contra "ROS" (erros, inputs maliciosos, cascatas de falha).
-- **Memória dual-layer**: STM/LTM via `CognitiveProxy`, com integração ao vault Obsidian (`learning_system.py`) para memória de longo prazo entre sessões.
+- **Radical modularity (golden rule)**: `iaglobal/graphs/nodes.py` is a *dynamic proxy* — never accumulates logic. Each operational node lives in its own file `no_<name>.py` inside `graphs/nodes/`, exporting an async function `run_<name>`.
+- **Multi-layer immune system**: `GlutathionePool`, `GlutathioneGuardrails`, and `ImmuneResponse` as defense against "ROS" (errors, malicious inputs, failure cascades).
+- **Dual-layer memory**: STM/LTM via `CognitiveProxy`, with integration to Obsidian vault (`learning_system.py`) for long-term memory between sessions.
 
 ---
 
-## 3. Verificação Genômica de DNA (Genesis & Lineage)
+## 3. Genomic DNA Verification (Genesis & Lineage)
 
-iaglobal tem uma arquitetura de **Autenticação Genômica** que é a validação definitiva das **LEIS_HOLLIWELL + AXIOMAS_BIOLOGICOS** de OmniMind. Ao derivar o token como `SHA3_512(GENESIS_HASH_OFFICIAL + node_name)`, iaglobal cria um sistema onde cada nó possui uma identidade única e inalterável, vinculada ao DNA central do sistema do genesis hash para que não haja invasão futura da rede iaglobal quando conectada em rede.
+iaglobal has a **Genomic Authentication** architecture that is the definitive validation of OmniMind's **HOLLIWELL_LAWS + BIOLOGICAL_AXIOMS**. By deriving the token as `SHA3_512(GENESIS_HASH_OFFICIAL + node_name)`, iaglobal creates a system where each node has a unique and unalterable identity, linked to the central DNA of the genesis hash to prevent future invasion of the iaglobal network when connected in a network.
 
-Cadeia de validação de identidade e integridade, do boot até a execução de cada agente individual — não é um hash-check simples, é um portão que impede que código não-derivado do DNA oficial entre no grafo de execução.
+Identity and integrity validation chain, from boot to execution of each individual agent — it's not a simple hash-check, it's a gate that prevents non-DNA-derived code from entering the execution graph.
 
 ```
-BOOT DO SISTEMA
+SYSTEM BOOT
        ↓
-verifygenesis.py ──► SHA3-512 streaming hash (chunks de 64KB)
+verifygenesis.py ──► SHA3-512 streaming hash (64KB chunks)
        ↓
-identity.py ──► compara com GENESIS_HASH_OFFICIAL (constante congelada)
+identity.py ──► compares with GENESIS_HASH_OFFICIAL (frozen constant)
        ↓
-test_dna_lineage.py ──► 153 testes parametrizados
+test_dna_lineage.py ──► 153 parametrized tests
        ↓
-CAMADAS DE VERIFICAÇÃO CONTÍNUA
+CONTINUOUS VERIFICATION LAYERS
  • MHC Detector · EntropySentinel · AsyncViolationDetector · ApoptosisEngine
        ↓
-EXECUÇÃO DE AGENTES/NÓS
+AGENT/NODE EXECUTION
        ↓
-Cada arquivo deve carregar "# 🧬 LINEAGE_MARKER: <hash>" na primeira linha
+Each file must carry "# 🧬 LINEAGE_MARKER: <hash>" on the first line
 ```
 
-**Componentes-chave:**
+**Key Components:**
 
-| Componente | Arquivo | Função |
+| Component | File | Function |
 |---|---|---|
-| Tribunal de Genesis | `genesis/verifygenesis.py` | Compara hash do `evolutive.cbor` contra o `blueprint.cbor`; aborta o boot se divergir |
-| Identidade congelada | `genesis/identity.py` | Define `GENESIS_HASH_OFFICIAL` |
-| Verificação de linhagem | `genesis/test_dna_lineage.py` | Extrai `LINEAGE_MARKER` de cada arquivo e valida contra o hash oficial |
+| Genesis Tribunal | `genesis/verifygenesis.py` | Compares hash of `evolutive.cbor` against `blueprint.cbor`; aborts boot if divergent |
+| Frozen Identity | `genesis/identity.py` | Defines `GENESIS_HASH_OFFICIAL` |
+| Lineage Verification | `genesis/test_dna_lineage.py` | Extracts `LINEAGE_MARKER` from each file and validates against official hash |
 
-**Cobertura atual (153/153 passed):** arquivos genesis (6/6) · agentes (32/32) · nós executáveis (115/115) · constante identity (1/1).
+**Current coverage (153/153 passed):** genesis files (6/6) · agents (32/32) · executable nodes (115/115) · identity constant (1/1).
 
-**Por que isso importa para fusões entre agentes/repositórios:**
-1. Todo agente/nó derivado do mesmo `LINEAGE_MARKER` compartilha identidade genômica — `FusionEngine`, `GenomicReflection` e `MetaSkillGenerator` operam sabendo que os parceiros não são "corpos estranhos".
-2. O tribunal (`verifygenesis.py` + `test_dna_lineage.py`) funciona como um contrato de fusão pré-assinado.
-3. `EvoAgent.replicate()` propaga o `lineage_marker` do pai para o filho automaticamente.
-4. `ImmuneMemoryExchange` e o vault Obsidian compartilham "vacinas" apenas entre agentes de mesmo DNA.
-5. Feature flags via `epigenetic_registry.py` mudam comportamento sem tocar no DNA base.
+**Why this matters for agent/repository mergers:**
+1. Every agent/node derived from the same `LINEAGE_MARKER` shares genomic identity — `FusionEngine`, `GenomicReflection`, and `MetaSkillGenerator` operate knowing that partners are not "foreign bodies".
+2. The tribunal (`verifygenesis.py` + `test_dna_lineage.py`) functions as a pre-signed merger contract.
+3. `EvoAgent.replicate()` propagates the `lineage_marker` from parent to child automatically.
+4. `ImmuneMemoryExchange` and the Obsidian vault share "vaccines" only among agents with the same DNA.
+5. Feature flags via `epigenetic_registry.py` change behavior without touching the base DNA.
 
-**Genesis Handshake Protocol** **mutação planejada:** handshake de Genesis entre nós remotos (SHA3-512 no lugar de certificados X.509) para permitir que repositórios clonados participem de uma rede global de agentes. implementado e testado:
+**Genesis Handshake Protocol** **planned mutation:** Genesis handshake between remote nodes (SHA3-512 instead of X.509 certificates) to allow cloned repositories to participate in a global agent network. implemented and tested:
 
-- `iaglobal/communication/genesis_handshake.py` — protocolo de autenticação entre nós remotos via SHA3-512 + HMAC
-- `tests/integration/test_genesis_handshake.py` — 8 testes simulativos passando
+- `iaglobal/communication/genesis_handshake.py` — authentication protocol between remote nodes via SHA3-512 + HMAC
+- `tests/integration/test_genesis_handshake.py` — 8 simulation tests passing
 
 ---
 
-## 4. Sistema Imunológico
+## 4. Immune System
 
-O texto original menciona "12 camadas ativas" mas só nomeia 5 explicitamente numa tabela. Reconstruindo a partir da árvore real de `immunity/` (Apêndice A), os módulos existentes são:
+The original text mentions "12 active layers" but only names 5 explicitly in a table. Reconstructing from the actual `immunity/` tree (Appendix A), the existing modules are:
 
-| Módulo | Caminho | Papel (conforme uso descrito no texto) |
+| Module | Path | Role (as described in text) |
 |---|---|---|
 | MHC Detector | `immunity/mhc_detector.py` | Fingerprints + anomaly scoring |
-| Entropy Sentinel | `immunity/entropy_sentinel.py` **e** `security/entropy_sentinel.py` | Anti-manipulação / detecção de caos — ⚠️ existe em duplicidade, ver §12 |
-| Async Violation Detector | `immunity/async_violation_detector.py` | Detecta blocking I/O em código async |
-| Apoptosis Engine | `immunity/apoptosis_engine.py` | Eliminação limpa de nós corrompidos |
-| Glutathione Pool / Guardrails | `immunity/glutathione_pool.py`, `glutathione_guardrails.py` | Defesa antioxidante contra ROS |
-| Pathogen Analyzer | `immunity/pathogen_analyzer.py` | Detecção de código malicioso/injeção |
-| Immune Memory Exchange | `immunity/immune_memory_exchange.py` | Compartilha "vacinas" entre nós de mesmo DNA |
-| Adaptive Threat Detector | `immunity/adaptive_threat_detector.py` | Aprende com ataques anteriores |
-| Regression Detector | `immunity/regression_detector.py` | Impede reintrodução de bugs já corrigidos |
-| Immune Orchestrator | `immunity/immune_orchestrator.py` | Integra as camadas acima |
-| Epigenetic Masking | `immunity/epigenetic_masking.py` | Barreira de memória crítica |
-| Metabolic Pruner | `immunity/metabolic_pruner.py` | Poda por TTL + deduplicação |
-| Emergent Behavior / Loop / Symbiosis / Vacuum | `emergent_behavior_detector.py`, `loop_detector.py`, `symbiosis_score.py`, `vacuum_trigger.py` | Ver §8 (Fase 9 — Leis de Holliwell) |
+| Entropy Sentinel | `immunity/entropy_sentinel.py` **and** `security/entropy_sentinel.py` | Anti-tampering / chaos detection — ⚠️ exists in duplicate, see §12 |
+| Async Violation Detector | `immunity/async_violation_detector.py` | Detects blocking I/O in async code |
+| Apoptosis Engine | `immunity/apoptosis_engine.py` | Clean elimination of corrupted nodes |
+| Glutathione Pool / Guardrails | `immunity/glutathione_pool.py`, `glutathione_guardrails.py` | Antioxidant defense against ROS |
+| Pathogen Analyzer | `immunity/pathogen_analyzer.py` | Malicious code/injection detection |
+| Immune Memory Exchange | `immunity/immune_memory_exchange.py` | Shares "vaccines" among nodes with same DNA |
+| Adaptive Threat Detector | `immunity/adaptive_threat_detector.py` | Learns from previous attacks |
+| Regression Detector | `immunity/regression_detector.py` | Prevents reintroduction of already-fixed bugs |
+| Immune Orchestrator | `immunity/immune_orchestrator.py` | Integrates the layers above |
+| Epigenetic Masking | `immunity/epigenetic_masking.py` | Critical memory barrier |
+| Metabolic Pruner | `immunity/metabolic_pruner.py` | Pruning by TTL + deduplication |
+| Emergent Behavior / Loop / Symbiosis / Vacuum | `emergent_behavior_detector.py`, `loop_detector.py`, `symbiosis_score.py`, `vacuum_trigger.py` | See §8 (Phase 9 — Holliwell Laws) |
 
-### Caso de estudo: `AsyncViolationDetector` como "órgão" completo
+### Case study: `AsyncViolationDetector` as a complete "organ"
 
-O texto original descreve este componente com riqueza suficiente para servir de exemplo de como o padrão biológico se aplica a um único módulo:
+The original text describes this component with enough richness to serve as an example of how the biological pattern applies to a single module:
 
 ```
-AGENTE STEM (async_violation_detector)
-    ├── NÚCLEO        → AST Analyzer (análise sintática)
-    ├── MITOCÔNDRIA   → PatternDNA (padrões de detecção evoluem)
-    ├── RIBOSSOMO     → scan_ecosystem() (síntese de relatórios)
-    ├── MEMBRANA      → glutathione_filter (seletividade de entrada)
-    ├── IMUNIDADE     → ImmuneMemoryExchange (memória de falsos positivos)
-    ├── EPIGENÉTICA   → _epigenetic_adaptation (expressão dinâmica)
-    ├── EVOLUÇÃO      → _genomic_reflection (BanditPolicy)
-    └── APOPTOSE      → _apoptose_toxic_patterns (limpeza de padrões)
+STEM AGENT (async_violation_detector)
+    ├── NUCLEUS       → AST Analyzer (syntax analysis)
+    ├── MITOCHONDRIA  → PatternDNA (detection patterns evolve)
+    ├── RIBOSOME      → scan_ecosystem() (report synthesis)
+    ├── MEMBRANE      → glutathione_filter (input selectivity)
+    ├── IMMUNITY      → ImmuneMemoryExchange (false positive memory)
+    ├── EPIGENETICS   → _epigenetic_adaptation (dynamic expression)
+    ├── EVOLUTION     → _genomic_reflection (BanditPolicy)
+    └── APOPTOSIS     → _apoptose_toxic_patterns (pattern cleanup)
 ```
 
-Fluxo operacional: `scan → detectar → filtrar (GSH) → aprender (memória) → adaptar (epigenética) → limpar (apoptose) → regenerar`. Regeneração automática é disparada quando `fitness_score < 0.5`; feedback humano é registrado via `detector.register_feedback(path, is_false_positive=True)`.
+Operational flow: `scan → detect → filter (GSH) → learn (memory) → adapt (epigenetics) → clean (apoptosis) → regenerate`. Automatic regeneration is triggered when `fitness_score < 0.5`; human feedback is registered via `detector.register_feedback(path, is_false_positive=True)`.
 
-**Mecanismos de defesa registrados no documento original:**
+**Defense mechanisms registered in the original document:**
 
-| ROS (ameaça) | GSH (defesa) |
+| ROS (threat) | GSH (defense) |
 |---|---|
-| Falsos positivos | Threshold de confiança + filtro GSH |
-| Padrões tóxicos | Apoptose automática (fitness < 20%) |
-| Auto-degradação | `regenerate()` |
-| Falta de aprendizado | Memória imunológica + feedback loop |
-| Isolamento | `AcetylcholineBus` + `OmniMind` |
-| Detecção over-aggressive | Modo adaptativo + peso epigenético |
+| False positives | Confidence threshold + GSH filter |
+| Toxic patterns | Automatic apoptosis (fitness < 20%) |
+| Self-degradation | `regenerate()` |
+| Lack of learning | Immune memory + feedback loop |
+| Isolation | `AcetylcholineBus` + `OmniMind` |
+| Over-aggressive detection | Adaptive mode + epigenetic weight |
 
 ---
 
-## 4.5 Evolução Epigenética da ToolLibrary (EETL)
+## 4.5 Epigenetic Evolution of ToolLibrary (EETL)
 
-A EETL fecha o loop autopoiético do sistema: tarefas que exigem escalonamento para modelos cloud repetidamente são convertidas em ferramentas locais permanentes, eliminando a dependência externa.
+EETL closes the autopoietic loop of the system: tasks that require repeated escalation to cloud models are converted into permanent local tools, eliminating external dependency.
 
-### Arquitetura
+### Architecture
 
 ```
 ancestry_tree.jsonl ──► EvolutionaryWatchdog ──► ToolLibrary
@@ -330,46 +334,48 @@ ancestry_tree.jsonl ──► EvolutionaryWatchdog ──► ToolLibrary
 Cognitive_Escalation    OmniMind apoptose        execução ~3s
 ```
 
-### Componentes
+### Components
 
-| Módulo | Caminho | Função |
+| Module | Path | Function |
 |--------|---------|--------|
-| EvolutionaryWatchdog | `evolution/watchdog.py` | Varre `ancestry_tree.jsonl`, detecta padrões (mesmo `task_hash` ≥3x em cloud com IVM > 0.85) |
-| Watcher no CriticAgent | `agents/critic_agent.py:_evolutionary_watchdog_check()` | Pós-escalonamento cloud bem-sucedido, verifica padrão e registra tool |
-| Watcher no Pipeline | `pipeline/engine.py:_async_learn_stage()` | Ao final de cada pipeline, watchdog varre ancestry_tree |
-| Ancestry enriquecido | `graphs/bandit.py:_psc_register_ancestry()` | Agora inclui `task_hash` e `task_summary` em todo registro |
-| RESET_METABOLIC | `agents/critic_agent.py:_check_metabolic_reset()` | Se CriticAgent degradado ≥3x consecutivas, emite reset via OmniMind |
+| EvolutionaryWatchdog | `evolution/watchdog.py` | Scans `ancestry_tree.jsonl`, detects patterns (same `task_hash` ≥3x in cloud with IVM > 0.85) |
+| Watcher in CriticAgent | `agents/critic_agent.py:_evolutionary_watchdog_check()` | After successful cloud escalation, checks pattern and registers tool |
+| Watcher in Pipeline | `pipeline/engine.py:_async_learn_stage()` | At end of each pipeline, watchdog scans ancestry_tree |
+| Enriched Ancestry | `graphs/bandit.py:_psc_register_ancestry()` | Now includes `task_hash` and `task_summary` in every record |
+| RESET_METABOLIC | `agents/critic_agent.py:_check_metabolic_reset()` | If CriticAgent degraded ≥3x consecutively, emits reset via OmniMind |
 
-### Regras de ativação
+### Activation Rules
 
-1. **Gatilho cloud**: CriticAgent escala para cloud (Groq/NVIDIA) → sucesso → `_evolutionary_watchdog_check()`
-2. **Padrão ≥3x**: Watchdog.analyze() agrupa por `task_hash`, conta escalonamentos bem-sucedidos
+1. **Cloud trigger**: CriticAgent escalates to cloud (Groq/NVIDIA) → success → `_evolutionary_watchdog_check()`
+2. **Pattern ≥3x**: Watchdog.analyze() groups by `task_hash`, counts successful escalations
 3. **Tool registration**: `watchdog.register_tool_from_pattern(pattern, code)` → `ToolLibrary.register_from_code(task, code)`
-4. **Redundância**: Pipeline `_async_learn_stage` também varre ancestry_tree após cada execução
+4. **Redundancy**: Pipeline `_async_learn_stage` also scans ancestry_tree after each execution
 
-### Perfil antioxidante
+### Antioxidant Profile
 
 | ROS | GSH |
 |-----|-----|
-| Escalonamento cloud repetitivo | Tool local registrada permanentemente |
-| CriticAgent degradado | RESET_METABOLIC + apoptose |
-| Ferramenta obsoleta | Próximo padrão substitui (sobrescrição) |
-| Task_hash collision | SHA3-512[:16] — colisão astronomicamente improvável |
+| Repetitive cloud escalation | Local tool permanently registered |
+| Degraded CriticAgent | RESET_METABOLIC + apoptosis |
+| Obsolete tool | Next pattern replaces (overwrite) |
+| Task_hash collision | SHA3-512[:16] — astronomically improbable collision |
 
-### Plano de diferenciação
+### Differentiation Plan
 
-- **Fase I**: Watchdog apenas monitora e registra tools no pipeline `_async_learn_stage`
-- **Fase II**: CriticAgent ativamente chama watchdog pós-cloud — acelera detecção
-- **Fase III**: RESET_METABOLIC — recuperação autônoma de degradação
+- **Phase I**: Watchdog only monitors and registers tools in pipeline `_async_learn_stage`
+- **Phase II**: CriticAgent actively calls watchdog post-cloud — accelerates detection
+- **Phase III**: RESET_METABOLIC — autonomous recovery from degradation
+PLACEHOLDER
 
-### Vetor evolutivo
-
-- **Próxima mutação**: Watchdog com feedback negativo — se uma tool registrada nunca for usada, é removida (autofagia de ferramentas)
-- **Pressão seletiva**: Toda tool registrada reduz o tempo de execução de 70s (cloud) para ~3s (local), criando pressão evolutiva forte para auto-registro
+### Evolutionary Vector
+- **Next mutation**: Watchdog with negative feedback — if a registered tool is never used, it is removed (tool autophagy)
+- **Selective pressure**: Every registered tool reduces execution time from 70s (cloud) to ~3s (local), creating strong evolutionary pressure for self-registration
+PLACEHOLDER
+PLACEHOLDER
 
 ---
 
-## 5. Ciclos Metabólicos (Pipeline de Dados)
+## 5. Metabolic Cycles (Data Pipeline)
 
 | Ciclo | Implementação | Função |
 |---|---|---|
@@ -388,31 +394,31 @@ Cognitive_Escalation    OmniMind apoptose        execução ~3s
 - **GSSG (componentes sacrificáveis)**: skills rejeitadas viram guardrails via `route_to_guardrail()`; erros críticos são registrados para análise posterior.
 - **NADPH (reserva de regeneração)**: `SAMePool` com budget limitado (100 unidades padrão) · `SAMeBudgetTracker` (janela de 24h) · `MethylationInhibitor` bloqueia mutações não-críticas quando SAMe está baixo.
 
-### Ciclo de auto-regeneração (geral)
+### Self-regeneration cycle (general)
 
-1. **Detecção** — `HomeostasisController.check_sla()` verifica latência/custo/erro.
-2. **Sinalização** — violações disparam `_apply_epigenetic_adjustments()`.
-3. **Recuperação** — epsilon do `BanditPolicy` é ajustado dinamicamente.
-4. **Aprendizado** — `SkillRecycler.recycle()` reintegra skills úteis.
-5. **Persistência** — pools usam arquivos JSON com locks de thread (⚠️ com uma exceção — ver §12).
+1. **Detection** — `HomeostasisController.check_sla()` verifies latency/cost/error.
+2. **Signaling** — violations trigger `_apply_epigenetic_adjustments()`.
+3. **Recovery** — epsilon of `BanditPolicy` is dynamically adjusted.
+4. **Learning** — `SkillRecycler.recycle()` reintegrates useful skills.
+5. **Persistence** — pools use JSON files with thread locks (⚠️ with one exception — see §12).
 
 ---
 
-## 6. Pipeline de Execução (DAG)
+## 6. Execution Pipeline (DAG)
 
-> ⚠️ O documento original descreve o DAG em dois momentos diferentes com números diferentes: uma síntese inicial fala em **55 nós/7 fases**; a cobertura de testes de linhagem, mais adiante, já fala em **115 nós executáveis**. Isso bate com o crescimento real do projeto — não é um erro de digitação isolado, é o projeto evoluindo entre uma seção e outra do mesmo arquivo. Mantive as duas versões, na ordem em que aparecem.
+> ⚠️ The original document describes the DAG at two different moments with different numbers: an initial synthesis mentions **55 nodes/7 phases**; later, lineage test coverage already mentions **115 executable nodes**. This matches the actual project growth — it's not an isolated typo, it's the project evolving between sections of the same file. I kept both versions, in the order they appear.
 
-### Estrutura original (síntese em 7 fases, 55 nós)
+### Original structure (synthesis in 7 phases, 55 nodes)
 
-1. **Definição** (23 nós) — intake, enhancement, PM, requisitos, arquitetura
-2. **Planejamento** (3 nós) — planner, task_breakdown, execution_plan
-3. **Construção** (6 nós) — coder, frontend/backend/database builder
-4. **Qualidade** (7 nós) — test_generator, integrador, auditoria
-5. **Correção** (6 nós) — qa, debugger, fix_validator
-6. **Entrega** (9 nós) — documentation, metrics, retrospective
-7. **Metacognição** (7 nós) — evaluator, gap_analyzer, evolution_trigger
+1. **Definition** (23 nodes) — intake, enhancement, PM, requirements, architecture
+2. **Planning** (3 nodes) — planner, task_breakdown, execution_plan
+3. **Construction** (6 nodes) — coder, frontend/backend/database builder
+4. **Quality** (7 nodes) — test_generator, integrator, audit
+5. **Correction** (6 nodes) — qa, debugger, fix_validator
+6. **Delivery** (9 nodes) — documentation, metrics, retrospective
+7. **Metacognition** (7 nodes) — evaluator, gap_analyzer, evolution_trigger
 
-### Fluxo metabólico do núcleo evolutivo
+### Metabolic flow of the evolutionary core
 
 ```
 evaluator → gap_analyzer → skill_generator → sandbox_validator → evolution_committee
@@ -428,101 +434,101 @@ evaluator → gap_analyzer → skill_generator → sandbox_validator → evoluti
                                                                    omnimind
 ```
 
-### Estado atual (conforme árvore de diretórios, Apêndice A)
+### Current state (according to directory tree, Appendix A)
 
-`graphs/nodes/` contém **110 arquivos únicos `no_*.py`** na árvore fornecida (mais os módulos auxiliares `_search_*.py`) — consistente com os "115 nós executáveis" citados na cobertura de testes de linhagem. Isso confirma que a estrutura de 55 nós é um retrato antigo do sistema, não o estado atual.
+`graphs/nodes/` contains **110 unique `no_*.py` files** in the provided tree (plus auxiliary modules `_search_*.py`) — consistent with the "115 executable nodes" cited in lineage test coverage. This confirms that the 55-node structure is an old snapshot of the system, not the current state.
 
 ---
 
-## 7. Protocolo de Soberania do Crítico (PSC)
+## 7. Critic Sovereignty Protocol (CSP)
 
-> **Princípio**: O `iaglobal` opera como um organismo com sistema nervoso central. Apenas o `CriticAgent` possui autoridade para escalonamento externo (cloud). Todos os demais agentes operam exclusivamente com recursos locais (ToolLibrary + Ollama).
+> **Principle**: The `iaglobal` operates as an organism with a central nervous system. Only `CriticAgent` has authority for external escalation (cloud). All other agents operate exclusively with local resources (ToolLibrary + Ollama).
 
-### 7.1 Arquitetura de 3 Camadas
+### 7.1 Three-Layer Architecture
 
 ```
-AGENTE LOCAL (Coder, Planner, Tester, etc.)
+LOCAL AGENT (Coder, Planner, Tester, etc.)
     │
     ├─ ToolLibrary.match(prompt) → score ≥ 0.7?
-    │    ├─ SIM: executa tool Python diretamente (NADPH — 200ms, 0 ATP LLM)
-    │    └─ NÃO: Ollama local (qwen2.5:0.5b)
+    │    ├─ YES: executes Python tool directly (NADPH — 200ms, 0 LLM ATP)
+    │    └─ NO: Ollama local (qwen2.5:0.5b)
     │
-    └─ Resultado submetido ao CriticAgent.avaliar()
+    └─ Result submitted to CriticAgent.evaluate()
          │
          ▼
-CRITICAGENT (Único portão para cloud)
+CRITICAGENT (Single gateway to cloud)
     │
-    ├─ 1. Avaliação local (Ollama) — preserva ATP
-    ├─ 2. Score ≥ 60? → retorna (local suficiente)
-    ├─ 3. Score < 60? → escala para cloud via BanditPolicy.generate(node_id="critic")
+    ├─ 1. Local evaluation (Ollama) — preserves ATP
+    ├─ 2. Score ≥ 60? → returns (local sufficient)
+    ├─ 3. Score < 60? → escalates to cloud via BanditPolicy.generate(node_id="critic")
     │
     ▼
-BANDITPOLICY (Membrana seletiva)
+BANDITPOLICY (Selective membrane)
     │
-    ├─ PSC §1.1: SecurityViolation se node_id não contém "critic"
-    ├─ PSC §1.2: IVM compliance — se homocisteína > 70%, bloqueia cloud
-    ├─ Membrana: não-crítico → apenas Ollama local (fail-closed)
-    ├─ Seleção ε-greedy → semáforo → execução → métricas
-    └─ PSC §1.3: Registra Cognitive_Escalation no ancestry_tree.jsonl
+    ├─ PSC §1.1: SecurityViolation if node_id does not contain "critic"
+    ├─ PSC §1.2: IVM compliance — if homocysteine > 70%, blocks cloud
+    ├─ Membrane: non-critical → only local Ollama (fail-closed)
+    ├─ ε-greedy selection → semaphore → execution → metrics
+    └─ PSC §1.3: Records Cognitive_Escalation in ancestry_tree.jsonl
 ```
 
-### 7.2 Implementação
+### 7.2 Implementation
 
-| Camada | Arquivo | Mecanismo |
+| Layer | File | Mechanism |
 |--------|---------|-----------|
-| **Primária** | `graphs/bandit.py:generate()` | `_psc_verify_caller(node_id)` — levanta `SecurityViolation` se não for crítico |
-| **Secundária** | `graphs/bandit.py` | `_psc_ivm_green()` — verifica homocisteína antes de liberar cloud |
-| **Terciária** | `providers/provider_router.py:async_route_generate()` | Rebaixa para local se node_id não for crítico |
-| **Prompt** | `agents/agent_base.py` | `PEC_SYSTEM_PROMPT` inclui: *"Nunca acesse modelos online por conta própria"* |
-| **Prompt** | `agents/prompt_improver.py` | Instrução final de todo prompt inclui diretriz PSC |
+| **Primary** | `graphs/bandit.py:generate()` | `_psc_verify_caller(node_id)` — raises `SecurityViolation` if not critical |
+| **Secondary** | `graphs/bandit.py` | `_psc_ivm_green()` — checks homocysteine before releasing cloud |
+| **Tertiary** | `providers/provider_router.py:async_route_generate()` | Downgrades to local if node_id is not critical |
+| **Prompt** | `agents/agent_base.py` | `PEC_SYSTEM_PROMPT` includes: *"Never access online models on your own"* |
+| **Prompt** | `agents/prompt_improver.py` | Final instruction of every prompt includes PSC guideline |
 
-### 7.3 Fluxo de Execução Estrito
+### 7.3 Strict Execution Flow
 
 ```
-Fase de Produção (Agentes Executores):
-    Coder, Planner, Tester processam a tarefa usando:
-    ├─ ToolLibrary (Python puro, 200ms, 0 ATP LLM)
-    └─ Ollama local (qwen2.5:0.5b, temperatura=0.1)
+Production Phase (Executor Agents):
+    Coder, Planner, Tester process the task using:
+    ├─ ToolLibrary (pure Python, 200ms, 0 LLM ATP)
+    └─ Ollama local (qwen2.5:0.5b, temperature=0.1)
 
-Fase de Crivo (CriticAgent):
-    Conteúdo gerado é enviado para CriticAgent.avaliar()
-    ├─ Score ≥ 70 → aprovado → ArtifactFactory
-    ├─ Score ≥ 60 → aprovado (local suficiente)
-    └─ Score < 60 ou erro → CriticAgent escala para BanditPolicy (único autorizado)
+Filter Phase (CriticAgent):
+    Generated content is sent to CriticAgent.evaluate()
+    ├─ Score ≥ 70 → approved → ArtifactFactory
+    ├─ Score ≥ 60 → approved (local sufficient)
+    └─ Score < 60 or error → CriticAgent escalates to BanditPolicy (only authorized)
 
-Fase de Escalonamento (BanditPolicy):
-    ├─ Verifica identidade: apenas "critic" passa
-    ├─ Verifica IVM: se homocisteína > 70%, bloqueia cloud
-    ├─ Seleciona modelo cloud (Groq/NVIDIA)
-    └─ Registra Cognitive_Escalation no ancestry_tree.jsonl
+Escalation Phase (BanditPolicy):
+    ├─ Verifies identity: only "critic" passes
+    ├─ Checks IVM: if homocysteine > 70%, blocks cloud
+    ├─ Selects cloud model (Groq/NVIDIA)
+    └─ Records Cognitive_Escalation in ancestry_tree.jsonl
 ```
 
-O fluxo correto é:
-1. Planner → Quebra tarefa
-2. Search/Local Knowledge → Coleta dados (web + obsidian)
-3. Filter/Validator → Filtra dados (source_validator)
-4. Coder/FrontendBuilder → Gera código
-5. Tester → Testa o código
-6. Reviewer → Revisa
-7. Critic → Avalia score
-   ├─ Score < threshold → Loop (volta para 3 ou 4)
-   └─ Score >= threshold → Aprova
-8. BanditPolicy → Seleciona modelo (após aprovação)
-9. ArtifactWriter → Persiste resultado
-10. Reflexion → Aprendizado (se falhou) ou Commit (se sucesso)
+The correct flow is:
+1. Planner → Breaks task
+2. Search/Local Knowledge → Collects data (web + obsidian)
+3. Filter/Validator → Filters data (source_validator)
+4. Coder/FrontendBuilder → Generates code
+5. Tester → Tests the code
+6. Reviewer → Reviews
+7. Critic → Evaluates score
+   ├─ Score < threshold → Loop (returns to 3 or 4)
+   └─ Score >= threshold → Approves
+8. BanditPolicy → Selects model (after approval)
+9. ArtifactWriter → Persists result
+10. Reflexion → Learning (if failed) or Commit (if success)
 
-### 7.4 Semáforos de Segurança
+### 7.4 Security Semaphores
 
-| Verificação | Onde | Efeito |
+| Verification | Where | Effect |
 |-------------|------|--------|
-| Identidade do chamador | `bandit.py:generate()` | `SecurityViolation` se não for crítico |
-| Homocisteína sistêmica | `bandit.py:_psc_ivm_green()` | Bloqueia cloud se > 70% do threshold |
-| Membrana seletiva | `bandit.py:_membrane_filter_candidates()` | Não-crítico → só Ollama (fail-closed) |
-| Provider router | `provider_router.py:async_route_generate()` | Rebaixa para local se node_id não for crítico |
+| Caller identity | `bandit.py:generate()` | `SecurityViolation` if not critical |
+| Systemic homocysteine | `bandit.py:_psc_ivm_green()` | Blocks cloud if > 70% of threshold |
+| Selective membrane | `bandit.py:_membrane_filter_candidates()` | Non-critical → only Ollama (fail-closed) |
+| Provider router | `provider_router.py:async_route_generate()` | Downgrades to local if node_id is not critical |
 
 ### 7.5 Ancestry Tracking
 
-Toda escalonamento cloud bem-sucedido registra um registro JSON em `DATA_DIR/ancestry_tree.jsonl`:
+Every successful cloud escalation registers a JSON record in `DATA_DIR/ancestry_tree.jsonl`:
 
 ```json
 {
@@ -535,68 +541,68 @@ Toda escalonamento cloud bem-sucedido registra um registro JSON em `DATA_DIR/anc
 }
 ```
 
-### 7.6 Diagrama de Imunidade
+### 7.6 Immunity Diagram
 
 ```
-AGENTE LOCAL (Coder)
-    │ chamada direta a BanditPolicy.generate()
+LOCAL AGENT (Coder)
+    │ direct call to BanditPolicy.generate()
     ▼
-PSC §1.1 ──► SecurityViolation ✋ BLOQUEADO
+PSC §1.1 ──► SecurityViolation ✋ BLOCKED
     │
     │ (via CriticAgent)
     ▼
 CriticAgent._avaliar_multidimensional()
-    ├─ Ollama local → score ≥ 60? → OK (sem cloud)
+    ├─ Ollama local → score ≥ 60? → OK (no cloud)
     └─ Ollama local → score < 60? → 
          │
          ▼
     BanditPolicy.generate(node_id="critic")
-         ├─ PSC §1.1: critic ✅ passa
-         ├─ PSC §1.2: IVM green? → SIM
-         ├─ Membrana: crítico → cloud liberado
-         ├─ Seleciona modelo → executa → métricas
+         ├─ PSC §1.1: critic ✅ passes
+         ├─ PSC §1.2: IVM green? → YES
+         ├─ Membrane: critical → cloud released
+         ├─ Selects model → executes → metrics
          └─ PSC §1.3: ancestry_tree.jsonl ← Cognitive_Escalation
               │
               ▼
-    CriticAgent valida resultado cloud → approved/rejected
+    CriticAgent validates cloud result → approved/rejected
 ```
 
-### 7.7 Diretriz de Prompt (Meta-Directive)
+### 7.7 Prompt Directive (Meta-Directive)
 
-Injetada via `PEC_SYSTEM_PROMPT` em `agent_base.py` e na instrução final do `prompt_improver.py`:
+Injected via `PEC_SYSTEM_PROMPT` in `agent_base.py` and in the final instruction of `prompt_improver.py`:
 
-> "PSC — Protocolo de Soberania do Crítico: Você nunca deve tentar acessar modelos online por conta própria. Sua autonomia é limitada a recursos locais (ToolLibrary + Ollama). Se sua tarefa local for insuficiente, submeta o resultado ao CriticAgent. Confie na autoridade do Crítico para decidir sobre escalonamento para o BanditPolicy."
+> "PSC — Critic Sovereignty Protocol: You must never attempt to access online models on your own. Your autonomy is limited to local resources (ToolLibrary + Ollama). If your local task is insufficient, submit the result to CriticAgent. Trust the Critic's authority to decide on escalation to BanditPolicy."
 
 ---
 
-## 8. Motor Evolutivo (Genomic Reflection)
+## 8. Evolutionary Engine (Genomic Reflection)
 
 ```
-EXECUÇÃO DO AGENTE
+AGENT EXECUTION
        ↓
-ResultAgent registra ExecutionMetrics
+ResultAgent registers ExecutionMetrics
        ↓
 GenomicReflection.analyze_performance()
        ↓
-Identifica best_traits / worst_traits
+Identifies best_traits / worst_traits
        ↓
 propose_mutations_async()
        ↓
-Tipo de mutação: TRAIT_ENHANCEMENT (sucesso) · TRAIT_SUPPRESSION (fracasso) · TRAIT_ADDITION (faltante)
+Mutation type: TRAIT_ENHANCEMENT (success) · TRAIT_SUPPRESSION (failure) · TRAIT_ADDITION (missing)
        ↓
-validate_with_bandit_async()  →  validador customizado, ou fallback: confidence > 0.6
+validate_with_bandit_async()  →  custom validator, or fallback: confidence > 0.6
        ↓
 apply_mutation_async()
        ↓
-DNA atualizado no FusionEngine
+DNA updated in FusionEngine
 ```
 
-### Cadeia de boot (do CLI ao `EvoAgent`)
+### Boot chain (from CLI to `EvoAgent`)
 
 ```
 CLI / IAGlobalAPI
     └─► bootstrap.initialize()          # cli/bootstrap.py
-            └─► Orchestrator()          # core/orchestrator.py  ← PONTO CENTRAL
+            └─► Orchestrator()          # core/orchestrator.py  ← CENTRAL POINT
                     ├─► EvolutionEngine(graph, strategies)
                     ├─► EvolutionRuntime(evolver, interval)
                     ├─► ReflexionEngine(model_fn)
@@ -604,10 +610,10 @@ CLI / IAGlobalAPI
                     ├─► PipelineEngine
                     ├─► graceful_shutdown.add_callback(...)
                     └─► if EVOLUTION_AUTO=1:
-                            evolution_runtime.start()   ← EvoAgent entra aqui
+                            evolution_runtime.start()   ← EvoAgent enters here
 ```
 
-O `EvoAgent` não substitui o `Orchestrator` — roda dentro da infraestrutura existente. Local correto de inicialização (`core/orchestrator.py`, após `self.evolution_runtime`):
+The `EvoAgent` does not replace the `Orchestrator` — it runs within the existing infrastructure. Correct initialization location (`core/orchestrator.py`, after `self.evolution_runtime`):
 
 ```python
 from iaglobal.evolution.evo_agent import EvoAgent
@@ -624,73 +630,73 @@ graceful_shutdown.add_async_callback(
 )
 ```
 
-No `run()` do `Orchestrator`, antes de executar o pipeline, o input pode passar por `evo_agent.handle()` para obter a expressão genômica e usar os ciclos de GSH + metilação como pré-processamento imunológico do prompt.
+In the `run()` of the `Orchestrator`, before executing the pipeline, the input can pass through `evo_agent.handle()` to obtain genomic expression and use GSH cycles + methylation as immunological pre-processing of the prompt.
 
-### 7.1 Integração EvoAgent ↔ AgentBase (Reflexão de 4 Módulos)
+### 7.1 EvoAgent ↔ AgentBase Integration (4-Module Reflection)
 
-Todos os agentes que herdam de `AgentBase` ganham os 4 módulos de reflexão nativos do iaglobal, consumidos via um único `EvoAgent` por **linhagem de agente** (`agent_name`). Isso preserva a família evolutiva (mesmo `lineage_marker`) e evita instanciar milhares de organismos desnecessários.
+All agents that inherit from `AgentBase` gain the 4 native reflection modules of iaglobal, consumed via a single `EvoAgent` per **agent lineage** (`agent_name`). This preserves the evolutionary family (same `lineage_marker`) and avoids instantiating thousands of unnecessary organisms.
 
-**Ciclo Metabólico da Integração**
+**Integration Metabolic Cycle**
 
 ```
-Agente (herda AgentBase)
-    ↓ self.get_evo_agent()  [lazy — 1 EvoAgent por agent_name no _EVO_REGISTRY]
-EvoAgent (mitose controlada por linhagem)
-    ├─ self_critique()        → reflection.self_critique.SelfCritique        (heurística pura, sem LLM)
+Agent (inherits AgentBase)
+    ↓ self.get_evo_agent()  [lazy — 1 EvoAgent per agent_name in _EVO_REGISTRY]
+EvoAgent (controlled mitosis by lineage)
+    ├─ self_critique()        → reflection.self_critique.SelfCritique        (pure heuristic, no LLM)
     ├─ reflexion_fix()        → reflection.reflexion_engine.ReflexionEngine   (gated: evo_reflexion_enabled)
-    ├─ analyze_failure()      → reflection.failure_analysis.FailureAnalyzer   (memória imunológica)
+    ├─ analyze_failure()      → reflection.failure_analysis.FailureAnalyzer   (immunological memory)
     └─ learning_iterate()     → reflection.learning_loop.LearningLoop         (gated: evo_learning_enabled)
 ```
 
-AgentBase mantém um _EVO_REGISTRY que cria um EvoAgent por agent_name sob demanda. Todo agente que herda de AgentBase consome evolução por delegação:
+AgentBase maintains an _EVO_REGISTRY that creates one EvoAgent per agent_name on demand. Every agent inheriting from AgentBase consumes evolution by delegation:
 
 ```
 AgentBase
- ├── evo_self_critique()      → SelfCritique (puro, CPU-bound)
+ ├── evo_self_critique()      → SelfCritique (pure, CPU-bound)
  ├── evo_reflexion_fix()      → ReflexionEngine
  ├── evo_analyze_failure()    → FailureAnalyzer + VaccineLedger
  └── evo_learning_iterate()   → LearningLoop
 ```
 
-**Pontos de implementação**
+**Implementation Points**
 
-| Local | Mudança |
+| Location | Change |
 |---|---|
-| `evolution/evo_agent.py` | Importa `FailureAnalyzer`, `SelfCritique`, `LearningLoop` (e `ReflexionEngine` sob demanda). Expõe `self_critique`, `reflexion_fix`, `analyze_failure`, `learning_iterate`. `reflexion_fix` acionado no path `critical` de `_analysis_and_action`. |
-| `agents/agent_base.py` | `_EVO_REGISTRY` (1 EvoAgent por `agent_name`) + `get_evo_agent()`. 4 delegadores `evo_self_critique / evo_reflexion_fix / evo_analyze_failure / evo_learning_iterate`. Auto-hook não-bloqueante em `_call_llm`: auto-crítica pós-resposta + análise de falha em exceção. |
-| `evolution/epigenetic.py` | Flags: `evo_self_critique=True` (barato), `evo_reflexion_enabled=False`, `evo_learning_enabled=False` (evitam gasto de ATP/LLM descontrolado). |
-| `models/event_bus.py` | `EventType` ganhou `REFLECTION_COMPLETED`, `EXECUTION_FAILED`, `MEMORY_SAVED` (corrigido `AttributeError` em `ReflexionEngine.reflect`). |
+| `evolution/evo_agent.py` | Imports `FailureAnalyzer`, `SelfCritique`, `LearningLoop` (and `ReflexionEngine` on demand). Exposes `self_critique`, `reflexion_fix`, `analyze_failure`, `learning_iterate`. `reflexion_fix` triggered in `critical` path of `_analysis_and_action`. |
+| `agents/agent_base.py` | `_EVO_REGISTRY` (1 EvoAgent per `agent_name`) + `get_evo_agent()`. 4 delegates `evo_self_critique / evo_reflexion_fix / evo_analyze_failure / evo_learning_iterate`. Non-blocking auto-hook in `_call_llm`: post-response self-critique + failure analysis on exception. |
+| `evolution/epigenetic.py` | Flags: `evo_self_critique=True` (cheap), `evo_reflexion_enabled=False`, `evo_learning_enabled=False` (prevent uncontrolled ATP/LLM consumption). |
+| `models/event_bus.py` | `EventType` gained `REFLECTION_COMPLETED`, `EXECUTION_FAILED`, `MEMORY_SAVED` (fixed `AttributeError` in `ReflexionEngine.reflect`). |
 
-**Custo metabólico (ATP):** auto-crítica e análise de falha são heurísticas puras — rodam em todo `_call_llm` sem consumir LLM. ReflexionEngine e LearningLoop ficam `False` por padrão, ativáveis por flag epigenética conforme pressão seletiva.
+**Metabolic cost (ATP):** self-critique and failure analysis are pure heuristics — run on every `_call_llm` without consuming LLM. ReflexionEngine and LearningLoop remain `False` by default, activatable by epigenetic flag according to selective pressure.
 
-#### P0.1 — Reúso de Event Loop na Reflexão
+#### P0.1 — Event Loop Reuse in Reflection
 
-**Problema original:** `_evo_model_fn()` em `agent_base.py` criava um NOVO event loop (`asyncio.new_event_loop()`) a cada chamada de reflexão do `EvoAgent`, gerando overhead desnecessário e impossibilitando monitoramento do loop principal.
+**Original problem:** `_evo_model_fn()` in `agent_base.py` created a NEW event loop (`asyncio.new_event_loop()`) on every reflection call from `EvoAgent`, generating unnecessary overhead and making monitoring of the main loop impossible.
 
-**Correção:** Substituído por `asyncio.run()`, que gerencia o ciclo de vida do loop corretamente e é a forma canônica de rodar corotinas em contexto síncrono.
+**Fix:** Replaced with `asyncio.run()`, which manages the loop lifecycle correctly and is the canonical way to run coroutines in synchronous context.
 
 ```python
 def _evo_model_fn(self, prompt: str) -> str:
     try:
         return asyncio.run(self._call_llm(prompt=prompt, task_type="reflection"))
     except Exception as e:
-        logger.debug("[%s] evo_model_fn falhou: %s", self.agent_name.upper(), e)
+        logger.debug("[%s] evo_model_fn failed: %s", self.agent_name.upper(), e)
         return ""
 ```
 
-#### P0.2 — Pesos Epigenéticos por Agente (IVM)
+#### P0.2 — Epigenetic Weights per Agent (IVM)
 
-**Problema original:** `IVMAxiom._ajustar_pesos_epigeneticos()` modificava atributos **globais** (`self._peso_produtividade`, `self._peso_eficiencia`, `self._peso_cooperacao`). Um agente com alta latência movia o peso E→P para **todos os outros**, distorcendo o ranking global.
+**Original problem:** `IVMAxiom._ajustar_pesos_epigeneticos()` modified **global** attributes (`self._peso_produtividade`, `self._peso_eficiencia`, `self._peso_cooperacao`). An agent with high latency moved the E→P weight for **all others**, distorting the global ranking.
 
-**Correção:** Pesos migrados para `IVMMetrics` (dataclass por agente):
+**Fix:** Weights migrated to `IVMMetrics` (dataclass per agent):
 
-| Atributo | Antes (global) | Depois (por agente) |
+| Attribute | Before (global) | After (per agent) |
 |----------|---------------|---------------------|
-| Peso P | `IVMAxiom._peso_produtividade` | `IVMMetrics.productivity_weight` |
-| Peso E | `IVMAxiom._peso_eficiencia` | `IVMMetrics.energy_weight` |
-| Peso C | `IVMAxiom._peso_cooperacao` | `IVMMetrics.cooperation_weight` |
+| Weight P | `IVMAxiom._peso_produtividade` | `IVMMetrics.productivity_weight` |
+| Weight E | `IVMAxiom._peso_eficiencia` | `IVMMetrics.energy_weight` |
+| Weight C | `IVMAxiom._peso_cooperacao` | `IVMMetrics.cooperation_weight` |
 
-`_ajustar_pesos_epigeneticos()` agora modifica `metricas.productivity_weight` etc. A `atualizar_metricas()` do IVMMetrics usa:
+`_ajustar_pesos_epigeneticos()` now modifies `metricas.productivity_weight` etc. The `atualizar_metricas()` of IVMMetrics uses:
 
 ```python
 ivm = (metricas.productivity_score * metricas.productivity_weight +
@@ -747,7 +753,7 @@ vaccine_ledger.aplicar_vacina(agent)   ← pré-carrega _failure_patterns da PR�
 
 ---
 
-## 8. Leis Universais Aplicadas
+## 9. Universal Laws Applied
 
 Bloco de trabalho identificado no documento original como "Fase 9", mapeando as Leis de Holliwell a componentes concretos:
 
@@ -779,7 +785,7 @@ Integrações: `FusionEngine → FusionNode → Topology → Obsidian`.
 
 ---
 
-## 9. Módulo Obsidian — Subconsciente
+## 10. Obsidian Module — Subconscious
 
 Modelo de mente em três níveis usando Markdown real com YAML frontmatter, tags e links bidirecionais `[[...]]` — 100% legível e editável por humanos.
 
@@ -870,22 +876,22 @@ REMSleepEngine.iniciar_fase_rem()
 LearningSystem / IAGlobalAgentWrapper → sussurrar_intuicao(tags) → prompt enriquecido
 ```
 
-### Integração com evolução
+### Integration with evolution
 
-- **IVM**: `obsidian_notes_escritas` é métrica de Cooperação (peso 0.2) — agentes que documentam no Obsidian têm maior fitness.
-- **Linhagem**: `exportar_nota_agente()` cria `03_Long_Term/agentes/{id}.md` com `strategy`, `fitness`, `parent_link`.
-- **OmniMind**: `EvoAgent` consulta o singleton `omni_mind` para orientação existencial.
+- **IVM**: `obsidian_notes_escritas` is a Cooperation metric (weight 0.2) — agents that document in Obsidian have higher fitness.
+- **Lineage**: `exportar_nota_agente()` creates `03_Long_Term/agentes/{id}.md` with `strategy`, `fitness`, `parent_link`.
+- **OmniMind**: `EvoAgent` queries the singleton `omni_mind` for existential guidance.
 
-### Estado do vault (conforme documento original)
+### Vault state (according to original document)
 
-| Diretório | Status | Conteúdo |
+| Directory | Status | Content |
 |---|---|---|
-| `01_Instincts/` | Vazio | API pronta via `escrever_instinto()` |
-| `02_Short_Term/` | Vazio | 9 erros consolidados e podados |
-| `03_Long_Term/` | 9 notas | Erros consolidados pelo `REMSleepEngine` (fallback mock) |
-| `04_Synapses/` | 1 mapa | `Mapa_Mental_Subconsciente.md`, índice de 9 notas e 2 tags ativas |
+| `01_Instincts/` | Empty | API ready via `escrever_instinto()` |
+| `02_Short_Term/` | Empty | 9 errors consolidated and pruned |
+| `03_Long_Term/` | 9 notes | Errors consolidated by `REMSleepEngine` (fallback mock) |
+| `04_Synapses/` | 1 map | `Mapa_Mental_Subconsciente.md`, index of 9 notes and 2 active tags |
 
-**Gargalo pendente:** a síntese usou fallback mock (`_mock_sintese`). Para consolidar com insights reais:
+**Pending bottleneck:** synthesis used mock fallback (`_mock_sintese`). To consolidate with real insights:
 
 ```python
 from iaglobal.obsidian.consolidation import REMSleepEngine
@@ -894,11 +900,11 @@ REMSleepEngine(ai_client=meu_client_llm).iniciar_fase_rem()
 
 ---
 
-## 10. Comunicação Assíncrona
+## 11. Asynchronous Communication
 
-O sistema de comunicação do iaglobal é modelado como **sinalização celular** — uma arquitetura em 4 camadas que vai da autorização externa até a entrega final no inbox de cada agente.
+The iaglobal communication system is modeled as **cellular signaling** — a 4-layer architecture that goes from external authorization to final delivery in each agent's inbox.
 
-### 10.1 Camadas de Comunicação
+### 10.1 Communication Layers
 
 ```
 Simbiote / Nó Remoto
@@ -962,7 +968,7 @@ Camada de isolamento lógico entre subsistemas (organelas). Uma falha em uma org
 - `Membrane` — `register_handler(organelle, handler)`, `send(message)`.
 - **Regra de segurança:** organelas não-CORE não podem **escrever** em organelas CORE (apenas `query`/`read`). Toda mensagem externa passa por validação de `MembraneKey`.
 
-### 10.5 `MembraneKey` — Autenticação de Simbiotes Externos
+### 10.5 `MembraneKey` — External Symbiont Authentication
 
 **Arquivo:** `iaglobal/graphs/communication/membrane_key.py`
 
@@ -1029,20 +1035,20 @@ Arquivos: `iaglobal/graphs/communication/acetylcholine_bus.py`, `iaglobal/commun
 └───────────────────────────────────────────────────────┘
 ```
 
-### 10.8 Integração com Segurança
+### 10.8 Integration with Security
 
 - `SandboxExecutor` (`iaglobal/security/sandbox_executor.py`) — execução de código em subprocesso com AST Gateway + SandboxRules + GlutathioneGuardrails + isolamento de rede.
 - `NetworkGuard` (`iaglobal/security/network_guard.py`) — monkey-patch de `socket` para bloquear rede não-autorizada. Qualquer tentativa dispara MHC Detector.
 - `resource_limits.py` — `setrlimit` com limites duros: 256MB RAM, 10s CPU, 1MB arquivo, 20 processos filho.
 - `controlled_subprocess.py` — executor whitelist-based (pip, python, git em /tmp). Sem `shell=True`.
 
-### 10.9 Diferenciação e Escalonamento
+### 10.9 Differentiation and Scaling
 
 - `MetaAgentDesigner.design_team()` — detecta keywords e ativa especialistas conforme demanda.
 - `specialization_instructions` — injeta contexto de especialização no nó.
 - `CpuAffinityManager` — mapeia nós em núcleos para balanceamento em hardware limitado.
 
-### 10.10 Epigenética Operacional (`epigenetic.py`)
+### 10.10 Operational Epigenetics (`epigenetic.py`)
 
 | Flag | Valor padrão | Propósito |
 |---|---|---|
@@ -1055,7 +1061,7 @@ Configurações que sobrevivem a restarts: `bandit_epsilon`, `sam_budget_multipl
 
 ---
 
-## 10.11 Projeto Synapse — Sistema Nervoso Reativo
+## 10.11 Project Synapse — Reactive Nervous System
 
 > **Objetivo**: Transformar comunicação de "passiva" (pipeline sequencial) para "ativa" (dispatch-based), permitindo que agentes processem tarefas automaticamente conforme mensagens chegam em suas mailboxes.
 
@@ -1112,7 +1118,7 @@ class MailboxManager:
 | **Obediência** | `set_executor()` verifica `compliance_approved` antes de bindar |
 | **Cooperação** | Agente finalizado posta resultado na `outbox` do sucessor automaticamente |
 
-### Fluxo de Execução (Exemplo: React Component)
+### Execution Flow (Exemplo: React Component)
 
 ```
 1. Orchestrator.dispatch_to_agent("PlannerAgent", {"task": "crie UserCard.jsx"})
@@ -1123,7 +1129,7 @@ class MailboxManager:
 6. CriticAgent recebe → compliance check → approval/rejection
 ```
 
-### Métricas: Pipeline vs Synapse
+### Metrics: Pipeline vs Synapse
 
 | Indicador | Pipeline (antes) | Synapse (agora) |
 |-----------|------------------|-----------------|
@@ -1133,7 +1139,7 @@ class MailboxManager:
 | Escalabilidade | vertical (mais CPU) | horizontal (mais mailboxes) |
 | Resiliência | falha em cascata | isolamento (mailbox por agente) |
 
-### Integração no Orchestrator
+### Integration in Orchestrator
 
 ```python
 # No initialize() do Orchestrator:
@@ -1170,7 +1176,7 @@ await manager.heartbeat()
 
 ---
 
-## 10.12 Privilégio de Processamento Dinâmico — CPU Boost para Batches Críticos
+## 10.12 Dynamic Processing Privilege — CPU Boost for Critical Batches
 
 **Problema metabólico:** Em hardware limitado (4 núcleos, 0 GPU), 30+ agentes competindo por CPU simultaneamente causam *thrashing* de contexto — o sistema gasta mais ciclos trocando entre agentes do que executando trabalho útil. O `orchestrator_pump` sofre com IVM baixo (~0.49) devido à contenção de I/O.
 
@@ -1203,7 +1209,7 @@ class CpuAffinityManager:
         """Cleanup: restaura homeostase após batch crítico."""
 ```
 
-### Integração com CriticBatchQueue
+### Integration with CriticBatchQueue
 
 ```python
 # iaglobal/core/critic_batch_queue.py
@@ -1226,7 +1232,7 @@ async def evaluate_with_context(self, memory, task, coder_output, bandit):
         await cpu_affinity.reset_budgets()
 ```
 
-### Fluxo Metabólico
+### Metabolic Flow
 
 ```
 BATCH CRÍTICO (CriticBatchQueue)
@@ -1242,7 +1248,7 @@ EXECUTA AVALIAÇÃO COM VALIDAÇÃO CRUZADA
 [CPU] 📉 Homeostase restaurada: todos os agentes em 25% CPU
 ```
 
-### Benefícios Mensuráveis
+### Measurable Benefits
 
 | Métrica | Antes | Depois (esperado) |
 |---------|-------|-------------------|
@@ -1272,7 +1278,7 @@ EXECUTA AVALIAÇÃO COM VALIDAÇÃO CRUZADA
 - `test_boost_apenas_em_agentes_registrados` ✅
 - `test_boost_preserva_agents_nao_envolvidos` ✅
 
-### Correções Metabólicas Aplicadas (Fase E, P1.1–P1.2)
+### Applied Metabolic Corrections (Fase E, P1.1–P1.2)
 
 O `CpuAffinityManager` recebeu duas correções estruturais pós-integração EvoAgent:
 
@@ -1304,7 +1310,7 @@ async def _persist_fitness(self, agent_id: str, score: float) -> None:
         self._fitness_buffer[agent_id] = score
 ```
 
-### Próximas Expansões
+### Next Expansions
 
 1. **Estender para outros batches**:
    - `tester` + `debug_unificado` (correção de testes)
@@ -1320,7 +1326,7 @@ async def _persist_fitness(self, agent_id: str, score: float) -> None:
 
 ---
 
-## 11. Validação sob Carga
+## 12. Validation Under Load
 
 Bloco identificado no original como "Fase 12" — testes de produção sob estresse:
 
@@ -1336,7 +1342,7 @@ Esses **99 testes de carga** somados aos 724 anteriores e a mais **9 testes** de
 
 ---
 
-## 12. Débito Técnico e Inconsistências Detectadas
+## 13. Technical Debt and Detected Inconsistencies
 
 Itens sinalizados explicitamente no documento original (mantidos como lista acionável, não diluídos em prosa):
 
@@ -1353,9 +1359,9 @@ Itens sinalizados explicitamente no documento original (mantidos como lista acio
 
 ---
 
-## 13. Vetor Evolutivo
+## 14. Evolutionary Vector
 
-### 13.1 (integração evolutiva)
+### 13.1 (evolutionary integration)
 
 - **[DONE] Integração EvoAgent ↔ AgentBase (Reflexão de 4 Módulos)** — §7.1.
   Todo agente que herda de `AgentBase` consome `SelfCritique`, `ReflexionEngine`,
@@ -1371,7 +1377,7 @@ Itens sinalizados explicitamente no documento original (mantidos como lista acio
    registry por linhagem + auto-hooks em `_call_llm` + VaccineLedger + ImmuneMemoryExchange).
    19 testes em 7 classes. Também serviu para detectar o bug do §12 item 10.
 
-### 13.2 Fase E — Correções Metabólicas (P0–P2)
+### 13.2 Phase E — Metabolic Corrections (P0–P2)
 
 Correções estruturais aplicadas após diagnóstico sistêmico de 8 patologias em `cpu_affinity.py`,
 `chappie/` e `agent_base.py`. 7 itens corrigidos, 0 regressão:
@@ -1386,7 +1392,7 @@ Correções estruturais aplicadas após diagnóstico sistêmico de 8 patologias 
 | P2.1 | `custo_creditos=1.0` fixo | `_estimar_custo_creditos()` por prefixo de provider | 235 ✅ |
 | P2.2 | Thresholds IVMCompliance (0.85/0.60) divergiam do IVMAxiom (0.9/0.3) | Sincronizados para 0.9/0.3 | 235 ✅ |
 
-### 13.3 Fases A–D — Correções Pós-Integração
+### 13.3 Phases A–D — Post-Integration Corrections
 
 Bloco de correções identificado após execução de análise técnica do ecossistema:
 
@@ -1397,7 +1403,7 @@ Bloco de correções identificado após execução de análise técnica do ecoss
 | **C** | Elevação de modelo no `skill_model_router` | `REASONING_KEYWORDS` + IVM threshold 0.5; tarefas de análise baixo IVM sobem para nuvem; teste `test_model_router.py` (10 casos) | ✅ |
 | **D** | Limpeza de ruído | `_schedule_close` em `async_http.py` sem warning de connector; `unittest`/`pytest` no sandbox `allowed_modules` | ✅ |
 
-### 13.4 Próximas mutações do Vetor Evolutivo:
+### 13.4 Next mutations of the Evolutionary Vector:
 
 - **Genetic Algorithm** para tuning automático de pesos do IVM.
 - **[DONE] Expansão do MCP Protocol** — tools externas via Model Context Protocol (ver §15).
@@ -1412,7 +1418,7 @@ Bloco de correções identificado após execução de análise técnica do ecoss
 
 ---
 
-## 14. SearchMiddleware — Acesso Inteligente a Contexto com RAG Duplo (Web + Local)
+## 15. SearchMiddleware — Intelligent Context Access with Dual RAG (Web + Local)
 
 A partir da otimização para `qwen2.5:0.5b` como modelo padrão local, o iaglobal adotou uma arquitetura de **acesso unificado via BanditPolicy** com **Membrana Seletiva** em dois gates. Todo agente passa por `bandit.generate()`, que aplica:
 
@@ -1420,7 +1426,7 @@ A partir da otimização para `qwen2.5:0.5b` como modelo padrão local, o iaglob
 2. **GATE 1 (Bandit)**: `_membrane_filter_candidates()` — sempre ativo (default `enforce`). Não-críticos só enxergam Ollama local. Críticos têm acesso a cloud.
 3. **GATE 2 (Provider Router)**: `_force_local_model()` — defense-in-depth. Redireciona para Ollama se o nó não for autorizado.
 
-### Diagrama de Fluxo **🏆 RAG Autônomo Completo**
+### Flow Diagram **🏆 Complete Autonomous RAG**
 
 Consolidado em 6 fases de maturidade no sistema iaglobal:
 
@@ -1502,7 +1508,7 @@ Consolidado em 6 fases de maturidade no sistema iaglobal:
 └────────────────────────────────────────────────────────────┘
 ```
 
-### Notas sobre o Diagrama de Fluxo Metabólico da RAG Autônoma:
+### Notes on the Metabolic Flow Diagram of Autonomous RAG:
 
 * **Fluxo de Dados:** O sistema segue um encadeamento linear onde cada fase atua como um filtro ou enriquecedor, culminando no armazenamento de longo prazo pelas pastas (obsidian + memory) e pela eficiencia de (sqlite3 serializado com cbor2).
 
@@ -1527,7 +1533,7 @@ O **Ciclo de Auto-Evolução iaglobal** é o que diferencia iaglobal de um RAG c
 
 Ao analisar o código e o fluxo de iaglobal, fica claro como o `BanditPolicy` e o `CreditAssignmentEngine` fecham esse ciclo de forma técnica:
 
-### A Mecânica da Evolução no Sistema iaglobal
+### The Mechanics of Evolution no Sistema iaglobal
 
 1. **O "Aprendizado" (`CreditAssignmentEngine`):**
 * Quando o sistema executa uma busca, o `CreditAssignmentEngine` registra o resultado (sucesso/falha/latência).
@@ -1541,7 +1547,7 @@ Ao analisar o código e o fluxo de iaglobal, fica claro como o `BanditPolicy` e 
 * Ao ajustar a confiança após o `FeedbackLoop`, você está permitindo que o sistema identifique quando ele "não sabe o que não sabe".
 * Isso força o sistema a ser mais agressivo na busca quando a confiança é baixa e mais econômico quando ela é alta, otimizando o gasto de ATP.
 
-### O Diagrama do **"Cérebro" do Sistema iaglobal**:
+### The Diagram of **"Brain" of the iaglobal System**:
 
 Para entender como essas peças se conectam durante o **Ciclo de Auto-Evolução**, há um fluxo recorrente que evidencia a natureza recursiva e o aprendizado constante do sistema iaglobal:
 
@@ -1582,13 +1588,13 @@ Para entender como essas peças se conectam durante o **Ciclo de Auto-Evolução
 
 ```
 
-### Por que este ciclo é evolutivo?
+### Why is this cycle evolutionary?
 
 1. **Atribuição de Crédito:** O `CreditAssignmentEngine` analisa o resultado do ciclo anterior e atribui crédito aos modelos/estratégias que performaram melhor.
 2. **Aprendizado Adaptativo:** O `BanditPolicy` usa esse crédito para atualizar seus "pesos" (`_sync_weights_from_credit`), garantindo que o sistema "esqueça" caminhos ineficientes e priorize caminhos de alta performance metabólica.
 3. **Memória de Longo Prazo:** O feedback não é apenas descartado; ele é persistido, permitindo que a "inteligência" do sistema se acumule, tornando as buscas futuras cada vez mais precisas e econômicas.
 
-### O que isso significa na prática?
+### What does this mean in practice?
 
 iaglobal construiu um **agente que refina sua própria estratégia de exploração**.
 
@@ -1599,7 +1605,7 @@ Se o sistema perceber, por exemplo, que para tarefas de "análise de código" o 
 
 O sistema aprende com cada busca e otimiza decisões futuras.
 
-### Agente Crítico — Escalonamento Local → Cloud
+### Critic Agent — Local → Cloud Escalation
 
 O critic é o **único nó autorizado** a acessar modelos cloud. O fluxo prioriza eficiência energética (ATP):
 
@@ -1658,7 +1664,7 @@ Para máxima eficiência com `qwen2.5:0.5b` (modelo de 500M parâmetros), o prom
 - Nenhum bloco excede 300 caracteres individualmente (web snippet) ou 600 (instrução)
 - Formato sem markdown, sem explicações, sem exemplos — apenas o necessário para o modelo responder
 
-### 14.3 Parâmetros Otimizados do Ollama
+### 14.3 Optimized Ollama Parameters
 
 Os parâmetros foram ajustados experimentalmente para `qwen2.5:0.5b` nos três endpoints da API (`generate`, `chat`, `embeddings`):
 
@@ -1681,7 +1687,7 @@ Os parâmetros foram ajustados experimentalmente para `qwen2.5:0.5b` nos três e
 | Dependência de API keys para todos os agentes | Apenas o crítico precisa de API keys |
 | Contexto cru enviado ao LLM | Contexto enriquecido via web + RAG local |
 
-### 14.5 Métricas de Performance
+### 14.5 Performance Metrics
 
 | Métrica | Antes | Depois |
 |---------|-------|--------|
@@ -1692,7 +1698,7 @@ Os parâmetros foram ajustados experimentalmente para `qwen2.5:0.5b` nos três e
 
 ---
 
-## 15. SERVIDORES e MCP Protocol Expansion
+## 16. SERVERS and MCP Protocol Expansion
 
 🧬 **DIAGNÓSTICO GENÔMICO - MAPEAMENTO DE SERVIDORES**
 
@@ -1790,7 +1796,7 @@ Servidor FastMCP com 8 tools expostas:
 
 `ToolCallerAgent` — seleciona a tool MCP adequada baseado no plano do orchestrator. Mapa de dispatch direto para tools internas (`web_search`, `read_file`, `execute_code`, etc.) e resolução via `MCPDiscovery` + `MCPClient` para tools externas. Cada chamada retorna `execution_metrics` com `success`, `latency`, `tool_name`, `result_summary` para o `JointOptimizationLoop` do BanditPolicy.
 
-### 15.5 Segurança MCP
+### 15.5 MCP Security
 
 - **`MCPSandbox`** (`iaglobal/security/mcp_sandbox.py`) — whitelist de 8 tools permitidas, rate limits por tool (ex: `web_search` 10 chamadas/min, `execute_code` 5 chamadas/min), audit trail em `iaglobal/memory/data/json/audit.json` (máx 1000 entradas).
 - **`GlutathioneGuardrails.check_mcp_rate_limit()`** — verificação de rate limit integrada ao sistema SAMe, reutilizando o sistema imunológico existente.
@@ -1803,11 +1809,11 @@ Servidor FastMCP com 8 tools expostas:
 
 ---
 
-## 16. Colony Intelligence Communication
+## 17. Colony Intelligence Communication
 
 > **Objetivo:** Múltiplos organismos iaglobal colaborando como colônia — divisão de tarefas, comunicação entre organismos, seleção de fitness coletivo.
 
-### 16.1 Arquitetura da Colônia
+### 16.1 Colony Architecture
 
 ```
 ┌──────────────────────────────────────────────────────────┐
@@ -1868,7 +1874,7 @@ Worker com filtro de skills: `can_handle(task_type)` verifica se o worker tem a 
 | `feed_evolution(task_id, result)` | Registra aprendizado no `MetaEvolver` para evolução contínua |
 | `feed_obsidian(organism_id, result)` | Escreve nota markdown estruturada em `obsidian/03_Long_Term/` |
 
-### 16.6 Seleção de Fitness — ColonyFitness
+### 16.6 Fitness Selection — ColonyFitness
 
 **Arquivo:** `iaglobal/communication/fitness.py`
 
@@ -1906,7 +1912,7 @@ Cada organismo da colônia mantém métricas independentes:
 
 ---
 
-## 17. Genetic Algorithm Tuning — Otimização Evolutiva de Pesos IVM
+## 18. Genetic Algorithm Tuning — Evolutionary Optimization of IVM Weights
 
 > **Objetivo:** Automatizar o ajuste dos pesos do Índice de Viabilidade Metabólica (IVM) via Algoritmo Genético, eliminando a necessidade de calibração manual e permitindo adaptação contínua às pressões do ambiente.
 
@@ -1947,7 +1953,7 @@ GARunner.step()
 └────────────────────────────────────────────────────┘
 ```
 
-### 17.2 Ciclo Metabólico
+### 17.2 Metabolic Cycle
 
 **Frequência:** A cada 10 execuções de pipeline (`GENERATION_INTERVAL=10`), o `GARunner.task_hook()` dispara 1 geração do GA.
 
@@ -1963,7 +1969,7 @@ _counter % 10 == 0?
     └── NÃO → apenas incrementa _counter
 ```
 
-### 17.3 Função de Fitness
+### 17.3 Fitness Function
 
 ```
 fitness = (P × 0.5) + (E × 0.3) + (C × 0.2)
@@ -2029,7 +2035,7 @@ Sem este estágio, o sistema é estéril: cada execução é um organismo novo s
 
 A população tem 50 indivíduos, elite de 2, crossover BLX-α (α=0.5), mutação gaussiana (σ=0.05, 20%).
 
-### 17.5 Integração com Memória Biológica
+### 17.5 Integration with Biological Memory
 
 Cada geração persiste o melhor genoma nos **6 sistemas de memória** do iaglobal:
 
@@ -2043,7 +2049,7 @@ Cada geração persiste o melhor genoma nos **6 sistemas de memória** do iaglob
 | **EpigeneticRegistry** | Marca de sucesso (`record_success`) | Toda geração |
 | **Vacinas** | `05_Vaccines/linhagem_{gen}.md` | Queda de fitness > 15% |
 
-### 17.6 Arquivos de Persistência
+### 17.6 Persistence Files
 
 | Arquivo | Conteúdo |
 |---------|----------|
@@ -2068,7 +2074,7 @@ Cada geração persiste o melhor genoma nos **6 sistemas de memória** do iaglob
 | `tests/test_ga_tuning.py` | 40 | Population, Individual, Selector, GARunner, memória biológica |
 | `tests/test_integration_pipeline_genetic_algorithm_tuning.py` | 26 | Pipeline completo, persistência, epigenética |
 
-### 17.9 Vetor Evolutivo (Próximas Mutações)
+### 17.9 Evolutionary Vector (Next Mutations)
 
 - **Crossover adaptativo**: α da BLX-α ajustado dinamicamente com base na diversidade da população
 - **Migração entre geracoes**: troca de indivíduos entre populações paralelas (modelo de ilhas)
@@ -2078,9 +2084,9 @@ Cada geração persiste o melhor genoma nos **6 sistemas de memória** do iaglob
 
 ---
 
-## 18. Engenharia de Prompt Local — Self-Correction, Few-Shot e Chain of Thought
+## 19. Local Prompt Engineering — Self-Correction, Few-Shot and Chain of Thought
 
-### 18.1 DependencyEnforcer — Proibição de Bibliotecas Não-Instaladas
+### 18.1 DependencyEnforcer — Prohibition of Non-Installed Libraries
 
 **Arquivo:** `iaglobal/core/dependency_enforcer.py`
 
@@ -2095,7 +2101,7 @@ Mecanismo que impede a invenção de bibliotecas inexistentes pelo LLM. Opera em
 - `TesterAgent.gerar_testes()` — após auto-correção
 - `PromptImprover` — no PEC_SYSTEM_PROMPT item 9
 
-### 18.2 FewShotProvider — Exemplos Reais com Ranking Semântico
+### 18.2 FewShotProvider — Real Examples with Semantic Ranking
 
 **Arquivo:** `iaglobal/core/few_shot_provider.py`
 
@@ -2118,7 +2124,7 @@ Fornece exemplos reais de execuções anteriores para guiar o LLM.
 
 **Custo:** Primeira chamada ~15s (embedding model load + 79 embeddings); subsequentes ~740ms.
 
-### 18.3 Chain of Thought — Desagregação em 4 Etapas
+### 18.3 Chain of Thought — Breakdown into 4 Steps
 
 **Constante:** `INSTRUCAO_COT` em `agent_base.py:19-25`
 
@@ -2141,7 +2147,7 @@ Injetado como item 10 no `PEC_SYSTEM_PROMPT`.
 | `DebuggerAgent` | `build_fix_prompt()` — instrução "Siga as 4 etapas" antes do código |
 | `PromptImprover` | Seção `[CHAIN OF THOUGHT — ...]` antes de instruções PSC/EETL |
 
-### 18.4 Perfil de Integração por Agente
+### 18.4 Integration Profile per Agent
 
 | Agente | DependencyEnforcer | FewShotProvider | Chain of Thought |
 |--------|-------------------|-----------------|------------------|
@@ -2157,7 +2163,7 @@ Injetado como item 10 no `PEC_SYSTEM_PROMPT`.
 773 passed, 2 skipped — zero regressão após inserção das camadas de entropia + prompt engineering.
 ```
 
-### 18.6 EntropySentinel — Lei da Ordem com Ação Observável
+### 18.6 EntropySentinel — Law of Order with Observable Action
 
 **Arquivo:** `iaglobal/immunity/entropy_sentinel.py`
 
@@ -2209,7 +2215,7 @@ no_apoptosis_kill (nó consumidor) → avalia e executa apoptose
 
 **Integração:** `no_immune_check.py` chama `intercept_execution()` e retorna `entropy_report` enriquecido com `action_taken`.
 
-### 18.6.1 Exposição no Health Gateway (`/health`)
+### 18.6.1 Exposure in Health Gateway (`/health`)
 
 O endpoint `GET /health` do ASGI Gateway (porta 8000) agora inclui o estado imunológico consolidado:
 
@@ -2257,7 +2263,7 @@ O endpoint `GET /health` do ASGI Gateway (porta 8000) agora inclui o estado imun
 - MCP tool `get_status` — pode enriquecer com `immune_state`
 - Prometheus metrics — pode exportar gauges `iaglobal_immune_*`
 
-### 18.6.2 Nó de Apoptose (`no_apoptosis_kill.py`)
+### 18.6.2 Apoptosis Node (`no_apoptosis_kill.py`)
 
 **Arquivo:** `iaglobal/graphs/nodes/no_apoptosis_kill.py`
 
@@ -2359,7 +2365,7 @@ _get_or_compute_embedding(query)
 
 **Testes:** `tests/test_fewshot_embedding_cache.py` (7 testes)
 
-### 18.6.4 Ciclo DLQ → FewShotProvider (Memória Imunológica Adaptativa)
+### 18.6.4 DLQ Cycle → FewShotProvider (Adaptive Immunological Memory)
 
 **Arquivos:** `iaglobal/core/few_shot_provider.py`, `iaglobal/obsidian/consolidation.py`
 
@@ -2609,7 +2615,7 @@ async def iniciar_fase_rem(self) -> Dict[str, Any]:
 - **Threshold adaptativo**: `DLQ_THRESHOLD` dinâmico baseado em volume total de arquivos (lei de potência)
 - **EpigeneticRegistry integration**: padrões consolidados registrados para introspecção do Critic/Reflexion
 
-### 18.7 Próximas Mutações
+### 18.7 Next Mutations
 
 - ~~**Embedding preload**~~ ✅ **IMPLEMENTADO**: `FewShotProvider` agora tem:
   - Cache LRU em memória (100 embeddings)
@@ -2784,9 +2790,9 @@ Está no requirements.txt?
 
 ---
 
-## 📋 ROADMAP_2.md — Histórico de Evolução
+## 📋 ROADMAP_2.md — Evolution History
 
-### Integração #1: DLQ Scan no REMSleep (✅ COMPLETA)
+### Integration #1: DLQ Scan in REMSleep (✅ COMPLETA)
 
 **Status:** 7/7 fases completas, 807 testes passando
 
@@ -2796,7 +2802,7 @@ Está no requirements.txt?
 - Integração no `iniciar_fase_rem()` — chama DLQ scan **antes** da consolidação
 - 6 testes em `test_remsleep_dlq_scan.py`
 
-### Integração #2: Mutação 1C (Expiry + Monitoramento) (✅ COMPLETA)
+### Integration #2: Mutation 1C (Expiry + Monitoramento) (✅ COMPLETA)
 
 **Status:** 6/6 fases completas, 812 testes passando
 
