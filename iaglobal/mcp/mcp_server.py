@@ -141,7 +141,7 @@ else:
     mcp = MCPPlaceholder()
 
 
-async def run_server(host: str = "0.0.0.0", port: int = 8100):
+async def run_server(host: str = "127.0.0.1", port: int = 8100):
     """Inicia o servidor MCP via SSE ou stdio."""
     if FastMCP is None:
         logger.error("FastMCP não instalado. Não é possível iniciar o servidor.")

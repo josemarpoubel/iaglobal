@@ -514,6 +514,7 @@ class DatabaseManager:
                 conditions.append("step = ?")
                 params.append(step)
             where_clause = "WHERE " + " AND ".join(conditions) if conditions else ""
+            # Safe: where_clause é construído apenas com condições fixas, valores usam parameter binding
             cursor = conn.execute(f"SELECT COUNT(*) FROM decision_events {where_clause}", params)
             row = cursor.fetchone()
             return row[0] if row else 0

@@ -779,7 +779,7 @@ async def _setup_bus_integration():
 # SERVER LIFECYCLE
 # ==============================================================================
 
-async def run_server(host: str = "0.0.0.0", port: int = 8100, sse: bool = True):
+async def run_server(host: str = "127.0.0.1", port: int = 8100, sse: bool = True):
     """Inicia servidor MCP via SSE ou stdio."""
     if FastMCP is None:
         logger.error("FastMCP não instalado. Execute: pip install mcp")
@@ -827,7 +827,7 @@ if __name__ == "__main__":
     import os
 
     parser = argparse.ArgumentParser(description="MCP Server Unificado iaglobal")
-    parser.add_argument("--host", default="0.0.0.0", help="Host do servidor")
+    parser.add_argument("--host", default="127.0.0.1", help="Host do servidor (padrão: 127.0.0.1)")
     parser.add_argument("--port", type=int, default=8100, help="Porta do servidor")
     parser.add_argument("--http-port", type=int, default=8101, help="Porta HTTP gateway")
     parser.add_argument("--mode", choices=["sse", "stdio", "http", "both"], default="both")

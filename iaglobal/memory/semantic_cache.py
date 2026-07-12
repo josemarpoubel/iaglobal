@@ -302,6 +302,7 @@ class SemanticCache:
             if archived_ids:
                 conn = sqlite3.connect(self.db_path)
                 try:
+                    # Safe: archived_ids vem do resultado interno do pruner, não de entrada externa
                     placeholders = ",".join("?" for _ in archived_ids)
                     conn.execute(f"DELETE FROM semantic_cache WHERE id IN ({placeholders})", archived_ids)
                     conn.commit()

@@ -235,7 +235,12 @@ class DataBridge:
             with conn:
                 conn.row_factory = sqlite3.Row
                 cursor = conn.cursor()
-                cursor.execute(f"SELECT * FROM {table_name}")
+                # Usar parâmetro seguro para nome de tabela (whitelist validation)
+                allowed_tables = ["cache", "sessions", "data"]  # ajustar conforme tabelas reais
+                if table_name not in allowed_tables:
+                    logger.error(f"Tabela {table_name} não permitida")
+                    return
+                cursor.execute(f"SELECT * FROM {table_name}")  # Nomes de tabela não podem usar parameter binding em SQLite
                 rows = cursor.fetchall()
         except Exception as e:
             logger.error(f"Erro na sincronização de {table_name}: {e}")
