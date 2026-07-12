@@ -416,7 +416,7 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 ##                    🧬 END OF BIOMIMETIC FLOW
 ## ==================================================================
 
-###**Security feature** | LLM Access Architecture in iaglobal:
+### **Security feature** | LLM Access Architecture in iaglobal:
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                   USER / CLI                                │
