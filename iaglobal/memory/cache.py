@@ -69,7 +69,8 @@ def _flush_quarantine_batch(entries: List[Dict[str, Any]]):
     QUARANTINE_DIR.mkdir(parents=True, exist_ok=True)
     for entry in entries:
         ts = entry.get("timestamp", datetime.now(timezone.utc).isoformat())
-        key_hash = hashlib.md5(entry.get("prompt", "").encode()).hexdigest()[:12]
+        # Use SHA-256 instead of MD5 for security (truncate for filename compatibility)
+        key_hash = hashlib.sha256(entry.get("prompt", "").encode()).hexdigest()[:12]
         fname = f"cache_poison_{entry['reason']}_{ts[:10]}_{key_hash}.json"
         fname = fname.replace(" ", "_").replace(":", "-")
         path = QUARANTINE_DIR / fname
@@ -113,8 +114,8 @@ _cache: Dict[str, Dict[str, Any]] = {}
 
 
 def hash_prompt(prompt: str) -> str:
-    """Hash prompt using MD5 for speed in L1 memory."""
-    return hashlib.md5(prompt.encode()).hexdigest()
+    """Hash prompt using SHA-256 for security in L1 memory."""
+    return hashlib.sha256(prompt.encode()).hexdigest()
 
 
 def _is_valid_response(value: str) -> bool:

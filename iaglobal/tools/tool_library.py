@@ -168,7 +168,8 @@ class ToolLibrary:
             return {}
 
     def register_from_code(self, task: str, code: str) -> Optional[str]:
-        name = f"auto_tool_{hashlib.md5(task.encode()).hexdigest()[:8]}"
+        # Use SHA-256 instead of MD5 for security
+        name = f"auto_tool_{hashlib.sha256(task.encode()).hexdigest()[:8]}"
         tags = [w.lower() for w in task.split() if len(w) > 3][:10]
         # Extrair nome real da função via AST
         try:

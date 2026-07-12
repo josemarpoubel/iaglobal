@@ -57,7 +57,8 @@ class WorkDir:
 
 
 def make_workdir(agent_name: str, execution_id: str, task: str = "") -> WorkDir:
-    eid = execution_id or hashlib.md5(task.encode()).hexdigest()[:12]
+    # Use SHA-256 instead of MD5 for security
+    eid = execution_id or hashlib.sha256(task.encode()).hexdigest()[:12]
     return WorkDir(agent_name, eid).ensure()
 
 

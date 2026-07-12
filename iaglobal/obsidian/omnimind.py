@@ -872,7 +872,8 @@ class OmniMind:
         from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
         registry = EpigeneticRegistry()
 
-        task_hash = hashlib.md5(motivo.encode()).hexdigest()[:12]
+        # Use SHA-256 instead of MD5 for security
+        task_hash = hashlib.sha256(motivo.encode()).hexdigest()[:12]
 
         # Registra falha no EpigeneticRegistry (efeito cumulativo)
         import asyncio

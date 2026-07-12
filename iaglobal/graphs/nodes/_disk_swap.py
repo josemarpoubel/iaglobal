@@ -17,7 +17,8 @@ _TTL_SECONDS = 3600  # 1h
 
 def _hash_key(source: str, task: str) -> str:
     raw = f"{source}:{task}".encode()
-    return hashlib.md5(raw).hexdigest()
+    # Use SHA-256 instead of MD5 for security
+    return hashlib.sha256(raw).hexdigest()
 
 
 def save_search(source: str, task: str, result: str) -> Path:

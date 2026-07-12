@@ -244,9 +244,10 @@ class FewShotProvider:
                 reason = data.get("reason", "unknown")
                 if not prompt_snippet:
                     continue
+                # Use SHA-256 instead of MD5 for security
                 key = "dlq:{}:{:x}".format(
                     reason,
-                    int(hashlib.md5(prompt_snippet.encode()).hexdigest()[:12], 16),
+                    int(hashlib.sha256(prompt_snippet.encode()).hexdigest()[:12], 16),
                 )
                 if key in self._example_cache:
                     continue

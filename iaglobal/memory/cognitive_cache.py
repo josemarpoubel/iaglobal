@@ -89,6 +89,7 @@ class CognitiveCache:
         return score
 
     def _make_key(self, node, task: str) -> str:
-        return hashlib.md5(
+        # Use SHA-256 instead of MD5 for security
+        return hashlib.sha256(
             f"{node.name}:{node.strategy}:{task}".encode()
         ).hexdigest()

@@ -204,7 +204,8 @@ FASE 5: SearchMemory — persiste buscas no Obsidian
     @classmethod
     async def _search_cached(cls, query: str) -> str:
         """Busca web + RAG local com cache."""
-        key = hashlib.md5(query.encode()).hexdigest()
+        # Use SHA-256 instead of MD5 for security
+        key = hashlib.sha256(query.encode()).hexdigest()
         now = time.time()
 
         cached = cls._cache.get(key)
@@ -461,7 +462,8 @@ FASE 5: SearchMemory — persiste buscas no Obsidian
         seen = set()
         for result in valid_results:
             for line in result.split("\n"):
-                line_hash = hashlib.md5(line.encode()).hexdigest()
+                # Use SHA-256 instead of MD5 for deduplication
+                line_hash = hashlib.sha256(line.encode()).hexdigest()
                 if line_hash not in seen:
                     seen.add(line_hash)
                     all_lines.append(line)

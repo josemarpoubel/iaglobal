@@ -597,7 +597,8 @@ class FusionEngine:
 
     def process_web_result(self, content: str, url: str, source: str) -> Dict:
         """Processa um resultado web completo: cache + dedup + KG + noise check."""
-        cache_key = hashlib.md5(content.encode()).hexdigest()
+        # Use SHA-256 instead of MD5 for security
+        cache_key = hashlib.sha256(content.encode()).hexdigest()
 
         cached = self.cache.get(cache_key)
         if cached:
