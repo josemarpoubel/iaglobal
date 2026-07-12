@@ -244,7 +244,7 @@ async def start_apoptosis_listener():
             ))
     
     # Subscreve no canal de apoptose
-    bus.subscribe("no_apoptosis_kill", on_apoptosis_event, message_type="apoptosis_candidate")
+    bus.subscribe("apoptosis_candidate", on_apoptosis_event)
     logger.info("[APOPTOSE] Listener iniciado no AcetylcholineBus")
 
 

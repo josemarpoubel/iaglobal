@@ -1,0 +1,736 @@
+2026-07-12 13:35:32,783 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-12 13:36:43,789 [INFO] [iaglobal] --- 🚀 Nova Sessão Iniciada ---
+2026-07-12 13:36:43,843 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-12 13:36:43,886 [INFO] [iaglobal] [GÊNESIS] ✅ Tribunal: Blueprint autêntico
+2026-07-12 13:36:44,003 [INFO] [iaglobal] ✅ Banco de vetores inicializado em: /workspace/iaglobal/memory/data/db/core.db
+2026-07-12 13:36:44,007 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initialized (data_root=/workspace/iaglobal/memory/data)
+2026-07-12 13:36:44,007 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initializing components...
+2026-07-12 13:36:44,007 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Bandit initialized
+2026-07-12 13:36:44,047 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-12 13:36:44,146 [INFO] [iaglobal.core.few_shot_provider] [FEW-SHOT] Cache de embeddings carregado: 4 entries
+2026-07-12 13:36:44,181 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos
+2026-07-12 13:36:44,201 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
+2026-07-12 13:36:44,205 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
+2026-07-12 13:36:44,206 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
+2026-07-12 13:36:44,524 [WARNING] [iaglobal] ⚠️  BanditPolicyEvolutiva não disponível, usando BanditPolicy clássica
+2026-07-12 13:36:46,369 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Pipeline initialized
+2026-07-12 13:36:46,391 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] CPU affinity initialized
+2026-07-12 13:36:46,446 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-12 13:36:46,447 [INFO] [iaglobal] [COMPLIANCE] CoderAgent: approved=True
+2026-07-12 13:36:46,447 [INFO] [iaglobal] [MAILBOX] CoderAgent criado
+2026-07-12 13:36:46,447 [INFO] [iaglobal] [CoderAgent] Executor registrado com compliance=True
+2026-07-12 13:36:46,447 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] CoderAgent bindado ao MailboxManager
+2026-07-12 13:36:46,466 [INFO] [iaglobal] [COMPLIANCE] PlannerAgent: approved=True
+2026-07-12 13:36:46,467 [INFO] [iaglobal] [MAILBOX] PlannerAgent criado
+2026-07-12 13:36:46,467 [INFO] [iaglobal] [PlannerAgent] Executor registrado com compliance=True
+2026-07-12 13:36:46,467 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] PlannerAgent bindado ao MailboxManager
+2026-07-12 13:36:46,768 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Fully initialized
+2026-07-12 13:36:46,770 [ERROR] [iaglobal] Falha crítica durante a execução do CLI
+Traceback (most recent call last):
+  File "/workspace/iaglobal/cli/bootstrap.py", line 108, in initialize
+    from iaglobal.chappie import VacuumDaemon, ErrorEnricher, LineageGuardian, _set_chappie
+  File "/workspace/iaglobal/chappie/__init__.py", line 19, in <module>
+    from iaglobal.chappie.bandit_evolution import BanditPolicyEvolution, get_bandit_evolution, init_bandit_evolution
+  File "/workspace/iaglobal/chappie/bandit_evolution.py", line 8, in <module>
+    from iaglobal.tools.search import async_search_tool
+  File "/workspace/iaglobal/tools/search.py", line 2, in <module>
+    from iaglobal.tools.search_tools import SearchTools
+  File "/workspace/iaglobal/tools/search_tools.py", line 3, in <module>
+    from ddgs import DDGS
+ModuleNotFoundError: No module named 'ddgs'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/iaglobal/cli/bootstrap.py", line 125, in initialize
+    _set_chappie()
+    ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable '_set_chappie' where it is not associated with a value
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/iaglobal/cli/main.py", line 28, in run_cli
+    await _run_cli_impl()
+  File "/workspace/iaglobal/cli/main.py", line 84, in _run_cli_impl
+    orch = await bootstrap.initialize()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/iaglobal/cli/bootstrap.py", line 155, in initialize
+    raise RuntimeError(f"Falha na inicialização do sistema: {e}")
+RuntimeError: Falha na inicialização do sistema: cannot access local variable '_set_chappie' where it is not associated with a value
+2026-07-12 13:36:46,785 [INFO] [iaglobal] --- 🏁 Sessão Finalizada ---
+2026-07-12 13:36:56,944 [INFO] [iaglobal] --- 🚀 Nova Sessão Iniciada ---
+2026-07-12 13:36:56,967 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-12 13:36:56,987 [INFO] [iaglobal] [GÊNESIS] ✅ Tribunal: Blueprint autêntico
+2026-07-12 13:36:57,088 [INFO] [iaglobal] ✅ Banco de vetores inicializado em: /workspace/iaglobal/memory/data/db/core.db
+2026-07-12 13:36:57,090 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initialized (data_root=/workspace/iaglobal/memory/data)
+2026-07-12 13:36:57,090 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initializing components...
+2026-07-12 13:36:57,090 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Bandit initialized
+2026-07-12 13:36:57,107 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-12 13:36:57,128 [INFO] [iaglobal.core.few_shot_provider] [FEW-SHOT] Cache de embeddings carregado: 4 entries
+2026-07-12 13:36:57,142 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos
+2026-07-12 13:36:57,146 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
+2026-07-12 13:36:57,147 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
+2026-07-12 13:36:57,148 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
+2026-07-12 13:36:57,446 [WARNING] [iaglobal] ⚠️  BanditPolicyEvolutiva não disponível, usando BanditPolicy clássica
+2026-07-12 13:36:59,122 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Pipeline initialized
+2026-07-12 13:36:59,126 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] CPU affinity initialized
+2026-07-12 13:36:59,150 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-12 13:36:59,150 [INFO] [iaglobal] [COMPLIANCE] CoderAgent: approved=True
+2026-07-12 13:36:59,150 [INFO] [iaglobal] [MAILBOX] CoderAgent criado
+2026-07-12 13:36:59,151 [INFO] [iaglobal] [CoderAgent] Executor registrado com compliance=True
+2026-07-12 13:36:59,151 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] CoderAgent bindado ao MailboxManager
+2026-07-12 13:36:59,166 [INFO] [iaglobal] [COMPLIANCE] PlannerAgent: approved=True
+2026-07-12 13:36:59,167 [INFO] [iaglobal] [MAILBOX] PlannerAgent criado
+2026-07-12 13:36:59,167 [INFO] [iaglobal] [PlannerAgent] Executor registrado com compliance=True
+2026-07-12 13:36:59,167 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] PlannerAgent bindado ao MailboxManager
+2026-07-12 13:36:59,489 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Fully initialized
+2026-07-12 13:36:59,502 [ERROR] [iaglobal] Falha crítica durante a execução do CLI
+Traceback (most recent call last):
+  File "/workspace/iaglobal/cli/bootstrap.py", line 108, in initialize
+    from iaglobal.chappie import VacuumDaemon, ErrorEnricher, LineageGuardian, _set_chappie
+  File "/workspace/iaglobal/chappie/__init__.py", line 19, in <module>
+    from iaglobal.chappie.bandit_evolution import BanditPolicyEvolution, get_bandit_evolution, init_bandit_evolution
+  File "/workspace/iaglobal/chappie/bandit_evolution.py", line 8, in <module>
+    from iaglobal.tools.search import async_search_tool
+  File "/workspace/iaglobal/tools/search.py", line 2, in <module>
+    from iaglobal.tools.search_tools import SearchTools
+  File "/workspace/iaglobal/tools/search_tools.py", line 3, in <module>
+    from ddgs import DDGS
+ModuleNotFoundError: No module named 'ddgs'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/iaglobal/cli/bootstrap.py", line 125, in initialize
+    _set_chappie()
+    ^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable '_set_chappie' where it is not associated with a value
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+  File "/workspace/iaglobal/cli/main.py", line 28, in run_cli
+    await _run_cli_impl()
+  File "/workspace/iaglobal/cli/main.py", line 84, in _run_cli_impl
+    orch = await bootstrap.initialize()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/iaglobal/cli/bootstrap.py", line 155, in initialize
+    raise RuntimeError(f"Falha na inicialização do sistema: {e}")
+RuntimeError: Falha na inicialização do sistema: cannot access local variable '_set_chappie' where it is not associated with a value
+2026-07-12 13:36:59,506 [INFO] [iaglobal] --- 🏁 Sessão Finalizada ---
+2026-07-12 13:37:20,425 [INFO] [iaglobal] --- 🚀 Nova Sessão Iniciada ---
+2026-07-12 13:37:20,448 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-12 13:37:20,468 [INFO] [iaglobal] [GÊNESIS] ✅ Tribunal: Blueprint autêntico
+2026-07-12 13:37:20,568 [INFO] [iaglobal] ✅ Banco de vetores inicializado em: /workspace/iaglobal/memory/data/db/core.db
+2026-07-12 13:37:20,570 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initialized (data_root=/workspace/iaglobal/memory/data)
+2026-07-12 13:37:20,570 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initializing components...
+2026-07-12 13:37:20,570 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Bandit initialized
+2026-07-12 13:37:20,588 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
+2026-07-12 13:37:20,609 [INFO] [iaglobal.core.few_shot_provider] [FEW-SHOT] Cache de embeddings carregado: 4 entries
+2026-07-12 13:37:20,623 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos
+2026-07-12 13:37:20,628 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
+2026-07-12 13:37:20,629 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
+2026-07-12 13:37:20,629 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
+2026-07-12 13:37:20,962 [WARNING] [iaglobal] ⚠️  BanditPolicyEvolutiva não disponível, usando BanditPolicy clássica
+2026-07-12 13:37:22,702 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Pipeline initialized
+2026-07-12 13:37:22,705 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] CPU affinity initialized
+2026-07-12 13:37:22,725 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-12 13:37:22,725 [INFO] [iaglobal] [COMPLIANCE] CoderAgent: approved=True
+2026-07-12 13:37:22,725 [INFO] [iaglobal] [MAILBOX] CoderAgent criado
+2026-07-12 13:37:22,725 [INFO] [iaglobal] [CoderAgent] Executor registrado com compliance=True
+2026-07-12 13:37:22,725 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] CoderAgent bindado ao MailboxManager
+2026-07-12 13:37:22,728 [INFO] [iaglobal] [COMPLIANCE] PlannerAgent: approved=True
+2026-07-12 13:37:22,728 [INFO] [iaglobal] [MAILBOX] PlannerAgent criado
+2026-07-12 13:37:22,728 [INFO] [iaglobal] [PlannerAgent] Executor registrado com compliance=True
+2026-07-12 13:37:22,728 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] PlannerAgent bindado ao MailboxManager
+2026-07-12 13:37:23,065 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Fully initialized
+2026-07-12 13:37:23,067 [INFO] [iaglobal] [BATCH_WRITER] Iniciado: flush_ms=2000 max_batch=100
+2026-07-12 13:37:23,725 [WARNING] [iaglobal] [PIPELINE] Graph nodes vazios, construindo...
+2026-07-12 13:37:23,749 [WARNING] [iaglobal] [PIPELINE] Antes build - registry size=80
+2026-07-12 13:37:23,823 [WARNING] [iaglobal] [PIPELINE] Depois build - graph nodes=80
+2026-07-12 13:37:23,823 [WARNING] [iaglobal] [PIPELINE] Nós raiz (sem deps): ['orchestrator_pump', 'lineage_proof', 'prompt_intake']
+2026-07-12 13:37:23,824 [WARNING] [iaglobal] [PIPELINE] Nós do grafo: ['orchestrator_pump', 'lineage_proof', 'agentmailbox', 'prompt_intake', 'enhancement', 'interpreter', 'web_classifier', 'orchestrator_agent', 'pm', 'requirements', 'ingestion', 'domain_analysis', 'business_rules', 'local_knowledge', 'search', 'knowledge', 'knowledge_analyzer', 'dependency', 'prompt_builder', 'prompt_improver', 'technology_selection', 'architect', 'risk_analysis', 'system_design', 'api_design', 'database_design', 'security_design', 'threat_modeling', 'performance_design', 'observability_design', 'architecture_validator', 'applied_ai_engineer', 'planner', 'task_breakdown', 'execution_plan', 'multi_coder', 'coder', 'backend_builder', 'database_builder', 'api_builder', 'test_generator', 'integrator', 'genesis_builder', 'code_executor', 'reviewer', 'semantic_validator', 'security_audit', 'performance_audit', 'compliance_audit', 'performance', 'security', 'qa', 'tester', 'debug_unificado', 'fix_validator', 'critic', 'documentation', 'deployment_plan', 'release', 'artifact_writer', 'metrics', 'optimization', 'retrospective', 'reflexion', 'result_agent', 'memory_writer', 'memory_cleaner', 'evaluator', 'gap_analyzer', 'skill_generator', 'sandbox_validator', 'evolution_committee', 'pipeline_updater', 'evolution_trigger', 'failure_analysis', 'knowledge_writer', 'multi_agent', 'typing_agent', 'lsp_validator', 'system_analysis']
+2026-07-12 13:37:23,824 [INFO] [iaglobal] 🚀 [ASYNC PIPELINE] Starting: fbe34d84-c45b-479a-a79a-0df2b510d458
+2026-07-12 13:37:23,824 [INFO] [iaglobal] 📖 lendo o aprendizado anterior ...
+2026-07-12 13:37:23,825 [INFO] [iaglobal] 🧠 vou aprender algo novo!
+2026-07-12 13:37:23,826 [WARNING] [iaglobal] [PIPELINE] ⚙️ INICIANDO GERAÇÃO | prompt=build a REST API with CRUD operations | parallel=False
+2026-07-12 13:37:23,871 [WARNING] [iaglobal] 🎯 BANDIT indisponível (BanditPolicy.select_model() got an unexpected keyword argument 'node'), usando fallback
+2026-07-12 13:37:23,872 [INFO] [iaglobal] ⚖️ Invocando o Tribunal: Validando nascimento do nó...
+2026-07-12 13:37:23,882 [INFO] [iaglobal] ✅ [SOBERANIA CONFIRMADA] DNA validado. Nó autorizado a ingressar na malha.
+2026-07-12 13:37:23,885 [INFO] [iaglobal] 🚀 [ASYNC] Iniciando execução orquestrada: aaed76a9-fbea-4406-b825-88224607de08
+2026-07-12 13:37:23,885 [INFO] [iaglobal.evolution.canonical_graph] 🧹 Iniciando limpeza de agentes duplicados ...
+2026-07-12 13:37:23,885 [INFO] [iaglobal.evolution.canonical_graph] [CANON] Consolidação concluída: 4 redundâncias removidas em 4 nós
+2026-07-12 13:37:23,903 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['lineage_proof', 'orchestrator_pump', 'prompt_intake']
+2026-07-12 13:37:24,185 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-07-12 13:37:24,185 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Carregados 0 perfis entrópicos de disco (CBOR)
+2026-07-12 13:37:24,246 [INFO] [iaglobal.fusion_engine] [FusionEngine] Motor de Fusão initialized | resonance_threshold=0.60 | max_parents=4
+2026-07-12 13:37:24,249 [INFO] [iaglobal.genomic_reflection] [GenomicReflection] Reflexão Genômica initialized | success_threshold=0.70 | confidence_min=0.60
+2026-07-12 13:37:24,264 [INFO] [iaglobal] [OmniMind] Agente registrado: AsyncViolationDetector (gen=1, phonetic=mou-bw-keu-sea-ceu-be-ma-hi-lu-sa-pei-ji-hau-bai-gea-gai)
+2026-07-12 13:37:24,264 [INFO] [iaglobal.immunity.async_violation_detector] [ASYNC_DETECTOR] 🧬 Nascimento completo | agente=async_violation_detector | gen=1 | padrões=29 | imunidade=ativa | epigenética=ativa
+2026-07-12 13:37:24,522 [WARNING] [iaglobal] Network isolation disabled - UNSAFE MODE
+2026-07-12 13:37:24,524 [ERROR] [iaglobal.immunity.mhc_detector] [MHC] PARASITE DETECTED: lineage_proof - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}
+2026-07-12 13:37:24,666 [ERROR] [iaglobal.graphs._nodes_mod] ❌ Falha crítica ao carregar nó modular do arquivo no_evolution_committee.py: No module named 'nest_asyncio'
+2026-07-12 13:37:24,667 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=import_failure | detail=no_evolution_committee.py: No module named 'nest_asyncio' | agent=no_evolution_committee.py
+2026-07-12 13:37:24,703 [INFO] [iaglobal] [KNOWLEDGE] 0 entradas carregadas de /workspace/iaglobal/memory/data/json/knowledge.json
+2026-07-12 13:37:24,703 [INFO] [iaglobal] [KNOWLEDGE] 0 entradas carregadas de /workspace/iaglobal/memory/data/json/knowledge.json
+2026-07-12 13:37:24,786 [ERROR] [iaglobal.graphs._nodes_mod] ❌ Falha crítica ao carregar nó modular do arquivo no_frontend_builder.py: 'return' outside function (prompt_improver.py, line 988)
+2026-07-12 13:37:24,787 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=import_failure | detail=no_frontend_builder.py: 'return' outside function (prompt_improver.py, line 988) | agent=no_frontend_builder.py
+2026-07-12 13:37:24,807 [ERROR] [iaglobal.graphs._nodes_mod] ❌ Falha crítica ao carregar nó modular do arquivo no_fugue_compartment.py: No module named 'nest_asyncio'
+2026-07-12 13:37:24,807 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=import_failure | detail=no_fugue_compartment.py: No module named 'nest_asyncio' | agent=no_fugue_compartment.py
+2026-07-12 13:37:24,810 [ERROR] [iaglobal.graphs._nodes_mod] ❌ Falha crítica ao carregar nó modular do arquivo no_fusion.py: No module named 'nest_asyncio'
+2026-07-12 13:37:24,822 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=import_failure | detail=no_fusion.py: No module named 'nest_asyncio' | agent=no_fusion.py
+2026-07-12 13:37:24,905 [INFO] [iaglobal] ✅ Banco de vetores inicializado em: /workspace/iaglobal/memory/data/db/core.db
+2026-07-12 13:37:25,105 [ERROR] [iaglobal.graphs._nodes_mod] ❌ Falha crítica ao carregar nó modular do arquivo no_prompt_improver.py: 'return' outside function (prompt_improver.py, line 988)
+2026-07-12 13:37:25,106 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=import_failure | detail=no_prompt_improver.py: 'return' outside function (prompt_improver.py, line 988) | agent=no_prompt_improver.py
+2026-07-12 13:37:25,203 [ERROR] [iaglobal.graphs._nodes_mod] ❌ Falha crítica ao carregar nó modular do arquivo no_search.py: No module named 'ddgs'
+2026-07-12 13:37:25,204 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=import_failure | detail=no_search.py: No module named 'ddgs' | agent=no_search.py
+2026-07-12 13:37:25,207 [ERROR] [iaglobal.graphs._nodes_mod] ❌ Falha crítica ao carregar nó modular do arquivo no_search_agent.py: No module named 'ddgs'
+2026-07-12 13:37:25,208 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=import_failure | detail=no_search_agent.py: No module named 'ddgs' | agent=no_search_agent.py
+2026-07-12 13:37:25,224 [ERROR] [iaglobal.graphs._nodes_mod] ❌ Falha crítica ao carregar nó modular do arquivo no_search_web_brain.py: No module named 'ddgs'
+2026-07-12 13:37:25,225 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=import_failure | detail=no_search_web_brain.py: No module named 'ddgs' | agent=no_search_web_brain.py
+2026-07-12 13:37:25,310 [INFO] [iaglobal.graphs._nodes_mod] 📦 Mapeamento dinâmico concluído! Métodos acoplados ao Singleton: 117
+2026-07-12 13:37:25,310 [INFO] [iaglobal.graphs._nodes_mod] 🧠 Nodes Pipeline Director Singleton initialized via dynamic loading
+2026-07-12 13:37:25,324 [INFO] [iaglobal.graphs.nodes.no_lineage_proof] [LINEAGE_PROOF] [SOBERANIA CONFIRMADA] batch=pipeline-integration nodes=117
+2026-07-12 13:37:25,325 [INFO] [iaglobal.graphs.nodes.no_lineage_proof] [LINEAGE_PROOF] Integração no pipeline concluída — sovereign=117/117
+2026-07-12 13:37:25,326 [INFO] [iaglobal.graphs.nodes.orchestrator_pump] [ORCHESTRATOR_PUMP] SAMe suficiente | agent=orchestrator | balance=100 | threshold=20
+2026-07-12 13:37:25,326 [INFO] [iaglobal.graphs.nodes.orchestrator_pump] [ORCHESTRATOR_PUMP] Finalizado | pumped=False | latency=0.50ms
+2026-07-12 13:37:25,344 [INFO] [iaglobal] [SKILL] Executando: prompt_intake vv1
+2026-07-12 13:37:25,344 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'prompt_intake' (estratégia=balanced)
+2026-07-12 13:37:25,344 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,344 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,345 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,385 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,385 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,407 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,408 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para prompt_intake: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,425 [WARNING] [iaglobal] [PSC] node_id='prompt_intake' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,425 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,427 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,427 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,427 [INFO] [iaglobal] [MEMBRANA] node_id='prompt_intake' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,427 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,427 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,429 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,442 [WARNING] [iaglobal] [GRAPH] Nó 'prompt_intake' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,445 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['agentmailbox', 'enhancement', 'interpreter', 'multi_agent', 'prompt_improver', 'typing_agent', 'web_classifier']
+2026-07-12 13:37:25,448 [INFO] [iaglobal] [SKILL] Executando: interpreter vv1
+2026-07-12 13:37:25,448 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'interpreter' (estratégia=creative)
+2026-07-12 13:37:25,448 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,448 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,449 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,449 [INFO] [iaglobal] [SKILL] Executando: multi_agent vv1
+2026-07-12 13:37:25,449 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'multi_agent' (estratégia=precise)
+2026-07-12 13:37:25,449 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,449 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,449 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,450 [INFO] [iaglobal] [SKILL] Executando: agentmailbox vv1
+2026-07-12 13:37:25,450 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'agentmailbox' (estratégia=balanced)
+2026-07-12 13:37:25,461 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,461 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,461 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,465 [INFO] [iaglobal] [SKILL] Executando: typing_agent vv1
+2026-07-12 13:37:25,465 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'typing_agent' (estratégia=precise)
+2026-07-12 13:37:25,465 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,465 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,465 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,466 [INFO] [iaglobal] [SKILL] Executando: web_classifier vv1
+2026-07-12 13:37:25,466 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'web_classifier' (estratégia=precise)
+2026-07-12 13:37:25,466 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,466 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,466 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,467 [WARNING] [iaglobal] [PSC] node_id='enhancement' nao critico tentou cloud 'nvidia/mistralai/mistral-large-3-675b-instruct-2512' — rebaixando para local
+2026-07-12 13:37:25,467 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/mistral-large-3-675b-instruct-2512 provider=ollama task_type=general
+2026-07-12 13:37:25,469 [WARNING] [iaglobal] [PSC] node_id='prompt_improver' nao critico tentou cloud 'nvidia/mistralai/mistral-large-3-675b-instruct-2512' — rebaixando para local
+2026-07-12 13:37:25,469 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/mistral-large-3-675b-instruct-2512 provider=ollama task_type=llm
+2026-07-12 13:37:25,470 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,471 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,481 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,482 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,482 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,483 [INFO] [iaglobal] [MEMBRANA] node_id='enhancement' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,483 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,483 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,483 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,489 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,505 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,510 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,510 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,510 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,510 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,511 [INFO] [iaglobal] [MEMBRANA] node_id='prompt_improver' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,511 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,511 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,522 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.03s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,523 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para interpreter: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,523 [WARNING] [iaglobal] [PSC] node_id='interpreter' nao critico tentou cloud 'nvidia/mistralai/mistral-large-3-675b-instruct-2512' — rebaixando para local
+2026-07-12 13:37:25,524 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/mistral-large-3-675b-instruct-2512 provider=ollama task_type=fast
+2026-07-12 13:37:25,524 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,543 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,548 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,548 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para multi_agent: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,548 [WARNING] [iaglobal] [PSC] node_id='multi_agent' nao critico tentou cloud 'nvidia/mistralai/mistral-large-3-675b-instruct-2512' — rebaixando para local
+2026-07-12 13:37:25,549 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/mistral-large-3-675b-instruct-2512 provider=ollama task_type=llm
+2026-07-12 13:37:25,549 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,550 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para agentmailbox: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,550 [WARNING] [iaglobal] [PSC] node_id='agentmailbox' nao critico tentou cloud 'nvidia/mistralai/mistral-large-3-675b-instruct-2512' — rebaixando para local
+2026-07-12 13:37:25,550 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/mistral-large-3-675b-instruct-2512 provider=ollama task_type=llm
+2026-07-12 13:37:25,561 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.05s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,562 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,583 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.06s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,583 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,583 [INFO] [iaglobal] [MEMBRANA] node_id='interpreter' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,583 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,584 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,584 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,584 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para typing_agent: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,585 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/qwen2.5:0.5b provider=ollama task_type=llm
+2026-07-12 13:37:25,585 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,586 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para web_classifier: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,586 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/qwen2.5:0.5b provider=ollama task_type=fast
+2026-07-12 13:37:25,588 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,588 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,588 [INFO] [iaglobal] [MEMBRANA] node_id='multi_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,588 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,588 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,602 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.05s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,602 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,602 [INFO] [iaglobal] [MEMBRANA] node_id='agentmailbox' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,602 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,602 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,602 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,602 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,602 [INFO] [iaglobal] [MEMBRANA] node_id='typing_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,602 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,602 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,605 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,605 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,605 [INFO] [iaglobal] [MEMBRANA] node_id='web_classifier' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,605 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,605 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,605 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,609 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,609 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,609 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,609 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,626 [WARNING] [iaglobal] [GRAPH] Nó 'agentmailbox' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,627 [WARNING] [iaglobal] [GRAPH] Nó 'enhancement' falhou: Skill 'enhancement' requer inputs faltando: ['intake_report']. Disponíveis no contexto: ['code', 'task', 'workdir']
+2026-07-12 13:37:25,628 [WARNING] [iaglobal] [GRAPH] Nó 'interpreter' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,628 [WARNING] [iaglobal] [GRAPH] Nó 'multi_agent' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,629 [WARNING] [iaglobal] [GRAPH] Nó 'prompt_improver' falhou: Skill 'prompt_improver' requer inputs faltando: ['prompt_builder']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,629 [WARNING] [iaglobal] [GRAPH] Nó 'typing_agent' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,630 [WARNING] [iaglobal] [GRAPH] Nó 'web_classifier' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,642 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['orchestrator_agent', 'planner']
+2026-07-12 13:37:25,644 [INFO] [iaglobal] [SKILL] Executando: planner vv1
+2026-07-12 13:37:25,644 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'planner' (estratégia=balanced)
+2026-07-12 13:37:25,644 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,644 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,644 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,645 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,646 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,662 [WARNING] [iaglobal] [PSC] node_id='orchestrator_agent' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,662 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,663 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,664 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para planner: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,685 [WARNING] [iaglobal.search.query_expander] [QUERY_EXPAND] BanditPolicy indisponível
+2026-07-12 13:37:25,686 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,686 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,686 [INFO] [iaglobal] [MEMBRANA] node_id='orchestrator_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,686 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,686 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,688 [WARNING] [iaglobal] [PSC] node_id='planner' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,688 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,702 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,704 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,704 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,704 [INFO] [iaglobal] [MEMBRANA] node_id='planner' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,704 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,704 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,706 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,722 [WARNING] [iaglobal] [GRAPH] Nó 'orchestrator_agent' falhou: Skill 'orchestrator_agent' requer inputs faltando: ['enhanced_task', 'prerequisites']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,723 [WARNING] [iaglobal] [GRAPH] Nó 'planner' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,725 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['pm', 'task_breakdown']
+2026-07-12 13:37:25,727 [WARNING] [iaglobal.search.query_expander] [QUERY_EXPAND] BanditPolicy indisponível
+2026-07-12 13:37:25,727 [WARNING] [iaglobal] [PSC] node_id='task_breakdown' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,728 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,742 [WARNING] [iaglobal] [PSC] node_id='pm' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,742 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,744 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,744 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,744 [INFO] [iaglobal] [MEMBRANA] node_id='task_breakdown' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,744 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,744 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,745 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,745 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,745 [INFO] [iaglobal] [MEMBRANA] node_id='pm' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,746 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,746 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,748 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,762 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,764 [WARNING] [iaglobal] [GRAPH] Nó 'pm' falhou: Skill 'pm' requer inputs faltando: ['requirements']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,765 [WARNING] [iaglobal] [GRAPH] Nó 'task_breakdown' falhou: Skill 'task_breakdown' requer inputs faltando: ['planner']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,766 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['requirements', 'execution_plan']
+2026-07-12 13:37:25,768 [WARNING] [iaglobal] [PSC] node_id='requirements' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,768 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,769 [WARNING] [iaglobal] [PSC] node_id='execution_plan' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,769 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,781 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,782 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,782 [INFO] [iaglobal] [MEMBRANA] node_id='requirements' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,782 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,782 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,782 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,782 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,782 [INFO] [iaglobal] [MEMBRANA] node_id='execution_plan' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,782 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,783 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,785 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,785 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,787 [WARNING] [iaglobal] [GRAPH] Nó 'requirements' falhou: Skill 'requirements' requer inputs faltando: ['refined_task']. Disponíveis no contexto: ['code', 'task', 'workdir']
+2026-07-12 13:37:25,788 [WARNING] [iaglobal] [GRAPH] Nó 'execution_plan' falhou: Skill 'execution_plan' requer inputs faltando: ['architecture_validation']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,790 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['domain_analysis', 'ingestion']
+2026-07-12 13:37:25,803 [WARNING] [iaglobal] [PSC] node_id='domain_analysis' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,803 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=research
+2026-07-12 13:37:25,804 [WARNING] [iaglobal] [PSC] node_id='ingestion' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,804 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,806 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,806 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,806 [INFO] [iaglobal] [MEMBRANA] node_id='domain_analysis' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,806 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,806 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,806 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,806 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,806 [INFO] [iaglobal] [MEMBRANA] node_id='ingestion' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,806 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,807 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,809 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,809 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,822 [WARNING] [iaglobal] [GRAPH] Nó 'domain_analysis' falhou: Skill 'domain_analysis' requer inputs faltando: ['requirements']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,823 [WARNING] [iaglobal] [GRAPH] Nó 'ingestion' falhou: Skill 'ingestion' requer inputs faltando: ['requirements']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,824 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['business_rules']
+2026-07-12 13:37:25,825 [INFO] [iaglobal] [SKILL] Executando: business_rules vv1
+2026-07-12 13:37:25,825 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'business_rules' (estratégia=creative)
+2026-07-12 13:37:25,825 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,825 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,825 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,827 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,827 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,843 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,844 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para business_rules: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,844 [WARNING] [iaglobal] [PSC] node_id='business_rules' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,845 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:25,846 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,846 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,846 [INFO] [iaglobal] [MEMBRANA] node_id='business_rules' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,846 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,846 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,848 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,849 [WARNING] [iaglobal] [GRAPH] Nó 'business_rules' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,862 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['local_knowledge', 'search']
+2026-07-12 13:37:25,864 [WARNING] [iaglobal] [PSC] node_id='local_knowledge' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,864 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=llm
+2026-07-12 13:37:25,865 [WARNING] [iaglobal] [PSC] node_id='search' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,865 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=research
+2026-07-12 13:37:25,867 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,868 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,868 [INFO] [iaglobal] [MEMBRANA] node_id='local_knowledge' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,868 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,868 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,881 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,882 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,882 [INFO] [iaglobal] [MEMBRANA] node_id='search' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,882 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,882 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,883 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,884 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,886 [WARNING] [iaglobal] [TRACE] Silent drop detectado em search - nó sem output válido
+2026-07-12 13:37:25,886 [WARNING] [iaglobal] [GRAPH] Nó 'local_knowledge' falhou: Skill 'local_knowledge' requer inputs faltando: ['prompt_intake']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,887 [WARNING] [iaglobal] [GRAPH] Nó 'search' falhou: Skill 'search' requer inputs faltando: ['needs_web']. Disponíveis no contexto: ['code', 'task', 'workdir']
+2026-07-12 13:37:25,888 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['knowledge']
+2026-07-12 13:37:25,889 [INFO] [iaglobal] [SKILL] Executando: knowledge vv1
+2026-07-12 13:37:25,889 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'knowledge' (estratégia=balanced)
+2026-07-12 13:37:25,889 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:25,889 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,889 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:25,902 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,902 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:25,906 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,921 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para knowledge: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:25,921 [WARNING] [iaglobal] [PSC] node_id='knowledge' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,922 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=fast
+2026-07-12 13:37:25,923 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,923 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,923 [INFO] [iaglobal] [MEMBRANA] node_id='knowledge' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,923 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,923 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,924 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,943 [WARNING] [iaglobal] [GRAPH] Nó 'knowledge' falhou: LLM não retornou output válido
+2026-07-12 13:37:25,945 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['knowledge_analyzer']
+2026-07-12 13:37:25,946 [WARNING] [iaglobal] [PSC] node_id='knowledge_analyzer' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,946 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=llm
+2026-07-12 13:37:25,949 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,961 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,961 [INFO] [iaglobal] [MEMBRANA] node_id='knowledge_analyzer' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,962 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,962 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,965 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,967 [WARNING] [iaglobal] [GRAPH] Nó 'knowledge_analyzer' falhou: Skill 'knowledge_analyzer' requer inputs faltando: ['local_knowledge']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:25,969 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['dependency']
+2026-07-12 13:37:25,982 [WARNING] [iaglobal] [PSC] node_id='dependency' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:25,982 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=fast
+2026-07-12 13:37:25,985 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:25,985 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:25,985 [INFO] [iaglobal] [MEMBRANA] node_id='dependency' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:25,985 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:25,985 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:25,987 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,002 [WARNING] [iaglobal] [GRAPH] Nó 'dependency' falhou: Skill 'dependency' requer inputs faltando: ['path', 'requirements']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:26,004 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['prompt_builder', 'technology_selection']
+2026-07-12 13:37:26,006 [WARNING] [iaglobal] [PSC] node_id='prompt_builder' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,006 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=llm
+2026-07-12 13:37:26,007 [WARNING] [iaglobal] [PSC] node_id='technology_selection' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,007 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=research
+2026-07-12 13:37:26,009 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,009 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,009 [INFO] [iaglobal] [MEMBRANA] node_id='prompt_builder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,009 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,009 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,010 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,010 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,010 [INFO] [iaglobal] [MEMBRANA] node_id='technology_selection' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,010 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,010 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,023 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,024 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,026 [WARNING] [iaglobal] [GRAPH] Nó 'prompt_builder' falhou: Skill 'prompt_builder' requer inputs faltando: ['prompt_intake']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:26,027 [WARNING] [iaglobal] [GRAPH] Nó 'technology_selection' falhou: Skill 'technology_selection' requer inputs faltando: ['business_rules']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:26,029 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['coder', 'multi_coder', 'architect']
+2026-07-12 13:37:26,043 [INFO] [iaglobal] [SKILL] Executando: architect vv1
+2026-07-12 13:37:26,044 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'architect' (estratégia=precise)
+2026-07-12 13:37:26,044 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:26,044 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,044 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:26,046 [WARNING] [iaglobal.search.query_expander] [QUERY_EXPAND] BanditPolicy indisponível
+2026-07-12 13:37:26,046 [WARNING] [iaglobal.search.query_expander] [QUERY_EXPAND] BanditPolicy indisponível
+2026-07-12 13:37:26,048 [WARNING] [iaglobal] [PSC] node_id='coder' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,048 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,049 [WARNING] [iaglobal] [PSC] node_id='multi_coder' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,049 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=llm
+2026-07-12 13:37:26,062 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,062 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:26,067 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,067 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,068 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,068 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,068 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,069 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,069 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,069 [INFO] [iaglobal] [MEMBRANA] node_id='multi_coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,069 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,069 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,082 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,083 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para architect: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:26,084 [WARNING] [iaglobal.search.query_expander] [QUERY_EXPAND] BanditPolicy indisponível
+2026-07-12 13:37:26,085 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,086 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,088 [WARNING] [iaglobal] [PSC] node_id='architect' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,088 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,102 [WARNING] [iaglobal] [TRACE] Silent drop detectado em coder - nó sem output válido
+2026-07-12 13:37:26,103 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,103 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,103 [INFO] [iaglobal] [MEMBRANA] node_id='architect' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,103 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,103 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,105 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,107 [WARNING] [iaglobal] [GRAPH] Nó 'coder' falhou: Skill 'coder' requer inputs faltando: ['plan']. Disponíveis no contexto: ['code', 'task', 'workdir']
+2026-07-12 13:37:26,107 [WARNING] [iaglobal] [GRAPH] Nó 'multi_coder' falhou: Skill 'multi_coder' requer inputs faltando: ['execution_plan']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:26,108 [WARNING] [iaglobal] [GRAPH] Nó 'architect' falhou: LLM não retornou output válido
+2026-07-12 13:37:26,123 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['backend_builder', 'database_builder', 'knowledge_writer', 'lsp_validator', 'api_design', 'database_design', 'observability_design', 'performance_design', 'risk_analysis', 'security_design', 'system_design']
+2026-07-12 13:37:26,126 [INFO] [iaglobal.graphs.nodes.no_backend_builder] [BACKEND_BUILDER] Iniciando geração da camada de backend e serviços...
+2026-07-12 13:37:26,129 [INFO] [iaglobal] [CODER] Processando com recursos locais | estilo=direto, minimalista
+2026-07-12 13:37:26,143 [INFO] [iaglobal] [SKILL] Match: api_design (vv1, Projeta as interfaces de API do sistema)
+2026-07-12 13:37:26,143 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'api_design' (estratégia=creative)
+2026-07-12 13:37:26,143 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:26,143 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,143 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:26,144 [INFO] [iaglobal.graphs.nodes.no_database_builder] [DATABASE_BUILDER] Iniciando geração da camada de persistência e schemas...
+2026-07-12 13:37:26,146 [INFO] [iaglobal] [CODER] Processando com recursos locais | estilo=direto, minimalista
+2026-07-12 13:37:26,147 [INFO] [iaglobal] [SKILL] Match: api_design (vv1, Projeta as interfaces de API do sistema)
+2026-07-12 13:37:26,147 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'api_design' (estratégia=balanced)
+2026-07-12 13:37:26,147 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:26,147 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,147 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:26,163 [WARNING] [iaglobal.graphs.nodes.lsp_validator] [LSP] Nenhum código encontrado para validar.
+2026-07-12 13:37:26,163 [WARNING] [iaglobal] [PSC] node_id='lsp_validator' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,163 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,184 [WARNING] [iaglobal] [PSC] node_id='knowledge_writer' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,184 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=llm
+2026-07-12 13:37:26,186 [WARNING] [iaglobal] [PSC] node_id='api_design' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,186 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,187 [WARNING] [iaglobal] [PSC] node_id='database_design' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,187 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,188 [WARNING] [iaglobal] [PSC] node_id='observability_design' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,188 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,188 [WARNING] [iaglobal] [PSC] node_id='performance_design' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,189 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,189 [WARNING] [iaglobal] [PSC] node_id='risk_analysis' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,189 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,190 [WARNING] [iaglobal] [PSC] node_id='security_design' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,190 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,191 [WARNING] [iaglobal] [PSC] node_id='system_design' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:26,191 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:26,202 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,202 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,202 [INFO] [iaglobal] [MEMBRANA] node_id='lsp_validator' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,202 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,203 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,204 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,204 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,205 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,206 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,206 [INFO] [iaglobal] [MEMBRANA] node_id='knowledge_writer' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,206 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,206 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,206 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:26,223 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:26,229 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,229 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,229 [INFO] [iaglobal] [MEMBRANA] node_id='api_design' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,229 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,229 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,230 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.04s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,231 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,241 [INFO] [iaglobal] [MEMBRANA] node_id='database_design' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,241 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,241 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,242 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.05s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,242 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,242 [INFO] [iaglobal] [MEMBRANA] node_id='observability_design' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,242 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,242 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,245 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.06s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,245 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,246 [INFO] [iaglobal] [MEMBRANA] node_id='performance_design' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,246 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,246 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,248 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.06s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,248 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,248 [INFO] [iaglobal] [MEMBRANA] node_id='risk_analysis' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,248 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,248 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,249 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.06s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,249 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,249 [INFO] [iaglobal] [MEMBRANA] node_id='security_design' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,249 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,250 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,261 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.07s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,261 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:26,261 [INFO] [iaglobal] [MEMBRANA] node_id='system_design' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:26,262 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:26,262 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:26,264 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.06s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,268 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.05s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,269 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para api_design: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:26,269 [INFO] [iaglobal] [CODER] Layer 3b: Esqueleto gerado
+2026-07-12 13:37:26,281 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.05s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,282 [INFO] [iaglobal] [FEEDBACK] Código aprovado: sintaxe + AST security OK
+2026-07-12 13:37:26,284 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para api_design: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:26,284 [INFO] [iaglobal] [CODER] Layer 3b: Esqueleto gerado
+2026-07-12 13:37:26,284 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.06s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,285 [INFO] [iaglobal] [FEEDBACK] Código aprovado: sintaxe + AST security OK
+2026-07-12 13:37:26,286 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.06s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,321 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.08s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,323 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.08s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,323 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.08s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,368 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.12s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,406 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.14s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,408 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.14s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:26,529 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 1/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:26,530 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 1/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:26,531 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 2/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:26,543 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 3/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:26,543 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Código limpo | lang=python latency=241.4ms
+2026-07-12 13:37:26,542 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 2/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:26,547 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 3/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:26,548 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Código limpo | lang=python latency=240.2ms
+2026-07-12 13:37:29,786 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] requirements.txt: 61 pacotes carregados
+2026-07-12 13:37:29,803 [INFO] [iaglobal] ✅ [EPIGENETIC] Sucesso registrado: 700caaa4e13cb00d | IVM=0.00 | Reward=0.00
+2026-07-12 13:37:29,804 [INFO] [iaglobal.graphs.nodes.no_backend_builder] [BACKEND_BUILDER] Camada de backend gerada com sucesso: 207 caracteres.
+2026-07-12 13:37:29,847 [INFO] [iaglobal] ✅ [EPIGENETIC] Sucesso registrado: cb531c1e4315b482 | IVM=0.00 | Reward=0.00
+2026-07-12 13:37:29,847 [INFO] [iaglobal.graphs.nodes.no_database_builder] [DATABASE_BUILDER] Scripts e schemas de banco de dados gerados: 207 caracteres.
+2026-07-12 13:37:29,850 [WARNING] [iaglobal] [GRAPH] Nó 'knowledge_writer' falhou: Skill 'knowledge_writer' requer inputs faltando: ['coder']. Disponíveis no contexto: ['code', 'task', 'workdir']
+2026-07-12 13:37:29,851 [WARNING] [iaglobal] [GRAPH] Nó 'lsp_validator' falhou: None
+2026-07-12 13:37:29,862 [WARNING] [iaglobal] [GRAPH] Nó 'api_design' falhou: Skill 'api_design' requer inputs faltando: ['architect']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:29,863 [WARNING] [iaglobal] [GRAPH] Nó 'database_design' falhou: Skill 'database_design' requer inputs faltando: ['architect']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:29,864 [WARNING] [iaglobal] [GRAPH] Nó 'observability_design' falhou: Skill 'observability_design' requer inputs faltando: ['architect']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:29,866 [WARNING] [iaglobal] [GRAPH] Nó 'performance_design' falhou: Skill 'performance_design' requer inputs faltando: ['architecture', 'requirements']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:29,867 [WARNING] [iaglobal] [GRAPH] Nó 'risk_analysis' falhou: Skill 'risk_analysis' requer inputs faltando: ['architecture']. Disponíveis no contexto: ['code', 'task', 'workdir']
+2026-07-12 13:37:29,883 [WARNING] [iaglobal] [GRAPH] Nó 'security_design' falhou: Skill 'security_design' requer inputs faltando: ['architecture', 'requirements']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:29,884 [WARNING] [iaglobal] [GRAPH] Nó 'system_design' falhou: Skill 'system_design' requer inputs faltando: ['architect']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:29,887 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['api_builder', 'architecture_validator', 'threat_modeling']
+2026-07-12 13:37:29,887 [INFO] [iaglobal.graphs.nodes.no_api_builder] [API_BUILDER] Iniciando desenvolvimento da camada de rotas e contratos de API...
+2026-07-12 13:37:29,903 [INFO] [iaglobal] [CODER] Processando com recursos locais | estilo=direto, minimalista
+2026-07-12 13:37:29,904 [INFO] [iaglobal] [SKILL] Match: api_design (vv1, Projeta as interfaces de API do sistema)
+2026-07-12 13:37:29,904 [INFO] [iaglobal] [RUN-FN-LLM] Executando skill 'api_design' (estratégia=balanced)
+2026-07-12 13:37:29,905 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
+2026-07-12 13:37:29,905 [INFO] [iaglobal] [MEMBRANA] node_id='skill_executor' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:29,905 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
+2026-07-12 13:37:29,942 [WARNING] [iaglobal] [PSC] node_id='architecture_validator' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:29,942 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=general
+2026-07-12 13:37:29,944 [WARNING] [iaglobal] [PSC] node_id='threat_modeling' nao critico tentou cloud 'groq/llama-3.3-70b-versatile' — rebaixando para local
+2026-07-12 13:37:29,944 [INFO] [iaglobal] [ROUTER] async_route_generate model=ollama/llama-3.3-70b-versatile provider=ollama task_type=security
+2026-07-12 13:37:29,946 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.02s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:29,946 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:29,946 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:29,946 [INFO] [iaglobal] [MEMBRANA] node_id='architecture_validator' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:29,946 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:29,947 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:29,947 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:29,947 [INFO] [iaglobal] [ROUTER] async_route_generate primary=ollama failed -> fallback
+2026-07-12 13:37:29,947 [INFO] [iaglobal] [MEMBRANA] node_id='threat_modeling' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
+2026-07-12 13:37:29,947 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=ollama RACE_SIZE=3 pool=1
+2026-07-12 13:37:29,947 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['ollama']
+2026-07-12 13:37:29,947 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
+2026-07-12 13:37:29,967 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:29,967 [WARNING] [iaglobal] [RUN-FN-LLM] Falha ao gerar via LLM para api_design: Todos os lotes da corrida falharam. Nenhum provedor disponível.
+2026-07-12 13:37:29,968 [INFO] [iaglobal] [CODER] Layer 3b: Esqueleto gerado
+2026-07-12 13:37:29,968 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:29,968 [INFO] [iaglobal] [FEEDBACK] Código aprovado: sintaxe + AST security OK
+2026-07-12 13:37:29,969 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
+2026-07-12 13:37:29,984 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 1/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:29,985 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 2/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:29,987 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Iteracao 3/3 | issues=1 fixes=0 | lang=python
+2026-07-12 13:37:29,987 [INFO] [iaglobal.core.auto_correction] [AUTO-CORRECAO] Código limpo | lang=python latency=5.3ms
+2026-07-12 13:37:30,001 [INFO] [iaglobal] ✅ [EPIGENETIC] Sucesso registrado: 98239851367ff438 | IVM=0.00 | Reward=0.00
+2026-07-12 13:37:30,002 [INFO] [iaglobal.graphs.nodes.no_api_builder] [API_BUILDER] Camada de rotas e endpoints gerada com sucesso: 207 caracteres.
+2026-07-12 13:37:30,004 [WARNING] [iaglobal] [GRAPH] Nó 'architecture_validator' falhou: Skill 'architecture_validator' requer inputs faltando: ['technology_selection']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:30,005 [WARNING] [iaglobal] [GRAPH] Nó 'threat_modeling' falhou: Skill 'threat_modeling' requer inputs faltando: ['security_design']. Disponíveis no contexto: ['code', 'workdir']
+2026-07-12 13:37:30,006 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['applied_ai_engineer']
+2026-07-12 13:37:30,007 [INFO] [iaglobal] [SKILL] Executando: applied_ai_engineer vv1
+2026-07-12 13:37:30,007 [INFO] [iaglobal] [SKILL] Executando: dynamic_model_router vv1
+2026-07-12 13:37:30,007 [INFO] [iaglobal.evolution.skills.skill_model_router] [MODEL_ROUTER] Modo ATP: roteado para qwen2.5:0.5b por padrão
+2026-07-12 13:37:30,008 [INFO] [iaglobal] [SKILL] Executando: optimize_rag_pipeline vv1
+2026-07-12 13:37:30,008 [INFO] [iaglobal.evolution.skills.skill_rag_optimizer] [RAG_OPTIMIZER] Modelo local detectado: chunk=250, max_docs=2
+2026-07-12 13:37:30,008 [INFO] [iaglobal] [SKILL] Executando: structured_prompt_generator vv1
+2026-07-12 13:37:30,008 [INFO] [iaglobal.evolution.skills.skill_prompt_structurer] [PROMPT_STRUCTURER] Prompt enriquecido com CoT + JSON constraint (37 chars -> 394 chars)
+2026-07-12 13:37:30,008 [INFO] [iaglobal.graphs.nodes.no_applied_ai_engineer] [APPLIED_AI] Ciclo concluído: modelo=qwen2.5:0.5b ivm=0.67 latência=1ms
+2026-07-12 13:37:30,010 [WARNING] [iaglobal] [ASYNC] DEADLOCK SUSPEITO — pendentes: ['integrator', 'code_executor', 'failure_analysis', 'genesis_builder', 'qa', 'reviewer', 'semantic_validator', 'compliance_audit', 'performance', 'performance_audit', 'security', 'security_audit', 'test_generator', 'tester', 'debug_unificado', 'documentation', 'deployment_plan', 'fix_validator', 'critic', 'memory_writer', 'memory_cleaner', 'evaluator', 'gap_analyzer', 'release', 'artifact_writer', 'metrics', 'optimization', 'retrospective', 'reflexion', 'result_agent', 'skill_generator', 'sandbox_validator', 'evolution_committee', 'pipeline_updater', 'evolution_trigger', 'system_analysis'] | executados: 44/80
+2026-07-12 13:37:30,022 [ERROR] [iaglobal] 💀 [APOPTOSIS] Falha crítica na execução do grafo: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08
+2026-07-12 13:37:30,023 [ERROR] [iaglobal] 💥 [ASYNC PIPELINE] Failure: Falha na execução do grafo: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08
+Traceback (most recent call last):
+  File "/workspace/iaglobal/pipeline/engine.py", line 271, in _async_generation_stage
+    graph_result = await state.graph.async_run(ctx)
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/workspace/iaglobal/graphs/execution_graph.py", line 432, in async_run
+    raise RuntimeError(f"Deadlock detectado: {execution_id}")
+RuntimeError: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/workspace/iaglobal/pipeline/engine.py", line 113, in async_execute
+    await self._async_generation_stage(state, parallel=parallel)
+  File "/workspace/iaglobal/pipeline/engine.py", line 284, in _async_generation_stage
+    raise RuntimeError(f"Falha na execução do grafo: {e}") from e
+RuntimeError: Falha na execução do grafo: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08
+2026-07-12 13:37:30,044 [INFO] [iaglobal] --- 🏁 Sessão Finalizada ---

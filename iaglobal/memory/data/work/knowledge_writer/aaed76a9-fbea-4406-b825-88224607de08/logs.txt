@@ -1,0 +1,1 @@
+[13:37:26] contrato insatisfeito: Skill 'knowledge_writer' requer inputs faltando: ['coder']. Disponíveis no conte — fallback

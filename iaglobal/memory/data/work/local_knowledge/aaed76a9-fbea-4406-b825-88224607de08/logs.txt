@@ -1,0 +1,1 @@
+[13:37:25] contrato insatisfeito: Skill 'local_knowledge' requer inputs faltando: ['prompt_intake']. Disponíveis n — fallback
