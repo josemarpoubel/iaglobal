@@ -769,25 +769,38 @@ Node A (Internet)                  Node B (iaglobal)
 
 ## 🚀 Quick Start
 
-```bash
-# 1. Clone and install
-git clone https://github.com/your-org/iaglobal.git
-cd iaglobal
+## 1. Clone and install
+```
+git clone https://github.com/josemarpoubel/iaglobal.git
+cd iaglobal-main
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
+pip install -e .
+```
 
-# 2. Configure environment (Ollama works offline — no API key required)
+## 2. Configure environment (Ollama local or API key required)
+```
 cp .env.example .env
+```
 
-# 3. Run a task
+## 3. Run a task
+```
 iaglobal run "build a REST API with CRUD operations"
+```
 
-# 4. Run tests
-python -m pytest tests/ -q
+## 4. Run tests
+```
+python pytest
+```
 
-# 5. Run evolution lab
+## 5. Run evolution lab
+```
 OLLAMA_BASE_URL=http://localhost:11434 evolution-lab
+```
 
-# 6. View system status
+## 6. View system status
+```
 iaglobal status
 iaglobal history --stats
 ```
@@ -863,15 +876,15 @@ The model is escalated automatically when the task contains high-criticality key
 
 ### 🧪 Usage Examples
 
-# Simple task → local model (ATP preserved)
+## Simple task → local model (ATP preserved)
 ```
 iaglobal run "create a Flask API with CRUD"
 ```
-# Critical task → escalated to cloud automatically
+## Critical task → escalated to cloud automatically
 ```
 iaglobal run "analyze security vulnerability in code"
 ```
-# IVM weight optimization (node acts as central hub)
+## IVM weight optimization (node acts as central hub)
 ```
 iaglobal run "optimize IVM routing weights"
 ```
@@ -884,7 +897,7 @@ iaglobal run "optimize IVM routing weights"
 | Critical task | ≥ 0.5 | groq-mixtral (cloud) | 1000 tokens, 7 docs | Maximum precision |
 | Insufficient IVM | < 0.5 | — | — | Task rejected |
 
-### 🔬 Tests
+## 🔬 Tests
 ```
 🔗 Architecture 
 ┌────────────────────────────────────┐
@@ -930,7 +943,7 @@ Selects real positive/negative examples from ToolLibrary, SkillRegistry and MTAP
 
 ### 3. Chain of Thought (INSTRUCAO_COT)
 
-**File:** `iaglobal/agents/agent_base.py:19-25`
+**File:** `iaglobal/agents/agent_base.py`
 
 Forces 4-step decomposition (ANALYSIS → STRUCTURE PLAN → IMPLEMENTATION → REVIEW) before code generation. Injected into `PEC_SYSTEM_PROMPT`, CriticAgent, DebuggerAgent and PromptImprover.
 
@@ -1600,7 +1613,7 @@ The organism is ready for:
 5. **PhospholipidRegistry integration** — dynamic provider load balancing at service-level
 
 The command that activates full self-optimization:
-```bash
+```
 iaglobal run "optimize IVM routing weights"
 ```
 
