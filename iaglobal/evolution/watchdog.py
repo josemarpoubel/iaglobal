@@ -38,7 +38,8 @@ class EvolutionaryWatchdog:
                 from iaglobal._paths import DATA_DIR
                 ancestry_path = DATA_DIR / "ancestry_tree.jsonl"
             except Exception:
-                ancestry_path = Path("/tmp/iaglobal_ancestry_tree.jsonl")
+                import tempfile
+                ancestry_path = Path(tempfile.gettempdir()) / "iaglobal_ancestry_tree.jsonl"
         self.ancestry_path = ancestry_path
         self._last_check: Dict[str, int] = {}
 
