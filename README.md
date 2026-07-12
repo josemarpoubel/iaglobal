@@ -109,22 +109,22 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 │
 ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ TASK_BREAKDOWN (Micro-Task Breakdown) │
-│ ├── Divides each step into atomic actions │
-│ └── Generates unique IDs for tracking │
+│ TASK_BREAKDOWN (Micro-Task Breakdown)                                       │
+│ ├── Divides each step into atomic actions                                   │
+│ └── Generates unique IDs for tracking                                       │
 └─────────────────────────────────────────────────────────────────────────────┘
-│
-▼
+                                        │
+                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ EXECUTION_PLAN (Detailed Execution Plan) │
-│ ├── Orders tasks by dependency │
-│ ├── Identifies parallelism opportunities │
-│ └── Prepares context for each agent │
+│ EXECUTION_PLAN (Detailed Execution Plan)                                    │
+│ ├── Orders tasks by dependency                                              │
+│ ├── Identifies parallelism opportunities                                    │
+│ └── Prepares context for each agent                                         │
 └─────────────────────────────────────────────────────────────────────────────┘
-│
-▼
+                                        │
+                                        ▼
 ================================================================================
-🔍 PHASE 3 — DATA COLLECTION (RAG)
+                      🔍 PHASE 3 — DATA COLLECTION (RAG)
 ================================================================================
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
