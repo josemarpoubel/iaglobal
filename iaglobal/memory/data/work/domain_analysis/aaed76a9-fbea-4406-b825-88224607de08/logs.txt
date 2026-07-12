@@ -1,0 +1,1 @@
+[13:37:25] contrato insatisfeito: Skill 'domain_analysis' requer inputs faltando: ['requirements']. Disponíveis no — fallback

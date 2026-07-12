@@ -1,0 +1,1 @@
+[13:37:26] contrato insatisfeito: Skill 'prompt_builder' requer inputs faltando: ['prompt_intake']. Disponíveis no — fallback

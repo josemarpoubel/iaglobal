@@ -1,0 +1,1 @@
+[13:37:26] contrato insatisfeito: Skill 'database_design' requer inputs faltando: ['architect']. Disponíveis no co — fallback

@@ -1,0 +1,1 @@
+[13:37:26] contrato insatisfeito: Skill 'security_design' requer inputs faltando: ['architecture', 'requirements'] — fallback

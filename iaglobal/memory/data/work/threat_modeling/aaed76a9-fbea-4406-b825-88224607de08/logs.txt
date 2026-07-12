@@ -1,0 +1,1 @@
+[13:37:29] contrato insatisfeito: Skill 'threat_modeling' requer inputs faltando: ['security_design']. Disponíveis — fallback

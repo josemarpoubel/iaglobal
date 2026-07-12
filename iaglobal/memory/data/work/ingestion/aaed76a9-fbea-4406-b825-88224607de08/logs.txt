@@ -1,0 +1,1 @@
+[13:37:25] contrato insatisfeito: Skill 'ingestion' requer inputs faltando: ['requirements']. Disponíveis no conte — fallback

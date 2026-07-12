@@ -1,0 +1,1 @@
+[13:37:25] contrato insatisfeito: Skill 'enhancement' requer inputs faltando: ['intake_report']. Disponíveis no co — fallback
