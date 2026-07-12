@@ -10,6 +10,7 @@ Na biologia, o MHC apresenta peptídeos para células T — aqui, age como:
 import hashlib
 import logging
 import threading
+import traceback
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -194,6 +195,9 @@ class MHCDetector:
         )
 
         if should_quarantine:
+            # Capturar stack trace para rastreabilidade
+            error_trace = traceback.format_stack()
+            
             # Usar impact=3 e 3 falhas mínimas para ativar quarentena
             quarantine.record_failure(
                 skill_name,
@@ -207,6 +211,7 @@ class MHCDetector:
                     quarantine._quarantined[skill_name].requires_review = True
             
             logger.error(f"[MHC] PARASITE DETECTED: {skill_name} - {evidence}")
+            logger.error(f"Origin Trace: {''.join(error_trace[-5:])}")
             return True
 
         return False

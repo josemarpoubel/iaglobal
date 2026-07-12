@@ -58,6 +58,38 @@
 
 ---
 
+## Integração #4: Rastreabilidade MHC — Diagnóstico de "Parasitas Digitais"
+
+**Objetivo:** Restaurar a "visibilidade imunológica" do sistema capturando stack traces quando o MHC detecta comportamento anômalo.
+
+**Problema Identificado:** Traceback vazio transforma problemas de segurança (tentativa de rede não autorizada) em "cegueira imunológica" — impossibilita identificar a origem da chamada.
+
+**Solução Implementada:**
+1. **Injeção de Rastreabilidade:** `traceback.format_stack()` no handler `PARASITE DETECTED`
+2. **Log de Origem:** Últimos 5 frames do stack trace registrados no log de erro
+3. **Diagnóstico Diferenciado:** Permite classificar falhas como:
+   - **Configural:** Rota faltando no `allowed_paths`
+   - **Arquitetural:** Agente tentando bypass do gateway de rede
+   - **Temporal:** Race condition (agente dispara antes do `netcheck` inicializar)
+
+**Status:** ✅ **IMPLEMENTADA** (mhc_detector.py atualizado)
+
+**Próximos Passos:**
+- [ ] Executar processo e monitorar logs com stack trace
+- [ ] Auditar módulos `lineage_proof` e `system_analysis` em busca de imports de rede diretos
+- [ ] Validar configuração `allowed_paths` do MHC
+
+**Comandos de Auditoria:**
+```bash
+# Busca por bibliotecas de rede instanciadas fora do gateway seguro
+grep -rE "import (requests|httpx|aiohttp|socket)" iaglobal/graphs/nodes/
+
+# Exibe configuração atual de rede carregada pelo MHC
+python3 -c "from iaglobal.immunity.mhc_detector import MHCDetector; d = MHCDetector(); print('MHC initialized')"
+```
+
+---
+
 ## Passo a Passo da Implementação (Integração #2)
 
 ### Fase 1: Expiry de Vacinas (_expire_old_vaccines)
