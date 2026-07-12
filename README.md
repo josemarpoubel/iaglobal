@@ -468,14 +468,15 @@ In iaglobal, agents cannot call LLM directly...
 - Immune memory hooks (EvoAgent)
 
 3. **Critic as validator** — The CriticAgent:
-- Valida outputs de outros agentes
-- Decide se precisa de retrabalho
-- Aprova antes de prosseguir no pipeline
+- Validates outputs from other agents
+- Decides if rework is needed
+- Approves before proceeding in the pipeline
 
 **So... How do you "talk" to the system?**
 
-* resposta... Via CLI — the only human or localhost entry point
-  exemplo em CLI: 
+* Response... Via CLI — the only human or localhost entry point
+
+Example in CLI:
 ```
   iaglobal run "create a Flask API with user CRUD"
 ```
