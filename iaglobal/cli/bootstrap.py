@@ -104,6 +104,7 @@ class Bootstrap:
             logger.info("[BOOTSTRAP] Orchestrator async init completo")
 
             # 5. Chappie — Núcleo da Autonomia Computacional
+            _set_chappie = None  # Initialize as None in case import fails
             try:
                 from iaglobal.chappie import VacuumDaemon, ErrorEnricher, LineageGuardian, _set_chappie
                 from iaglobal.chappie.ivm_axiom import init_ivm_axiom_com_persistencia
@@ -122,7 +123,8 @@ class Bootstrap:
                 self.chappie_vacuum = None
                 self.chappie_error = None
                 self.chappie_lineage = None
-                _set_chappie()
+                if _set_chappie is not None:
+                    _set_chappie()
 
             # 6. Observabilidade (Fail-safe)
             try:

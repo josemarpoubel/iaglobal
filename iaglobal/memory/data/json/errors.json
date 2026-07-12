@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-07-12T04:30:40.305726Z",
+  "updated_at": "2026-07-12T13:37:30.026586Z",
   "learning_errors": [],
   "runtime_errors": [
     {
@@ -15,6 +15,153 @@
       "source": "graphs.nodes:no_prompt_improver.py",
       "message": "Falha ao carregar n\u00f3: 'return' outside function (prompt_improver.py, line 988)",
       "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:36:46.783453Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "Falha cr\u00edtica durante a execu\u00e7\u00e3o do CLI",
+      "traceback": "Traceback (most recent call last):\n  File \"/workspace/iaglobal/cli/bootstrap.py\", line 108, in initialize\n    from iaglobal.chappie import VacuumDaemon, ErrorEnricher, LineageGuardian, _set_chappie\n  File \"/workspace/iaglobal/chappie/__init__.py\", line 19, in <module>\n    from iaglobal.chappie.bandit_evolution import BanditPolicyEvolution, get_bandit_evolution, init_bandit_evolution\n  File \"/workspace/iaglobal/chappie/bandit_evolution.py\", line 8, in <module>\n    from iaglobal.tools.search import async_search_tool\n  File \"/workspace/iaglobal/tools/search.py\", line 2, in <module>\n    from iaglobal.tools.search_tools import SearchTools\n  File \"/workspace/iaglobal/tools/search_tools.py\", line 3, in <module>\n    from ddgs import DDGS\nModuleNotFoundError: No module named 'ddgs'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/workspace/iaglobal/cli/bootstrap.py\", line 125, in initialize\n    _set_chappie()\n    ^^^^^^^^^^^^\nUnboundLocalError: cannot access local variable '_set_chappie' where it is not associated with a value\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/workspace/iaglobal/cli/main.py\", line 28, in run_cli\n    await _run_cli_impl()\n  File \"/workspace/iaglobal/cli/main.py\", line 84, in _run_cli_impl\n    orch = await bootstrap.initialize()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/iaglobal/cli/bootstrap.py\", line 155, in initialize\n    raise RuntimeError(f\"Falha na inicializa\u00e7\u00e3o do sistema: {e}\")\nRuntimeError: Falha na inicializa\u00e7\u00e3o do sistema: cannot access local variable '_set_chappie' where it is not associated with a value\n"
+    },
+    {
+      "timestamp": "2026-07-12T13:36:59.504886Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "Falha cr\u00edtica durante a execu\u00e7\u00e3o do CLI",
+      "traceback": "Traceback (most recent call last):\n  File \"/workspace/iaglobal/cli/bootstrap.py\", line 108, in initialize\n    from iaglobal.chappie import VacuumDaemon, ErrorEnricher, LineageGuardian, _set_chappie\n  File \"/workspace/iaglobal/chappie/__init__.py\", line 19, in <module>\n    from iaglobal.chappie.bandit_evolution import BanditPolicyEvolution, get_bandit_evolution, init_bandit_evolution\n  File \"/workspace/iaglobal/chappie/bandit_evolution.py\", line 8, in <module>\n    from iaglobal.tools.search import async_search_tool\n  File \"/workspace/iaglobal/tools/search.py\", line 2, in <module>\n    from iaglobal.tools.search_tools import SearchTools\n  File \"/workspace/iaglobal/tools/search_tools.py\", line 3, in <module>\n    from ddgs import DDGS\nModuleNotFoundError: No module named 'ddgs'\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/workspace/iaglobal/cli/bootstrap.py\", line 125, in initialize\n    _set_chappie()\n    ^^^^^^^^^^^^\nUnboundLocalError: cannot access local variable '_set_chappie' where it is not associated with a value\n\nDuring handling of the above exception, another exception occurred:\n\nTraceback (most recent call last):\n  File \"/workspace/iaglobal/cli/main.py\", line 28, in run_cli\n    await _run_cli_impl()\n  File \"/workspace/iaglobal/cli/main.py\", line 84, in _run_cli_impl\n    orch = await bootstrap.initialize()\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/iaglobal/cli/bootstrap.py\", line 155, in initialize\n    raise RuntimeError(f\"Falha na inicializa\u00e7\u00e3o do sistema: {e}\")\nRuntimeError: Falha na inicializa\u00e7\u00e3o do sistema: cannot access local variable '_set_chappie' where it is not associated with a value\n"
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.524617Z",
+      "component": "iaglobal.immunity.mhc_detector",
+      "source": "iaglobal.immunity.mhc_detector",
+      "message": "[MHC] PARASITE DETECTED: lineage_proof - {'unauthorized_path': 'network_call_to_unknown', 'unexpected_output': True}",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.666638Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_evolution_committee.py: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.667363Z",
+      "component": "graphs.nodes:no_evolution_committee.py",
+      "source": "graphs.nodes:no_evolution_committee.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.786885Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_frontend_builder.py: 'return' outside function (prompt_improver.py, line 988)",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.787755Z",
+      "component": "graphs.nodes:no_frontend_builder.py",
+      "source": "graphs.nodes:no_frontend_builder.py",
+      "message": "Falha ao carregar n\u00f3: 'return' outside function (prompt_improver.py, line 988)",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.807243Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_fugue_compartment.py: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.807977Z",
+      "component": "graphs.nodes:no_fugue_compartment.py",
+      "source": "graphs.nodes:no_fugue_compartment.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.810905Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_fusion.py: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:24.822378Z",
+      "component": "graphs.nodes:no_fusion.py",
+      "source": "graphs.nodes:no_fusion.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'nest_asyncio'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:25.106237Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_prompt_improver.py: 'return' outside function (prompt_improver.py, line 988)",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:25.107173Z",
+      "component": "graphs.nodes:no_prompt_improver.py",
+      "source": "graphs.nodes:no_prompt_improver.py",
+      "message": "Falha ao carregar n\u00f3: 'return' outside function (prompt_improver.py, line 988)",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:25.203529Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_search.py: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:25.204428Z",
+      "component": "graphs.nodes:no_search.py",
+      "source": "graphs.nodes:no_search.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:25.208107Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_search_agent.py: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:25.208759Z",
+      "component": "graphs.nodes:no_search_agent.py",
+      "source": "graphs.nodes:no_search_agent.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:25.224424Z",
+      "component": "iaglobal.graphs._nodes_mod",
+      "source": "iaglobal.graphs._nodes_mod",
+      "message": "\u274c Falha cr\u00edtica ao carregar n\u00f3 modular do arquivo no_search_web_brain.py: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:25.225209Z",
+      "component": "graphs.nodes:no_search_web_brain.py",
+      "source": "graphs.nodes:no_search_web_brain.py",
+      "message": "Falha ao carregar n\u00f3: No module named 'ddgs'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:30.023253Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "\ud83d\udc80 [APOPTOSIS] Falha cr\u00edtica na execu\u00e7\u00e3o do grafo: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-07-12T13:37:30.026314Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "\ud83d\udca5 [ASYNC PIPELINE] Failure: Falha na execu\u00e7\u00e3o do grafo: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08",
+      "traceback": "Traceback (most recent call last):\n  File \"/workspace/iaglobal/pipeline/engine.py\", line 271, in _async_generation_stage\n    graph_result = await state.graph.async_run(ctx)\n                   ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/workspace/iaglobal/graphs/execution_graph.py\", line 432, in async_run\n    raise RuntimeError(f\"Deadlock detectado: {execution_id}\")\nRuntimeError: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/workspace/iaglobal/pipeline/engine.py\", line 113, in async_execute\n    await self._async_generation_stage(state, parallel=parallel)\n  File \"/workspace/iaglobal/pipeline/engine.py\", line 284, in _async_generation_stage\n    raise RuntimeError(f\"Falha na execu\u00e7\u00e3o do grafo: {e}\") from e\nRuntimeError: Falha na execu\u00e7\u00e3o do grafo: Deadlock detectado: aaed76a9-fbea-4406-b825-88224607de08\n"
     }
   ]
 }
