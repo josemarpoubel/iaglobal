@@ -1,88 +1,52 @@
-```
-# Python
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-.Python
-build/
-develop-eggs/
-dist/
-downloads/
-eggs/
-.eggs/
-lib/
-lib64/
-parts/
-sdist/
-var/
-wheels/
-*.egg-info/
-.installed.cfg
-*.egg
-MANIFEST
-
-# Databases
-*.db
-*.db-shm
-*.db-wal
-
 # Logs
 *.log
-logs/
+*.json
+*.jsonl
+*.cbor
+*.pkl
 
-# Temporary files and cache
-*.tmp
-*.temp
-*.cache
-.cache/
-*.swp
-*.swo
+# Database files
+*.db
+
+# Temporary work files
+iaglobal/memory/data/*.*
+
+# Python cache
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
 
 # Environment files
 .env
 .env.local
-*.env.*
 
-# CBOR files (likely binary data/cache)
-*.cbor
-
-# JSON files in memory/data that appear to be runtime data
-iaglobal/memory/data/json/*.json
-
-# Error logs and temporary markdown files
-iaglobal/memory/data/error/*.md
-
-# Work logs
-iaglobal/memory/data/work/*/*/logs.txt
-
-# Coverage
-.coverage
-htmlcov/
-.coverage.*
-.nyc_output
-istanbul.out
-coverage/
-coverage.xml
-lcov.info
-
-# Pytest
-pytest_debug.log
-.pytest_cache/
-
-# MyPy
-.mypy_cache/
-
-# VSCode
+# IDE files
 .vscode/
-
-# IntelliJ IDEA
 .idea/
+*.swp
+*.swo
+.kilo
 
-# macOS
+# OS files
 .DS_Store
-
-# Windows
 Thumbs.db
-ehthumbs.db
-```
+
+# Coverage reports
+coverage/
+htmlcov/
+.coverage
+
+# Build artifacts
+dist/
+build/
+target/
+*.egg-info/
+
+# Dependencies
+node_modules/
+.venv/
+venv/
+.mypy_cache/
+.pytest_cache/
+.gradle/

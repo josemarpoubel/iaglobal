@@ -1,4 +1,4 @@
-# 🌌 Biological Evolution + The Holliwell Paradigm = iaglobal
+## 🌌 Biological Evolution + The Holliwell Paradigm = iaglobal
 
 ### *The First Synthetic Organism Governed by Metabolic Viability*
 
@@ -8,7 +8,7 @@
 
 > *"Nature never hurries, and yet everything is accomplished."*
 
-## iaglobal is not alone — bio-inspired AI is an established field for decades:
+### iaglobal is not alone — bio-inspired AI is an established field for decades:
 
 - Swarm Intelligence (Dorigo, Kennedy — ants/bees)
 - Genetic Algorithms (Holland, 1975)
@@ -31,9 +31,9 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 
 ... What's missing is what any organism takes time to develop: body, maturity, real selective pressure. iaglobal built the genome and metabolism — the rest is growth.
 
-================================================================================
-                        🧬 BEGIN BIOMIMETIC FLOW
-================================================================================
+## ===========================================================
+##                 🧬 BEGIN BIOMIMETIC FLOW
+## ===========================================================
 
 ## 🧬 iaglobal Pipeline Architecture
 
@@ -106,109 +106,109 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 │ "estimated_complexity": "medium"                                            │
 │ }                                                                           │
 └─────────────────────────────────────────────────────────────────────────────┘
-│
-▼
+                                        │
+                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ TASK_BREAKDOWN (Micro-Task Breakdown) │
-│ ├── Divides each step into atomic actions │
-│ └── Generates unique IDs for tracking │
+│ TASK_BREAKDOWN (Micro-Task Breakdown)                                       │
+│ ├── Divides each step into atomic actions                                   │
+│ └── Generates unique IDs for tracking                                       │
 └─────────────────────────────────────────────────────────────────────────────┘
-│
-▼
+                                        │
+                                        ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│ EXECUTION_PLAN (Detailed Execution Plan) │
-│ ├── Orders tasks by dependency │
-│ ├── Identifies parallelism opportunities │
-│ └── Prepares context for each agent │
+│ EXECUTION_PLAN (Detailed Execution Plan)                                    │
+│ ├── Orders tasks by dependency                                              │
+│ ├── Identifies parallelism opportunities                                    │
+│ └── Prepares context for each agent                                         │
 └─────────────────────────────────────────────────────────────────────────────┘
-│
-▼
+                                        │
+                                        ▼
 ================================================================================
-🔍 PHASE 3 — DATA COLLECTION (RAG)
+                      🔍 PHASE 3 — DATA COLLECTION (RAG)
 ================================================================================
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  SEARCH + LOCAL_KNOWLEDGE (Parallel Collection)                                 │
+│  SEARCH + LOCAL_KNOWLEDGE (Parallel Collection)                             │
 │  ├── Web Search (DuckDuckGo): Framer Motion dashboard examples              │
-│  ├── Local Knowledge (Obsidian): Reusable components                  │
-│  └── Memory Vector: Similar task embeddings                         │
+│  ├── Local Knowledge (Obsidian): Reusable components                        │
+│  └── Memory Vector: Similar task embeddings                                 │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  SOURCE_VALIDATOR (Credibility Validation) ⭐ IMMUNOLOGICAL FILTER        │
-│  ├── Domain score (arxiv.org=0.95, medium.com=0.60)                     │
-│  ├── Recency score (<30 days=1.0, >3 years=0.4)                          │
-│  ├── Consistency score (agrees with other sources?)                    │
+│  SOURCE_VALIDATOR (Credibility Validation) ⭐ IMMUNOLOGICAL FILTER          │
+│  ├── Domain score (arxiv.org=0.95, medium.com=0.60)                         │
+│  ├── Recency score (<30 days=1.0, >3 years=0.4)                             │
+│  ├── Consistency score (agrees with other sources?)                         │
 │  └── Filters: score < 0.6 → DISCARD                                         │
 │                                                                             │
-│  OUTPUT: Only reliable sources (score >= 0.6)                             │
+│  OUTPUT: Only reliable sources (score >= 0.6)                               │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  SNIPPET_SYNTHESIZER (Optional, if enabled)                              │
-│  ├── Summarizes multiple snippets into 1 coherent paragraph                      │
-│  ├── Detects contradictions between sources                                      │
-│  └── Generates synthesis with 50% fewer tokens                                      │
+│  SNIPPET_SYNTHESIZER (Optional, if enabled)                                 │
+│  ├── Summarizes multiple snippets into 1 coherent paragraph                 │
+│  ├── Detects contradictions between sources                                 │
+│  └── Generates synthesis with 50% fewer tokens                              │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ================================================================================
-                    🏗️ PHASE 4 — BUILD
+                            🏗️ PHASE 4 — BUILD
 ================================================================================
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
 │  FRONTEND_BUILDER / BACKEND_BUILDER / API_BUILDER                           │
-│  ├── Receives: enhanced prompt + plan + validated data                     │
-│  ├── Uses CoderAgent with enriched context                                │
-│  ├── Generates JSX/TS/Python code                                              │
+│  ├── Receives: enhanced prompt + plan + validated data                      │
+│  ├── Uses CoderAgent with enriched context                                  │
+│  ├── Generates JSX/TS/Python code                                           │
 │  └── Publishes to AcetylcholineBus for next node                            │
 │                                                                             │
-│  ⚠️ NOTE: Does NOT call BanditPolicy directly!                               │
-│     Uses default models (qwen2.5:0.5b) as fallback                         │
+│  ⚠️ NOTE: Does NOT call BanditPolicy directly!                              │
+│     Uses default models (qwen2.5:0.5b) as fallback                          │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  LSP_VALIDATOR (Syntactic Validation)                                        │
-│  ├── Checks syntax errors                                              │
-│  ├── Checks missing imports                                              │
+│  LSP_VALIDATOR (Syntactic Validation)                                       │
+│  ├── Checks syntax errors                                                   │
+│  ├── Checks missing imports                                                 │
 │  └── If error → DEBUG_UNIFIED fixes it                                      │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  DEBUG_UNIFIED (Error Correction)                                        │
-│  ├── Analyzes LSP error                                                    │
-│  ├── Applies direct fix (if simple)                                    │
-│  └── Requests LLM (if complex)                                             │
+│  DEBUG_UNIFIED (Error Correction)                                           │
+│  ├── Analyzes LSP error                                                     │
+│  ├── Applies direct fix (if simple)                                         │
+│  └── Requests LLM (if complex)                                              │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  FIX_VALIDATOR (Validates Fix)                                            │
-│  └── Confirms error is resolved                                        │
+│  FIX_VALIDATOR (Validates Fix)                                              │
+│  └── Confirms error is resolved                                             │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ================================================================================
-                    🧪 PHASE 5 — TESTING AND REVIEW
+                      🧪 PHASE 5 — TESTING AND REVIEW
 ================================================================================
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  TESTER (Test Generation)                                                 │
-│  ├── Generates unit tests (pytest/Jest)                                    │
-│  ├── Covers happy path + edge cases                                          │
-│  └── Isolates dependencies with mocks                                           │
+│  TESTER (Test Generation)                                                   │
+│  ├── Generates unit tests (pytest/Jest)                                     │
+│  ├── Covers happy path + edge cases                                         │
+│  └── Isolates dependencies with mocks                                       │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  REVIEWER (Code Review)                                               │
-│  ├── Checks best practices                                                │
-│  ├── Applies linting (ESLint, Pylint)                                        │
-│  └── Suggests optimizations                                                     │
+│  REVIEWER (Code Review)                                                     │
+│  ├── Checks best practices                                                  │
+│  ├── Applies linting (ESLint, Pylint)                                       │
+│  └── Suggests optimizations                                                 │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                                     ▼
@@ -217,21 +217,21 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 ================================================================================
 
 ┌─────────────────────────────────────────────────────────────────────────────┐
-│  CRITIC ⭐ APPROVAL GATE (Critical Decision Point)                         │
-│  ├── Evaluates generated code (score 0-100)                                     │
-│  ├── Criteria:                                                             │
-│  │   ├── Functionality: meets the prompt?                                  │
+│  CRITIC ⭐ APPROVAL GATE (Critical Decision Point)                          │
+│  ├── Evaluates generated code (score 0-100)                                 │
+│  ├── Criteria:                                                              │
+│  │   ├── Functionality: meets the prompt?                                   │
 │  │   ├── Quality: follows best practices?                                   │
-│  │   ├── Tests: coverage >= 80%?                                          │
-│  │   ├── Performance: no bottlenecks?                                      │
-│  │   └── Security: no vulnerabilities?                                   │
+│  │   ├── Tests: coverage >= 80%?                                            │
+│  │   ├── Performance: no bottlenecks?                                       │
+│  │   └── Security: no vulnerabilities?                                      │
 │  │                                                                          │
-│  ├── DECISION:                                                               │
-│  │   ├── Score >= 80: ✅ APPROVED → goes to BANDIT_POLICY                    │
+│  ├── DECISION:                                                              │
+│  │   ├── Score >= 80: ✅ APPROVED → goes to BANDIT_POLICY                   │
 │  │   └── Score < 80:  ❌ REPROVA → RETRY LOOP                               │
-│  │                └─→ Returns to FRONTEND_BUILDER (with feedback)            │
-│  │                    (max 3 retries before critical failure)             │
-│  └── Publishes decision to AcetylcholineBus                                    │
+│  │                └─→ Returns to FRONTEND_BUILDER (with feedback)           │
+│  │                    (max 3 retries before critical failure)               │
+│  └── Publishes decision to AcetylcholineBus                                 │
 └─────────────────────────────────────────────────────────────────────────────┘
                                     │
                     ┌───────────────┴───────────────┐
@@ -240,23 +240,23 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
                     │                               │
                     ▼                               │
 ================================================================================              
-                    🎯 PHASE 7 — MODEL SELECTION                                                   
+                      🎯 PHASE 7 — MODEL SELECTION                                                   
 ================================================================================              
                                                                                               
 ┌─────────────────────────────────────────────────────────────────────────────┐ 
-│  BANDIT_POLICY ⭐ SINGLE MODEL SELECTION POINT                          │
-│  ├── Receives: prompt + context + Critic score                            │
-│  ├── Analyzes available providers (ollama, groq, nvidia, openrouter)       │
-│  ├── Calculates IVM (Metabolic Viability Index):                        │
+│  BANDIT_POLICY ⭐ SINGLE MODEL SELECTION POINT                              │
+│  ├── Receives: prompt + context + Critic score                              │
+│  ├── Analyzes available providers (ollama, groq, nvidia, openrouter)        │
+│  ├── Calculates IVM (Metabolic Viability Index):                            │
 │  │   IVM = (P × 0.4) + (E × 0.4) + (C × 0.2)                                │
-│  │   P = Productivity (success rate)                                    │
-│  │   E = Efficiency (1/latency)                                            │
-│  │   C = Cooperation (skills exchanged)                                       │
-│  ├── Selects optimal model:                                                │
-│  │   ├── Simple tasks: qwen2.5:0.5b (local, free)                      │
-│  │   ├── Complex tasks: groq-llama-3.1-70b (fast)                     │
-│  │   └── Critical tasks: o1-preview (reasoning)                          │
-│  └── Returns: selected provider + model                                │
+│  │   P = Productivity (success rate)                                        │
+│  │   E = Efficiency (1/latency)                                             │
+│  │   C = Cooperation (skills exchanged)                                     │
+│  ├── Selects optimal model:                                                 │
+│  │   ├── Simple tasks: qwen2.5:0.5b (local, free)                           │
+│  │   ├── Complex tasks: groq-llama-3.1-70b (fast)                           │
+│  │   └── Critical tasks: o1-preview (reasoning)                             │
+│  └── Returns: selected provider + model                                     │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                     │                                                           │
                                     ▼                                                           │
@@ -265,43 +265,43 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 ================================================================================                │
                                                                                                 │
 ┌─────────────────────────────────────────────────────────────────────────────┐                 │
-│  ARTIFACT_WRITER (Persists Result)                                       │                 │
-│  ├── Detects artifact type (.jsx, .py, .md)                              │                 │
+│  ARTIFACT_WRITER (Persists Result)                                          │                 │
+│  ├── Detects artifact type (.jsx, .py, .md)                                 │                 │
 │  ├── Saves to: iaglobal/memory/data/result/                                 │                 │
-│  └── Generates metadata (author, timestamp, task_hash)                            │                 │
+│  └── Generates metadata (author, timestamp, task_hash)                      │                 │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                     │                                                           │
                                     ▼                                                           │
 ┌─────────────────────────────────────────────────────────────────────────────┐                 │
 │  RESULT_AGENT (Consolidates Final Result)                                   │                 │
-│  ├── Aggregates all artifacts                                              │                 │
-│  ├── Generates executive summary                                                 │                 │
-│  └── Prepares for long-term memory                                    │                 │
+│  ├── Aggregates all artifacts                                               │                 │
+│  ├── Generates executive summary                                            │                 │
+│  └── Prepares for long-term memory                                          │                 │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                     │                                                           │
                                     ▼                                                           │
 ================================================================================                │
-                    🧠 PHASE 9 — MEMORY AND LEARNING            │                              │
+                    🧠 PHASE 9 — MEMORY AND LEARNING                                            │
 ================================================================================                │
                                                                                                 │
 ┌─────────────────────────────────────────────────────────────────────────────┐                 │
-│  RETROSPECTIVE (Post-Execution Analysis)                                       │                 │
-│  ├── What worked well?                                                   │                 │
-│  ├── What failed?                                                          │                 │
-│  └── Lessons learned                                                      │                 │
+│  RETROSPECTIVE (Post-Execution Analysis)                                    │                 │
+│  ├── What worked well?                                                      │                 │
+│  ├── What failed?                                                           │                 │
+│  └── Lessons learned                                                        │                 │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                                                                                 │
                     ┌──────────────────────────────────────────┐                                │
                     │                                          │                                │
-              (Success)                                (Failure after 3 retries)                   │
+              (Success)                                (Failure after 3 retries)                │
                     │                                          │                                │
                     ▼                                          ▼                                │
 ┌────────────────────────────────────────────────────┐   ┌────────────────────────────────────┐ │
-│  REFLEXION (Learning Commit)                 │   │  REFLEXION (Failure Analysis)      │ │
+│  REFLEXION (Learning Commit)                       │   │  REFLEXION (Failure Analysis)      │ │
 │  ├── Saves to Obsidian:                            │   │  ├── Identifies root cause         │ │
-│  │   - What worked                             │   │  ├── Updates failure patterns     │ │
-│  │   - Success patterns                          │   │  ├── Adjusts thresholds             │ │
-│  │   - Performance metrics                      │   │  └── Generates insight for future      │ │
+│  │   - What worked                                 │   │  ├── Updates failure patterns      │ │
+│  │   - Success patterns                            │   │  ├── Adjusts thresholds            │ │
+│  │   - Performance metrics                         │   │  └── Generates insight for future  │ │
 │  └── Atualiza CreditAssignmentEngine               │   └── Atualiza CreditAssignmentEngine  │ │
 └────────────────────────────────────────────────────┘   └────────────────────────────────────┘ │
                     │                                          │                                │
@@ -309,48 +309,48 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
                                        │                                                        │
                                        ▼                                                        │
 ┌─────────────────────────────────────────────────────────────────────────────┐                 │
-│  MEMORY_WRITER (Persists Long-Term)                                    │                 │
+│  MEMORY_WRITER (Persists Long-Term)                                         │                 │
 │  ├── Saves to Obsidian (04_Synapses/)                                       │                 │
-│  ├── Updates MemoryVector (embeddings)                                     │                 │
-│  └── Indexes for future search                                               │                 │
+│  ├── Updates MemoryVector (embeddings)                                      │                 │
+│  └── Indexes for future search                                              │                 │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                     │                                                           │
                                     ▼                                                           │
 ================================================================================                │
-                    ✅ PHASE 10 — FINAL DELIVERY                                                  │
+                    ✅ PHASE 10 — FINAL DELIVERY                                                │
 ================================================================================                │
                                                                                                 │
 ┌─────────────────────────────────────────────────────────────────────────────┐                 │
-│  MEMORY_CLEANER (Cache Cleanup)                                          │                 │
+│  MEMORY_CLEANER (Cache Cleanup)                                             │                 │
 │  ├── Removes expired cache (>5min)                                          │                 │
-│  └── Releases RAM memory                                                     │                 │
+│  └── Releases RAM memory                                                    │                 │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                     │                                                           │
                                     ▼                                                           │
 ┌─────────────────────────────────────────────────────────────────────────────┐                 │
-│  METRICS (Final Metrics Collection)                                        │                 │
-│  ├── Total latency                                                         │                 │
-│  ├── Total cost (tokens × price)                                           │                 │
+│  METRICS (Final Metrics Collection)                                         │                 │
+│  ├── Total latency                                                          │                 │
+│  ├── Total cost (tokens × price)                                            │                 │
 │  ├── Final IVM of pipeline                                                  │                 │
-│  └── Success/Failure                                                          │                 │
+│  └── Success/Failure                                                        │                 │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                     │                                                           │
                                     ▼                                                           │
 ┌─────────────────────────────────────────────────────────────────────────────┐                 │
-│  OUTPUT TO USER                                                        │                 │
-│  ├── Generated artifact: HealthDashboard.jsx                                   │                 │
+│  OUTPUT TO USER                                                             │                 │
+│  ├── Generated artifact: HealthDashboard.jsx                                │                 │
 │  ├── Tests: test_HealthDashboard.jsx                                        │                 │
-│  ├── Summary: 2318 chars → 150 chars (summary)                               │                 │
-│  └── Path: /home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/      │                 │
+│  ├── Summary: 2318 chars → 150 chars (summary)                              │                 │
+│  └── Path: /home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/         │                 │
 │                result/Criar_um_componente__HealthDashboard_jsx__*.md        │                 │
 └─────────────────────────────────────────────────────────────────────────────┘                 │
                                                                                                 │
-                                    END OF FLOW                                                │
+                                    END OF FLOW                                                 │
                                                                                                 │
 =================================================================================================
 ```
 
-## 🔄 RETRY LOOP (Critic rejection method)
+### 🔄 RETRY LOOP (Critic rejection method)
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -367,22 +367,22 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
          │
          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  FRONTEND_BUILDER: Re-generates code with feedback              │
+│  FRONTEND_BUILDER: Re-generates code with feedback          │
 └─────────────────────────────────────────────────────────────┘
          │
          ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  TESTER + REVIEWER + CRITIC: Re-evaluates                      │
+│  TESTER + REVIEWER + CRITIC: Re-evaluates                   │
 │  - Score = 85 → ✅ APPROVED                                 │
-│  - Score = 70 → ❌ REJECTED (retry 2/3)                    │
-│  - Score = 50 → ❌ REJECTED (retry 3/3) → CRITICAL FAILURE    │
+│  - Score = 70 → ❌ REJECTED (retry 2/3)                     │
+│  - Score = 50 → ❌ REJECTED (retry 3/3) → CRITICAL FAILURE  │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-## 📊 FLOW METRICS
+### 📊 FLOW METRICS
 
 ```
-| Phase | Main Agent | Expected Latency | ATP (Cost)      |
+| Phase | Main Agent      | Expected Latency  | ATP (Cost)       |
 |------|------------------|-------------------|------------------|
 | 0    | User             | -                 | 0                |
 | 1    | Prompt Improver  | 1-2s              | 50 tokens        |
@@ -398,35 +398,35 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
 | **TOTAL** |             | **19-33s**        | **~1250 tokens** |
 ```
 
-## 🧬 BIOMIMETIC PRINCIPLES APPLIED
+### 🧬 BIOMIMETIC PRINCIPLES APPLIED
 
 ```
-| Biological Process      |         Computational Equivalent       |
+| Biological Process      |         Computational Equivalent        |
 |-------------------------|-----------------------------------------|
-| **Methylation**           | Prompt Improver (enriches raw input) |
-| **Translation**            | Planner → Execution Plan                |
-| **Homeostasis**          | Source Validator (filters toxins)       |
-| **Immune System** | Critic (detects anomalies)              |
-| **Apoptosis**            | Retry Loop (eliminates bad code)        |
-| **Immune Memory** | Obsidian + MemoryVector                 |
-| **Metabolism**         | IVM (optimizes ATP/token)                 |
-| **Evolution**            | Reflexion (continuous learning)        |
+| **Methylation**         | Prompt Improver (enriches raw input)    |
+| **Translation**         | Planner → Execution Plan                |
+| **Homeostasis**         | Source Validator (filters toxins)       |
+| **Immune System**       | Critic (detects anomalies)              |
+| **Apoptosis**           | Retry Loop (eliminates bad code)        |
+| **Immune Memory**       | Obsidian + MemoryVector                 |
+| **Metabolism**          | IVM (optimizes ATP/token)               |
+| **Evolution**           | Reflexion (continuous learning)         |
 ```
-================================================================================
-                        🧬 END OF BIOMIMETIC FLOW
-================================================================================
+## ===========================================================
+##               🧬 END OF BIOMIMETIC FLOW
+## ===========================================================
 
-**Security feature** | LLM Access Architecture in iaglobal:
+### **Security feature** | LLM Access Architecture in iaglobal:
 ```
 ┌─────────────────────────────────────────────────────────────┐
-│                   USER / CLI                             │
+│                   USER / CLI                                │
 │              (iaglobal run "task description")              │
 └────────────────────┬────────────────────────────────────────┘
                      │
                      ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                   PIPELINE ENGINE                           │
-│         (orchestrates nodes, does not call LLM directly)       │
+│         (orchestrates nodes, does not call LLM directly)    │
 └────────────────────┬────────────────────────────────────────┘
                      │
                      ▼
@@ -439,9 +439,9 @@ iaglobal is closer than most. The difference between iaglobal and a "Chappie (th
                      ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                  Chappie + BanditPolicy = IVMAxiom          │
-│	Calculates, tracks and integrates IVM with BanditPolicy for     │
-│rewards proportional to each agent's contribution│
-│    (SINGLE SEMAPHORE — selects model, circuit breaker,     │
+│	Calculates, tracks and integrates IVM with BanditPolicy for │
+│rewards proportional to each agent's contribution            │
+│    (SINGLE SEMAPHORE — selects model, circuit breaker,      │
 │     fallback chain, credit assignment, rewards)             │
 └────────────────────┬────────────────────────────────────────┘
                      │
@@ -468,14 +468,15 @@ In iaglobal, agents cannot call LLM directly...
 - Immune memory hooks (EvoAgent)
 
 3. **Critic as validator** — The CriticAgent:
-- Valida outputs de outros agentes
-- Decide se precisa de retrabalho
-- Aprova antes de prosseguir no pipeline
+- Validates outputs from other agents
+- Decides if rework is needed
+- Approves before proceeding in the pipeline
 
 **So... How do you "talk" to the system?**
 
-* resposta... Via CLI — the only human or localhost entry point
-  exemplo em CLI: 
+* Response... Via CLI — the only human or localhost entry point
+
+Example in CLI:
 ```
   iaglobal run "create a Flask API with user CRUD"
 ```
@@ -768,25 +769,38 @@ Node A (Internet)                  Node B (iaglobal)
 
 ## 🚀 Quick Start
 
-```bash
-# 1. Clone and install
-git clone https://github.com/your-org/iaglobal.git
-cd iaglobal
+## 1. Clone and install
+```
+git clone https://github.com/josemarpoubel/iaglobal.git
+cd iaglobal-main
+python3 -m venv venv
+source venv/bin/activate
 pip install -r requirements.txt
+pip install -e .
+```
 
-# 2. Configure environment (Ollama works offline — no API key required)
+## 2. Configure environment (Ollama local or API key required)
+```
 cp .env.example .env
+```
 
-# 3. Run a task
+## 3. Run a task
+```
 iaglobal run "build a REST API with CRUD operations"
+```
 
-# 4. Run tests
-python -m pytest tests/ -q
+## 4. Run tests
+```
+python pytest
+```
 
-# 5. Run evolution lab
+## 5. Run evolution lab
+```
 OLLAMA_BASE_URL=http://localhost:11434 evolution-lab
+```
 
-# 6. View system status
+## 6. View system status
+```
 iaglobal status
 iaglobal history --stats
 ```
@@ -862,15 +876,15 @@ The model is escalated automatically when the task contains high-criticality key
 
 ### 🧪 Usage Examples
 
-# Simple task → local model (ATP preserved)
+## Simple task → local model (ATP preserved)
 ```
 iaglobal run "create a Flask API with CRUD"
 ```
-# Critical task → escalated to cloud automatically
+## Critical task → escalated to cloud automatically
 ```
 iaglobal run "analyze security vulnerability in code"
 ```
-# IVM weight optimization (node acts as central hub)
+## IVM weight optimization (node acts as central hub)
 ```
 iaglobal run "optimize IVM routing weights"
 ```
@@ -883,11 +897,11 @@ iaglobal run "optimize IVM routing weights"
 | Critical task | ≥ 0.5 | groq-mixtral (cloud) | 1000 tokens, 7 docs | Maximum precision |
 | Insufficient IVM | < 0.5 | — | — | Task rejected |
 
-### 🔬 Tests
+## 🔬 Tests
 ```
 🔗 Architecture 
 ┌────────────────────────────────────┐
-│  claim_detection.py (SINGLE SOURCE)   │
+│  claim_detection.py (SINGLE SOURCE)│
 │  - detect_architectural_claims()   │
 │  - verify_architectural_claims()   │
 │  - create_quarantine_report()      │
@@ -929,7 +943,7 @@ Selects real positive/negative examples from ToolLibrary, SkillRegistry and MTAP
 
 ### 3. Chain of Thought (INSTRUCAO_COT)
 
-**File:** `iaglobal/agents/agent_base.py:19-25`
+**File:** `iaglobal/agents/agent_base.py`
 
 Forces 4-step decomposition (ANALYSIS → STRUCTURE PLAN → IMPLEMENTATION → REVIEW) before code generation. Injected into `PEC_SYSTEM_PROMPT`, CriticAgent, DebuggerAgent and PromptImprover.
 
@@ -1599,7 +1613,7 @@ The organism is ready for:
 5. **PhospholipidRegistry integration** — dynamic provider load balancing at service-level
 
 The command that activates full self-optimization:
-```bash
+```
 iaglobal run "optimize IVM routing weights"
 ```
 
