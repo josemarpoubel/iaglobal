@@ -772,7 +772,11 @@ Node A (Internet)                  Node B (iaglobal)
 ## 1. Clone and install
 ```
 git clone https://github.com/josemarpoubel/iaglobal.git
+```
+```
 cd iaglobal-main
+```
+```
 python3 -m venv venv
 source venv/bin/activate
 pip install -r requirements.txt
