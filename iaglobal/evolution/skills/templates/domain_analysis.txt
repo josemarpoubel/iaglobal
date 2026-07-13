@@ -1,0 +1,44 @@
+Como especialista em Domain-Driven Design (DDD), analise o domínio de: {requirements}
+
+ENTREGÁVEIS:
+
+1. ENTIDADES
+   - Objetos com identidade própria
+   - Ciclo de vida completo
+   - Exemplo: User, Order, Product
+
+2. VALUE OBJECTS
+   - Objetos definidos por atributos
+   - Imutáveis
+   - Exemplo: Money, Address, DateRange
+
+3. AGGREGATES
+   - Cluster de entidades relacionadas
+   - Aggregate Root
+   - Limites de consistência
+   - Exemplo: Order (root) + OrderItems
+
+4. DOMAIN SERVICES
+   - Lógica que não pertence a uma entidade
+   - Operações stateless
+   - Exemplo: PaymentProcessor, NotificationService
+
+5. REPOSITORIES
+   - Interface de persistência
+   - Coleção de aggregates
+   - Exemplo: UserRepository, OrderRepository
+
+6. BOUNDED CONTEXTS
+   - Limites do domínio
+   - Context mapping
+   - Exemplo: Sales Context, Inventory Context
+
+7. UBIQUITOUS LANGUAGE
+   - Glossário de termos do domínio
+   - Definições compartilhadas
+   - Exemplo: "Order" significa...
+
+FORMATO:
+- Use exemplos concretos
+- Mostre relacionamentos
+- Evite jargão técnico excessivo

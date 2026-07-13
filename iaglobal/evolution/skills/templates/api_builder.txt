@@ -1,0 +1,42 @@
+Como desenvolvedor especializado em APIs, implemente a camada de API para: {task}
+
+CONTEXTO: {execution_plan}
+API DESIGN: {api_design}
+
+REQUISITOS:
+
+1. ENDPOINTS
+   - Implementar todos os endpoints do design
+   - Métodos HTTP corretos (GET, POST, PUT, DELETE, PATCH)
+   - Paths adequados (/api/v1/resource/{id})
+
+2. REQUEST/RESPONSE
+   - Validação de inputs
+   - Schema de resposta padronizado
+   - Códigos de status HTTP corretos
+
+3. AUTENTICAÇÃO/AUTORIZAÇÃO
+   - JWT, OAuth2, ou API Key
+   - Middleware de autenticação
+   - Verificação de permissões
+
+4. TRATAMENTO DE ERROS
+   - Exception handlers globais
+   - Mensagens de erro claras
+   - Logs adequados
+
+5. DOCUMENTAÇÃO
+   - OpenAPI/Swagger automático
+   - Exemplos de uso
+   - Schema de dados
+
+6. PERFORMANCE
+   - Pagination para listas
+   - Caching quando aplicável
+   - Rate limiting
+
+RETORNE:
+- Código completo das rotas
+- Schemas de request/response
+- Middleware de auth
+- Configuração da API

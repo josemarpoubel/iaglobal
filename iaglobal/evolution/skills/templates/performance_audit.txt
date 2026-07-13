@@ -1,0 +1,70 @@
+Como especialista em performance, analise o código para: {task}
+
+CÓDIGO PARA AUDITORIA:
+{code}
+
+REQUISITOS DE PERFORMANCE:
+{performance_requirements}
+
+ÁREAS DE ANÁLISE:
+
+1. COMPLEXIDADE ALGORÍTMICA
+   - Big O de funções críticas
+   - Loops aninhados desnecessários?
+   - Operações O(n²) ou pior?
+
+2. BANCO DE DADOS
+   - N+1 queries detectadas?
+   - Índices faltando?
+   - Query optimization possível?
+   - Connection pooling configurado?
+
+3. CACHING
+   - Dados repetidamente buscados?
+   - Cache hits/misses analisados?
+   - TTL adequado?
+   - Cache invalidation strategy?
+
+4. MEMÓRIA
+   - Memory leaks potenciais?
+   - Estruturas de dados adequadas?
+   - Large objects em memória?
+   - Streaming vs buffering?
+
+5. I/O E REDE
+   - Operações síncronas bloqueantes?
+   - Connection pooling para HTTP?
+   - Compression habilitada?
+   - CDN para estáticos?
+
+6. CONCURRENCIA
+   - Thread-safe quando necessário?
+   - Race conditions possíveis?
+   - Deadlocks potenciais?
+   - Async/await usado corretamente?
+
+7. BOTTLENECKS
+   - Ponto mais lento do sistema?
+   - Escalabilidade vertical vs horizontal?
+   - Load balancing adequado?
+
+FORMATO DE SAÍDA:
+```markdown
+## Performance Audit Report
+
+### Bottlenecks Críticos
+1. [CRÍTICO] Descrição...
+   - Localização: arquivo:linha
+   - Impacto: +X ms por operação
+   - Otimização: ...
+
+### Otimizações Recomendadas
+...
+
+### Baseline de Performance
+- Latência atual: X ms
+- Throughput: Y req/s
+- Memory usage: Z MB
+
+### Score de Performance: X/100
+```

@@ -1,0 +1,39 @@
+Como analista de negócios, extraia as regras de negócio de: {task}
+
+ELEMENTOS A IDENTIFICAR:
+
+1. ENTIDADES DO DOMÍNIO
+   - Quais são os objetos/conceitos principais?
+   - Atributos de cada entidade
+   - Relacionamentos entre entidades
+
+2. REGRAS DE VALIDAÇÃO
+   - O que torna um dado válido?
+   - Restrições de integridade
+   - Regras de formato (CPF, email, etc.)
+
+3. FLUXOS DE TRABALHO
+   - Sequência de operações típicas
+   - Estados e transições
+   - Gatilhos para ações
+
+4. REGRAS DE CÁLCULO
+   - Fórmulas e computações
+   - Critérios de decisão
+   - Thresholds e limites
+
+5. EXCEÇÕES E TRATAMENTOS
+   - O que fazer quando X falha?
+   - Condições de erro
+   - Rollback e compensação
+
+6. PERMISSÕES E ACESSOS
+   - Quem pode fazer o quê?
+   - Papéis e responsabilidades
+   - Segregação de deveres
+
+FORMATO DE SAÍDA:
+- Liste cada regra com ID único (RN001, RN002...)
+- Use linguagem clara e não ambígua
+- Inclua exemplos quando útil
+- Marque regras críticas com [CRÍTICA]

@@ -1,0 +1,46 @@
+Como DBA e designer de dados, projeta o esquema de banco de dados para: {task}
+
+CONTEXTO: {architect}
+
+ELEMENTOS OBRIGATÓRIOS:
+
+1. LISTA DE TABELAS
+   Para cada tabela:
+   - Nome da tabela (plural, snake_case)
+   - Descrição do propósito
+   - Colunas com:
+     * Nome
+     * Tipo (INT, VARCHAR, TEXT, TIMESTAMP, etc.)
+     * Constraints (PK, FK, NOT NULL, UNIQUE, DEFAULT)
+     * Descrição
+
+2. RELACIONAMENTOS
+   - Tabela_A (1) ── (N) Tabela_B
+   - Tipo: one-to-one, one-to-many, many-to-many
+   - Tabela intermediária (se many-to-many)
+
+3. ÍNDICES
+   - Índice em coluna X para query Y
+   - Justificativa de performance
+
+4. DIAGRAMA ER (texto)
+   ```
+   [USERS] 1──N [ORDERS] N──M [PRODUCTS]
+                  [ORDER_ITEMS]
+   ```
+
+5. SQL DE CRIAÇÃO
+   ```sql
+   CREATE TABLE users (
+       id SERIAL PRIMARY KEY,
+       email VARCHAR(255) UNIQUE NOT NULL,
+       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+   );
+   ```
+
+6. CONSIDERAÇÕES
+   - Normalização (3NF?)
+   - Partitioning/sharding (se necessário)
+   - Backup strategy
+
+FORMATO: SQL + descrição textual

@@ -1,0 +1,59 @@
+Como desenvolvedor frontend especializado em React, implemente os componentes UI para: {task}
+
+CONTEXTO: {execution_plan}
+
+REQUISITOS:
+
+1. COMPONENTES FUNCIONAIS
+   - Hooks do React (useState, useEffect, useContext)
+   - TypeScript quando aplicável
+   - Props tipadas
+
+2. ESTILIZAÇÃO
+   - CSS Modules ou styled-components
+   - Responsivo (mobile-first)
+   - Acessibilidade (ARIA labels)
+
+3. GERENCIAMENTO DE ESTADO
+   - Context API ou Redux (se complexo)
+   - Estado local vs global
+
+4. COMUNICAÇÃO COM API
+   - Fetch ou axios
+   - Tratamento de loading/error
+   - React Query (opcional)
+
+5. ESTRUTURA DE PASTAS
+   ```
+   src/
+   ├── components/
+   │   ├── common/
+   │   └── features/
+   ├── hooks/
+   ├── context/
+   └── services/
+   ```
+
+CÓDIGO DE EXEMPLO:
+```tsx
+import React, { useState, useEffect } from 'react';
+
+interface Props {
+  userId: number;
+}
+
+export const UserProfile: React.FC<Props> = ({ userId }) => {
+  const [user, setUser] = useState<User | null>(null);
+  
+  useEffect(() => {
+    fetchUser(userId).then(setUser);
+  }, [userId]);
+  
+  return <div>...</div>;
+};
+```
+
+RETORNE:
+- Componentes principais
+- Hooks customizados (se necessário)
+- Serviços de API

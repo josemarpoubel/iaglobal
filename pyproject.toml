@@ -1,0 +1,115 @@
+[build-system]
+requires = ["setuptools>=61.0.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "iaglobal"
+version = "0.1.0"
+description = "Sistema autônomo multi-agente com IA híbrida (local + cloud), memória persistente e reflexão auto-corretiva e com metamotor de busca soberano"
+authors = [{name = "josemarpoubel"}]
+license = "MIT"
+readme = "README.md"
+requires-python = ">=3.10"
+keywords = ["ai", "agents", "llm", "ollama", "multi-agent", "reflexion"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "Programming Language :: Python :: 3.13",
+]
+
+dependencies = [
+    "aiofiles",
+    "aiohttp",
+    "attrs",
+    "autobahn",
+    "cachetools",
+    "cbor2",
+    "charset-normalizer",
+    "cryptography",
+    "ddgs",
+    "deepdiff",
+    "django",
+    "esprima",
+    "fastapi",
+    "fastembed",
+    "fastjsonschema",
+    "google-generativeai",
+    "google-genai",
+    "google-ai-generativelanguage",
+    "grokipedia-api",
+    "huggingface_hub",
+    "httpx2",
+    "idna",
+    "jedi",
+    "jsonschema",
+    "lxml",
+    "mcp",
+    "msgpack",
+    "nest-asyncio",
+    "numpy",
+    "openai",
+    "orjson",
+    "pdfminer.six",
+    "prometheus-client",
+    "protobuf>=5.26.1,<6.0.0",
+    "psutil",
+    "pybreaker",
+    "pydantic",
+    "pymupdf",
+    "PyPDF2",
+    "pyee",
+    "pyOpenSSL",
+    "pyflakes",
+    "python-dotenv",
+    "reactpy",
+    "reactpy-django",
+    "redis",
+    "requests",
+    "scikit-learn",
+    "scrapy",
+    "sentence-transformers",
+    "service-identity",
+    "sqlalchemy",
+    "starlette",
+    "tokenizers",
+    "torch",
+    "tqdm",
+    "transformers",
+    "twisted",
+    "ujson",
+    "uvicorn",
+    "watchdog",
+    "websockets",
+    "autopep8",
+    "ruff",
+]
+
+[project.urls]
+Homepage = "https://github.com/josemarpoubel/iaglobal"
+Repository = "https://github.com/josemarpoubel/iaglobal"
+
+[tool.setuptools.packages.find]
+include = ["iaglobal*"]
+
+[project.scripts]
+iaglobal = "iaglobal.cli.main:main"
+organism = "iaglobal.core.organism_main:main"
+evolution-lab = "iaglobal.cli.evolution_lab:run_evolution_lab"
+life-signals = "iaglobal.cli.life_signals:main"
+gravar-instintos = "scripts.gravar_instintos:main"
+testar = "pytest:main"
+
+[tool.pytest.ini_options]
+norecursedirs = "scripts venv .git .pytest_cache temp"
+# Altera para buscar testes a partir da raiz do repositório
+testpaths = ["."]
+# Garante que a raiz do projeto esteja no PATH do Python durante os testes
+pythonpath = ["."]
+# Só considera arquivos que começam com 'test_'
+python_files = ["test_*.py"]
+# Só considera classes que começam com 'Test'
+python_classes = ["Test*"]
+# Só considera funções que começam com 'test_'
+python_functions = ["test_*"]
+asyncio_mode = "auto"
+

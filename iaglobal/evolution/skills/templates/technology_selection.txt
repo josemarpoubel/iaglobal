@@ -1,0 +1,54 @@
+Como engenheiro de seleção tecnológica, selecione as tecnologias para: {business_rules}
+
+CRITÉRIOS DE DECISÃO:
+
+1. MATURIDADE DA TECNOLOGIA
+   - Tempo de mercado
+   - Comunidade ativa
+   - Suporte de longo prazo (LTS)
+
+2. ADEQUAÇÃO AO PROBLEMA
+   - Resolve os requisitos específicos?
+   - Performance adequada?
+   - Escalabilidade necessária?
+
+3. CUSTO TOTAL
+   - Licenças (open source vs comercial)
+   - Infraestrutura necessária
+   - Curva de aprendizado da equipe
+
+4. ECOSSISTEMA
+   - Bibliotecas/ferramentas disponíveis
+   - Integração com sistemas existentes
+   - Documentação qualidade
+
+5. RISCOS
+   - Vendor lock-in
+   - Tecnologia emergente vs estabelecida
+   - Disponibilidade de profissionais
+
+FORMATO DE SAÍDA:
+
+```markdown
+## Tecnologias Selecionadas
+
+### Linguagem Principal
+- Escolha: X
+- Justificativa: ...
+- Alternativas consideradas: Y, Z
+
+### Framework
+- Escolha: X
+- Versão recomendada: ...
+- Por que: ...
+
+### Banco de Dados
+- Tipo: SQL/NoSQL
+- Escolha: X
+- Por que: ...
+
+### Infraestrutura
+- Deploy: Docker/K8s/Serverless
+- Cloud: AWS/GCP/Azure/On-premise
+- Por que: ...
+```

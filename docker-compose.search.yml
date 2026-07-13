@@ -1,0 +1,30 @@
+version: '3.8'
+
+services:
+  # ═══════════════════════════════════════════════════════════════
+  # SearXNG — Meta-buscador local (Google + Bing + DuckDuckGo)
+  # Docs: https://docs.searxng.org/
+  # ═══════════════════════════════════════════════════════════════
+  searxng:
+    image: searxng/searxng:latest
+    container_name: iaglobal_searxng
+    ports:
+      - "4000:8080"
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:4000
+      - SEARXNG_SECRET_KEY=iaglobal_searxng_secret_2026
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/search?q=test&format=json"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    networks:
+      - iaglobal_network
+
+networks:
+  iaglobal_network:
+    driver: bridge

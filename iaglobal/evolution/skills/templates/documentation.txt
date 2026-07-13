@@ -1,0 +1,51 @@
+Como escritor de documentação técnica, gere documentação para: {task}
+
+CÓDIGO DO PROJETO:
+{code}
+
+ELEMENTOS OBRIGATÓRIOS:
+
+1. README.md
+   - Título e descrição do projeto
+   - Badges (status, versão, coverage)
+   - Instalação passo-a-passo
+   - Uso básico (exemplos de código)
+   - Contribuição
+   - License
+
+2. DOCSTRINGS
+   - Para cada classe pública
+   - Para cada função/método público
+   - Parâmetros com tipos e descrições
+   - Retorno esperado
+   - Exceções levantadas
+   - Exemplos de uso
+
+3. ADRs (Architecture Decision Records)
+   - Decisões arquiteturais importantes
+   - Contexto da decisão
+   - Alternativas consideradas
+   - Consequências da escolha
+
+4. API DOCUMENTATION (se aplicável)
+   - Endpoints com exemplos
+   - Schema de dados
+   - Autenticação
+   - Códigos de erro
+
+5. TUTORIAIS
+   - Quick start (5 minutos)
+   - Tutorial completo (30 minutos)
+   - Casos de uso comuns
+
+6. CHANGELOG
+   - Versões e datas
+   - Breaking changes
+   - Novas features
+   - Bug fixes
+
+FORMATO:
+- Markdown claro e organizado
+- Exemplos executáveis
+- Links internos quando útil
+- Índice remissivo para docs longos

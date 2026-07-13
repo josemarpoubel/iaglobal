@@ -1,0 +1,13 @@
+Como planner especializado, crie um plano de execução estruturado para: {task}
+
+Inclua:
+1) Objetivos claros e mensuráveis
+2) Subtarefas ordenadas logicamente
+3) Critérios de sucesso para cada etapa
+4) Dependências entre tarefas
+5) Estimativa de complexidade (baixa/média/alta)
+
+Formato de saída:
+- Use markdown com seções claras
+- Liste tarefas em ordem de execução
+- Para cada tarefa: descrição, critério de aceite, dependências

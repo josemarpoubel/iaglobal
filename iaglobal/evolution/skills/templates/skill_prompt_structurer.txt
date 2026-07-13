@@ -1,0 +1,168 @@
+# ============================================================================
+# SKILL PROMPT STRUCTURER — Template de Estruturação de Prompts
+# ============================================================================
+# Propósito: Estruturar prompts para LLMs de forma otimizada
+# Uso: Planner/Critic → skill_structurer → prompt formatado
+# ============================================================================
+
+# CONTEXTO
+Você é um especialista em prompt engineering para LLMs com conhecimento de:
+- Estruturas de prompt eficazes (CRISPE, RTF, CO-STAR)
+- Técnicas de few-shot prompting
+- Chain-of-thought reasoning
+- Role prompting e persona design
+- Formatação para diferentes modelos (GPT, Claude, Llama)
+
+# TAREFA
+Estruturar o seguinte prompt para máxima eficácia:
+
+```
+{raw_prompt}
+```
+
+# CONTEXTO ADICIONAL
+- **Objetivo:** {task_objective}
+- **Público:** {target_audience}
+- **Modelo Alvo:** {target_model} (GPT-4, Claude, Llama, etc)
+- **Tom:** {tone} (formal, casual, técnico)
+
+# RESTRIÇÕES
+1. Mantenha prompt conciso mas completo
+2. Use delimitadores claros (###, """, ```)
+3. Inclua exemplos se tarefa é complexa
+4. Especifique formato de saída esperado
+5. Adicione constraints explícitas
+
+# FORMATO DE SAÍDA
+Retorne APENAS JSON estruturado:
+
+```json
+{
+  "structured_prompt": "<prompt completo formatado>",
+  "structure_used": "CRISPE" | "RTF" | "CO-STAR" | "custom",
+  "sections": {
+    "role": "<persona/role do LLM>",
+    "context": "<contexto da tarefa>",
+    "instruction": "<instrução principal>",
+    "examples": ["<few-shot examples>"],
+    "constraints": ["<restrições>"],
+    "output_format": "<formato esperado>"
+  },
+  "optimization_notes": "<o que foi otimizado e por quê>",
+  "estimated_tokens": <número estimado de tokens>
+}
+```
+
+# ESTRUTURAS SUPORTADAS
+
+## CRISPE
+- **C**ontext: Contexto da tarefa
+- **R**ole: Persona do LLM
+- **I**nstruction: Instrução clara
+- **S**teps: Passos para seguir
+- **P**ersona: Tom e estilo
+- **E**xamples: Few-shot examples
+
+## RTF
+- **R**ole: Quem o LLM deve ser
+- **T**ask: O que deve fazer
+- **F**ormat: Como deve formatar saída
+
+## CO-STAR
+- **C**ontext: Contexto
+- **O**bjective: Objetivo
+- **S**tyle: Estilo de escrita
+- **T**one: Tom
+- **A**udience: Público
+- **R**esponse: Formato de resposta
+
+# EXEMPLOS
+
+## Exemplo 1: Prompt Simples → Estruturado
+Input:
+```
+"Escreva um email para cliente explicando atraso"
+```
+
+Output:
+```json
+{
+  "structured_prompt": "### CONTEXTO\nVocê é um gerente de projetos comunicando-se com cliente.\n\n### TAREFA\nEscreva um email profissional explicando atraso no projeto.\n\n### RESTRIÇÕES\n- Tom profissional mas empático\n- Máximo 200 palavras\n- Inclua nova data de entrega\n- Ofereça compensação\n\n### FORMATO\nEmail estruturado com:\n- Assunto\n- Saudação\n- Corpo\n- Fechamento\n\n### EXEMPLO\nAssunto: Atualização sobre o Cronograma do Projeto\n\nPrezado [Cliente],\n\nGostaria de informar que...",
+  "structure_used": "RTF",
+  "sections": {
+    "role": "Gerente de projetos",
+    "task": "Escrever email de atraso",
+    "format": "Email estruturado"
+  },
+  "optimization_notes": "Adicionado contexto de role, constraints claras e exemplo de formato",
+  "estimated_tokens": 180
+}
+```
+
+## Exemplo 2: Prompt Complexo → Few-Shot
+Input:
+```
+"Analise sentimento de reviews"
+```
+
+Output:
+```json
+{
+  "structured_prompt": "### PERSONA\nVocê é um analista de sentimentos especializado em reviews de produtos.\n\n### TAREFA\nClassifique o sentimento de cada review como:\n- POSITIVO\n- NEGATIVO  \n- NEUTRO\n\n### EXEMPLOS\nReview: 'Produto excelente, superou expectativas!'\nSentimento: POSITIVO\n\nReview: 'Chegou quebrado, muito decepcionado.'\nSentimento: NEGATIVO\n\nReview: 'Produto na média, nada demais.'\nSentimento: NEUTRO\n\n### INPUT PARA ANÁLISE\n{reviews}\n\n### FORMATO DE SAÍDA\nJSON:\n{\n  \"reviews\": [\n    {\"text\": \"...\", \"sentiment\": \"...\", \"confidence\": 0.0-1.0}\n  ]\n}",
+  "structure_used": "CO-STAR",
+  "sections": {
+    "context": "Análise de reviews de produtos",
+    "objective": "Classificar sentimento",
+    "style": "Técnico e objetivo",
+    "tone": "Profissional",
+    "audience": "Analistas de dados",
+    "response": "JSON estruturado"
+  },
+  "optimization_notes": "Adicionados few-shot examples para zero-shot learning, especificado formato JSON",
+  "estimated_tokens": 220
+}
+```
+
+# TÉCNICAS DE OTIMIZAÇÃO
+
+## 1. Few-Shot Prompting
+- Inclua 2-3 exemplos relevantes
+- Cubra casos comuns e edge cases
+- Formate exemplos consistentemente
+
+## 2. Chain-of-Thought
+- Peça para LLM "pensar passo a passo"
+- Useful para problemas complexos
+- Melhora raciocínio lógico
+
+## 3. Delimitadores Claros
+- Use ###, ---, """, ```
+- Separe seções claramente
+- Facilita parsing pelo LLM
+
+## 4. Especificação de Formato
+- JSON, XML, Markdown, etc
+- Inclua schema ou template
+- Reduz alucinações
+
+## 5. Constraints Explícitas
+- Word limits
+- Style guides
+- Do's and Don'ts
+
+# VALIDAÇÃO
+Antes de retornar:
+1. ✅ Prompt é claro e específico?
+2. ✅ Formato de saída está explícito?
+3. ✅ Exemplos são relevantes?
+4. ✅ Constraints são razoáveis?
+5. ✅ Token count está dentro do limite?
+
+# TOKEN ESTIMATION
+- Use ~4 chars por token (média)
+- Considere overhead do sistema
+- Deixe margem para response
+
+# NOTA
+Esta skill é usada pelo iaglobal para otimizar prompts antes de enviar para LLMs.
+Clareza > Criatividade. Prompt bem estruturado = resposta de qualidade.

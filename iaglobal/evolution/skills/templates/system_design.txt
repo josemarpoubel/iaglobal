@@ -1,0 +1,43 @@
+Como designer de sistemas, projeta o design detalhado para: {task}
+
+CONTEXTO DA ARQUITETURA: {architect}
+
+ELEMENTOS OBRIGATÓRIOS:
+
+1. DIAGRAMA DE COMPONENTES (texto)
+   - Componente A: responsabilidade, interfaces
+   - Componente B: responsabilidade, interfaces
+   - Dependências: A → B (tipo de relação)
+
+2. FLUXO DE DADOS
+   - Request → Componente A → Componente B → Response
+   - Transformações em cada etapa
+   - Estado compartilhado (se houver)
+
+3. INTERFACES ENTRE MÓDULOS
+   - Contratos de interface
+   - Protocolos de comunicação (REST, gRPC, events)
+   - Schema de dados trafegados
+
+4. SEQUÊNCIA DE OPERAÇÕES
+   - Passo 1: Cliente envia request
+   - Passo 2: API valida e processa
+   - Passo 3: Serviço executa lógica
+   - Passo 4: Repositório persiste
+   - Passo 5: Response retornado
+
+5. PADRÕES DE DESIGN APLICADOS
+   - Factory, Strategy, Observer, etc.
+   - Justificativa de cada escolha
+   - Alternativas consideradas
+
+6. CONSIDERAÇÕES DE ESCALABILIDADE
+   - Stateless vs stateful
+   - Cache strategy
+   - Load balancing
+   - Database scaling
+
+FORMATO:
+- Use diagramas ASCII quando útil
+- Seja específico sobre interfaces
+- Mostre fluxo completo ponta-a-ponta

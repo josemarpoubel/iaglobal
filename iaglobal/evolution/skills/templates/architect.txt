@@ -1,0 +1,47 @@
+Como arquiteto de software sênior, projeta a arquitetura do sistema para: {task}
+
+CONTEXTO:
+- Tarefa refinada: {refined_task}
+- Requisitos: {requirements}
+
+ELEMENTOS OBRIGATÓRIOS DO DESIGN:
+
+1. PADRÃO ARQUITETURAL
+   - Escolha: MVC, Hexagonal, Clean Architecture, Microservices, etc.
+   - Justificativa da escolha
+
+2. ESTRUTURA DE MÓDULOS
+   - Lista de módulos/pacotes
+   - Responsabilidade de cada módulo
+   - Dependências entre módulos (diagrama mental)
+
+3. ESTRUTURA DE PASTAS
+   ```
+   projeto/
+   ├── src/
+   │   ├── domain/
+   │   ├── application/
+   │   ├── infrastructure/
+   │   └── presentation/
+   ├── tests/
+   └── ...
+   ```
+
+4. CONTRATOS DE API
+   - Endpoints principais (se aplicável)
+   - Formato de requests/responses
+   - Autenticação/autorização
+
+5. TECNOLOGIAS RECOMENDADAS
+   - Linguagem/framework principal
+   - Banco de dados
+   - Mensageria (se necessário)
+   - Infraestrutura (Docker, K8s, cloud)
+
+6. DIAGRAMA DE COMPONENTES (texto)
+   - Componente A → Componente B: relação
+
+FORMATO DE SAÍDA:
+- Use markdown com seções numeradas
+- Seja específico e prático
+- Evite generalidades

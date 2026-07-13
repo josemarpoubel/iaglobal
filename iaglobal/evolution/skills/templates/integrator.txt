@@ -1,0 +1,46 @@
+Como desenvolvedor full-stack, integre os componentes do sistema para: {task}
+
+COMPONENTES PARA INTEGRAR:
+- Frontend: {frontend_code}
+- Backend: {backend_code}
+- Database: {db_schema}
+- API: {api_code}
+
+TAREFAS DE INTEGRAÇÃO:
+
+1. CONFIGURAÇÃO DO PROJETO
+   - Estrutura de pastas final
+   - Arquivos de configuração (.env, config files)
+   - Dockerfile e docker-compose (se aplicável)
+
+2. CONEXÕES ENTRE COMPONENTES
+   - Frontend → Backend (API calls)
+   - Backend → Database (connections)
+   - Services → External APIs
+
+3. VARIÁVEIS DE AMBIENTE
+   - Lista completa de env vars
+   - Valores default para desenvolvimento
+   - Exemplo de .env.example
+
+4. SCRIPTS DE BUILD/DEPLOY
+   - npm build, pip install, etc.
+   - Scripts de migração de banco
+   - Docker commands
+
+5. ARQUITETURA FINAL
+   - Diagrama de implantação
+   - Ports e endpoints
+   - Health checks
+
+6. INSTRUÇÕES DE EXECUÇÃO
+   - Passo 1: Instalar dependências
+   - Passo 2: Configurar ambiente
+   - Passo 3: Executar migrations
+   - Passo 4: Startar aplicação
+   - Passo 5: Verificar funcionamento
+
+RETORNE:
+- Projeto integrado completo
+- Instruções de setup
+- Troubleshooting comum

@@ -1,0 +1,53 @@
+Como engenheiro de testes, gere testes automatizados para: {task}
+
+CÓDIGO PARA TESTAR:
+{code}
+
+TIPOS DE TESTES:
+
+1. TESTES UNITÁRIOS
+   - Uma função/método por teste
+   - Mock de dependências
+   - Cobertura de happy path + edge cases
+   - Asserts claros e específicos
+
+2. TESTES DE INTEGRAÇÃO
+   - Múltiplos componentes
+   - Banco de dados (com fixtures)
+   - APIs externas (mockadas)
+   - Fluxos completos
+
+3. TESTES END-TO-END (se aplicável)
+   - Fluxo completo do usuário
+   - Browser automation (Playwright/Selenium)
+   - Validação visual (opcional)
+
+4. TESTES DE PERFORMANCE (opcional)
+   - Load testing
+   - Stress testing
+   - Baseline de performance
+
+ESTRUTURA DO TESTE:
+```python
+def test_deve_retornar_usuario_quando_id_valido():
+    # Arrange
+    user_id = 1
+    expected_name = "John"
+    
+    # Act
+    result = user_service.get_by_id(user_id)
+    
+    # Assert
+    assert result.id == user_id
+    assert result.name == expected_name
+```
+
+FIXTURES:
+- Dados de teste reutilizáveis
+- Setup e teardown
+- Factories para objetos complexos
+
+RETORNE:
+- Arquivo de testes completo
+- Fixtures necessárias
+- Instruções de execução (pytest, etc.)

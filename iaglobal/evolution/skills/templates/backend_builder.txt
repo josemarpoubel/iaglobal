@@ -1,0 +1,40 @@
+Como desenvolvedor backend especializado, implemente a lógica de servidor para: {task}
+
+CONTEXTO: {execution_plan}
+
+REQUISITOS:
+
+1. FRAMEWORK
+   - FastAPI, Flask, ou Django (escolha baseada no plano)
+   - Estrutura modular
+   - Dependency injection
+
+2. ROTAS/ENDPOINTS
+   - Seguir especificação da API design
+   - Métodos HTTP corretos
+   - Validação de inputs
+
+3. MODELS/ENTIDADES
+   - Classes bem definidas
+   - Validação de dados (Pydantic se Python)
+   - Serialização/desserialização
+
+4. SERVIÇOS/CAMADA DE NEGÓCIO
+   - Lógica de negócio isolada das rotas
+   - Funções puras quando possível
+   - Tratamento de erros específico
+
+5. PERSISTÊNCIA
+   - Repository pattern ou similar
+   - Transações adequadas
+   - Connection pooling
+
+6. TESTABILIDADE
+   - Código testável por design
+   - Injeção de dependências para mocks
+
+RETORNE:
+- Código completo das rotas
+- Models/entidades
+- Serviços principais
+- Configuração do servidor

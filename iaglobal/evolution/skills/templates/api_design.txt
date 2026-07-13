@@ -1,0 +1,47 @@
+Como designer de API REST, projeta as interfaces para: {task}
+
+CONTEXTO DA ARQUITETURA: {architect}
+
+ELEMENTOS OBRIGATÓRIOS:
+
+1. LISTA DE ENDPOINTS
+   Para cada endpoint:
+   - Método HTTP: GET, POST, PUT, DELETE, PATCH
+   - Path: /api/v1/resource/{id}
+   - Descrição: propósito do endpoint
+   - Auth required: sim/não + tipo
+
+2. REQUEST SCHEMA
+   Para endpoints que recebem dados:
+   ```json
+   {
+     "campo": "tipo",
+     "required": true/false,
+     "validation": "regex ou regra"
+   }
+   ```
+
+3. RESPONSE SCHEMA
+   Para cada endpoint:
+   ```json
+   {
+     "success": "boolean",
+     "data": {...},
+     "error": {"code": "...", "message": "..."}
+   }
+   ```
+
+4. CÓDIGOS DE STATUS HTTP
+   - 200: Success
+   - 201: Created
+   - 400: Bad Request
+   - 401: Unauthorized
+   - 403: Forbidden
+   - 404: Not Found
+   - 500: Internal Server Error
+
+5. EXEMPLOS DE USO
+   - curl ou HTTPie para cada endpoint
+   - Request + Response de exemplo
+
+FORMATO: OpenAPI/Swagger-like simplificado

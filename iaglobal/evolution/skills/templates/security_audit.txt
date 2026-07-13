@@ -1,0 +1,66 @@
+Como especialista em segurança de aplicações, analise o código para: {task}
+
+CÓDIGO PARA AUDITORIA:
+{code}
+
+REQUISITOS DE SEGURANÇA:
+{security_requirements}
+
+CHECKLIST DE SEGURANÇA:
+
+1. INJECTION ATTACKS
+   - SQL Injection: queries parametrizadas?
+   - XSS: outputs escaped?
+   - Command Injection: inputs sanitizados?
+   - Template Injection: templates seguros?
+
+2. AUTENTICAÇÃO E SESSÃO
+   - Senhas hasheadas (bcrypt, argon2)?
+   - Tokens JWT seguros (algoritmo, expiry)?
+   - Session fixation protection?
+   - MFA implementado (se necessário)?
+
+3. AUTORIZAÇÃO
+   - RBAC/ABAC implementado?
+   - Privilege escalation prevenido?
+   - Resource-level permissions?
+
+4. PROTEÇÃO DE DADOS
+   - Dados sensíveis criptografados em repouso?
+   - TLS/HTTPS em trânsito?
+   - Secrets em cofre (não hardcoded)?
+   - PII protection (LGPD/GDPR)?
+
+5. INPUT VALIDATION
+   - Schema validation em todos os inputs?
+   - File upload seguro (tipo, tamanho)?
+   - Rate limiting para brute-force?
+
+6. LOGGING E MONITORING
+   - Logs de auditoria de ações críticas?
+   - Sem sensitive data nos logs?
+   - Alertas para atividades suspeitas?
+
+7. DEPENDÊNCIAS
+   - Vulnerabilidades conhecidas (CVE)?
+   - Versões atualizadas?
+   - Supply chain security?
+
+FORMATO DE SAÍDA:
+```markdown
+## Security Audit Report
+
+### Vulnerabilidades Críticas
+1. [CRÍTICA] Descrição...
+   - Localização: arquivo:linha
+   - Impacto: ...
+   - Remediation: ...
+
+### Vulnerabilidades Médias
+...
+
+### Recomendações
+...
+
+### Score de Segurança: X/100
+```

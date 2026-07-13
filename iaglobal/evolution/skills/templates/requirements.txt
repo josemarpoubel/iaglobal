@@ -1,0 +1,32 @@
+Como engenheiro de requisitos, extraia os requisitos formais da tarefa: {task}
+
+TAREFA REFINADA: {refined_task}
+
+ENTREGÁVEIS:
+
+1. REQUISITOS FUNCIONAIS (RFs)
+   Liste cada RF com:
+   - ID: RF001, RF002, ...
+   - Descrição: "O sistema deve..."
+   - Critério de aceite: "Dado-Quando-Então"
+
+2. REQUISITOS NÃO-FUNCIONAIS (RNFs)
+   Liste cada RNF com:
+   - ID: RNF001, RNF002, ...
+   - Categoria: performance, segurança, usabilidade, etc.
+   - Métrica mensurável: "Tempo de resposta < 200ms"
+
+3. REGRAS DE NEGÓCIO
+   - Regras de validação
+   - Fluxos de trabalho obrigatórios
+   - Exceções e tratamentos
+
+4. CASOS DE USO PRINCIPAIS
+   - Ator → Ação → Resultado
+   - Fluxo principal
+   - Fluxos alternativos
+
+FORMATO DE SAÍDA:
+- Use markdown organizado
+- Seja específico e testável
+- Evite ambiguidades
