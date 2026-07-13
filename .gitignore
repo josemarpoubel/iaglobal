@@ -1,0 +1,26 @@
+```gitignore
+# Python compiled files
+*.pyc
+__pycache__/
+
+# Database files
+*.db
+
+# Log files
+*.log
+
+# Lock files
+*.lock
+
+# Data files that might be generated
+*.jsonl
+*.cbor
+*.pkl
+*.json
+
+# Obsidian vault files (if auto-generated)
+*.md
+
+# Test cache files
+.pytest_cache/
+```
