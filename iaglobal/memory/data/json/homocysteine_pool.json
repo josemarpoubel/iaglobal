@@ -1,0 +1,20 @@
+[
+  {
+    "skill_name": "skill_8997ff26",
+    "skill_description": "Skill derivada de: tarefa normal de an\u00e1lise",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "tarefa normal de an\u00e1lise",
+    "created_at": 1783986226.963161
+  },
+  {
+    "skill_name": "skill_76e568f7",
+    "skill_description": "Skill derivada de: tarefa normal de an\u00e1lise",
+    "generation": 0,
+    "score": 0.5,
+    "route": "undecided",
+    "source_gap": "tarefa normal de an\u00e1lise",
+    "created_at": 1783986241.325466
+  }
+]

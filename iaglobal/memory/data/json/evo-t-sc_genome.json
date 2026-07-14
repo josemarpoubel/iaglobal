@@ -1,0 +1,13 @@
+{
+  "name": "evo-t-sc",
+  "lineage_id": "c6bd5f444ade7c9f11a8f25c8b7189ae19dd194831eda03ccfd3df594fd37b78bf70eb4a2a049f3ebe61d728f53040736397c8eb7779fc643d8570077a56b598",
+  "lineage_marker": "fb6c18d08b9adf37",
+  "generation": 0,
+  "parent_lineage_id": "",
+  "nadph_reserve": 0.5,
+  "epigenetic_flags": {},
+  "failure_patterns": [],
+  "same_balance": 105,
+  "timestamp": 1783986234.488089,
+  "reason": "t"
+}
