@@ -19,15 +19,19 @@ Integração:
   - Fallback: se correção nativa falhar, sinaliza para debug_unificado usar LLM
 """
 
-import ast
 import time
 import re
+import ast
 from typing import Dict, Any, Optional
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.validation.js_validator import detect_lang
+from iaglobal.security.ast_gateway import ASTGateway
 
 logger = get_logger("iaglobal.graphs.nodes.syntax_sentinel")
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 
 def _count_unclosed(code: str) -> Dict[str, int]:
@@ -112,34 +116,34 @@ _AUTO_FIXERS = [
 
 
 async def _try_ast_parse(code: str) -> Optional[ast.AST]:
-    """Tenta fazer parse do código via AST nativo."""
-    try:
-        return ast.parse(code)
-    except SyntaxError as e:
-        logger.debug(
-            "[SYNTAX_SENTINEL] SyntaxError: linha=%d col=%d msg=%s",
-            e.lineno or 1,
-            e.offset or 0,
-            e.msg,
-        )
-        return None
-    except Exception as e:
-        logger.warning("[SYNTAX_SENTINEL] Erro no parse: %s", e)
-        return None
+    """Tenta fazer parse do código via ASTGateway."""
+    result = _ast_gateway.parse(code)
+    if result.valid and result.tree:
+        return result.tree
+    return None
 
 
 def _extract_syntax_error_details(code: str) -> Optional[Dict[str, Any]]:
     """Extrai detalhes do primeiro SyntaxError encontrado."""
-    try:
-        ast.parse(code)
+    result = _ast_gateway.parse(code)
+    if result.valid:
         return None
-    except SyntaxError as e:
+
+    # Extrair erro do primeiro erro na lista
+    if result.errors:
+        error_msg = result.errors[0]
+        # Tentar extrair linha/coluna do mensaje
+        import re
+
+        match = re.search(r"line (\d+)", error_msg)
+        line = int(match.group(1)) if match else 1
         return {
-            "line": e.lineno or 1,
-            "column": e.offset or 0,
-            "message": e.msg or "Erro de sintaxe",
-            "text": (e.text or "").rstrip("\n"),
+            "line": line,
+            "column": 0,
+            "message": error_msg,
+            "source": "ast_gateway",
         }
+    return None
 
 
 async def run_syntax_sentinel(ctx: Dict[str, Any]) -> Dict[str, Any]:

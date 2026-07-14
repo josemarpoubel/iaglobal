@@ -9,8 +9,11 @@ from typing import Callable, Dict, List, Optional, Tuple
 from dataclasses import dataclass
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.security.ast_gateway import ASTGateway
 
 logger = get_logger("iaglobal.tools.library")
+
+_ast_gateway = ASTGateway()
 
 _TOOLS_DB = None
 
@@ -188,14 +191,12 @@ class ToolLibrary:
         name = f"auto_tool_{hashlib.sha256(task.encode()).hexdigest()[:8]}"
         tags = [w.lower() for w in task.split() if len(w) > 3][:10]
         # Extrair nome real da função via AST
-        try:
-            tree = ast.parse(code)
-            for node in ast.iter_child_nodes(tree):
+        result = _ast_gateway.parse(code)
+        if result.valid and result.tree:
+            for node in ast.iter_child_nodes(result.tree):
                 if isinstance(node, ast.FunctionDef):
                     tags.append(node.name)
                     break
-        except SyntaxError:
-            pass
         try:
             compiled = compile(code, f"<{name}>", "exec")
             ns = {"__builtins__": {}}  # Restringir builtins para segurança

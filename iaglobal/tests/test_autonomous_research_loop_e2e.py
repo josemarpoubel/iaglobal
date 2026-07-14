@@ -347,7 +347,6 @@ class TestPipelineIntegration:
         for module_name in modules:
             module_path = (
                 Path(__file__).parent.parent
-                / "iaglobal"
                 / "agents"
                 / "ingestion"
                 / f"{module_name}.py"

@@ -913,20 +913,31 @@ class OmniMind:
             "timestamp": time.time(),
         }
 
-    def emitir_gatilho_apoptose(self, agent_id: str, motivo: str) -> dict[str, Any]:
+    def emitir_gatilho_apoptose(
+        self,
+        agent_id: str,
+        motivo: str,
+        duration_hours: Optional[int] = None,
+        violation_type: str = "psc_violation",
+    ) -> dict[str, Any]:
         """Implementa a Lei da Obediencia — apoptose por quebra de contrato.
 
-        Quando um agente viola o PSC (tenta acessar cloud fora do CriticAgent),
-        a OmniMind registra o patogeno e aciona apoptose contratual.
+        Quando um agente viola o PSC (tenta acessar cloud fora do CriticAgent)
+        ou acumula violacoes de segurança (AST bloqueado, reincidencia),
+        a OmniMind registra o patogeno, aciona apoptose contratual
+        e revoga o agente no CRL (Certificate Revocation List).
 
         Args:
             agent_id: ID do agente violador
-            motivo: Descricao da violacao (ex: "PSC: acesso cloud sem autorizacao")
+            motivo: Descricao da violacao
+            duration_hours: Duracao da revogacao em horas (None = permanente)
+            violation_type: Tipo da violacao (psc_violation, ast_violation, etc)
 
         Returns:
             Dict com trigger de apoptose
         """
         from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
+        from iaglobal.genesis.lineage_gate import revoke_node
 
         registry = EpigeneticRegistry()
 
@@ -941,10 +952,11 @@ class OmniMind:
                 registry.record_failure(
                     agent_id,
                     task_hash,
-                    "psc_violation",
+                    violation_type,
                     {
                         "node_id": agent_id,
                         "motivo": motivo,
+                        "duration_hours": duration_hours,
                         "omni_law_violated": "Lei da Obediencia",
                     },
                 )
@@ -957,6 +969,8 @@ class OmniMind:
                 "type": "apoptose_contratual",
                 "agent_id": agent_id,
                 "motivo": motivo,
+                "violation_type": violation_type,
+                "duration_hours": duration_hours,
                 "law": "Lei da Obediencia",
                 "timestamp": time.time(),
             }
@@ -965,20 +979,33 @@ class OmniMind:
             self._memoria_coletiva = self._memoria_coletiva[-500:]
         self._salvar_estado()
 
+        # Aplica revogacao no CRL (bloqueia execucao futura do agente)
+        duration_str = "permanentemente" if duration_hours is None else f"por {duration_hours}h"
+        revogou = revoke_node(
+            node_name=agent_id,
+            reason=f"Apoptose contratual: {motivo}",
+            duration_hours=duration_hours,
+        )
+
         logger.warning(
             "[OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente %s violou contrato — "
-            "Apoptose acionada. Motivo: %s",
+            "Apoptose acionada. Revogacao %s. Motivo: %s | CRL: %s",
             agent_id,
+            duration_str,
             motivo,
+            "OK" if revogou else "FALHA",
         )
         return {
             "trigger": "APOPTOSE_CONTRATUAL",
             "agent_id": agent_id,
             "law": "Lei da Obediencia",
             "motivo": motivo,
+            "violation_type": violation_type,
+            "duration_hours": duration_hours,
+            "crl_applied": revogou,
             "instruction": (
-                "O agente violou o Protocolo de Soberania do Critico (PSC). "
-                "A liberdade existe DENTRO dos contratos, nao apesar deles. "
+                f"O agente violou o contrato ({violation_type}). "
+                f"Revogacao {duration_str}. "
                 "Registrar no MHC Detector como patogeno por desobediencia contratual."
             ),
             "timestamp": time.time(),

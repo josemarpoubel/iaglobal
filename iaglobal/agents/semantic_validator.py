@@ -16,6 +16,10 @@ from typing import Dict, Any, List, Optional, Pattern
 
 from iaglobal.utils.helpers import run_async_safe
 from iaglobal.agents.agent_base import AgentBase
+from iaglobal.security.ast_gateway import ASTGateway
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 
 # =============================================================================
@@ -148,11 +152,13 @@ class PythonStructureRule(ValidationRule):
             return None
 
         try:
-            tree = await asyncio.to_thread(ast.parse, code)
-            has_func_or_class = any(
-                isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
-                for node in ast.walk(tree)
-            )
+            result = _ast_gateway.parse(code)
+            has_func_or_class = False
+            if result.valid and result.tree:
+                has_func_or_class = any(
+                    isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                    for node in ast.walk(result.tree)
+                )
 
             if has_func_or_class:
                 return RuleResult(
@@ -171,7 +177,7 @@ class PythonStructureRule(ValidationRule):
                     self.category,
                     suggestion="Adicione uma definição de função (def) ou classe (class)",
                 )
-        except SyntaxError:
+        except Exception:
             return RuleResult(
                 self.name,
                 "Erro de sintaxe no código Python",

@@ -14,12 +14,21 @@ Filosofia:
 import re
 import ast
 import time
+import hashlib
+import asyncio
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List, Tuple, Set, Dict, Any, Optional
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.security.ast_gateway import ASTGateway
 
 logger = get_logger("iaglobal.core.auto_correction")
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
+
+# Limiar de reincidencia antes da apoptose contratual
+REINCIDENCIA_LIMIAR = 3
 
 
 @dataclass
@@ -31,6 +40,50 @@ class Correcao:
     codigo_final: str = ""
     foi_corrigido: bool = False
     linguagem: str = "unknown"
+
+
+class _SanitizerTransformer(ast.NodeTransformer):
+    """Substitui nós ofensivos por alternativas seguras."""
+
+    def __init__(self, violations: List[Dict[str, Any]]):
+        self.violation_lines: Set[int] = {v["line"] for v in violations if v["line"]}
+        self.sanitized: List[str] = []
+
+    def visit_Import(self, node: ast.Import) -> Any:
+        if node.lineno in self.violation_lines:
+            self.sanitized.append(
+                f"L{node.lineno}: Import removido por segurança"
+            )
+            return ast.Pass()
+        return node
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
+        if node.lineno in self.violation_lines:
+            self.sanitized.append(
+                f"L{node.lineno}: ImportFrom removido por segurança"
+            )
+            return ast.Pass()
+        return node
+
+    def visit_Call(self, node: ast.Call) -> Any:
+        if node.lineno in self.violation_lines:
+            if isinstance(node.func, ast.Name) and node.func.id in {
+                "eval", "exec", "compile", "__import__",
+                "getattr", "setattr", "delattr",
+                "globals", "vars", "dir",
+            }:
+                self.sanitized.append(
+                    f"L{node.lineno}: Chamada '{node.func.id}()' substituída por None"
+                )
+                return ast.Constant(value=None)
+            if isinstance(node.func, ast.Attribute) and node.func.attr in {
+                "system", "popen", "spawn", "execute",
+            }:
+                self.sanitized.append(
+                    f"L{node.lineno}: Acesso a '.{node.func.attr}()' substituído por None"
+                )
+                return ast.Constant(value=None)
+        return self.generic_visit(node)
 
 
 class AutoCorrectionLoop:
@@ -46,9 +99,19 @@ class AutoCorrectionLoop:
     """
 
     MAX_ITERATIONS = 3
+    _violation_counter: Dict[str, int] = {}  # agent_name -> count (memória only)
 
-    def corrigir(self, codigo: str, task: str = "") -> Correcao:
-        """Executa o loop completo de auto-correção."""
+    def corrigir(self, codigo: str, task: str = "", agent_name: str = "") -> Correcao:
+        """Executa o loop completo de auto-correção.
+
+        Args:
+            codigo: Código fonte para validar/corrigir
+            task: Descrição da tarefa (contexto)
+            agent_name: Nome do agente que gerou o código (para rastreio de reincidência)
+
+        Returns:
+            Correcao com resultado da validação
+        """
         if not codigo or not codigo.strip():
             return Correcao(issues=["Código vazio"], codigo_final=codigo)
 
@@ -82,6 +145,11 @@ class AutoCorrectionLoop:
         foi_corrigido = codigo_atual != codigo or bool(fixes_aplicados)
         latency = (time.time() - start) * 1000.0
 
+        # Rastreio de reincidência de violações de segurança
+        sec_issues = [i for i in issues_encontradas if i.startswith("SECURITY:")]
+        if sec_issues and agent_name:
+            self._reportar_violacao_seguranca(agent_name, sec_issues)
+
         if foi_corrigido:
             logger.info(
                 "[AUTO-CORRECAO] Finalizado | issues=%d fixes=%d lang=%s latency=%.1fms",
@@ -105,15 +173,67 @@ class AutoCorrectionLoop:
             linguagem=linguagem,
         )
 
+    def _reportar_violacao_seguranca(self, agent_name: str, violacoes: List[str]) -> None:
+        """Registra violação de segurança e dispara apoptose se reincidente."""
+        # Contador de reincidência em memória
+        self._violation_counter[agent_name] = self._violation_counter.get(agent_name, 0) + 1
+        reincidencia = self._violation_counter[agent_name]
+
+        logger.warning(
+            "[AUTO-CORRECAO] 🛡️ Violacao seguranca: %s | agente=%s | reincidencia=%d/%d",
+            violacoes[0][:80], agent_name, reincidencia, REINCIDENCIA_LIMIAR,
+        )
+
+        # Registro persistente via EpigeneticRegistry (assíncrono, fire-and-forget)
+        try:
+            from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
+
+            registry = EpigeneticRegistry()
+            detalhes = {"violacoes": violacoes, "reincidencia": reincidencia}
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(
+                    registry.record_failure(
+                        agent_name,
+                        hashlib.sha256(str(violacoes).encode()).hexdigest()[:12],
+                        "ast_violation",
+                        detalhes,
+                    )
+                )
+            except RuntimeError:
+                pass
+        except Exception as e:
+            logger.debug("[AUTO-CORRECAO] EpigeneticRegistry indisponivel: %s", e)
+
+        # Se reincidência >= limiar, dispara apoptose contratual via OmniMind
+        if reincidencia >= REINCIDENCIA_LIMIAR:
+            try:
+                from iaglobal.obsidian.omnimind import OmniMind
+
+                omnimind = OmniMind()
+                duracao = 24 if reincidencia < 6 else None  # 24h ou permanente
+                omnimind.emitir_gatilho_apoptose(
+                    agent_id=agent_name,
+                    motivo=(
+                        f"Reincidencia de seguranca AST ({reincidencia}x): "
+                        f"{violacoes[0][:100]}"
+                    ),
+                    duration_hours=duracao,
+                    violation_type="ast_violation",
+                )
+            except Exception as e:
+                logger.warning("[AUTO-CORRECAO] Falha ao emitir apoptose: %s", e)
+
     def _detectar_linguagem(self, codigo: str) -> str:
         """Detecta se o código é Python, JS/JSX ou outro."""
         if not codigo:
             return "unknown"
-        try:
-            ast.parse(codigo)
+
+        # Usar ASTGateway em vez de ast.parse direto
+        result = _ast_gateway.parse(codigo)
+        if result.valid:
             return "python"
-        except SyntaxError:
-            pass
+
         try:
             from iaglobal.validation.js_validator import detect_lang
 
@@ -153,16 +273,46 @@ class AutoCorrectionLoop:
         return issues, fixes
 
     def _validar_python(self, codigo: str) -> Tuple[List[str], List[str]]:
-        """Valida Python com pyflakes + AST, retorna issues e fixes."""
+        """Valida Python com ASTGateway + pyflakes, retorna issues e fixes."""
         issues = []
         fixes = []
 
-        try:
-            ast.parse(codigo)
-        except SyntaxError as e:
-            msg = f"SyntaxError: {e.msg} (linha {e.lineno})"
-            issues.append(msg)
-            fixes.append(("fechar_brackets", msg))
+        result = _ast_gateway.parse(codigo)
+
+        # Sanitização de violações de segurança (AST)
+        if not result.valid and result.metadata:
+            transformer = _SanitizerTransformer(result.metadata)
+            try:
+                tree_sanitized = transformer.visit(result.tree)
+                ast.fix_missing_locations(tree_sanitized)
+                codigo_sanitizado = ast.unparse(tree_sanitized)
+                result = _ast_gateway.parse(codigo_sanitizado)
+                if result.valid:
+                    fixes.append(("substituir_codigo", codigo_sanitizado))
+                    for s in transformer.sanitized:
+                        issues.append(f"SECURITY: {s}")
+                    logger.info(
+                        "[AUTO-CORRECAO] Sanitizacao AST: %d violacoes removidas",
+                        len(transformer.sanitized),
+                    )
+                else:
+                    issues.append("SECURITY: Violações detectadas mas sanitização falhou")
+            except Exception as e:
+                logger.warning("[AUTO-CORRECAO] Erro na sanitizacao AST: %s", e)
+                issues.append(f"SECURITY: Erro ao sanitizar ({e})")
+            return issues, fixes
+
+        if not result.valid:
+            if result.errors:
+                error_msg = result.errors[0].strip("'\"")
+                # Extrair informações do erro
+                import re
+
+                match = re.search(r"line (\d+)", error_msg)
+                line = int(match.group(1)) if match else 0
+                msg = f"SyntaxError: {error_msg} (linha {line})"
+                issues.append(msg)
+                fixes.append(("fechar_brackets", msg))
             return issues, fixes
 
         try:
@@ -232,12 +382,16 @@ class AutoCorrectionLoop:
             tipo = fix[0] if isinstance(fix, tuple) else fix
             detalhe = fix[1] if isinstance(fix, tuple) and len(fix) > 1 else ""
 
-            if tipo == "fechar_brackets":
+            if tipo == "substituir_codigo" and detalhe:
+                codigo_atual = detalhe
+            elif tipo == "fechar_brackets":
                 codigo_atual = self._fechar_brackets(codigo_atual)
             elif tipo == "fechar_string":
                 codigo_atual = self._fechar_strings(codigo_atual)
             elif tipo == "stub_var" and detalhe:
                 codigo_atual = self._adicionar_stub(codigo_atual, detalhe)
+            elif tipo == "sanitizado":
+                pass
 
         return codigo_atual
 

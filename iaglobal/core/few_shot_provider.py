@@ -37,9 +37,13 @@ from typing import List, Optional, Tuple, Any, Dict
 from collections import OrderedDict
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.security.ast_gateway import ASTGateway
 from iaglobal._paths import PACKAGE_DIR
 
 logger = get_logger("iaglobal.core.few_shot_provider")
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 # Caminho do cache de embeddings
 EMBEDDING_CACHE_PATH = (
@@ -726,14 +730,15 @@ class FewShotProvider:
 
     @staticmethod
     def _detect_lang(code: str) -> str:
-        """Quick language detection."""
+        """Quick language detection via ASTGateway."""
         if not code:
             return "text"
-        try:
-            ast.parse(code)
+
+        # Usar ASTGateway em vez de ast.parse direto
+        result = _ast_gateway.parse(code)
+        if result.valid:
             return "python"
-        except SyntaxError:
-            pass
+
         if re.search(r"def |class |import |from ", code[:200]):
             return "python"
         if re.search(r"function |const |let |var |=>|require\(|import ", code[:200]):

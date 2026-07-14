@@ -19,8 +19,12 @@ from typing import List, Tuple, Set, Dict, Optional
 from dataclasses import dataclass, field
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.security.ast_gateway import ASTGateway
 
 logger = get_logger("iaglobal.core.dependency_enforcer")
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 INSTRUCAO_DEPENDENCIAS = (
     "Use apenas a biblioteca padrão do Python. "
@@ -143,11 +147,14 @@ class DependencyEnforcer:
     def _extract_imports(code: str) -> List[Tuple[int, str, str]]:
         """
         Extrai (linha, module_name, stmt_text) de imports Python
-        usando AST. Fallback para regex se AST falhar.
+        usando ASTGateway. Fallback para regex se AST falhar.
         """
         imports: List[Tuple[int, str, str]] = []
-        try:
-            tree = ast.parse(code)
+
+        # Usar ASTGateway em vez de ast.parse direto
+        result = _ast_gateway.parse(code)
+        if result.valid and result.tree:
+            tree = result.tree
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
                     for alias in node.names:
@@ -155,8 +162,10 @@ class DependencyEnforcer:
                 elif isinstance(node, ast.ImportFrom):
                     if node.module:
                         imports.append((node.lineno, node.module, _ast_to_code(node)))
-        except SyntaxError:
+        else:
+            # Fallback para regex
             imports = _extract_imports_regex(code)
+
         return imports
 
     # ------------------------------------------------------------------

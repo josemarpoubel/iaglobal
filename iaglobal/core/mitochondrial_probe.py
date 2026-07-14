@@ -44,11 +44,14 @@ class MitochondrialProbe:
     MONITOR_INTERVAL_SECONDS = 1.0  # Monitora a cada 1 segundo
     PROBE_SLEEP_SECONDS = 0.01  # 10ms (yield mínimo ao loop)
 
+    STARTUP_GRACE_SECONDS = 10.0  # Não alerta nos primeiros 10s (startup spike)
+
     def __init__(self):
         self.current_lag = 0.0
         self.hypoxia_detected = False
         self._alert_callbacks: List[Callable[[float], Awaitable[None]]] = []
         self._monitor_task: asyncio.Task = None
+        self._startup_time = time.perf_counter()
 
     def register_alosteric_inhibitor(
         self, callback: Callable[[float], Awaitable[None]]
@@ -104,9 +107,17 @@ class MitochondrialProbe:
 
         self.current_lag = lag
 
-        # Detecta hipóxia
+        # Detecta hipóxia (com graça de startup para evitar falso positivo)
         if lag > self.HYPOXIA_THRESHOLD_SECONDS:
-            if not self.hypoxia_detected:
+            elapsed_startup = time.perf_counter() - self._startup_time
+            if elapsed_startup < self.STARTUP_GRACE_SECONDS:
+                if not self.hypoxia_detected:
+                    logger.info(
+                        "[MITO-PROBE] Lag elevado durante startup (%.0fms < %.0fs de gracejo) — ignorando",
+                        lag * 1000,
+                        self.STARTUP_GRACE_SECONDS,
+                    )
+            elif not self.hypoxia_detected:
                 self.hypoxia_detected = True
                 logger.critical(
                     "[MITO-PROBE] ⚠️ GRADIENTE EM COLAPSO: %.0fms de lag (threshold=%.0fms)",

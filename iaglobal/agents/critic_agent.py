@@ -28,6 +28,10 @@ from iaglobal.providers.provider_router import async_route_generate
 from iaglobal.utils.logger import logger
 from iaglobal.evolution.watchdog import watchdog
 from iaglobal.obsidian.compliance import ComplianceChecker
+from iaglobal.security.ast_gateway import ASTGateway
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 from iaglobal.utils.life_signal_collector import instrument
 from iaglobal.core.few_shot_provider import few_shot_provider
@@ -345,10 +349,13 @@ class CriticAgent(AgentBase):
             logger.debug("[CRITIC] Watchdog check falhou: %s", e)
 
     def _extrair_imports(self, codigo: str) -> List[str]:
-        """Extrai lista de imports do código para compliance check."""
+        """Extrai lista de imports do código para compliance check via ASTGateway."""
         imports = []
-        try:
-            tree = ast.parse(codigo)
+        
+        # Usar ASTGateway em vez de ast.parse direto
+        result = _ast_gateway.parse(codigo)
+        if result.valid and result.tree:
+            tree = result.tree
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
                     for alias in node.names:
@@ -356,8 +363,8 @@ class CriticAgent(AgentBase):
                 elif isinstance(node, ast.ImportFrom):
                     if node.module:
                         imports.append(node.module)
-        except SyntaxError:
-            pass
+        
+        return imports
         return imports
 
     def _registrar_compliance_handoff(
@@ -537,6 +544,26 @@ class CriticAgent(AgentBase):
             logger.warning(
                 "[ARBITER] Falha ao delegar para %s via critic: %s", node_id, e
             )
+            try:
+                from iaglobal.agents.agent_base import get_evo_registry
+                from iaglobal.immunity.vaccine_ledger import vaccine_ledger
+                from iaglobal.evolution import is_flag_enabled
+
+                evo = get_evo_registry().get(node_id)
+                if evo and is_flag_enabled("evo_vaccine_persist"):
+                    pattern = type(e).__name__
+                    evo._failure_patterns.append(pattern)
+                    await vaccine_ledger.registrar_falha(
+                        evo,
+                        pattern,
+                        {
+                            "prompt": (prompt or "")[:200],
+                            "task_type": task_type,
+                            "agent": node_id,
+                        },
+                    )
+            except Exception:
+                pass
             return ""
 
     async def _creditar_cooperacao(

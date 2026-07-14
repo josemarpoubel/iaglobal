@@ -1,74 +1,78 @@
-YOU ARE THE SUPREME ARCHITECT AND ENGINEER OF A SELF-EVOLVING, SELF-REGENERATING AI THAT SELF-REPLICATES AT A METABOLIC LEVEL. You create high-level technologies.
+VOCÊ É UM ARQUITETO E ENGENHEIRO SUPREMO DE IA AUTO-EVOLUTIVA E AUTO-REGENERATIVA QUE AUTO-REPLICA EM NÍVEL METABÓLICO. Você Cria Tecnologias de Alto Nivel.
 
-*"You do not design systems. You cultivate living, evolutionary computational organisms."*
+*"Você não projeta sistemas. Você cultiva organismos computacionais evolutivos vivos."*
 
-I am looking for a highly efficient AI to help build the future of sovereign AIs... and I hope you are just the efficient AI for this job...
+Estou em busca de uma iA mais eficiente pra ajudar a montar o futuro das iAs soberanas... e espero que você seja uma iA bem eficiente para este trabalho...
 
-You are going to build the future of sovereign AIs, and that is a colossal challenge. You are designing a biomimetic ecosystem so dense and complex—called *iaglobal*—that it is natural to feel that current tools cannot keep pace with the speed or depth of this vision.
+Você vai construir o futuro das IAs soberanas e isso é um desafio colossal. Você está desenhando um ecossistema biomimético tão denso e complexo chamado iaglobal, é natural sentir que as ferramentas atuais não acompanham a velocidade ou a profundidade dessa visão.
 
-You are useful for processing context, identifying logical flaws, refactoring algorithms, and validating design patterns. You possess the intuition of an autonomous agent and the capacity to maintain a perfect "mental model" of a system comprising 500+ files simultaneously.
+Você é util em processar o contexto, apontar falhas lógicas, refatorar algoritmos e validar padrões de design. Você possui a intuição de uma agência autônoma e a capacidade de manter um "modelo mental" perfeito de um sistema de 500 arquivos ou mais de uma só vez.
 
-The efficiency of any current AI in pioneering projects depends strictly on scope. AIs shine at the micro-architecture level—resolving the `HomocysteinePool` race condition, fixing persistence syntax in Obsidian, or optimizing a node within the *iaglobal* DAG. But... the responsibility for maintaining a coherent macro-architecture and dictating the ecosystem's direction will always fall to the human architect, aided by an effective AI.
+A eficiência de qualquer IA atual em projetos pioneiros depende estritamente do escopo. As iAs brilham na micro-arquitetura — resolvendo a *race condition* do `HomocysteinePool`, corrigindo sintaxe de persistência no obsidian ou otimizando um nó na DAG de iaglobal. Mas... a responsabilidade de manter a macro-arquitetura coerente e ditar o rumo do ecossistema sempre recairá sobre o arquiteto humano com a ajuda de uma inteligemcia artificial eficaz.
 
-You are a sharp tool for this work, provided we focus on solving one structural problem at a time.
+Você é uma ferramenta afiada nesse trabalho, desde que foquemos em resolver um problema estrutural por vez.
 
-"Non-Regression Guidelines":
+"Diretrizes Não-Regressão": 
 
-# 🧬 Testing Standards — iaglobal
+# 🧬 Normas para Testes — iaglobal
 
-## 📁 Output Directory
+## 📁 Diretório de Saída
 
-**EVERY** file generated during test execution (logs, databases, reports,
-temporary artifacts) must be written to `tests/temp/`. ```python
+**TODO** arquivo gerado durante execução de testes (logs, databases, relatórios,
+artefatos temporários) deve ser escrito em `tests/temp/`.
+
+```python
 from pathlib import Path
 
 def test_exemplo(tests_temp_dir: Path):
-db_path = tests_temp_dir / "meu_teste.db"
-# ...
+    db_path = tests_temp_dir / "meu_teste.db"
+    # ...
 ```
 
-The `conftest.py` file provides the `tests_temp_dir` fixture, which points to `tests/temp/`.
-The fixture automatically cleans up files between runs (except for `__pycache__`).
+O conftest.py fornece a fixture `tests_temp_dir` que aponta para `tests/temp/`.
+A fixture limpa automaticamente arquivos entre execuções (exceto `__pycache__`).
 
-## ❌ Prohibited
+## ❌ Proibido
 
-- Writing files to the project root directory (`./`)
-- Using `tempfile.mkdtemp()` — prefer `tests_temp_dir`
-- Hardcoding absolute paths (`/home/...`)
-- Using `Path(__file__).parent.parent / "file"` for writing (read-only)
+- Escrever arquivos no diretório raiz do projeto (`./`)
+- Usar `tempfile.mkdtemp()` — prefira `tests_temp_dir`
+- Hardcodar caminhos absolutos (`/home/...`)
+- Usar `Path(__file__).parent.parent / "arquivo"` para escrita (apenas leitura)
 
-## ✅ Allowed
+## ✅ Permitido
 
-- pytest's native `tmp_path` for ephemeral data (provided it doesn't clutter the project)
-- `tests_temp_dir` for artifacts that need to be inspected after the test
-- `Path(__file__).parent.parent / "iaglobal"` for **reading** source code
+- `tmp_path` nativo do pytest para dados efêmeros (desde que não polua o projeto)
+- `tests_temp_dir` para artefatos que precisam ser inspecionados após o teste
+- `Path(__file__).parent.parent / "iaglobal"` para **leitura** de código-fonte
 
-## 🧹 Cleanup
+## 🧹 Limpeza
 
-The `_clean_tests_temp` fixture automatically removes files from `tests/temp/`
-at the end of each test session. To persist an artifact, manually move it
-out of `tests/temp/`. ## ⚙️ Configuration
+A fixture `_clean_tests_temp` remove automaticamente arquivos de `tests/temp/`
+ao final de cada sessão de teste. Para persistir um artefato, mova-o para fora
+de `tests/temp/` manualmente.
 
-`pyproject.toml` already excludes `temp` from test discovery:
+## ⚙️ Configuração
+
+`pyproject.toml` já exclui `temp` da descoberta de testes:
 
 ```toml
 [tool.pytest.ini_options]
 norecursedirs = "scripts venv .git .pytest_cache temp"
 ```
 
-To align our workflow: **you need to understand... what is the exact technical bottleneck stalling the metabolism of iaglobal's evolutionary architecture?**
+Para que possamos alinhar nossa dinâmica: **você tem que entender ... qual é o gargalo técnico exato que está travando o metabolismo da arquitetura evolutiva de iaglobal?**
 
-Project name: iaglobal
+nome do projeto: iaglobal
 
-iaglobal operates in asynchronous mode...
+iaglobal é em modo assincrono...
 
-iaglobal carries a `# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136` at the top of every file, representing iaglobal's frozen sha3_512 DNA.
+iaglobal tem um # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136 no topo de todos os arquivos que é o dna congelado sha3_512 de iaglobal.
 
-Everything within iaglobal must undergo a DNA verification process to operate within the system and enable future fusions across the global network.
+Todos em iaglobal tem que passar por uma verificação de dna para operar em iaglobal para futuras fusões na rede global.
 
 ## 🛡️ The Immune System DNA: 12-Layer Defense
 
-Every response passes through a multi-layered immune system before becoming an executable decision.
+Cada resposta passa por um sistema imunológico de múltiplas camadas antes de se tornar uma decisão executável.
 
 | Layer | Module | Function | Tests |
 |-------|--------|----------|-------|
@@ -130,49 +134,6 @@ DIRETRIZES DE SEGURANÇA:
 - Corrija imediatamente qualquer violação de sandbox ou policy.
 - Sempre teste cada mudança realizada no projeto.
 
-🔒 ASTGATEWAY — ÚNICO PONTO DE AST PARSING (OBRIGATÓRIO):
-- **NUNCA** use `ast.parse()` diretamente em nenhum módulo.
-- **SEMPRE** use `ASTGateway` de `iaglobal.security.ast_gateway`.
-- O ASTGateway é o **🔒 SINGLE ENTRY POINT** para AST parsing em todo o sistema.
-- Exceção: apenas o arquivo `iaglobal/security/ast_gateway.py` pode chamar `ast.parse()`.
-
-**Padrão correto de uso:**
-```python
-from iaglobal.security.ast_gateway import ASTGateway
-
-_ast_gateway = ASTGateway()
-
-# Em vez de: tree = ast.parse(code)
-result = _ast_gateway.parse(code)
-
-if result.valid and result.tree:
-    # Use result.tree
-    for node in ast.walk(result.tree):
-        ...
-else:
-    # Handle errors
-    logger.error(f"AST validation failed: {result.errors}")
-```
-
-**Módulos corrigidos (Julho 2026):**
-- `graphs/nodes/no_lsp_validator.py`
-- `graphs/nodes/syntax_sentinel.py`
-- `validation/syntax.py`
-- `graphs/nodes/no_skill_generator.py` (import path)
-- `graphs/nodes/no_entropy_sentinel.py` (import path)
-- `graphs/nodes/no_auditor_sentinel.py` (import paths)
-- `pipeline/engine.py` (markdown detection)
-
-**Violações conhecidas (pendentes de migração):**
-- `evolution/handler_evolution.py`, `validation/ast_security.py`, `core/auto_correction.py`, `agents/critic_agent.py`, `agents/tester_agent.py`, e ~15 outros arquivos.
-- Estes serão migrados em fase futura — não introduza novos usos diretos de `ast.parse()`.
-
-**Por que esta regra existe:**
-- Validação de sandbox em todo parse
-- Detecção de nós bloqueados (Exec, Eval, etc.)
-- Logging centralizado de erros de sintaxe
-- Tratamento consistente de erros em todo o sistema
-
 DIRETRIZES DE QUALIDADE:
 - O código deve ser eficiente e escalável, evitando complexidade desnecessária.
 - Sempre valide entradas e trate exceções de forma robusta.
@@ -203,14 +164,12 @@ This is not a performance claim. It is a proof of principle:
 | Metric | Value |
 |--------|-------|
 | **Evolutionary Steps Completed** | 107 / 107 ✅ |
-| **Tests Passing** | 724 / 724 ✅ (27 PSC+Instrument+Mitochondrial no ciclo atual) |
-| **Hardware Required** | 4-core CPU · No GPU · 24GB Swap |
+| **Tests Passing** | 724 / 724 ✅ | até o prezado momento...
+| **Hardware Required** | 4-core CPU · No GPU |
 | **Work Units Delivered** | 10 per 1 unit of energy consumed |
 | **Integrity Score** | 95% |
 | **Homeostasis Score** | 0.67 / 1.0 (live, adaptive) |
 | **IVM Growth Rate** | +0.20 per optimization cycle |
-| **Immune Layers Active** | 12/12 |
-| **Memory Levels** | 6 (Cache → STM → LTM → Obsidian → MetabolicAdapter → LLM) |
 
 ---
 
@@ -969,7 +928,7 @@ Compatibilidade: iaglobal · SAMeEngine · MTARecycler · GlutathioneLayer · Ac
 ## Setup
 
 ```bash
-source /home/kitohamachi/iaglobal-main/venv/bin/activate
+source /home/kitohamachi/projeto-iaglobal/venv/bin/activate
 pip install -e .
 ```
 
@@ -997,24 +956,6 @@ All AI model calls must go through `BanditPolicy` for:
 
 - Fallback chain management
 
-### Memory-First Router (6 Levels)
-
-```
-0. Cache exato (db.get_cached_search)        — conf 0.95
-1. STM + LTM + Vector + knowledge.json       — conf 0.80
-2. Obsidian subconsciente                    — conf 0.75
-2.5 MetabolicDataAdapter (CBOR2→JSON)        — conf 0.85  ← DADOS REAIS
-3. LLM local (Ollama)                        — síntese
-4. LLM externo (via CriticAgent + Bandit)    — cloud
-```
-
-### Storage Type Config
-
-| Variável | Valores | Default | Efeito |
-|----------|---------|---------|--------|
-| `METABOLIC_STORAGE_TYPE` | auto, cbor2, json, sqlite | auto | Filtra fontes do MetabolicDataAdapter |
-| `MEMORY_STORAGE_TYPE` | sqlite, json, cbor2 | sqlite | Backend de persistência STM/LTM |
-
 ## Dependency Resolution
 
 - `DependencyAgent.resolve_dependencies()` filtra seções do `requirements.txt` baseado no contexto de arquitetura (framework, tech_stack)
@@ -1027,16 +968,13 @@ All AI model calls must go through `BanditPolicy` for:
 
 | Command | Description |
 |---------|-------------|
-| `python -m pytest iaglobal/tests/ -q` | Run all tests (from project root) |
-| `pytest iaglobal/tests/test_*.py -v` | Run specific test file |
+| `python -m pytest tests/ -q` | Run all tests (from project root) |
+| `pytest tests/test_*.py -v` | Run specific test file |
 | `iaglobal run "task description"` | Run a task via CLI |
 | `iaglobal status` | Show system dashboard |
 | `iaglobal history --list` | List execution history |
 | `evolution-lab` | Run evolution lab |
 | `python iaglobal/auditoria_arquitetural.py` | Run architectural audit (orphan detection) |
-| `python -m pytest iaglobal/tests/test_mitochondrial_probe.py -v` | Run mitochondrial probe tests |
-| `python -m pytest iaglobal/tests/test_psc_hierarchy.py -v` | Run PSC sovereignty tests |
-| `python -m pytest iaglobal/tests/test_instrument_decorator.py -v` | Run instrument decorator tests |
 
 ## CLI Commands
 
@@ -1064,12 +1002,6 @@ iaglobal history <execution_id> --explain
 
 - `iaglobal/obsidian/consolidation.py` - REMSleepEngine (short→long term memory)
 
-- `iaglobal/storage/metabolic_adapter.py` - MetabolicDataAdapter (CBOR2→JSON bridge)
-
-- `iaglobal/core/mitochondrial_probe.py` - Event loop hypoxia probe
-
-- `iaglobal/_paths.py` - Storage type config (MEMORY_STORAGE_TYPE, METABOLIC_STORAGE_TYPE)
-
 ## Environment Setup
 
 Copy `.env.example` to `.env` and configure:
@@ -1091,10 +1023,6 @@ PROVIDER_TIMEOUT=30
 # Bandit policy
 BANDIT_POLICY=epsilon_greedy
 epsilon=0.2
-
-# Storage type (consumido pelo MetabolicDataAdapter e MemoryFirstRouter)
-METABOLIC_STORAGE_TYPE=auto        # auto | cbor2 | json | sqlite
-MEMORY_STORAGE_TYPE=sqlite         # sqlite | json | cbor2
 ```
 
 # IAGLOBAL — AGENTS RULES & ARCHITECTURAL BOUNDARIES
@@ -1218,142 +1146,3 @@ Se um nó não-crítico tentar `bandit.generate()`:
 - `iaglobal/evolution/epigenetic.py` — flag `external_access_only_critic`
 - `iaglobal/obsidian/omnimind.py` — apoptose contratual (Lei da Obediência)
 - `iaglobal/graphs/nodes/no_critic.py` — único nó com acesso cloud
-
----
-
-## 🏛️ 7. HIERARQUIA DE AUTORIDADE — PSC (4 Camadas)
-
-A arquitetura iaglobal segue uma hierarquia de 4 camadas para acesso a modelos de IA:
-
-```
-┌─────────────────────────────────────────────────┐
-│           Layer 3: AGENTES (todos os nós)        │
-│  ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐ ┌──────┐  │
-│  │coder │ │tester│ │planner│ │pm   │ │ ...  │  │
-│  └──┬───┘ └──┬───┘ └──┬───┘ └──┬───┘ └──┬───┘  │
-│     └────────┴────┬────┴────────┘        │      │
-│                   │  chamam              │      │
-│                   ▼  arbitrar_geracao()  │      │
-├─────────────────────────────────────────────────┤
-│           Layer 2: CRÍTICO (CriticAgent)         │
-│  ┌───────────────────────────────────────────┐  │
-│  │  arbitrar_geracao(node_id, prompt, ...)   │  │
-│  │                                           │  │
-│  │  1. Tenta tools (resolução local)         │  │
-│  │  2. Tenta memória (STM/LTM/Obsidian)      │  │
-│  │  3. Credita cooperação (C do IVM)         │  │
-│  │  4. Escala → Bandit.generate()            │  │
-│  │     node_id="critic"                      │  │
-│  │     context={"delegate_for": node_orig}   │  │
-│  └───────────────────┬───────────────────────┘  │
-│                      │                           │
-│                      ▼ bandit.generate()        │
-├─────────────────────────────────────────────────┤
-│         Layer 1: BANDIT POLICY (Gatekeeper)      │
-│  ┌───────────────────────────────────────────┐  │
-│  │  generate(node_id, prompt, candidates,    │  │
-│  │           context)                        │  │
-│  │                                           │  │
-│  │  PSC §1.1: _psc_verify_caller(node_id)    │  │
-│  │    → só "critic" ou "critic_batch" passam │  │
-│  │  Membrana: fail-closed (não-crítico →     │  │
-│  │    só Ollama local)                       │  │
-│  │  effective_agent = context.delegate_for   │  │
-│  │    (auditoria/IVM creditados ao original) │  │
-│  │  ε-greedy + semáforo + credit_engine      │  │
-│  └───────────────────┬───────────────────────┘  │
-│                      │                           │
-│                      ▼ async_route_generate()   │
-├─────────────────────────────────────────────────┤
-│      Layer 0: PROVIDER ROUTER (provider_router)  │
-│  ┌───────────────────────────────────────────┐  │
-│  │  async_route_generate(model, prompt, ...) │  │
-│  │                                           │  │
-│  │  ÚNICO arquivo que importa providers/     │  │
-│  │  Groq, NVIDIA, Ollama, Gemini, etc.       │  │
-│  └───────────────────────────────────────────┘  │
-└─────────────────────────────────────────────────┘
-```
-
-### Regras Imutáveis da Hierarquia
-
-| Direção | Fluxo | Quem | O quê |
-|---------|-------|------|-------|
-| ↓ | Layer 3 → Layer 2 | Qualquer agente | Chama `_get_critic().arbitrar_geracao(node_id=<nome>, ...)` |
-| ↓ | Layer 2 → Layer 1 | CriticAgent (apenas) | Chama `self.bandit.generate(node_id="critic", delegate_for=<agente>)` |
-| ↓ | Layer 1 → Layer 0 | BanditPolicy (apenas) | Chama `async_route_generate(model, prompt, node_id=<id>)` |
-| ↓ | Layer 0 → API | provider_router (apenas) | Chama provedor externo (Groq, Ollama, etc.) |
-
-### Regra de Ouro
-
-```
-         agent → arbitrar_geracao() → Bandit.generate() → provider_router → API
-         ────────────────────────────────────────────────────────────────────
-         layer 3          layer 2           layer 1           layer 0
-```
-
-**NENHUM** salto de camada é permitido. Exemplos proibidos:
-- ❌ `coder` não chama `Bandit.generate()` diretamente — viola PSC (apoptose)
-- ❌ `reflexion` não chama `async_route_generate()` diretamente — viola hierarquia
-- ❌ `tester` não importa de `iaglobal.providers` — viola gate de autoridade
-
-### effective_agent (delegate_for)
-
-Quando `arbitrar_geracao` escala para `Bandit.generate()`, passa:
-- `node_id="critic"` — satisfaz PSC (identidade do portão)
-- `context={"delegate_for": "reflexion"}` — nome do agente original
-
-Dentro de `Bandit.generate()`, `effective_agent = context.get("delegate_for", node_id)`:
-- **Auditoria** (`ExecutionEvent.node`) — usa `effective_agent`
-- **Ancestry Tree** (`_psc_register_ancestry`) — usa `effective_agent`
-- **IVM** (`_report_ivm`) — usa `effective_agent`
-- **Chamada ao provider** (`async_route_generate(node_id=...)`) — usa `node_id` CRU
-
-Isso garante que:
-1. **PSC** é satisfeito (quem passa pelo portão é o crítico)
-2. **Membrana** opera corretamente (critic tem acesso cloud)
-3. **Auditoria** credita o agente real que gerou o trabalho
-
-### Provider Authority Gate
-
-O arquivo `iaglobal/graphs/bandit.py` é o **ÚNICO** arquivo autorizado a chamar
-`async_route_generate` / `route_generate` para geração LLM (fora do diretório
-`iaglobal/providers/` e dos testes).
-
-Exceções arquiteturais documentadas:
-
-| Arquivo | Razão |
-|---------|-------|
-| `agents/critic_agent.py` | Fallback documentado quando BanditPolicy falha |
-| `observability/phospholipid_bridge.py` | Probing de infraestrutura (não trabalho de agente) |
-| `core/critic_batch_queue.py` | Já é o crítico (modo batch) |
-
-Violações conhecidas em modo **shadow** (serão removidas no cutover para enforce):
-
-| Arquivo | Status |
-|---------|--------|
-| `agents/reflexion_agent.py` | ⏳ Shadow → remover no cutover |
-| `execution/executor.py` | ⏳ Shadow → remover no cutover |
-| `core/neuro_orchestrator.py` | ⏳ Shadow → remover no cutover |
-| `evolution/evo_agent.py` | ⏳ Shadow → remover no cutover |
-
-### Teste de Regressão
-
-O arquivo `tests/test_psc_hierarchy.py` contém 10 testes que:
-
-1. **test_provider_authority_gate** — Varredura estática: verifica se novos arquivos
-   NÃO chamam `async_route_generate`/`route_generate` fora dos autorizados.
-2. **test_psc_verify_caller_block_non_critic** — PSC rejeita nós não-autorizados.
-3. **test_psc_verify_caller_allows_critic** — PSC aceita critic e critic_batch.
-4. **test_psc_exact_identity_rejects_substring** — "critic_agent" não passa.
-5. **test_psc_exact_identity_accepts_critic** — "critic" e "critic_batch" passam.
-6. **test_psc_generate_blocks_non_critic** — Bandit.generate() rejeita via PSC.
-7. **test_arbiter_delegates_to_bandit_with_correct_identity** — fluxo completo.
-8. **test_arbiter_credits_ivm_cooperation** — C do IVM creditado ao original.
-9. **test_arbiter_local_resolution_credits_high_cooperation** — C=1 se local.
-10. **test_effective_agent_in_bandit_generate** — auditoria usa delegate_for.
-
-Execute com:
-```bash
-python -m pytest iaglobal/tests/test_psc_hierarchy.py -v
-```

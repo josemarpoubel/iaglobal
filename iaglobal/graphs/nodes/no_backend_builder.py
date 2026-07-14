@@ -52,12 +52,15 @@ async def run_backend_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         # Como a geração de código é guiada por LLM, garantimos a execução assíncrona nativa
         if asyncio.iscoroutinefunction(agent.generate):
             artifact = await agent.generate(
-                task=task, contexto=contexto_refinado,
+                task=task,
+                contexto=contexto_refinado,
                 search_results=search_results,
             )
         else:
             artifact = await asyncio.to_thread(
-                agent.generate, task=task, contexto=contexto_refinado,
+                agent.generate,
+                task=task,
+                contexto=contexto_refinado,
                 search_results=search_results,
             )
 

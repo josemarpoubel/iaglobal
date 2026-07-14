@@ -293,20 +293,29 @@ class ExecutionGraph:
             result_text = ""
             await workdir.async_append_log(f"import_error: {last_error}")
             missing_lib = sandbox_expansion.extract_missing_lib(e)
-            if missing_lib:
-                logger.warning(
-                    "[PEC] ImportError detectado no no '%s': lib=%s | instalando...",
-                    node.name,
-                    missing_lib,
-                )
-                installed = sandbox_expansion.request_install(missing_lib)
-                if installed:
-                    logger.info(
-                        "[PEC] Lib '%s' instalada. Re-executando no '%s'...",
-                        missing_lib,
+
+            # Evita loop infinito: não tenta instalar módulos do projeto local
+            # nem libs que já falharam nesta execução
+            if missing_lib and not missing_lib.startswith("iaglobal"):
+                if not hasattr(self, "_pec_retried"):
+                    self._pec_retried = set()
+                retry_key = (node.name, missing_lib)
+                if retry_key not in self._pec_retried:
+                    self._pec_retried.add(retry_key)
+                    logger.warning(
+                        "[PEC] ImportError detectado no no '%s': lib=%s | instalando...",
                         node.name,
+                        missing_lib,
                     )
-                    return await self._execute_node_async(node, input_data)
+                    installed = sandbox_expansion.request_install(missing_lib)
+                    if installed:
+                        logger.info(
+                            "[PEC] Lib '%s' instalada. Re-executando no '%s'...",
+                            missing_lib,
+                            node.name,
+                        )
+                        await asyncio.to_thread(node.release)
+                        return await self._execute_node_async(node, input_data)
         except Exception as e:
             last_error = str(e)
             result_text = ""
@@ -389,19 +398,23 @@ class ExecutionGraph:
             **extra_fields,
         }
 
+    def _find_dependents(
+        self, node_name: str, visited: Optional[Set[str]] = None
+    ) -> Set[str]:
+        """Encontra recursivamente todos os dependentes (transitivos) de um nó."""
+        if visited is None:
+            visited = set()
+        for n_name, n_node in self.nodes.items():
+            if node_name in n_node.depends_on and n_name not in visited:
+                visited.add(n_name)
+                self._find_dependents(n_name, visited)
+        return visited
+
     async def _abort_dependent_nodes_async(
         self, execution_id: str, failed_node_name: str, reason: str
     ):
         """Abortamento assíncrono em cascata (Sanity Barrier)."""
-        dependents = set()
-
-        def _find_dependents(node_name: str):
-            for n_name, n_node in self.nodes.items():
-                if failed_node_name in n_node.depends_on and n_name not in dependents:
-                    dependents.add(n_name)
-                    _find_dependents(n_name)
-
-        _find_dependents(failed_node_name)
+        dependents = self._find_dependents(failed_node_name)
 
         if not dependents:
             return
@@ -731,23 +744,25 @@ class ExecutionGraph:
                     scored.append((output_text, score, name))
 
         import re as _re
+
         _parece_codigo = lambda t: bool(
-            t and (
-                _re.search(r'<!DOCTYPE\s+html', t)
-                or _re.search(r'<html[\s>]', t)
-                or _re.search(r'<head[\s>]', t)
-                or _re.search(r'<body[\s>]', t)
-                or _re.search(r'<script[\s>]', t)
-                or _re.search(r'<style[\s>]', t)
-                or _re.search(r'^import\s+\w+', t, _re.MULTILINE)
-                or _re.search(r'^from\s+\w+\s+import', t, _re.MULTILINE)
-                or _re.search(r'^def\s+\w+\s*\(', t, _re.MULTILINE)
-                or _re.search(r'^class\s+\w+', t, _re.MULTILINE)
-                or _re.search(r'^async\s+def\s+\w+', t, _re.MULTILINE)
-                or _re.search(r'^function\s+\w+\s*\(', t, _re.MULTILINE)
-                or _re.search(r'^const\s+\w+\s*=', t, _re.MULTILINE)
-                or _re.search(r'^let\s+\w+\s*=', t, _re.MULTILINE)
-                or _re.search(r'^var\s+\w+\s*=', t, _re.MULTILINE)
+            t
+            and (
+                _re.search(r"<!DOCTYPE\s+html", t)
+                or _re.search(r"<html[\s>]", t)
+                or _re.search(r"<head[\s>]", t)
+                or _re.search(r"<body[\s>]", t)
+                or _re.search(r"<script[\s>]", t)
+                or _re.search(r"<style[\s>]", t)
+                or _re.search(r"^import\s+\w+", t, _re.MULTILINE)
+                or _re.search(r"^from\s+\w+\s+import", t, _re.MULTILINE)
+                or _re.search(r"^def\s+\w+\s*\(", t, _re.MULTILINE)
+                or _re.search(r"^class\s+\w+", t, _re.MULTILINE)
+                or _re.search(r"^async\s+def\s+\w+", t, _re.MULTILINE)
+                or _re.search(r"^function\s+\w+\s*\(", t, _re.MULTILINE)
+                or _re.search(r"^const\s+\w+\s*=", t, _re.MULTILINE)
+                or _re.search(r"^let\s+\w+\s*=", t, _re.MULTILINE)
+                or _re.search(r"^var\s+\w+\s*=", t, _re.MULTILINE)
             )
         )
 
@@ -759,14 +774,17 @@ class ExecutionGraph:
                 code_scored.sort(key=lambda x: x[1], reverse=True)
                 final_text = code_scored[0][0]
                 logger.info(
-                    "🏆 Melhor codigo: %s (score=%.2f)", code_scored[0][2], code_scored[0][1]
+                    "🏆 Melhor codigo: %s (score=%.2f)",
+                    code_scored[0][2],
+                    code_scored[0][1],
                 )
             else:
                 scored.sort(key=lambda x: x[1], reverse=True)
                 final_text = scored[0][0]
                 logger.info(
                     "🏆 Melhor resultado (fallback sem codigo): %s (score=%.2f)",
-                    scored[0][2], scored[0][1]
+                    scored[0][2],
+                    scored[0][1],
                 )
         elif self.results:
             fallback_candidates = []
@@ -780,10 +798,12 @@ class ExecutionGraph:
                 fallback_candidates.append((priority, len(text), text, name))
             fallback_candidates.sort(key=lambda x: (x[0], x[1]), reverse=True)
             final_text = fallback_candidates[0][2] if fallback_candidates else ""
-            logger.info("[DEBUG-AGG] fallback winner: %s (p=%d, len=%d)",
-                        fallback_candidates[0][3] if fallback_candidates else "NONE",
-                        fallback_candidates[0][0] if fallback_candidates else 0,
-                        fallback_candidates[0][1] if fallback_candidates else 0)
+            logger.info(
+                "[DEBUG-AGG] fallback winner: %s (p=%d, len=%d)",
+                fallback_candidates[0][3] if fallback_candidates else "NONE",
+                fallback_candidates[0][0] if fallback_candidates else 0,
+                fallback_candidates[0][1] if fallback_candidates else 0,
+            )
 
         return {
             "success": any_success,
@@ -867,8 +887,3 @@ class ExecutionGraph:
             },
             "timestamp": time.time(),  # Útil para controle de versão do snapshot
         }
-
-
-# Injetado automaticamente para resolver assinaturas ausentes
-class Node:
-    pass

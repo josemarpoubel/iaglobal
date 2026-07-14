@@ -727,7 +727,11 @@ class SearchMiddleware:
         text = text.replace("\r", " ").replace("\t", " ")
         text = re.sub(r"\n{2,}", "\n", text)
         # Remove caracteres invisíveis/não-ASCII perigosos para código Python
-        text = re.sub(r"[\u00b7\u2010-\u2015\u00a0\u1680\u2000-\u200f\u2028\u2029\u202f\u205f\u3000]", " ", text)
+        text = re.sub(
+            r"[\u00b7\u2010-\u2015\u00a0\u1680\u2000-\u200f\u2028\u2029\u202f\u205f\u3000]",
+            " ",
+            text,
+        )
         return " ".join(text.split())[:max_chars]
 
     # ══════════════════════════════════════════════════════════════════

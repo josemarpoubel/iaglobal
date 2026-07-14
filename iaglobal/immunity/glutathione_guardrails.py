@@ -5,7 +5,11 @@ import re
 import logging
 from typing import Any, Dict, List
 
+from iaglobal.security.ast_gateway import ASTGateway
+
 logger = logging.getLogger(__name__)
+
+_ast_gateway = ASTGateway()
 
 DANGEROUS_PATTERNS = [
     (r"eval\s*\(", "eval() detectado — risco de injeção de código"),
@@ -73,8 +77,9 @@ class GlutathioneGuardrails:
                 issues.append({"type": "pattern_block", "message": msg})
                 threat_level = "critical"
 
-        try:
-            tree = ast.parse(code)
+        result = _ast_gateway.parse(code)
+        if result.valid and result.tree:
+            tree = result.tree
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):
                     for alias in node.names:
@@ -95,9 +100,6 @@ class GlutathioneGuardrails:
                             }
                         )
                         threat_level = "critical"
-        except SyntaxError as e:
-            issues.append({"type": "syntax_error", "message": f"Erro de sintaxe: {e}"})
-            threat_level = "warning"
 
         # SAMe integration: check if agent can afford validation
         sam_cost = (

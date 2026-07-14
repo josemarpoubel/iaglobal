@@ -6,13 +6,18 @@ Metáfora biológica:
   - CodeBlock = eritrócito (hemácia que carrega oxigênio/utilidade)
   - Este módulo = medula óssea (extrai células úteis do plasma)
 """
+
 import re
 import ast
 import logging
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+from iaglobal.security.ast_gateway import ASTGateway
+
 logger = logging.getLogger("iaglobal")
+
+_ast_gateway = ASTGateway()
 
 
 @dataclass
@@ -28,9 +33,7 @@ class CodeBlock:
 
 
 SOURCE_RE = re.compile(r"^===+\s*(\S+)\s*===+", re.MULTILINE)
-CODE_BLOCK_RE = re.compile(
-    r"```(\w+)?\s*\n(.*?)```", re.DOTALL
-)
+CODE_BLOCK_RE = re.compile(r"```(\w+)?\s*\n(.*?)```", re.DOTALL)
 INLINE_CODE_RE = re.compile(r"`([^`]{10,})`")  # inline code >= 10 chars
 
 
@@ -38,15 +41,21 @@ class SearchCodeExtractor:
     """Extrai blocos de código reutilizáveis de textos de busca."""
 
     LANGUAGE_EXT_MAP = {
-        "python": ".py", "py": ".py",
-        "javascript": ".js", "js": ".js",
-        "typescript": ".ts", "ts": ".ts", "tsx": ".tsx",
+        "python": ".py",
+        "py": ".py",
+        "javascript": ".js",
+        "js": ".js",
+        "typescript": ".ts",
+        "ts": ".ts",
+        "tsx": ".tsx",
         "html": ".html",
         "css": ".css",
-        "bash": ".sh", "shell": ".sh",
+        "bash": ".sh",
+        "shell": ".sh",
         "sql": ".sql",
         "json": ".json",
-        "yaml": ".yaml", "yml": ".yaml",
+        "yaml": ".yaml",
+        "yml": ".yaml",
         "xml": ".xml",
         "php": ".php",
         "rust": ".rs",
@@ -77,9 +86,7 @@ class SearchCodeExtractor:
         all_blocks = self.extract(search_text, min_lines)
         return [b for b in all_blocks if b.language == language]
 
-    def extract_html_components(
-        self, html_blocks_or_text: list
-    ) -> dict:
+    def extract_html_components(self, html_blocks_or_text: list) -> dict:
         """Extrai componentes HTML: head, body, style, script separadamente.
 
         Aceita lista de CodeBlock com language='html' OU texto bruto.
@@ -90,7 +97,8 @@ class SearchCodeExtractor:
             html_blocks = [b for b in all_blocks if b.language in ("html",)]
         else:
             html_blocks = [
-                b for b in html_blocks_or_text
+                b
+                for b in html_blocks_or_text
                 if hasattr(b, "language") and b.language in ("html",)
             ]
         result = {"head": [], "body": [], "style": [], "script": []}
@@ -164,15 +172,15 @@ class SearchCodeExtractor:
         """Estima confiança do bloco baseado em validade sintática."""
         conf = 0.5
         if language in ("python", "py"):
-            try:
-                ast.parse(code)
+            result = _ast_gateway.parse(code)
+            if result.valid:
                 conf += 0.4
-            except SyntaxError:
-                pass
             if re.search(r"def |class |import |from ", code):
                 conf += 0.1
         elif language == "html":
-            if re.search(r"<!DOCTYPE|<html|<head|<body|<div|<style", code, re.IGNORECASE):
+            if re.search(
+                r"<!DOCTYPE|<html|<head|<body|<div|<style", code, re.IGNORECASE
+            ):
                 conf += 0.3
             if code.count("<") > 3 and code.count(">") > 3:
                 conf += 0.2
@@ -182,7 +190,9 @@ class SearchCodeExtractor:
             if re.search(r"@media|display|color|margin|padding|flex|grid", code):
                 conf += 0.2
         elif language == "javascript" or language == "js":
-            if re.search(r"function|const |let |var |=>|document|window|addEventListener", code):
+            if re.search(
+                r"function|const |let |var |=>|document|window|addEventListener", code
+            ):
                 conf += 0.3
             try:
                 _check_js_syntax(code)
@@ -194,9 +204,7 @@ class SearchCodeExtractor:
     @staticmethod
     def _extract_tag(html: str, tag: str) -> str:
         """Extrai conteúdo de uma tag HTML."""
-        m = re.search(
-            rf"<{tag}[^>]*>(.*?)</{tag}>", html, re.DOTALL | re.IGNORECASE
-        )
+        m = re.search(rf"<{tag}[^>]*>(.*?)</{tag}>", html, re.DOTALL | re.IGNORECASE)
         return m.group(1).strip() if m else ""
 
 

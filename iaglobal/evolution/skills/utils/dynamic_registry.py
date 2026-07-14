@@ -13,7 +13,7 @@ from typing import Dict, Optional, List, Union
 
 from iaglobal._paths import CORE_DB, get_db_connection as _norm_path
 from iaglobal.evolution.skills.native.skill import Skill, ExecutionPolicy
-from iaglobal.evolution.skills.skill_registry import (
+from iaglobal.evolution.skills.native.skill_registry import (
     SkillRegistry,
     skill_registry as _global_registry,
 )

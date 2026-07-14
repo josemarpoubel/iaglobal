@@ -18,6 +18,10 @@ import ast
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
+
+from iaglobal.security.ast_gateway import ASTGateway
+
+_ast_gateway = ASTGateway()
 from datetime import datetime, timezone
 
 from iaglobal._paths import JSON_DIR
@@ -328,12 +332,9 @@ Retorne APENAS o código Python, sem explicações ou markdown.
         return "\n".join(cleaned_lines)
 
     def _validate_syntax(self, code: str) -> bool:
-        """Valida sintaxe Python do código."""
-        try:
-            ast.parse(code)
-            return True
-        except SyntaxError:
-            return False
+        """Valida sintaxe Python do código via ASTGateway."""
+        result = _ast_gateway.parse(code)
+        return result.valid
 
     def _parse_success_criteria(self, criteria: str) -> str:
         """

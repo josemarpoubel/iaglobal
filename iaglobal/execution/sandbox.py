@@ -18,6 +18,9 @@ from iaglobal.validation.ast_security import (
     ASTSecurityEngine,
 )
 from iaglobal.validation.engine import ValidationEngine
+from iaglobal.security.ast_gateway import ASTGateway
+
+_ast_gateway = ASTGateway()
 from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails
 from iaglobal.utils.logger import logger
 from iaglobal._paths import DATA_DIR
@@ -322,7 +325,14 @@ def executar_codigo_sandbox(
                 "details": errors,
             }
 
-        tree = ast.parse(validation_result.code or codigo)
+        result = _ast_gateway.parse(validation_result.code or codigo)
+        if not result.valid or not result.tree:
+            return {
+                "sucesso": False,
+                "erro": "SyntaxError",
+                "details": result.errors,
+            }
+        tree = result.tree
 
         # --- Validação simples por whitelist ---
         for node in ast.walk(tree):

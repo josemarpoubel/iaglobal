@@ -50,11 +50,12 @@ from iaglobal.utils.logger import get_logger
 
 # Optional: AcetylcholineBus
 try:
-    from iaglobal.graphs.comms.acetylcholine_bus import AcetylcholineBus
+    from iaglobal.graphs.comms.acetylcholine_bus import AcetylcholineBus, AgentMessage
 
     BUS_AVAILABLE = True
 except ImportError:
     BUS_AVAILABLE = False
+    AgentMessage = None
 
 logger = get_logger("iaglobal.mcp.unified")
 
@@ -726,7 +727,10 @@ async def _publish_metrics_loop():
                 "timestamp": time.time(),
             }
 
-            await bus.publish("mcp/metrics", metrics)
+            msg = AgentMessage(
+                sender="mcp_unified", recipient="mcp/metrics", payload=metrics
+            )
+            await bus.publish(msg)
             logger.debug(f"📊 Métricas publicadas: IVM={ivm:.2f}")
         except Exception as e:
             logger.error(f"❌ Falha ao publicar métricas: {e}")
@@ -750,15 +754,19 @@ async def _handle_autocorrect_command(payload: Dict[str, Any]):
             "details": result["correcoes"],
         }
 
-        await bus.publish(f"mcp/autocorrect/response/{payload['command_id']}", response)
-    except Exception as e:
-        await bus.publish(
-            f"mcp/autocorrect/response/{payload['command_id']}",
-            {
-                "status": "error",
-                "error": str(e),
-            },
+        response_msg = AgentMessage(
+            sender="mcp_unified",
+            recipient=f"mcp/autocorrect/response/{payload['command_id']}",
+            payload=response,
         )
+        await bus.publish(response_msg)
+    except Exception as e:
+        error_msg = AgentMessage(
+            sender="mcp_unified",
+            recipient=f"mcp/autocorrect/response/{payload['command_id']}",
+            payload={"status": "error", "error": str(e)},
+        )
+        await bus.publish(error_msg)
 
 
 async def _handle_invariant_violation(payload: Dict[str, Any]):
@@ -820,7 +828,7 @@ async def run_server(host: str = "127.0.0.1", port: int = 8100, sse: bool = True
     if sse:
         await mcp.run_sse(host=host, port=port)
     else:
-        await mcp.run_stdio()
+        await mcp.run_stdio_async()
 
 
 def run_http_server(host: str = "127.0.0.1", port: int = 8101):

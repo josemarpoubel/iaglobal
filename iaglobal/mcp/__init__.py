@@ -17,65 +17,38 @@ DNA do sistema:
 - Circuit breakers para proteção contra falhas em cascata
 """
 
-from iaglobal.mcp.server import (
-    mcp,
-    run_server,
-    run_http_server,
-    get_app,
-    metabolic_audit,
-    get_ivm,
-    run_task,
-    get_status,
-    get_history,
-    web_search,
-    web_fetch,
-    read_file,
-    write_file,
-    list_dir,
-    execute_code,
-    evolution_status,
-    evolve_strategy,
-    evolution_dashboard,
-    reflexion_fix,
-    reflexion_loop,
-    get_error_history,
-)
+import importlib
+from typing import Any
 
-from iaglobal.mcp.mcp_agent import MCPAgent
-from iaglobal.mcp.discovery import MCPDiscovery
 
-__all__ = [
-    # Servidor unificado
-    "mcp",
-    "run_server",
-    "run_http_server",
-    "get_app",
-    # Tools metabólicas
-    "metabolic_audit",
-    "get_ivm",
-    # Tools IAGlobal API
-    "run_task",
-    "get_status",
-    "get_history",
-    # Tools Web
-    "web_search",
-    "web_fetch",
-    # Tools File System
-    "read_file",
-    "write_file",
-    "list_dir",
-    # Tools Code Execution
-    "execute_code",
-    # Tools Evolution
-    "evolution_status",
-    "evolve_strategy",
-    "evolution_dashboard",
-    # Tools Glutationa (Auto-cura)
-    "reflexion_fix",
-    "reflexion_loop",
-    "get_error_history",
-    # Agente
-    "MCPAgent",
-    # Descoberta
-    "MCPDiscovery",
-]
+def __getattr__(name: str) -> Any:
+    """Lazy import para evitar RuntimeWarning de import circular."""
+    module_map = {
+        "mcp": "iaglobal.mcp.server",
+        "run_server": "iaglobal.mcp.server",
+        "run_http_server": "iaglobal.mcp.server",
+        "get_app": "iaglobal.mcp.server",
+        "metabolic_audit": "iaglobal.mcp.server",
+        "get_ivm": "iaglobal.mcp.server",
+        "run_task": "iaglobal.mcp.server",
+        "get_status": "iaglobal.mcp.server",
+        "get_history": "iaglobal.mcp.server",
+        "web_search": "iaglobal.mcp.server",
+        "web_fetch": "iaglobal.mcp.server",
+        "read_file": "iaglobal.mcp.server",
+        "write_file": "iaglobal.mcp.server",
+        "list_dir": "iaglobal.mcp.server",
+        "execute_code": "iaglobal.mcp.server",
+        "evolution_status": "iaglobal.mcp.server",
+        "evolve_strategy": "iaglobal.mcp.server",
+        "evolution_dashboard": "iaglobal.mcp.server",
+        "reflexion_fix": "iaglobal.mcp.server",
+        "reflexion_loop": "iaglobal.mcp.server",
+        "get_error_history": "iaglobal.mcp.server",
+        "MCPAgent": "iaglobal.mcp.mcp_agent",
+        "MCPDiscovery": "iaglobal.mcp.discovery",
+    }
+    if name in module_map:
+        mod = importlib.import_module(module_map[name])
+        return getattr(mod, name)
+    raise AttributeError(f"module 'iaglobal.mcp' has no attribute {name!r}")

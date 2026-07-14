@@ -7,4 +7,10 @@ from iaglobal.colony_comms.integrator import ColonyIntegrator
 from iaglobal.colony_comms.queen import ColonyQueen
 from iaglobal.colony_comms.worker import ColonyWorker
 
-__all__ = ["ColonyFitness", "GenesisHandshake", "ColonyIntegrator", "ColonyQueen", "ColonyWorker"]
+__all__ = [
+    "ColonyFitness",
+    "GenesisHandshake",
+    "ColonyIntegrator",
+    "ColonyQueen",
+    "ColonyWorker",
+]

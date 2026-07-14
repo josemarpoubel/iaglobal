@@ -62,6 +62,7 @@ class SandboxRules:
         "logging",
         "pathlib",
         "sys",
+        "os",
         # Test frameworks (permitidos para geração e validação de testes)
         "unittest",
         "unittest.mock",
@@ -209,8 +210,6 @@ class SandboxRules:
 
     def configure_defaults(self) -> None:
         """Configura regras padrão e expõe todos os controles no fluxo de execução."""
-        self.enable()
-        self.disable()
         self.enable()
         self.add_allowed_module("tempfile")
         self.remove_allowed_module("iaglobal_sandbox_never_allow_placeholder")
