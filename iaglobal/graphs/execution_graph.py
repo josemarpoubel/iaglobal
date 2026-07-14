@@ -293,20 +293,29 @@ class ExecutionGraph:
             result_text = ""
             await workdir.async_append_log(f"import_error: {last_error}")
             missing_lib = sandbox_expansion.extract_missing_lib(e)
-            if missing_lib:
-                logger.warning(
-                    "[PEC] ImportError detectado no no '%s': lib=%s | instalando...",
-                    node.name,
-                    missing_lib,
-                )
-                installed = sandbox_expansion.request_install(missing_lib)
-                if installed:
-                    logger.info(
-                        "[PEC] Lib '%s' instalada. Re-executando no '%s'...",
-                        missing_lib,
+
+            # Evita loop infinito: não tenta instalar módulos do projeto local
+            # nem libs que já falharam nesta execução
+            if missing_lib and not missing_lib.startswith("iaglobal"):
+                if not hasattr(self, "_pec_retried"):
+                    self._pec_retried = set()
+                retry_key = (node.name, missing_lib)
+                if retry_key not in self._pec_retried:
+                    self._pec_retried.add(retry_key)
+                    logger.warning(
+                        "[PEC] ImportError detectado no no '%s': lib=%s | instalando...",
                         node.name,
+                        missing_lib,
                     )
-                    return await self._execute_node_async(node, input_data)
+                    installed = sandbox_expansion.request_install(missing_lib)
+                    if installed:
+                        logger.info(
+                            "[PEC] Lib '%s' instalada. Re-executando no '%s'...",
+                            missing_lib,
+                            node.name,
+                        )
+                        await asyncio.to_thread(node.release)
+                        return await self._execute_node_async(node, input_data)
         except Exception as e:
             last_error = str(e)
             result_text = ""
@@ -389,19 +398,21 @@ class ExecutionGraph:
             **extra_fields,
         }
 
+    def _find_dependents(self, node_name: str, visited: Optional[Set[str]] = None) -> Set[str]:
+        """Encontra recursivamente todos os dependentes (transitivos) de um nó."""
+        if visited is None:
+            visited = set()
+        for n_name, n_node in self.nodes.items():
+            if node_name in n_node.depends_on and n_name not in visited:
+                visited.add(n_name)
+                self._find_dependents(n_name, visited)
+        return visited
+
     async def _abort_dependent_nodes_async(
         self, execution_id: str, failed_node_name: str, reason: str
     ):
         """Abortamento assíncrono em cascata (Sanity Barrier)."""
-        dependents = set()
-
-        def _find_dependents(node_name: str):
-            for n_name, n_node in self.nodes.items():
-                if failed_node_name in n_node.depends_on and n_name not in dependents:
-                    dependents.add(n_name)
-                    _find_dependents(n_name)
-
-        _find_dependents(failed_node_name)
+        dependents = self._find_dependents(failed_node_name)
 
         if not dependents:
             return
@@ -869,6 +880,3 @@ class ExecutionGraph:
         }
 
 
-# Injetado automaticamente para resolver assinaturas ausentes
-class Node:
-    pass

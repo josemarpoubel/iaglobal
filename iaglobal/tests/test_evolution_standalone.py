@@ -32,7 +32,7 @@ def is_port_available(port: int) -> bool:
 def test_evolution_server_has_main_entry():
     """Evolution Server tem entry point __main__."""
     # Verifica que o código __main__ existe no arquivo
-    server_path = Path(__file__).parent.parent / "iaglobal" / "server" / "server.py"
+    server_path = Path(__file__).parent.parent / "server" / "server.py"
     content = server_path.read_text()
 
     # Deve ter o bloco if __name__ == "__main__"
@@ -45,7 +45,7 @@ def test_evolution_server_syntax():
     """Evolution Server tem sintaxe Python válida."""
     import py_compile
 
-    server_path = Path(__file__).parent.parent / "iaglobal" / "server" / "server.py"
+    server_path = Path(__file__).parent.parent / "server" / "server.py"
 
     # Compila para verificar sintaxe
     try:
@@ -58,7 +58,7 @@ def test_evolution_server_syntax():
 def test_evolution_server_env_vars():
     """Evolution Server lê variáveis de ambiente corretamente."""
     # Verifica que as variáveis estão no .env.example
-    env_example = Path(__file__).parent.parent / ".env.example"
+    env_example = Path(__file__).parent.parent.parent / ".env.example"
     content = env_example.read_text()
 
     assert "EVOLUTION_HOST" in content
@@ -69,7 +69,7 @@ def test_evolution_server_env_vars():
 def test_evolution_server_default_port():
     """Evolution Server usa porta 8002 como default."""
     # Verifica o código fonte
-    server_path = Path(__file__).parent.parent / "iaglobal" / "server" / "server.py"
+    server_path = Path(__file__).parent.parent / "server" / "server.py"
     content = server_path.read_text()
 
     # Deve ter o default 8002
@@ -146,7 +146,7 @@ async def test_evolution_server_standalone_compatibility():
 
 def test_evolution_server_logging_config():
     """Evolution Server tem configuração de logging adequada."""
-    server_path = Path(__file__).parent.parent / "iaglobal" / "server" / "server.py"
+    server_path = Path(__file__).parent.parent / "server" / "server.py"
     content = server_path.read_text()
 
     # Deve ter configuração de log no uvicorn

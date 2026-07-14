@@ -4,18 +4,22 @@ import ast
 from typing import Tuple, Optional
 import builtins
 from iaglobal.utils.logger import logger
+from iaglobal.security.ast_gateway import ASTGateway
+
+# Gateway singleton para AST parsing - ÚNICO ponto permitido no sistema
+_ast_gateway = ASTGateway()
 
 
 def validar_sintaxe(code: str) -> None:
     """
-    ÚNICO ponto do sistema onde ast.parse é permitido.
+    ÚNICO ponto do sistema onde AST parsing é permitido.
+    Usa o ASTGateway para validação segura.
     """
-
-    try:
-        ast.parse(code)
-
-    except SyntaxError as e:
-        raise SyntaxError(f"Invalid syntax: {e}")
+    result = _ast_gateway.parse(code)
+    if not result.valid:
+        if result.errors:
+            raise SyntaxError(f"Invalid syntax: {result.errors[0]}")
+        raise SyntaxError("Invalid syntax")
 
 
 class ScopeAnalyzer(ast.NodeVisitor):

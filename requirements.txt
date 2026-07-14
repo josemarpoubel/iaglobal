@@ -61,3 +61,4 @@ watchdog
 websockets
 autopep8
 ruff
+pytest-asyncio

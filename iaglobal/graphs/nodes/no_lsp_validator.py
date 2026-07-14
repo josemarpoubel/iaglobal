@@ -13,12 +13,15 @@ Saída: lista de diagnósticos estilo LSP (line, column, message, severity).
 """
 
 import time
-import ast
 from typing import Dict, Any, List
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.security.ast_gateway import ASTGateway
 
 logger = get_logger("iaglobal.graphs.nodes.lsp_validator")
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 
 def _validar_com_pyflakes(code: str) -> List[Dict[str, Any]]:
@@ -98,7 +101,12 @@ def _validar_imports(code: str) -> List[Dict[str, Any]]:
     """Verifica se os imports do código resolvem no ambiente atual."""
     diagnostics = []
     try:
-        tree = ast.parse(code)
+        result = _ast_gateway.parse(code)
+        if not result.valid or result.tree is None:
+            return diagnostics
+        
+        tree = result.tree
+        import ast
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 for alias in node.names:

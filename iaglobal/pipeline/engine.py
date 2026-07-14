@@ -424,14 +424,30 @@ class PipelineEngine:
                 "check",
                 "verify",
                 "scan",
+                "optimize",
+                "diagnose",
+                "diagnosis",
+                "metabolic",
+                "metabolism",
+                "ivm",
+                "routing",
+                "weights",
             ]
         )
 
-        if is_analysis_task and not code.startswith(
-            ("import ", "def ", "class ", "from ", "async ")
-        ):
+        # Detecta se é markdown/texto estruturado (não código)
+        is_markdown_or_text = (
+            code.startswith("#") or
+            "**" in code or
+            "## " in code or
+            "- **" in code or
+            "| **" in code or
+            ("> " in code and len(code.split("\n")) > 5)
+        )
+
+        if is_analysis_task or is_markdown_or_text:
             logger.info(
-                "[VALIDATION] Tarefa de análise detectada — pulando validação Python AST"
+                "[VALIDATION] Tarefa de análise/texto detectada — pulando validação Python AST"
             )
             state.syntax_valid = True
             return

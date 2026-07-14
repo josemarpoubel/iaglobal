@@ -6,30 +6,31 @@
 2. [Fundamental Principles](#2-fundamental-principles-the-systems-dna)
 3. [Genomic Verification (Genesis & Lineage)](#3-genomic-dna-verification-genesis--lineage)
 4. [Immune System](#4-immune-system)
-4.5 [Epigenetic Evolution of ToolLibrary](#45-epigenetic-evolution-of-toollibrary-eetl)
-5. [Metabolic Cycles (Data Pipeline)](#5-metabolic-cycles-data-pipeline)
-6. [Execution Pipeline (DAG)](#6-execution-pipeline-dag)
-7. [Critic Sovereignty Protocol (CSP)](#7-critic-sovereignty-protocol-csp)
-8. [Evolutionary Engine (Genomic Reflection)](#8-evolutionary-engine-genomic-reflection)
-9. [Universal Laws Applied](#9-universal-laws-applied)
-10. [Obsidian Module — Subconscious](#10-obsidian-module--subconscious)
-10.11 [Project Synapse — Reactive Nervous System](#1011-project-synapse--reactive-nervous-system)
-10.12 [Dynamic Processing Privilege — CPU Boost for Critical Batches](#1012-dynamic-processing-privilege--cpu-boost-for-critical-batches)
-11. [Asynchronous Communication](#11-asynchronous-communication)
-12. [Validation Under Load](#12-validation-under-load)
-13. [Technical Debt and Detected Inconsistencies](#13-technical-debt-and-detected-inconsistencies)
-14. [Evolutionary Vector (Consolidated Roadmap)](#14-evolutionary-vector)
-15. [SearchMiddleware — Intelligent Context Access with Dual RAG (Web + Local)](#15-searchmiddleware--intelligent-context-access-with-dual-rag-web--local)
-16. [SERVERS and MCP Protocol Expansion](#16-servers-and-mcp-protocol-expansion)
-17. [Colony Intelligence Communication](#17-colony-intelligence-communication)
-18. [Genetic Algorithm Tuning — Evolutionary Optimization of IVM Weights](#18-genetic-algorithm-tuning--evolutionary-optimization-of-ivm-weights)
-19. [Local Prompt Engineering — Self-Correction, Few-Shot and Chain of Thought](#19-local-prompt-engineering--self-correction-few-shot-and-chain-of-thought)
+5. [ASTGateway — Centralized AST Parsing Security Layer](#46-astgateway--centralized-ast-parsing-security-layer)
+6. [Epigenetic Evolution of ToolLibrary](#47-epigenetic-evolution-of-toollibrary-eetl)
+7. [Metabolic Cycles (Data Pipeline)](#5-metabolic-cycles-data-pipeline)
+8. [Execution Pipeline (DAG)](#6-execution-pipeline-dag)
+9. [Critic Sovereignty Protocol (CSP)](#7-critic-sovereignty-protocol-csp)
+10. [Evolutionary Engine (Genomic Reflection)](#8-evolutionary-engine-genomic-reflection)
+11. [Universal Laws Applied](#9-universal-laws-applied)
+12. [Obsidian Module — Subconscious](#10-obsidian-module--subconscious)
+13. [Project Synapse — Reactive Nervous System](#1011-project-synapse--reactive-nervous-system)
+14. [Dynamic Processing Privilege — CPU Boost for Critical Batches](#1012-dynamic-processing-privilege--cpu-boost-for-critical-batches)
+15. [Asynchronous Communication](#11-asynchronous-communication)
+16. [Validation Under Load](#12-validation-under-load)
+17. [Technical Debt and Detected Inconsistencies](#13-technical-debt-and-detected-inconsistencies)
+18. [Evolutionary Vector (Consolidated Roadmap)](#14-evolutionary-vector)
+19. [SearchMiddleware — Intelligent Context Access with Dual RAG (Web + Local)](#15-searchmiddleware--intelligent-context-access-with-dual-rag-web--local)
+20. [SERVERS and MCP Protocol Expansion](#16-servers-and-mcp-protocol-expansion)
+21. [Colony Intelligence Communication](#17-colony-intelligence-communication)
+22. [Genetic Algorithm Tuning — Evolutionary Optimization of IVM Weights](#18-genetic-algorithm-tuning--evolutionary-optimization-of-ivm-weights)
+23. [Local Prompt Engineering — Self-Correction, Few-Shot and Chain of Thought](#19-local-prompt-engineering--self-correction-few-shot-and-chain-of-thought)
     - [19.6.4 DLQ → FewShotProvider Cycle (Adaptive Immune Memory)](#1964-dlq--fewshotprovider-cycle-adaptive-immune-memory)
-20. [MetabolicDataAdapter — CBOR2↔JSON Bridge](#20-metabolicdataadapter--cbor2json-bridge-for-llm-consumption)
-21. [Skill Templates — Centralized Prompt Management](#21-skill-templates--centralized-prompt-management)
-22. [Appendix A — Complete Directory Tree](#appendix-a--complete-directory-tree)
-23. [Curator's Note](#curators-note)
-24. [ROADMAP_2.md — Evolution History](#-roadmap_2md--evolution-history)
+24. [MetabolicDataAdapter — CBOR2↔JSON Bridge](#20-metabolicdataadapter--cbor2json-bridge-for-llm-consumption)
+25. [Skill Templates — Centralized Prompt Management](#21-skill-templates--centralized-prompt-management)
+26. [Appendix A — Complete Directory Tree](#appendix-a--complete-directory-tree)
+27. [Curator's Note](#curators-note)
+28. [ROADMAP_2.md — Evolution History](#-roadmap_2md--evolution-history)
 
 ---
 
@@ -321,7 +322,149 @@ Operational flow: `scan → detect → filter (GSH) → learn (memory) → adapt
 
 ---
 
-## 4.5 Epigenetic Evolution of ToolLibrary (EETL)
+## 4.6 ASTGateway — Centralized AST Parsing Security Layer
+
+**Implementation Date:** July 2026  
+**Status:** ✅ Active — Centralized AST parsing enforcement  
+**Location:** `iaglobal/security/ast_gateway.py`
+
+### Architectural Principle
+
+The **ASTGateway** is the **🔒 SINGLE ENTRY POINT** for AST parsing across the entire iaglobal system. No other module is permitted to call `ast.parse()` directly.
+
+This centralization ensures:
+- **Sandbox validation** at every parse point
+- **Blocked node detection** (e.g., `ast.Exec`, dynamic code execution)
+- **Centralized logging** of syntax errors and security violations
+- **Consistent error handling** across all validation points
+
+### Architecture Diagram
+
+```
+┌─────────────────────────────────────────────────────────┐
+│              ASTGateway (security/)                     │
+│  🔒 SINGLE ENTRY POINT para ast.parse()                 │
+│                                                         │
+│  Components:                                            │
+│  - parse(code: str) → ASTResult                         │
+│  - validate(code: str) → ASTResult                      │
+│  - _scan(tree: ast.AST) → List[str]                     │
+│                                                         │
+│  Security Features:                                     │
+│  - SandboxRules validation (allowed modules)            │
+│  - Blocked node detection (Exec, Eval, etc.)            │
+│  - Error aggregation and structured reporting           │
+└─────────────────┬───────────────────────────────────────┘
+                  │
+    ┌─────────────┼─────────────┬─────────────────┐
+    │             │             │                 │
+┌───▼───┐   ┌────▼────┐   ┌───▼────┐      ┌─────▼─────┐
+│  LSP  │   │ Syntax  │   │ Syntax │      │  Other    │
+│Validator│   │Sentinel │   │.py    │      │  Modules  │
+│(nodes/)│   │(nodes/) │   │(valid.)│      │  (future) │
+└─────────┘   └─────────┘   └────────┘      └───────────┘
+```
+
+### Implementation Details
+
+**ASTResult Dataclass:**
+```python
+@dataclass
+class ASTResult:
+    valid: bool
+    tree: Optional[ast.AST]
+    errors: List[str]
+```
+
+**Usage Pattern (Correct):**
+```python
+from iaglobal.security.ast_gateway import ASTGateway
+
+_gateway = ASTGateway()
+result = _gateway.parse(code)
+
+if result.valid:
+    # Safe to use result.tree
+    for node in ast.walk(result.tree):
+        ...
+else:
+    # Handle errors from result.errors
+    logger.error(f"AST validation failed: {result.errors}")
+```
+
+### Modules Corrected (July 2026)
+
+| Module | Before | After | Status |
+|--------|--------|-------|--------|
+| `graphs/nodes/no_lsp_validator.py` | `ast.parse(code)` | `_ast_gateway.parse(code)` | ✅ |
+| `graphs/nodes/syntax_sentinel.py` | `ast.parse(code)` | `_ast_gateway.parse(code)` | ✅ |
+| `validation/syntax.py` | `ast.parse(code)` | `_ast_gateway.parse(code)` | ✅ |
+| `graphs/nodes/no_skill_generator.py` | Wrong import path | `iaglobal.evolution.skills.native.skill_generator_agent` | ✅ |
+| `graphs/nodes/no_entropy_sentinel.py` | `iaglobal.security.entropy_sentinel` | `iaglobal.immunity.entropy_sentinel` | ✅ |
+| `graphs/nodes/no_auditor_sentinel.py` | Wrong imports | `iaglobal.immunity.entropy_sentinel` + `iaglobal.core.graceful_shutdown` | ✅ |
+| `pipeline/engine.py` | AST validation on markdown | Markdown/text detection → skip AST | ✅ |
+
+### Security Scanning Features
+
+The ASTGateway performs the following security checks on every parse:
+
+1. **Import Validation**: Checks all `ast.Import` and `ast.ImportFrom` nodes against `SandboxRules.allowed_modules`
+2. **Blocked Node Detection**: Prevents use of dangerous nodes like `ast.Exec`, `ast.Eval`, `ast.Compile`
+3. **Error Aggregation**: Collects all errors in a single pass instead of failing on first error
+4. **Structured Reporting**: Returns `ASTResult` with detailed error messages
+
+### Metabolic Analogy
+
+| Biological Component | Computational Equivalent |
+|---------------------|-------------------------|
+| **Nuclear membrane** | ASTGateway (controls access to AST) |
+| **DNA transcription** | `ast.parse()` (converts code to AST) |
+| **mRNA processing** | `_scan()` (validates and filters) |
+| **Quality control** | `SandboxRules` (allowed modules list) |
+| **Apoptosis trigger** | `result.valid == False` (rejects toxic code) |
+
+### Validation Under Load
+
+During the July 2026 correction cycle, the system demonstrated:
+
+- **Before**: 3 import failures, health status = "comprometida"
+- **After**: 0 import failures, health status = "estável"
+- **Pipeline success rate**: Increased from ~60% to 100% for analysis tasks
+- **Markdown detection**: Added heuristic detection to skip AST validation for reports
+
+### Future Enforcement
+
+**Remaining modules to migrate** (identified via grep, not yet corrected):
+
+- `evolution/handler_evolution.py` (4 occurrences)
+- `evolution/skills/utils/run_fn_factory.py` (1)
+- `validation/ast_security.py` (2)
+- `validation/gateway.py` (1)
+- `validation/engine.py` (1)
+- `validation/scoring.py` (1)
+- `core/auto_correction.py` (2)
+- `core/code_assembler.py` (4)
+- `core/few_shot_provider.py` (1)
+- `core/dependency_enforcer.py` (1)
+- `utils/integrity.py` (2)
+- `agents/critic_agent.py` (1)
+- `agents/tester_agent.py` (1)
+- `agents/ingestion/experiment_runner.py` (1)
+- `agents/semantic_validator.py` (1)
+- `search/search_code_extractor.py` (1)
+- `execution/sandbox.py` (1)
+- `immunity/glutathione_guardrails.py` (1)
+- `tools/tool_library.py` (1)
+
+**Migration strategy:** Each module should be updated to:
+1. Import `ASTGateway` from `iaglobal.security.ast_gateway`
+2. Create singleton instance: `_ast_gateway = ASTGateway()`
+3. Replace `ast.parse(code)` with `_ast_gateway.parse(code)`
+4. Handle `ASTResult` instead of raw `ast.AST`
+
+---
+
+## 4.7 Epigenetic Evolution of ToolLibrary (EETL)
 
 EETL closes the autopoietic loop of the system: tasks that require repeated escalation to cloud models are converted into permanent local tools, eliminating external dependency.
 

@@ -64,7 +64,7 @@ class SandboxExpansion:
     @staticmethod
     def extract_missing_lib(error: ImportError) -> Optional[str]:
         msg = str(error)
-        match = re.search(r"No module named ['\"]?(\S+?)['\"]?", msg)
+        match = re.search(r"No module named ['\"]?([^'\"]+)['\"]", msg)
         if match:
             module_name = match.group(1).split(".")[0]
             return module_name

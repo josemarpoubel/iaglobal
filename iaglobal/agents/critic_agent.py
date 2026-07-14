@@ -537,6 +537,26 @@ class CriticAgent(AgentBase):
             logger.warning(
                 "[ARBITER] Falha ao delegar para %s via critic: %s", node_id, e
             )
+            try:
+                from iaglobal.agents.agent_base import get_evo_registry
+                from iaglobal.immunity.vaccine_ledger import vaccine_ledger
+                from iaglobal.evolution import is_flag_enabled
+
+                evo = get_evo_registry().get(node_id)
+                if evo and is_flag_enabled("evo_vaccine_persist"):
+                    pattern = type(e).__name__
+                    evo._failure_patterns.append(pattern)
+                    await vaccine_ledger.registrar_falha(
+                        evo,
+                        pattern,
+                        {
+                            "prompt": (prompt or "")[:200],
+                            "task_type": task_type,
+                            "agent": node_id,
+                        },
+                    )
+            except Exception:
+                pass
             return ""
 
     async def _creditar_cooperacao(

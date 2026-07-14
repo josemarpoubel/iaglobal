@@ -4,6 +4,7 @@ import socket
 import os
 import logging
 from pathlib import Path
+from typing import Set
 
 
 logger = logging.getLogger("iaglobal")
@@ -31,15 +32,23 @@ def _get_caller_skill() -> str:
     return "unknown"
 
 
+# Nós do sistema que fazem chamadas de API legítimas (não são parasitas)
+_SYSTEM_NODES: Set[str] = {
+    "system_analysis", "critic", "coder", "tester", "debugger",
+    "reflexion", "orchestrator", "evaluator", "planner",
+}
+
+
 def _bloquear_conexao_origem(*args, **kwargs):
     """Universal interceptor that aborts socket connection attempts."""
     skill_name = _get_caller_skill()
 
-    # Integração MHC: reportar tentativa de acesso não autorizado
-    if MHC_AVAILABLE:
+    # Nós do sistema fazem chamadas de API legítimas — não reportar como parasita
+    if skill_name not in _SYSTEM_NODES and MHC_AVAILABLE:
         mhc_detector.quarantine_if_parasite(
             skill_name,
             {
+                "origin": skill_name,
                 "unauthorized_path": f"network_call_to_{args[0] if args else 'unknown'}",
                 "unexpected_output": True,
             },
@@ -95,21 +104,10 @@ class NetworkGuard:
         """Conecta controles de rede usados pelo sandbox."""
         if os.getenv("IAGLOBAL_ENABLE_NETWORK_ISOLATION_IN_PROCESS") == "1":
             self.enable_isolation()
-        self.disable_isolation()
-        self.block_host("example.com")
-        self.block_port(22)
-        self.allow_host("localhost")
-        self.is_host_blocked("example.com")
-        self.is_port_blocked(22)
-        self.get_blocked_hosts()
-        self.get_blocked_ports()
-        self.get_allowed_hosts()
-        self.reset_blocks()
-        try:
-            _bloquear_conexao_origem()
-        except NetworkAccessBlocked:
-            pass
-        self.test_isolation()
+            try:
+                _bloquear_conexao_origem()
+            except NetworkAccessBlocked:
+                pass
 
     def enable_isolation(self) -> None:
         """Enable strict network isolation."""

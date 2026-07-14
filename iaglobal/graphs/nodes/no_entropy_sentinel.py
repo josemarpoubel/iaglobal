@@ -8,7 +8,7 @@ import logging
 from datetime import datetime, timezone
 from typing import Any, Dict
 
-from iaglobal.security.entropy_sentinel import entropy_sentinel
+from iaglobal.immunity.entropy_sentinel import entropy_sentinel
 
 logger = logging.getLogger(__name__)
 

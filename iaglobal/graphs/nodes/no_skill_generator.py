@@ -11,7 +11,7 @@ import logging
 import asyncio
 from typing import Dict, Any
 
-from iaglobal.agents.skill_generator_agent import SkillGeneratorAgent
+from iaglobal.evolution.skills.native.skill_generator_agent import SkillGeneratorAgent
 
 logger = logging.getLogger(__name__)
 
