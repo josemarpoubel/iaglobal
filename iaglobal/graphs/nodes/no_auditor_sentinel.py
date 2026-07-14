@@ -25,9 +25,10 @@ async def run_auditor_sentinel(context: Dict[str, Any]) -> Dict[str, Any]:
         {"integrity_ok": bool, "current_hash": str, "alert_triggered": bool}
     """
     from iaglobal.core.graceful_shutdown import graceful_shutdown
-    
+
     expected = context.get("expected_hash") or entropy_sentinel._genesis_hash
     current = entropy_sentinel._genesis_hash
+
 
 logger = logging.getLogger(__name__)
 

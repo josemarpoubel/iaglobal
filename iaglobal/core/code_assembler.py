@@ -13,8 +13,12 @@ from typing import List, Optional, Dict
 from dataclasses import dataclass, field
 
 from iaglobal.search.search_code_extractor import CodeBlock
+from iaglobal.security.ast_gateway import ASTGateway
 
 logger = logging.getLogger("iaglobal")
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 DEFAULT_HEAD = """    <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -123,37 +127,41 @@ class CodeAssembler:
         return result
 
     def _assemble_python(self, blocks: List[CodeBlock], result: AssemblyResult) -> AssemblyResult:
-        """Monta Python válido a partir de blocos — valida cada um via AST."""
+        """Monta Python válido a partir de blocos — valida cada um via ASTGateway."""
         valid_parts: List[str] = []
         for block in blocks:
             code = block.code.strip()
             if not code:
                 continue
-            try:
-                tree = ast.parse(code)
-                if self._has_meaningful_content(tree):
+            
+            # Usar ASTGateway em vez de ast.parse direto
+            parse_result = _ast_gateway.parse(code)
+            if parse_result.valid and parse_result.tree:
+                if self._has_meaningful_content(parse_result.tree):
                     valid_parts.append(code)
-            except SyntaxError:
-                pass
 
         if not valid_parts:
             result.errors.append("Nenhum bloco Python sintaticamente válido")
             return result
 
         merged = self._dedupe_and_merge(valid_parts)
-        try:
-            ast.parse(merged)
+        
+        # Validar merged com ASTGateway
+        merged_result = _ast_gateway.parse(merged)
+        if merged_result.valid:
             result.code = merged
             result.valid = True
             result.blocks_used = len(valid_parts)
-        except SyntaxError as e:
+        else:
+            # Fallback: tentar com primeiro bloco
             result.code = valid_parts[0]
-            try:
-                ast.parse(result.code)
+            first_result = _ast_gateway.parse(result.code)
+            if first_result.valid:
                 result.valid = True
                 result.blocks_used = 1
-            except SyntaxError:
-                result.errors.append(f"AST inválido mesmo após merge: {e}")
+            else:
+                if merged_result.errors:
+                    result.errors.append(f"AST inválido mesmo após merge: {merged_result.errors[0]}")
 
         return result
 
@@ -228,37 +236,42 @@ class CodeAssembler:
         seen_classes: set = set()
 
         for part in parts:
-            try:
-                tree = ast.parse(part)
-                for node in ast.walk(tree):
-                    if isinstance(node, ast.Import):
-                        for alias in node.names:
-                            if alias.name not in seen_imports:
-                                seen_imports.add(alias.name)
-                                imports.append(f"import {alias.name}")
-                    elif isinstance(node, ast.ImportFrom):
-                        module = node.module or ""
-                        names = [n.name for n in node.names]
-                        key = f"from {module} import {', '.join(names)}"
-                        if key not in seen_imports:
-                            seen_imports.add(key)
-                            imports.append(key)
-                    elif isinstance(node, ast.FunctionDef):
-                        if node.name not in seen_funcs:
-                            seen_funcs.add(node.name)
-                            start = node.lineno - 1
-                            end = node.end_lineno or start
-                            lines = part.splitlines()[start:end]
-                            functions.append("\n".join(lines))
-                    elif isinstance(node, ast.ClassDef):
-                        if node.name not in seen_classes:
-                            seen_classes.add(node.name)
-                            start = node.lineno - 1
-                            end = node.end_lineno or start
-                            lines = part.splitlines()[start:end]
-                            classes.append("\n".join(lines))
-            except SyntaxError:
+            # Usar ASTGateway para parse
+            parse_result = _ast_gateway.parse(part)
+            if not parse_result.valid or not parse_result.tree:
                 other.append(part)
+                continue
+            
+            tree = parse_result.tree
+            for node in ast.walk(tree):
+                if isinstance(node, ast.Import):
+                    for alias in node.names:
+                        if alias.name not in seen_imports:
+                            seen_imports.add(alias.name)
+                            imports.append(f"import {alias.name}")
+                elif isinstance(node, ast.ImportFrom):
+                    module = node.module or ""
+                    names = [n.name for n in node.names]
+                    key = f"from {module} import {', '.join(names)}"
+                    if key not in seen_imports:
+                        seen_imports.add(key)
+                        imports.append(key)
+                elif isinstance(node, ast.FunctionDef):
+                    if node.name not in seen_funcs:
+                        seen_funcs.add(node.name)
+                        start = node.lineno - 1
+                        end = node.end_lineno or start
+                        lines = part.splitlines()[start:end]
+                        functions.append("\n".join(lines))
+                elif isinstance(node, ast.ClassDef):
+                    if node.name not in seen_classes:
+                        seen_classes.add(node.name)
+                        start = node.lineno - 1
+                        end = node.end_lineno or start
+                        lines = part.splitlines()[start:end]
+                        classes.append("\n".join(lines))
+
+        # Parts inválidas vão para other
 
         merged_lines: List[str] = []
         merged_lines.extend(imports)

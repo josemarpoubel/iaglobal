@@ -122,6 +122,451 @@ Cada passo é independente dentro da fase, mas fases devem ser executadas em ord
 
 ---
 
+# 🧬 ROADMAP 3 — ASTGateway Migration (Centralização de AST Parsing)
+
+**Status:** 🟡 Em Progresso (7/27 módulos migrados — 26% concluído)  
+**Data de Início:** Julho 2026  
+**Prioridade:** 🔥 ALTA (Segurança + Arquitetura)  
+**Owner:** Security & Validation Team  
+**Related:** `ARCHITECTURE.md §4.6`, `AGENTS.md`, `SYNTAX_VALIDATION_GUIDE.md`
+
+---
+
+## 📊 Status Atual
+
+### ✅ Módulos Migrados (7/27)
+
+| Módulo | Linha | Status | Testes |
+|--------|-------|--------|--------|
+| `graphs/nodes/no_lsp_validator.py` | 101 | ✅ Completo | ✅ Pass |
+| `graphs/nodes/syntax_sentinel.py` | 117, 134 | ✅ Completo | ✅ Pass |
+| `validation/syntax.py` | 15 | ✅ Completo | ✅ Pass |
+| `graphs/nodes/no_skill_generator.py` | Import path | ✅ Completo | ✅ Pass |
+| `graphs/nodes/no_entropy_sentinel.py` | Import path | ✅ Completo | ✅ Pass |
+| `graphs/nodes/no_auditor_sentinel.py` | Import path | ✅ Completo | ✅ Pass |
+| `pipeline/engine.py` | Markdown detection | ✅ Completo | ✅ Pass |
+
+### ❌ Módulos Pendentes (20/27)
+
+#### Core (4 arquivos, 8 ocorrências)
+- [ ] `core/auto_correction.py` (2 ocorrências)
+- [ ] `core/code_assembler.py` (4 ocorrências)
+- [ ] `core/dependency_enforcer.py` (1 ocorrência)
+- [ ] `core/few_shot_provider.py` (1 ocorrência)
+
+#### Agents (4 arquivos, 4 ocorrências)
+- [ ] `agents/critic_agent.py` (1 ocorrência)
+- [ ] `agents/tester_agent.py` (1 ocorrência)
+- [ ] `agents/semantic_validator.py` (1 ocorrência)
+- [ ] `agents/ingestion/experiment_runner.py` (1 ocorrência)
+
+#### Validation (3 arquivos, 4 ocorrências)
+- [ ] `validation/ast_security.py` (2 ocorrências)
+- [ ] `validation/engine.py` (1 ocorrência)
+- [ ] `validation/scoring.py` (1 ocorrência)
+
+#### Evolution (1 arquivo, 4 ocorrências)
+- [ ] `evolution/handler_evolution.py` (4 ocorrências)
+
+#### Security/Utils/Tools (5 arquivos, 5 ocorrências)
+- [ ] `utils/integrity.py` (2 ocorrências)
+- [ ] `execution/sandbox.py` (1 ocorrência)
+- [ ] `immunity/glutathione_guardrails.py` (1 ocorrência)
+- [ ] `tools/tool_library.py` (1 ocorrência)
+- [ ] `search/search_code_extractor.py` (1 ocorrência)
+
+---
+
+## FASE 1 — Preparação e Setup
+
+### Passo 1.1: Verificar ASTGateway disponível
+**Objetivo:** Confirmar que ASTGateway está funcional e testado.
+
+**Ação:**
+```bash
+python3 -c "
+from iaglobal.security.ast_gateway import ASTGateway
+gateway = ASTGateway()
+result = gateway.parse('x = 1')
+assert result.valid == True
+print('✅ ASTGateway OK')
+"
+```
+
+**Aceite:** ASTGateway inicializa e parseia código válido sem erros.
+
+**Status:** ✅ CONCLUÍDO (Julho 2026)
+
+---
+
+### Passo 1.2: Criar lista de módulos pendentes
+**Objetivo:** Ter lista exata de arquivos para migrar.
+
+**Ação:**
+```bash
+grep -r "ast\.parse" iaglobal/ \
+  --include="*.py" \
+  --exclude-dir=__pycache__ \
+  --exclude="*test*" \
+  | grep -v "ast_gateway.py" \
+  | cut -d: -f1 \
+  | sort -u
+```
+
+**Aceite:** Lista de 20 arquivos gerada e salva em `scripts/ast_migration_list.txt`
+
+**Status:** ✅ CONCLUÍDO (lista acima)
+
+---
+
+### Passo 1.3: Backup pré-migração
+**Objetivo:** Permitir rollback seguro se necessário.
+
+**Ação:**
+```bash
+git checkout -b backup-pre-astgateway-migration
+git checkout main
+```
+
+**Aceite:** Branch de backup criada e disponível para rollback.
+
+**Status:** ⏳ PENDENTE
+
+---
+
+## FASE 2 — Migração dos Módulos Core
+
+### Passo 2.1: Migrar `core/auto_correction.py`
+**Objetivo:** Substituir 2 ocorrências de `ast.parse()` por ASTGateway.
+
+**Ação:**
+```python
+# ANTES
+import ast
+ast.parse(codigo)
+
+# DEPOIS
+from iaglobal.security.ast_gateway import ASTGateway
+_ast_gateway = ASTGateway()
+result = _ast_gateway.parse(codigo)
+if not result.valid:
+    logger.error(f"AST validation failed: {result.errors}")
+```
+
+**Arquivo:** `iaglobal/core/auto_correction.py`  
+**Ocorrências:** 2 (linhas ~100, ~200)  
+**Testes:** `python -m pytest iaglobal/tests/test_auto_correction.py -v`
+
+**Aceite:**
+- [ ] Código compila sem erros
+- [ ] Testes existentes passam
+- [ ] Nenhum `ast.parse` direto no arquivo
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 2.2: Migrar `core/code_assembler.py`
+**Objetivo:** Substituir 4 ocorrências de `ast.parse()`.
+
+**Arquivo:** `iaglobal/core/code_assembler.py`  
+**Ocorrências:** 4  
+**Testes:** `python -m pytest iaglobal/tests/ -k "assembler" -v`
+
+**Aceite:**
+- [ ] 4 ocorrências substituídas
+- [ ] Testes passam
+- [ ] Merge conflicts resolvidos
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 2.3: Migrar `core/dependency_enforcer.py`
+**Objetivo:** Substituir 1 ocorrência de `ast.parse()`.
+
+**Arquivo:** `iaglobal/core/dependency_enforcer.py`  
+**Ocorrências:** 1  
+**Testes:** `python -m pytest iaglobal/tests/test_dependency_enforcer_autoinstall.py -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 2.4: Migrar `core/few_shot_provider.py`
+**Objetivo:** Substituir 1 ocorrência de `ast.parse()`.
+
+**Arquivo:** `iaglobal/core/few_shot_provider.py`  
+**Ocorrências:** 1  
+**Testes:** `python -m pytest iaglobal/tests/ -k "fewshot" -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+## FASE 3 — Migração dos Agents
+
+### Passo 3.1: Migrar `agents/critic_agent.py`
+**Objetivo:** Substituir 1 ocorrência de `ast.parse()`.
+
+**Arquivo:** `iaglobal/agents/critic_agent.py`  
+**Ocorrências:** 1  
+**Testes:** `python -m pytest iaglobal/tests/ -k "critic" -v`
+
+**Nota:** Crítico — critic_agent é o único que pode chamar LLM via PSC.
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 3.2: Migrar `agents/tester_agent.py`
+**Objetivo:** Substituir 1 ocorrência de `ast.parse()`.
+
+**Arquivo:** `iaglobal/agents/tester_agent.py`  
+**Ocorrências:** 1  
+**Testes:** `python -m pytest iaglobal/tests/ -k "tester" -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 3.3: Migrar `agents/semantic_validator.py`
+**Objetivo:** Substituir 1 ocorrência de `ast.parse()`.
+
+**Arquivo:** `iaglobal/agents/semantic_validator.py`  
+**Ocorrências:** 1  
+**Testes:** `python -m pytest iaglobal/tests/ -k "semantic" -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 3.4: Migrar `agents/ingestion/experiment_runner.py`
+**Objetivo:** Substituir 1 ocorrência de `ast.parse()`.
+
+**Arquivo:** `iaglobal/agents/ingestion/experiment_runner.py`  
+**Ocorrências:** 1  
+**Testes:** `python -m pytest iaglobal/tests/ -k "experiment" -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+## FASE 4 — Migração do Validation Core
+
+### Passo 4.1: Migrar `validation/ast_security.py`
+**Objetivo:** Substituir 2 ocorrências de `ast.parse()`.
+
+**Arquivo:** `iaglobal/validation/ast_security.py`  
+**Ocorrências:** 2  
+**Testes:** `python -m pytest iaglobal/tests/ -k "ast_security" -v`
+
+**Nota:** Ironia — módulo de segurança de AST usa `ast.parse` direto!
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 4.2: Migrar `validation/engine.py`
+**Objetivo:** Substituir 1 ocorrência de `ast.parse()`.
+
+**Arquivo:** `iaglobal/validation/engine.py`  
+**Ocorrências:** 1  
+**Testes:** `python -m pytest iaglobal/tests/ -k "validation" -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 4.3: Migrar `validation/scoring.py`
+**Objetivo:** Substituir 1 ocorrência de `ast.parse()`.
+
+**Arquivo:** `iaglobal/validation/scoring.py`  
+**Ocorrências:** 1  
+**Testes:** `python -m pytest iaglobal/tests/ -k "scoring" -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+## FASE 5 — Migração de Evolution e Utils
+
+### Passo 5.1: Migrar `evolution/handler_evolution.py`
+**Objetivo:** Substituir 4 ocorrências de `ast.parse()`.
+
+**Arquivo:** `iaglobal/evolution/handler_evolution.py`  
+**Ocorrências:** 4  
+**Testes:** `python -m pytest iaglobal/tests/ -k "evolution" -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 5.2: Migrar `utils/integrity.py`
+**Objetivo:** Substituir 2 ocorrências de `ast.parse()`.
+
+**Arquivo:** `iaglobal/utils/integrity.py`  
+**Ocorrências:** 2  
+**Testes:** `python -m pytest iaglobal/tests/ -k "integrity" -v`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 5.3: Migrar módulos restantes (5 arquivos)
+**Objetivo:** Completar migração dos últimos 5 módulos.
+
+**Arquivos:**
+- [ ] `execution/sandbox.py` (1)
+- [ ] `immunity/glutathione_guardrails.py` (1)
+- [ ] `tools/tool_library.py` (1)
+- [ ] `search/search_code_extractor.py` (1)
+
+**Testes:** `python -m pytest iaglobal/tests/ -q`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+## FASE 6 — Validação e Cleanup
+
+### Passo 6.1: Verificar zero ocorrências de `ast.parse`
+**Objetivo:** Confirmar migração completa.
+
+**Ação:**
+```bash
+grep -r "ast\.parse" iaglobal/ \
+  --include="*.py" \
+  --exclude-dir=__pycache__ \
+  --exclude="*test*" \
+  | grep -v "ast_gateway.py" \
+  | wc -l
+```
+
+**Aceite:** Saída = `0`
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 6.2: Rodar suite completa de testes
+**Objetivo:** Garantir zero regressões.
+
+**Ação:**
+```bash
+python -m pytest iaglobal/tests/ -q --tb=short
+```
+
+**Aceite:**
+- Todos testes passam
+- Zero failures
+- Zero warnings novas
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 6.3: Atualizar documentação
+**Objetivo:** Marcar migração como completa.
+
+**Ação:**
+- Atualizar `ARCHITECTURE.md §4.6` — remover lista de pendentes
+- Atualizar `SYNTAX_VALIDATION_GUIDE.md` — seção 9 (Migration Guide)
+- Atualizar `ROADMAP_2.md` — marcar ROADMAP 3 como ✅ CONCLUÍDO
+
+**Status:** ⏳ PENDENTE
+
+---
+
+## FASE 7 — Prevenção de Regressão
+
+### Passo 7.1: Criar pre-commit hook
+**Objetivo:** Impedir novos usos de `ast.parse` direto.
+
+**Ação:**
+```bash
+# .git/hooks/pre-commit
+#!/bin/bash
+if git diff --cached | grep -q "ast\.parse"; then
+  echo "❌ ERRO: ast.parse() direto não permitido!"
+  echo "Use ASTGateway de iaglobal.security.ast_gateway"
+  exit 1
+fi
+```
+
+**Aceite:** Hook bloqueia commit com `ast.parse` direto.
+
+**Status:** ⏳ PENDENTE
+
+---
+
+### Passo 7.2: Adicionar teste de regressão no CI/CD
+**Objetivo:** Detectar regressões em PRs.
+
+**Ação:**
+```yaml
+# .github/workflows/ast-gateway-check.yml
+name: ASTGateway Enforcement
+on: [push, pull_request]
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Check for ast.parse usage
+        run: |
+          if grep -r "ast\.parse" iaglobal/ \
+            --include="*.py" \
+            --exclude="ast_gateway.py" \
+            --exclude-dir=__pycache__; then
+            echo "❌ ast.parse() direto detectado!"
+            exit 1
+          fi
+```
+
+**Aceite:** CI/CD falha se `ast.parse` direto for detectado.
+
+**Status:** ⏳ PENDENTE
+
+---
+
+## 📊 Cronograma Estimado
+
+| Fase | Duração | Dependências |
+|------|---------|--------------|
+| FASE 1 — Preparação | 1 dia | Nenhuma |
+| FASE 2 — Core | 2 dias | FASE 1 |
+| FASE 3 — Agents | 2 dias | FASE 2 |
+| FASE 4 — Validation | 2 dias | FASE 3 |
+| FASE 5 — Evolution/Utils | 2 dias | FASE 4 |
+| FASE 6 — Validação | 1 dia | FASE 5 |
+| FASE 7 — Prevenção | 1 dia | FASE 6 |
+
+**Total estimado:** 11 dias (2 semanas úteis)
+
+---
+
+## 🎯 Critérios de Aceite do ROADMAP 3
+
+- [ ] 27/27 módulos migrados para ASTGateway
+- [ ] Zero ocorrências de `ast.parse` direto (exceto ast_gateway.py)
+- [ ] 100% dos testes passando
+- [ ] Pre-commit hook ativo
+- [ ] CI/CD check configurado
+- [ ] Documentação atualizada
+- [ ] Performance: cache LRU implementado (opcional)
+
+---
+
+## 🔗 Referências
+
+- `ARCHITECTURE.md §4.6` — ASTGateway architecture
+- `AGENTS.md` — Mandatory usage guidelines
+- `SYNTAX_VALIDATION_GUIDE.md` — Complete usage guide
+- `iaglobal/security/ast_gateway.py` — Implementation
+
+---
+
 # 🧭 ROADMAP 4 — Organização e Centralização de Skills
 
 **Objetivo:** Centralizar todas as skills espalhadas em `/iaglobal/evolution/skills/`, criar templates individuais e estabelecer padrão de estrutura.

@@ -56,12 +56,15 @@ async def run_database_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         # Garante a execução assíncrona ou desvia com segurança para thread pool
         if asyncio.iscoroutinefunction(agent.generate):
             artifact = await agent.generate(
-                task=task, contexto=contexto_refinado,
+                task=task,
+                contexto=contexto_refinado,
                 search_results=search_results,
             )
         else:
             artifact = await asyncio.to_thread(
-                agent.generate, task=task, contexto=contexto_refinado,
+                agent.generate,
+                task=task,
+                contexto=contexto_refinado,
                 search_results=search_results,
             )
 

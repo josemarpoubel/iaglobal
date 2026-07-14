@@ -727,7 +727,9 @@ async def _publish_metrics_loop():
                 "timestamp": time.time(),
             }
 
-            msg = AgentMessage(sender="mcp_unified", recipient="mcp/metrics", payload=metrics)
+            msg = AgentMessage(
+                sender="mcp_unified", recipient="mcp/metrics", payload=metrics
+            )
             await bus.publish(msg)
             logger.debug(f"📊 Métricas publicadas: IVM={ivm:.2f}")
         except Exception as e:

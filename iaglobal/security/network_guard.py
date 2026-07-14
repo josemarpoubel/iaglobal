@@ -34,8 +34,15 @@ def _get_caller_skill() -> str:
 
 # Nós do sistema que fazem chamadas de API legítimas (não são parasitas)
 _SYSTEM_NODES: Set[str] = {
-    "system_analysis", "critic", "coder", "tester", "debugger",
-    "reflexion", "orchestrator", "evaluator", "planner",
+    "system_analysis",
+    "critic",
+    "coder",
+    "tester",
+    "debugger",
+    "reflexion",
+    "orchestrator",
+    "evaluator",
+    "planner",
 }
 
 

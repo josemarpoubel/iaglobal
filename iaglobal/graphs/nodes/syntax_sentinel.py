@@ -128,13 +128,14 @@ def _extract_syntax_error_details(code: str) -> Optional[Dict[str, Any]]:
     result = _ast_gateway.parse(code)
     if result.valid:
         return None
-    
+
     # Extrair erro do primeiro erro na lista
     if result.errors:
         error_msg = result.errors[0]
         # Tentar extrair linha/coluna do mensaje
         import re
-        match = re.search(r'line (\d+)', error_msg)
+
+        match = re.search(r"line (\d+)", error_msg)
         line = int(match.group(1)) if match else 1
         return {
             "line": line,

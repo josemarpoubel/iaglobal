@@ -320,7 +320,9 @@ class SynapseMonitor:
         status = self.scan_health()
         import tempfile
 
-        path = Path(filepath or Path(tempfile.gettempdir()) / "iaglobal_synapse_status.json")
+        path = Path(
+            filepath or Path(tempfile.gettempdir()) / "iaglobal_synapse_status.json"
+        )
         path.parent.mkdir(parents=True, exist_ok=True)
         with open(path, "w") as f:
             json.dump(status, f, indent=2)

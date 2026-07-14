@@ -18,8 +18,12 @@ from dataclasses import dataclass, field
 from typing import List, Tuple
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.security.ast_gateway import ASTGateway
 
 logger = get_logger("iaglobal.core.auto_correction")
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 
 @dataclass
@@ -109,11 +113,12 @@ class AutoCorrectionLoop:
         """Detecta se o código é Python, JS/JSX ou outro."""
         if not codigo:
             return "unknown"
-        try:
-            ast.parse(codigo)
+
+        # Usar ASTGateway em vez de ast.parse direto
+        result = _ast_gateway.parse(codigo)
+        if result.valid:
             return "python"
-        except SyntaxError:
-            pass
+
         try:
             from iaglobal.validation.js_validator import detect_lang
 
@@ -157,12 +162,19 @@ class AutoCorrectionLoop:
         issues = []
         fixes = []
 
-        try:
-            ast.parse(codigo)
-        except SyntaxError as e:
-            msg = f"SyntaxError: {e.msg} (linha {e.lineno})"
-            issues.append(msg)
-            fixes.append(("fechar_brackets", msg))
+        # Usar ASTGateway em vez de ast.parse direto
+        result = _ast_gateway.parse(codigo)
+        if not result.valid:
+            if result.errors:
+                error_msg = result.errors[0].strip("'\"")
+                # Extrair informações do erro
+                import re
+
+                match = re.search(r"line (\d+)", error_msg)
+                line = int(match.group(1)) if match else 0
+                msg = f"SyntaxError: {error_msg} (linha {line})"
+                issues.append(msg)
+                fixes.append(("fechar_brackets", msg))
             return issues, fixes
 
         try:

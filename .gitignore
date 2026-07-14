@@ -23,4 +23,4 @@ __pycache__/
 
 # Test cache files
 .pytest_cache/
-```
+```.env

@@ -398,7 +398,9 @@ class ExecutionGraph:
             **extra_fields,
         }
 
-    def _find_dependents(self, node_name: str, visited: Optional[Set[str]] = None) -> Set[str]:
+    def _find_dependents(
+        self, node_name: str, visited: Optional[Set[str]] = None
+    ) -> Set[str]:
         """Encontra recursivamente todos os dependentes (transitivos) de um nó."""
         if visited is None:
             visited = set()
@@ -742,23 +744,25 @@ class ExecutionGraph:
                     scored.append((output_text, score, name))
 
         import re as _re
+
         _parece_codigo = lambda t: bool(
-            t and (
-                _re.search(r'<!DOCTYPE\s+html', t)
-                or _re.search(r'<html[\s>]', t)
-                or _re.search(r'<head[\s>]', t)
-                or _re.search(r'<body[\s>]', t)
-                or _re.search(r'<script[\s>]', t)
-                or _re.search(r'<style[\s>]', t)
-                or _re.search(r'^import\s+\w+', t, _re.MULTILINE)
-                or _re.search(r'^from\s+\w+\s+import', t, _re.MULTILINE)
-                or _re.search(r'^def\s+\w+\s*\(', t, _re.MULTILINE)
-                or _re.search(r'^class\s+\w+', t, _re.MULTILINE)
-                or _re.search(r'^async\s+def\s+\w+', t, _re.MULTILINE)
-                or _re.search(r'^function\s+\w+\s*\(', t, _re.MULTILINE)
-                or _re.search(r'^const\s+\w+\s*=', t, _re.MULTILINE)
-                or _re.search(r'^let\s+\w+\s*=', t, _re.MULTILINE)
-                or _re.search(r'^var\s+\w+\s*=', t, _re.MULTILINE)
+            t
+            and (
+                _re.search(r"<!DOCTYPE\s+html", t)
+                or _re.search(r"<html[\s>]", t)
+                or _re.search(r"<head[\s>]", t)
+                or _re.search(r"<body[\s>]", t)
+                or _re.search(r"<script[\s>]", t)
+                or _re.search(r"<style[\s>]", t)
+                or _re.search(r"^import\s+\w+", t, _re.MULTILINE)
+                or _re.search(r"^from\s+\w+\s+import", t, _re.MULTILINE)
+                or _re.search(r"^def\s+\w+\s*\(", t, _re.MULTILINE)
+                or _re.search(r"^class\s+\w+", t, _re.MULTILINE)
+                or _re.search(r"^async\s+def\s+\w+", t, _re.MULTILINE)
+                or _re.search(r"^function\s+\w+\s*\(", t, _re.MULTILINE)
+                or _re.search(r"^const\s+\w+\s*=", t, _re.MULTILINE)
+                or _re.search(r"^let\s+\w+\s*=", t, _re.MULTILINE)
+                or _re.search(r"^var\s+\w+\s*=", t, _re.MULTILINE)
             )
         )
 
@@ -770,14 +774,17 @@ class ExecutionGraph:
                 code_scored.sort(key=lambda x: x[1], reverse=True)
                 final_text = code_scored[0][0]
                 logger.info(
-                    "🏆 Melhor codigo: %s (score=%.2f)", code_scored[0][2], code_scored[0][1]
+                    "🏆 Melhor codigo: %s (score=%.2f)",
+                    code_scored[0][2],
+                    code_scored[0][1],
                 )
             else:
                 scored.sort(key=lambda x: x[1], reverse=True)
                 final_text = scored[0][0]
                 logger.info(
                     "🏆 Melhor resultado (fallback sem codigo): %s (score=%.2f)",
-                    scored[0][2], scored[0][1]
+                    scored[0][2],
+                    scored[0][1],
                 )
         elif self.results:
             fallback_candidates = []
@@ -791,10 +798,12 @@ class ExecutionGraph:
                 fallback_candidates.append((priority, len(text), text, name))
             fallback_candidates.sort(key=lambda x: (x[0], x[1]), reverse=True)
             final_text = fallback_candidates[0][2] if fallback_candidates else ""
-            logger.info("[DEBUG-AGG] fallback winner: %s (p=%d, len=%d)",
-                        fallback_candidates[0][3] if fallback_candidates else "NONE",
-                        fallback_candidates[0][0] if fallback_candidates else 0,
-                        fallback_candidates[0][1] if fallback_candidates else 0)
+            logger.info(
+                "[DEBUG-AGG] fallback winner: %s (p=%d, len=%d)",
+                fallback_candidates[0][3] if fallback_candidates else "NONE",
+                fallback_candidates[0][0] if fallback_candidates else 0,
+                fallback_candidates[0][1] if fallback_candidates else 0,
+            )
 
         return {
             "success": any_success,
@@ -878,5 +887,3 @@ class ExecutionGraph:
             },
             "timestamp": time.time(),  # Útil para controle de versão do snapshot
         }
-
-

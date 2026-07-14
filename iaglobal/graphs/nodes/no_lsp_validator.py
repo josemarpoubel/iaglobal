@@ -104,9 +104,10 @@ def _validar_imports(code: str) -> List[Dict[str, Any]]:
         result = _ast_gateway.parse(code)
         if not result.valid or result.tree is None:
             return diagnostics
-        
+
         tree = result.tree
         import ast
+
         for node in ast.walk(tree):
             if isinstance(node, ast.Import):
                 for alias in node.names:

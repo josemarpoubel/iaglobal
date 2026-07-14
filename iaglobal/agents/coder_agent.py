@@ -124,19 +124,41 @@ class CoderAgent(AgentBase):
             return False
         # Rejeita relatórios que começam com cabeçalhos de diagnóstico
         cabecalhos_ruido = [
-            "=== architecture", "=== validation", "=== report",
-            "análise", "analise", "diagnóstico", "diagnostico",
-            "problemas detectados", "issues found", "relatório",
+            "=== architecture",
+            "=== validation",
+            "=== report",
+            "análise",
+            "analise",
+            "diagnóstico",
+            "diagnostico",
+            "problemas detectados",
+            "issues found",
+            "relatório",
         ]
         for h in cabecalhos_ruido:
             if texto.lower().startswith(h) or h in texto.lower()[:80]:
                 return False
         # Aceita se tiver marcadores de código
         markers = [
-            "<!DOCTYPE", "<html", "<head", "<body", "<div", "<script", "<style",
-            "def ", "class ", "import ", "from ", "async def",
-            "function ", "const ", "let ", "var ",
-            "app =", "return ", "if __name__",
+            "<!DOCTYPE",
+            "<html",
+            "<head",
+            "<body",
+            "<div",
+            "<script",
+            "<style",
+            "def ",
+            "class ",
+            "import ",
+            "from ",
+            "async def",
+            "function ",
+            "const ",
+            "let ",
+            "var ",
+            "app =",
+            "return ",
+            "if __name__",
         ]
         return any(m in texto for m in markers)
 
@@ -189,7 +211,9 @@ class CoderAgent(AgentBase):
                             codigo = candidate
                             break
                 if codigo:
-                    logger.info("[SKILL] Output validado como codigo: %d chars", len(codigo))
+                    logger.info(
+                        "[SKILL] Output validado como codigo: %d chars", len(codigo)
+                    )
                     return codigo
                 logger.info("[SKILL] Output rejeitado — nao parece codigo executavel")
             return ""
@@ -216,10 +240,13 @@ class CoderAgent(AgentBase):
         task_lower = task.lower()
         linhas = []
         # HTML/Frontend primeiro — tem precedência sobre keywords genéricas
-        if "html" in task_lower or any(w in task_lower for w in
-                ["pagina", "pagina web", "site", "frontend", "interface", "web"]):
-            estilo_escuro = any(w in task_lower for w in
-                                ["escuro", "dark", "preto", "black", "noturno"])
+        if "html" in task_lower or any(
+            w in task_lower
+            for w in ["pagina", "pagina web", "site", "frontend", "interface", "web"]
+        ):
+            estilo_escuro = any(
+                w in task_lower for w in ["escuro", "dark", "preto", "black", "noturno"]
+            )
             bg = "#1a1a2e" if estilo_escuro else "#ffffff"
             surface = "#16213e" if estilo_escuro else "#f5f5f5"
             text = "#e0e0e0" if estilo_escuro else "#333333"
@@ -381,21 +408,38 @@ class CoderAgent(AgentBase):
         # Layer 1.5: SearchCodeAssembler — monta codigo de resultados de busca
         if not codigo and search_results:
             try:
-                from iaglobal.search.search_code_extractor import extract_from_search_results
+                from iaglobal.search.search_code_extractor import (
+                    extract_from_search_results,
+                )
                 from iaglobal.core.code_assembler import CodeAssembler
 
                 blocks = extract_from_search_results(search_results, min_lines=1)
                 if blocks:
-                    lang = "html" if any("html" in task_str.lower() or w in task_str.lower()
-                                          for w in ["pagina", "pagina web", "site", "frontend",
-                                                     "interface", "pagina", "web"]) else "python"
+                    lang = (
+                        "html"
+                        if any(
+                            "html" in task_str.lower() or w in task_str.lower()
+                            for w in [
+                                "pagina",
+                                "pagina web",
+                                "site",
+                                "frontend",
+                                "interface",
+                                "pagina",
+                                "web",
+                            ]
+                        )
+                        else "python"
+                    )
                     assembler = CodeAssembler()
                     result = assembler.assemble(blocks, language=lang)
                     if result.valid and result.code and len(result.code.strip()) > 50:
                         codigo = result.code
                         logger.info(
                             "[CODER] Layer 1.5: SearchCodeAssembler hit — %d blocos usados de %d (lang=%s)",
-                            result.blocks_used, result.blocks_total, lang,
+                            result.blocks_used,
+                            result.blocks_total,
+                            lang,
                         )
             except Exception as e:
                 logger.debug("[CODER] Layer 1.5: %s", e)
