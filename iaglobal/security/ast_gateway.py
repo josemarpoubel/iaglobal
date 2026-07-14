@@ -125,6 +125,9 @@ class ASTGateway:
                         "getattr",
                         "setattr",
                         "delattr",
+                        "globals",
+                        "vars",
+                        "dir",
                     }:
                         violations.append(
                             self._make_violation(

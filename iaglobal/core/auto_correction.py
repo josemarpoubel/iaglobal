@@ -64,6 +64,8 @@ class _SanitizerTransformer(ast.NodeTransformer):
         if node.lineno in self.violation_lines:
             if isinstance(node.func, ast.Name) and node.func.id in {
                 "eval", "exec", "compile", "__import__",
+                "getattr", "setattr", "delattr",
+                "globals", "vars", "dir",
             }:
                 self.sanitized.append(
                     f"L{node.lineno}: Chamada '{node.func.id}()' substituída por None"
