@@ -6,6 +6,9 @@ import ast
 from typing import Dict, Any
 from iaglobal.utils.logger import logger
 from iaglobal.validation.engine import ValidationEngine
+from iaglobal.security.ast_gateway import ASTGateway
+
+_ast_gateway = ASTGateway()
 
 
 class CodeScorer:
@@ -54,12 +57,12 @@ class CodeScorer:
         if not result.valid:
             return {"score": 0.0, "valid": False, "errors": result.errors}
 
-        try:
-            tree = ast.parse(result.code or codigo)
-        except SyntaxError as e:
-            logger.error(f"AST inválido: {e}")
-            return {"score": 0.0, "valid": False, "error": str(e)}
+        ast_result = _ast_gateway.parse(result.code or codigo)
+        if not ast_result.valid or not ast_result.tree:
+            logger.error(f"AST inválido: {ast_result.errors}")
+            return {"score": 0.0, "valid": False, "error": str(ast_result.errors)}
 
+        tree = ast_result.tree
         metrics = self._analisar_tree(tree)
         metrics["lines"] = len(codigo.splitlines())
         metrics["valid"] = True

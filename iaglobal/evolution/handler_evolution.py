@@ -12,12 +12,16 @@ from typing import Any, Callable, Dict, List, Optional, Set, Tuple
 from iaglobal.evolution.skills.utils.dynamic_registry import dynamic_registry
 from iaglobal.evolution.skills.native.skill import ExecutionPolicy, Skill
 from iaglobal.graphs.node import Node
+from iaglobal.security.ast_gateway import ASTGateway
 
 HANDLERS_DIR = Path(__file__).parent.parent / "graphs" / "nodes"
 MAX_MUTATIONS_PER_HANDLER = 2
 MAX_HYBRIDS_PER_CYCLE = 7
 
 _log = logging.getLogger(__name__)
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 
 # ---------------------------------------------------------------------------
@@ -207,7 +211,10 @@ class _ThresholdCrossover:
     @staticmethod
     def extract_thresholds(source: str) -> List[Tuple[int, ast.Compare]]:
         thresholds: List[Tuple[int, Any]] = []
-        tree = ast.parse(source)
+        result = _ast_gateway.parse(source)
+        if not result.valid or not result.tree:
+            return thresholds
+        tree = result.tree
         for node in ast.walk(tree):
             if isinstance(node, ast.Compare):
                 for comp in node.comparators:
@@ -357,12 +364,12 @@ class HandlerEvolver:
 
     def _mutate_handler(self, name: str, source: str) -> Optional[str]:
         """Apply random mutation operators to handler source."""
-        try:
-            tree = ast.parse(source)
-        except SyntaxError:
+        result = _ast_gateway.parse(source)
+        if not result.valid or not result.tree:
             _log.warning("[HANDLER-EVO] Erro de sintaxe em %s, pulando mutação", name)
             return None
 
+        tree = result.tree
         mutators = self._rng.sample(
             self.MUTATORS, min(MAX_MUTATIONS_PER_HANDLER, len(self.MUTATORS))
         )
@@ -404,10 +411,7 @@ class HandlerEvolver:
     ) -> Optional[Tuple[str, str]]:
         name_a, src_a = parent_a
         name_b, src_b = parent_b
-        try:
-            ast.parse(src_a)
-            ast.parse(src_b)
-        except SyntaxError:
+        if not _ast_gateway.parse(src_a).valid or not _ast_gateway.parse(src_b).valid:
             return None
 
         operator = self._rng.choice(["sources", "thresholds", "both"])

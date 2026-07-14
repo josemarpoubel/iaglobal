@@ -13,7 +13,11 @@ import logging
 from dataclasses import dataclass, field
 from typing import List, Optional
 
+from iaglobal.security.ast_gateway import ASTGateway
+
 logger = logging.getLogger("iaglobal")
+
+_ast_gateway = ASTGateway()
 
 
 @dataclass
@@ -168,11 +172,9 @@ class SearchCodeExtractor:
         """Estima confiança do bloco baseado em validade sintática."""
         conf = 0.5
         if language in ("python", "py"):
-            try:
-                ast.parse(code)
+            result = _ast_gateway.parse(code)
+            if result.valid:
                 conf += 0.4
-            except SyntaxError:
-                pass
             if re.search(r"def |class |import |from ", code):
                 conf += 0.1
         elif language == "html":

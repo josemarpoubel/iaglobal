@@ -2,8 +2,8 @@
 
 import ast
 
-from dataclasses import dataclass
-from typing import List, Set, Optional
+from dataclasses import dataclass, field
+from typing import List, Set, Optional, Dict, Any
 from iaglobal.utils.logger import logger
 from iaglobal.security.sandbox_rules import SandboxRules
 
@@ -13,6 +13,7 @@ class ASTResult:
     valid: bool
     tree: Optional[ast.AST]
     errors: List[str]
+    metadata: List[Dict[str, Any]] = field(default_factory=list)
 
 
 class ASTGateway:
@@ -28,34 +29,51 @@ class ASTGateway:
             self.blocked_nodes.add(ast.Exec)
         self.sandbox_rules = sandbox_rules or SandboxRules()
 
-    def parse(self, code: str) -> ASTResult:
+    def parse(self, code: str, mode: str = "exec") -> ASTResult:
         """
         ÚNICO método permitido de parsing no sistema.
+
+        Args:
+            code: Código Python para parsear
+            mode: Modo de parsing ('exec', 'eval', 'single') — igual ast.parse()
         """
 
         if not code or not code.strip():
-            return ASTResult(False, None, ["Empty code"])
+            return ASTResult(False, None, ["Empty code"], [])
 
         try:
-            tree = ast.parse(code)
+            tree = ast.parse(code, mode=mode)
 
-            errors = self._scan(tree)
+            violations = self._scan(tree)
 
-            if errors:
+            if violations:
+                errors = [v["message"] for v in violations]
                 logger.warning(f"AST BLOCKED: {errors}")
-                return ASTResult(False, tree, errors)
+                return ASTResult(False, tree, errors, violations)
 
-            return ASTResult(True, tree, [])
+            return ASTResult(True, tree, [], [])
 
         except SyntaxError as e:
             logger.error(f"Syntax error: {e}")
-            return ASTResult(False, None, [str(e)])
+            return ASTResult(False, None, [str(e)], [])
 
     def validate(self, code: str) -> ASTResult:
         return self.parse(code)
 
-    def _scan(self, tree: ast.AST) -> List[str]:
-        errors = []
+    def _make_violation(
+        self, node: ast.AST, vtype: str, message: str, suggestion: str
+    ) -> Dict[str, Any]:
+        return {
+            "type": vtype,
+            "message": message,
+            "node_type": type(node).__name__,
+            "line": getattr(node, "lineno", 0),
+            "col_offset": getattr(node, "col_offset", 0),
+            "suggestion": suggestion,
+        }
+
+    def _scan(self, tree: ast.AST) -> List[Dict[str, Any]]:
+        violations: List[Dict[str, Any]] = []
 
         for node in ast.walk(tree):
             # 1. Validação de imports contra SandboxRules
@@ -63,25 +81,41 @@ class ASTGateway:
                 for alias in node.names:
                     module_name = alias.name.split(".")[0]
                     if not self.sandbox_rules.is_module_allowed(module_name):
-                        errors.append(
-                            f"Module '{alias.name}' is not in allowed_modules"
+                        violations.append(
+                            self._make_violation(
+                                node,
+                                "BANNED_MODULE",
+                                f"Module '{alias.name}' is not in allowed_modules",
+                                f"Substitua '{alias.name}' por um módulo da lista de permitidos ou refatore para não depender dele",
+                            )
                         )
 
             if isinstance(node, ast.ImportFrom):
                 if node.module:
                     module_name = node.module.split(".")[0]
                     if not self.sandbox_rules.is_module_allowed(module_name):
-                        errors.append(
-                            f"Module '{node.module}' is not in allowed_modules"
+                        violations.append(
+                            self._make_violation(
+                                node,
+                                "BANNED_MODULE",
+                                f"Module '{node.module}' is not in allowed_modules",
+                                f"Substitua '{node.module}' por um módulo da lista de permitidos",
+                            )
                         )
 
             # 2. Bloqueio de nós proibidos (Exec, etc.)
             if isinstance(node, tuple(self.blocked_nodes)):
-                errors.append(f"Blocked node: {type(node).__name__}")
+                violations.append(
+                    self._make_violation(
+                        node,
+                        "BANNED_NODE",
+                        f"Blocked node: {type(node).__name__}",
+                        f"Remova a instrução '{type(node).__name__}' — não é permitida no ambiente seguro",
+                    )
+                )
 
             # 3. Verificação de Chamadas de Funções (Call)
             if isinstance(node, ast.Call):
-                # Verificação simples de nome (ex: exec())
                 if isinstance(node.func, ast.Name):
                     if node.func.id in {
                         "eval",
@@ -92,12 +126,16 @@ class ASTGateway:
                         "setattr",
                         "delattr",
                     }:
-                        errors.append(f"Unsafe function call: {node.func.id}")
+                        violations.append(
+                            self._make_violation(
+                                node,
+                                "UNSAFE_CALL",
+                                f"Unsafe function call: {node.func.id}",
+                                f"Substitua '{node.func.id}()' por uma alternativa segura ou refatore o código para não usar execução dinâmica",
+                            )
+                        )
 
-                # 4. Verificação de Acesso a Atributos (ex: os.system())
-                # Captura padrões como: objeto.atributo()
                 elif isinstance(node.func, ast.Attribute):
-                    # Bloqueia métodos específicos, independentemente de quem os chama
                     if node.func.attr in {
                         "system",
                         "popen",
@@ -106,41 +144,33 @@ class ASTGateway:
                         "eval",
                         "exec",
                     }:
-                        errors.append(f"Unsafe attribute access: {node.func.attr}")
+                        violations.append(
+                            self._make_violation(
+                                node,
+                                "UNSAFE_CALL",
+                                f"Unsafe attribute access: {node.func.attr}",
+                                f"Substitua chamada a '.{node.func.attr}()' por API segura equivalente",
+                            )
+                        )
 
-                    # Bloqueia métodos de introspecção perigosos específicos
                     dangerous_dunders = {
-                        "__subclasses__",
-                        "__mro__",
-                        "__bases__",
-                        "__globals__",
-                        "__closure__",
-                        "__code__",
-                        "__func__",
-                        "__self__",
-                        "__class__",
-                        "__dict__",
-                        "__getattribute__",
-                        "__getattr__",
-                        "__setattr__",
-                        "__delattr__",
-                        "__new__",
-                        "__reduce__",
-                        "__reduce_ex__",
-                        "__getstate__",
-                        "__setstate__",
-                        "__getitem__",
-                        "__setitem__",
-                        "__delitem__",
-                        "__iter__",
-                        "__next__",
-                        "__enter__",
-                        "__exit__",
-                        "__call__",
-                        "__instancecheck__",
-                        "__subclasscheck__",
+                        "__subclasses__", "__mro__", "__bases__",
+                        "__globals__", "__closure__", "__code__",
+                        "__func__", "__self__", "__class__", "__dict__",
+                        "__getattribute__", "__getattr__", "__setattr__",
+                        "__delattr__", "__new__", "__reduce__", "__reduce_ex__",
+                        "__getstate__", "__setstate__", "__getitem__", "__setitem__",
+                        "__delitem__", "__iter__", "__next__", "__enter__", "__exit__",
+                        "__call__", "__instancecheck__", "__subclasscheck__",
                     }
                     if node.func.attr in dangerous_dunders:
-                        errors.append(f"Forbidden dunder access: {node.func.attr}")
+                        violations.append(
+                            self._make_violation(
+                                node,
+                                "FORBIDDEN_DUNDER",
+                                f"Forbidden dunder access: {node.func.attr}",
+                                f"Acesso a '{node.func.attr}' bloqueado por segurança — refatore para não usar introspecção de dunder",
+                            )
+                        )
 
-        return errors
+        return violations

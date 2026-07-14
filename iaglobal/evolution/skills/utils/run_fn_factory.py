@@ -7,6 +7,10 @@ from typing import Dict, Any, Callable, Optional
 from iaglobal.utils.logger import logger
 from iaglobal.graphs.credit import CreditAssignmentEngine
 from iaglobal.graphs.telemetry import ExecutionEvent  # type: ignore
+from iaglobal.security.ast_gateway import ASTGateway
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 _STRATEGIES = ["creative", "precise", "balanced"]
 
@@ -193,7 +197,10 @@ def _make_deterministic_run_fn(skill_name: str, template_prompt: str) -> Callabl
                 "(" in stripped and ")" in stripped and ":" in stripped
             ):
                 try:
-                    tree = ast.parse(stripped, mode="eval")
+                    result = _ast_gateway.parse(stripped, mode="eval")
+                    if not result.valid or not result.tree:
+                        raise SyntaxError("Invalid expression")
+                    tree = result.tree
                     for node in ast.walk(tree):
                         if isinstance(node, ast.Call) and isinstance(
                             node.func, ast.Name

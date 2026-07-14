@@ -3,6 +3,10 @@
 import ast
 from typing import List, Set
 
+from iaglobal.security.ast_gateway import ASTGateway
+
+_ast_gateway = ASTGateway()
+
 FORBIDDEN_NAMES = {
     "__import__",
     "eval",
@@ -50,12 +54,13 @@ class RealASTValidator:
 
     def validate(self, code: str) -> List[str]:
         self.errors = []
-        try:
-            tree = ast.parse(code)
-        except SyntaxError as e:
-            self.errors.append(f"SyntaxError: {e}")
+
+        result = _ast_gateway.parse(code)
+        if not result.valid or not result.tree:
+            self.errors.append(f"SyntaxError: {result.errors}")
             return self.errors
 
+        tree = result.tree
         self._check_undefined_vars(tree)
         self._check_mutation_during_iteration(tree)
         self._check_join_type_error(tree)
@@ -327,10 +332,11 @@ class ASTSecurityEngine:
     def analyze(self, code: str) -> List[str]:
         violations = []
 
-        try:
-            tree = ast.parse(code)
-        except SyntaxError:
+        result = _ast_gateway.parse(code)
+        if not result.valid or not result.tree:
             return ["SyntaxError"]
+
+        tree = result.tree
 
         for node in ast.walk(tree):
             # -----------------------

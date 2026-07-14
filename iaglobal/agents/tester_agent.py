@@ -11,8 +11,12 @@ from iaglobal.models.task import Task
 from iaglobal.utils.logger import get_logger
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal.core.dependency_enforcer import dependency_enforcer
+from iaglobal.security.ast_gateway import ASTGateway
 
 logger = get_logger("iaglobal.agents.tester_agent")
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 _DEFAULT_TIMEOUT = 180.0
 
@@ -59,8 +63,11 @@ class TesterAgent(AgentBase):
     def _extrair_funcoes_classes(self, codigo: str) -> Dict[str, List[str]]:
         funcoes = []
         classes = []
-        try:
-            tree = ast.parse(codigo)
+        
+        # Usar ASTGateway em vez de ast.parse direto
+        result = _ast_gateway.parse(codigo)
+        if result.valid and result.tree:
+            tree = result.tree
             for node in ast.walk(tree):
                 if isinstance(node, ast.FunctionDef):
                     nome = node.name
@@ -69,7 +76,8 @@ class TesterAgent(AgentBase):
                     funcoes.append((nome, params))
                 elif isinstance(node, ast.ClassDef):
                     classes.append(node.name)
-        except SyntaxError:
+        else:
+            # Fallback para regex se AST falhar
             for line in codigo.splitlines():
                 line = line.strip()
                 if line.startswith("def "):
@@ -266,10 +274,11 @@ class TesterAgent(AgentBase):
             score += 5
         if "class Test" in test_code:
             score += 5
-        try:
-            ast.parse(test_code)
+        # Usar ASTGateway em vez de ast.parse direto
+        result = _ast_gateway.parse(test_code)
+        if result.valid:
             score += 10
-        except SyntaxError:
+        else:
             score -= 10
         return min(score, 100.0)
 

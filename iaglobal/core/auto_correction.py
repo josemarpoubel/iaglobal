@@ -15,7 +15,7 @@ import re
 import ast
 import time
 from dataclasses import dataclass, field
-from typing import List, Tuple
+from typing import List, Tuple, Set, Dict, Any
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.security.ast_gateway import ASTGateway
@@ -35,6 +35,48 @@ class Correcao:
     codigo_final: str = ""
     foi_corrigido: bool = False
     linguagem: str = "unknown"
+
+
+class _SanitizerTransformer(ast.NodeTransformer):
+    """Substitui nós ofensivos por alternativas seguras."""
+
+    def __init__(self, violations: List[Dict[str, Any]]):
+        self.violation_lines: Set[int] = {v["line"] for v in violations if v["line"]}
+        self.sanitized: List[str] = []
+
+    def visit_Import(self, node: ast.Import) -> Any:
+        if node.lineno in self.violation_lines:
+            self.sanitized.append(
+                f"L{node.lineno}: Import removido por segurança"
+            )
+            return ast.Pass()
+        return node
+
+    def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
+        if node.lineno in self.violation_lines:
+            self.sanitized.append(
+                f"L{node.lineno}: ImportFrom removido por segurança"
+            )
+            return ast.Pass()
+        return node
+
+    def visit_Call(self, node: ast.Call) -> Any:
+        if node.lineno in self.violation_lines:
+            if isinstance(node.func, ast.Name) and node.func.id in {
+                "eval", "exec", "compile", "__import__",
+            }:
+                self.sanitized.append(
+                    f"L{node.lineno}: Chamada '{node.func.id}()' substituída por None"
+                )
+                return ast.Constant(value=None)
+            if isinstance(node.func, ast.Attribute) and node.func.attr in {
+                "system", "popen", "spawn", "execute",
+            }:
+                self.sanitized.append(
+                    f"L{node.lineno}: Acesso a '.{node.func.attr}()' substituído por None"
+                )
+                return ast.Constant(value=None)
+        return self.generic_visit(node)
 
 
 class AutoCorrectionLoop:
@@ -158,12 +200,35 @@ class AutoCorrectionLoop:
         return issues, fixes
 
     def _validar_python(self, codigo: str) -> Tuple[List[str], List[str]]:
-        """Valida Python com pyflakes + AST, retorna issues e fixes."""
+        """Valida Python com ASTGateway + pyflakes, retorna issues e fixes."""
         issues = []
         fixes = []
 
-        # Usar ASTGateway em vez de ast.parse direto
         result = _ast_gateway.parse(codigo)
+
+        # Sanitização de violações de segurança (AST)
+        if not result.valid and result.metadata:
+            transformer = _SanitizerTransformer(result.metadata)
+            try:
+                tree_sanitized = transformer.visit(result.tree)
+                ast.fix_missing_locations(tree_sanitized)
+                codigo_sanitizado = ast.unparse(tree_sanitized)
+                result = _ast_gateway.parse(codigo_sanitizado)
+                if result.valid:
+                    fixes.append(("substituir_codigo", codigo_sanitizado))
+                    for s in transformer.sanitized:
+                        issues.append(f"SECURITY: {s}")
+                    logger.info(
+                        "[AUTO-CORRECAO] Sanitizacao AST: %d violacoes removidas",
+                        len(transformer.sanitized),
+                    )
+                else:
+                    issues.append("SECURITY: Violações detectadas mas sanitização falhou")
+            except Exception as e:
+                logger.warning("[AUTO-CORRECAO] Erro na sanitizacao AST: %s", e)
+                issues.append(f"SECURITY: Erro ao sanitizar ({e})")
+            return issues, fixes
+
         if not result.valid:
             if result.errors:
                 error_msg = result.errors[0].strip("'\"")
@@ -244,12 +309,16 @@ class AutoCorrectionLoop:
             tipo = fix[0] if isinstance(fix, tuple) else fix
             detalhe = fix[1] if isinstance(fix, tuple) and len(fix) > 1 else ""
 
-            if tipo == "fechar_brackets":
+            if tipo == "substituir_codigo" and detalhe:
+                codigo_atual = detalhe
+            elif tipo == "fechar_brackets":
                 codigo_atual = self._fechar_brackets(codigo_atual)
             elif tipo == "fechar_string":
                 codigo_atual = self._fechar_strings(codigo_atual)
             elif tipo == "stub_var" and detalhe:
                 codigo_atual = self._adicionar_stub(codigo_atual, detalhe)
+            elif tipo == "sanitizado":
+                pass
 
         return codigo_atual
 

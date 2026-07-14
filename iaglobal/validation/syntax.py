@@ -96,10 +96,12 @@ def validate_syntax(codigo: str) -> Tuple[bool, Optional[str]]:
         return False, "Code is empty"
 
     try:
-        tree = ast.parse(codigo)
+        result = _ast_gateway.parse(codigo)
+        if not result.valid or not result.tree:
+            return False, "; ".join(result.errors)
 
         analyzer = ScopeAnalyzer()
-        analyzer.visit(tree)
+        analyzer.visit(result.tree)
 
         if analyzer.errors:
             error_msg = "; ".join(analyzer.errors)

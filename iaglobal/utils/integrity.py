@@ -3,6 +3,10 @@ import datetime
 import pathlib
 import sys
 
+from iaglobal.security.ast_gateway import ASTGateway
+
+_ast_gateway = ASTGateway()
+
 
 def check_installed_integrity():
     """
@@ -28,7 +32,11 @@ def check_installed_integrity():
     for file_path in root_path.rglob("*.py"):
         try:
             with open(file_path, "r", encoding="utf-8") as f:
-                tree = ast.parse(f.read(), filename=str(file_path))
+                code = f.read()
+            result = _ast_gateway.parse(code)
+            if not result.valid or not result.tree:
+                continue
+            tree = result.tree
         except Exception:
             continue
 
@@ -48,9 +56,11 @@ def check_installed_integrity():
                 if target_path.is_file():
                     try:
                         with open(target_path, "r", encoding="utf-8") as tf:
-                            target_tree = ast.parse(
-                                tf.read(), filename=str(target_path)
-                            )
+                            target_code = tf.read()
+                        target_result = _ast_gateway.parse(target_code)
+                        if not target_result.valid or not target_result.tree:
+                            continue
+                        target_tree = target_result.tree
 
                         defined_names = set()
                         for t_node in ast.walk(target_tree):
