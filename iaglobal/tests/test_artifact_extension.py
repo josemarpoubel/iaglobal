@@ -159,9 +159,7 @@ class TestAgentCooperation:
 
     def test_skill_generator_nao_crasha(self):
         """SkillGeneratorAgent deve rodar sem crash mesmo sem dados."""
-        from iaglobal.evolution.skills.native.skill_generator_agent import (
-            SkillGeneratorAgent,
-        )
+        from iaglobal.evolution.skills.native.skill_generator_agent import SkillGeneratorAgent
 
         agent = SkillGeneratorAgent()
         skills = agent.analyze_and_generate()

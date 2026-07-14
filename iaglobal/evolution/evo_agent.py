@@ -707,21 +707,20 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
     def _reflexion_sync_fn(self, prompt: str) -> str:
         """
         Shim síncrono exigido pelo `ReflexionEngine.model_fn` (Callable[[str], str]).
-        Executa a função assíncrona injetada (ou a padrão) num loop isolado.
-        Deve ser chamado de dentro de `asyncio.to_thread` para não conflitar com
-        o event loop principal.
+        Executa a função assíncrona injetada (ou a padrão) usando asyncio.run(),
+        que gerencia automaticamente o ciclo de vida do event loop.
+
+        Este método é chamado de dentro de `asyncio.to_thread`, então cada thread
+        terá seu próprio loop isolado, evitando conflitos com o loop principal.
         """
         async_fn = self._reflexion_async_fn or self._default_reflexion_async_fn
         import asyncio
 
-        loop = asyncio.new_event_loop()
         try:
-            return loop.run_until_complete(async_fn(prompt)) or ""
+            return asyncio.run(async_fn(prompt)) or ""
         except Exception as e:
             logger.debug("[%s] Reflexion sync shim falhou: %s", self.name, e)
             return ""
-        finally:
-            loop.close()
 
     async def reflexion_fix(self, prompt: str, code: str | None = None) -> str:
         """

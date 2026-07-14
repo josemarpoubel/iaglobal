@@ -1,26 +1,15 @@
-# Python compiled files
-*.pyc
-__pycache__/
+```
+# Data files and databases
+iaglobal/memory/data/db/*.db
+iaglobal/memory/data/json/*.json
+iaglobal/memory/data/json/*.jsonl
+iaglobal/memory/data/json/*.cbor
+iaglobal/memory/data/omnimind_state.json
+iaglobal/memory/data/provider_metrics/*.jsonl
+iaglobal/memory/data/result/.counter.lock
+iaglobal/memory/data/tools_registry.pkl
+iaglobal/memory/data/ancestry_tree.jsonl
 
-# Database files
-*.db
-
-# Log files
-*.log
-
-# Lock files
-*.lock
-
-# Data files that might be generated
-*.jsonl
-*.cbor
-*.pkl
-*.json
-
-# Obsidian vault files (if auto-generated)
-*.md
-
-# Test cache files
-.pytest_cache/
-
-.env
+# Obsidian vault files
+iaglobal/obsidian/**/*.md
+```

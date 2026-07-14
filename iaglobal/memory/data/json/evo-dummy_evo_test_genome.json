@@ -1,0 +1,15 @@
+{
+  "name": "evo-dummy_evo_test",
+  "lineage_id": "fb207a091b18f273b6fd0ad687d2a36c91413773477a930ade3512b03e438be892be164dcae5a462539f19a561e39ac2cc2406fd99f65e8b204054092217f290",
+  "lineage_marker": "2f11100269a3ed53",
+  "generation": 0,
+  "parent_lineage_id": "",
+  "nadph_reserve": 0.5,
+  "epigenetic_flags": {},
+  "failure_patterns": [
+    "ValueError"
+  ],
+  "same_balance": 105,
+  "timestamp": 1783986241.3472476,
+  "reason": "t"
+}
