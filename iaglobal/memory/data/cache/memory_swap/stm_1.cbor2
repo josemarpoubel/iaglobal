@@ -1,1 +1,0 @@
-£gcontentx¦Q: migrate core/auto_correction.py to ASTGateway pattern: replace all ast.parse() calls with ASTGateway, follow SYNTAX_VALIDATION_GUIDE.md patterns, ensure tests passhmetadata¢dtypeequeryfsourcehpipelineitimestampx 2026-07-14T13:09:30.093998+00:00

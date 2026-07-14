@@ -14,8 +14,10 @@ Filosofia:
 import re
 import ast
 import time
+import hashlib
+import asyncio
 from dataclasses import dataclass, field
-from typing import List, Tuple, Set, Dict, Any
+from typing import List, Tuple, Set, Dict, Any, Optional
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.security.ast_gateway import ASTGateway
@@ -24,6 +26,9 @@ logger = get_logger("iaglobal.core.auto_correction")
 
 # Gateway singleton para AST parsing
 _ast_gateway = ASTGateway()
+
+# Limiar de reincidencia antes da apoptose contratual
+REINCIDENCIA_LIMIAR = 3
 
 
 @dataclass
@@ -94,9 +99,19 @@ class AutoCorrectionLoop:
     """
 
     MAX_ITERATIONS = 3
+    _violation_counter: Dict[str, int] = {}  # agent_name -> count (memória only)
 
-    def corrigir(self, codigo: str, task: str = "") -> Correcao:
-        """Executa o loop completo de auto-correção."""
+    def corrigir(self, codigo: str, task: str = "", agent_name: str = "") -> Correcao:
+        """Executa o loop completo de auto-correção.
+
+        Args:
+            codigo: Código fonte para validar/corrigir
+            task: Descrição da tarefa (contexto)
+            agent_name: Nome do agente que gerou o código (para rastreio de reincidência)
+
+        Returns:
+            Correcao com resultado da validação
+        """
         if not codigo or not codigo.strip():
             return Correcao(issues=["Código vazio"], codigo_final=codigo)
 
@@ -130,6 +145,11 @@ class AutoCorrectionLoop:
         foi_corrigido = codigo_atual != codigo or bool(fixes_aplicados)
         latency = (time.time() - start) * 1000.0
 
+        # Rastreio de reincidência de violações de segurança
+        sec_issues = [i for i in issues_encontradas if i.startswith("SECURITY:")]
+        if sec_issues and agent_name:
+            self._reportar_violacao_seguranca(agent_name, sec_issues)
+
         if foi_corrigido:
             logger.info(
                 "[AUTO-CORRECAO] Finalizado | issues=%d fixes=%d lang=%s latency=%.1fms",
@@ -152,6 +172,57 @@ class AutoCorrectionLoop:
             foi_corrigido=foi_corrigido,
             linguagem=linguagem,
         )
+
+    def _reportar_violacao_seguranca(self, agent_name: str, violacoes: List[str]) -> None:
+        """Registra violação de segurança e dispara apoptose se reincidente."""
+        # Contador de reincidência em memória
+        self._violation_counter[agent_name] = self._violation_counter.get(agent_name, 0) + 1
+        reincidencia = self._violation_counter[agent_name]
+
+        logger.warning(
+            "[AUTO-CORRECAO] 🛡️ Violacao seguranca: %s | agente=%s | reincidencia=%d/%d",
+            violacoes[0][:80], agent_name, reincidencia, REINCIDENCIA_LIMIAR,
+        )
+
+        # Registro persistente via EpigeneticRegistry (assíncrono, fire-and-forget)
+        try:
+            from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
+
+            registry = EpigeneticRegistry()
+            detalhes = {"violacoes": violacoes, "reincidencia": reincidencia}
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(
+                    registry.record_failure(
+                        agent_name,
+                        hashlib.sha256(str(violacoes).encode()).hexdigest()[:12],
+                        "ast_violation",
+                        detalhes,
+                    )
+                )
+            except RuntimeError:
+                pass
+        except Exception as e:
+            logger.debug("[AUTO-CORRECAO] EpigeneticRegistry indisponivel: %s", e)
+
+        # Se reincidência >= limiar, dispara apoptose contratual via OmniMind
+        if reincidencia >= REINCIDENCIA_LIMIAR:
+            try:
+                from iaglobal.obsidian.omnimind import OmniMind
+
+                omnimind = OmniMind()
+                duracao = 24 if reincidencia < 6 else None  # 24h ou permanente
+                omnimind.emitir_gatilho_apoptose(
+                    agent_id=agent_name,
+                    motivo=(
+                        f"Reincidencia de seguranca AST ({reincidencia}x): "
+                        f"{violacoes[0][:100]}"
+                    ),
+                    duration_hours=duracao,
+                    violation_type="ast_violation",
+                )
+            except Exception as e:
+                logger.warning("[AUTO-CORRECAO] Falha ao emitir apoptose: %s", e)
 
     def _detectar_linguagem(self, codigo: str) -> str:
         """Detecta se o código é Python, JS/JSX ou outro."""

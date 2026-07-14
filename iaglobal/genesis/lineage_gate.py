@@ -35,8 +35,10 @@ _OPEN_MODE = False
 
 # CRL (Certificate Revocation List) — persistida em disco
 # Caminho padrão: obsidian/revocation_list.json
+# Formato: {"revoked": {"node_name": expira_em_timestamp}, ...}
+# expira_em_timestamp = 0 significa permanente
 _REVOCATION_FILE: Optional[Path] = None
-_REVOKED_CACHE: Set[str] = set()
+_REVOKED_CACHE: Dict[str, float] = {}  # node_name -> expiration_timestamp
 _REVOCATION_MTIME: float = 0.0
 
 
@@ -46,8 +48,8 @@ def set_revocation_file(path: Optional[str | Path]) -> None:
     _REVOCATION_FILE = Path(path) if path else None
 
 
-def _load_revocation_list() -> Set[str]:
-    """Carrega (com cache) a lista de revogação do disco."""
+def _load_revocation_list() -> Dict[str, float]:
+    """Carrega (com cache) a lista de revogação do disco, expurgando entradas vencidas."""
     global _REVOKED_CACHE, _REVOCATION_MTIME
     if _REVOCATION_FILE is None:
         return _REVOKED_CACHE
@@ -57,13 +59,40 @@ def _load_revocation_list() -> Set[str]:
             if mtime != _REVOCATION_MTIME:
                 _REVOCATION_MTIME = mtime
                 data = json.loads(_REVOCATION_FILE.read_text(encoding="utf-8"))
-                if isinstance(data, dict):
-                    entries = data.get("revoked", [])
-                elif isinstance(data, list):
-                    entries = data
-                else:
-                    entries = []
-                _REVOKED_CACHE = {str(e) for e in entries if e}
+                revoked_raw = data.get("revoked", {}) if isinstance(data, dict) else {}
+
+                # Suporta formato legado (lista de strings)
+                if isinstance(revoked_raw, list):
+                    revoked_raw = {str(e): 0 for e in revoked_raw if e}
+
+                now = time.time()
+                active: Dict[str, float] = {}
+                expired: list[str] = []
+                for name, exp in revoked_raw.items():
+                    exp_f = float(exp)
+                    if exp_f == 0 or exp_f > now:
+                        active[str(name)] = exp_f
+                    else:
+                        expired.append(str(name))
+
+                # Expurga entradas vencidas do disco
+                if expired:
+                    history = data.get("revocation_history", [])
+                    for name in expired:
+                        history.append({
+                            "node": name,
+                            "reason": "expiracao_automatica",
+                            "timestamp": now,
+                            "action": "unrevoke",
+                        })
+                    data["revoked"] = {k: v for k, v in active.items()}
+                    data["revocation_history"] = history
+                    data["last_updated"] = now
+                    _REVOCATION_FILE.write_text(
+                        json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
+                    )
+
+                _REVOKED_CACHE = active
         return _REVOKED_CACHE
     except Exception as e:
         logger.warning("[LINEAGE_GATE] Falha ao carregar CRL: %s", e)
@@ -95,18 +124,26 @@ def revoke_node(
         if _REVOCATION_FILE.exists():
             data = json.loads(_REVOCATION_FILE.read_text(encoding="utf-8"))
         else:
-            data = {"revoked": [], "revocation_history": []}
+            data = {"revoked": {}, "revocation_history": []}
 
         if not isinstance(data, dict):
-            data = {"revoked": [], "revocation_history": []}
+            data = {"revoked": {}, "revocation_history": []}
 
-        revoked_set = set(data.get("revoked", []))
+        # Converte formato legado se necessário
+        revoked_raw = data.get("revoked", {})
+        if isinstance(revoked_raw, list):
+            revoked_raw = {str(e): 0 for e in revoked_raw if e}
 
-        # Adiciona à lista de revogados
-        revoked_set.add(node_name)
+        # Calcula timestamp de expiração
+        if duration_hours is not None and duration_hours > 0:
+            expires_at = time.time() + (duration_hours * 3600)
+        else:
+            expires_at = 0  # permanente
+
+        revoked_raw[node_name] = expires_at
 
         # Atualiza cache em memória
-        _REVOKED_CACHE = revoked_set
+        _REVOKED_CACHE = {k: float(v) for k, v in revoked_raw.items()}
 
         # Registra no histórico (auditoria)
         history = data.get("revocation_history", [])
@@ -116,10 +153,11 @@ def revoke_node(
                 "reason": reason,
                 "timestamp": time.time(),
                 "duration_hours": duration_hours,
+                "expires_at": expires_at,
                 "action": "revoke",
             }
         )
-        data["revoked"] = sorted(revoked_set)
+        data["revoked"] = {k: float(v) for k, v in revoked_raw.items()}
         data["revocation_history"] = history
         data["last_updated"] = time.time()
 
@@ -129,8 +167,9 @@ def revoke_node(
             json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
         )
 
+        duration_str = "permanentemente" if expires_at == 0 else f"por {duration_hours}h"
         logger.warning(
-            "[LINEAGE_GATE] 🔒 Nó revogado: %s | motivo: %s", node_name, reason
+            "[LINEAGE_GATE] 🔒 Nó revogado %s: %s | %s", duration_str, node_name, reason
         )
         return True
 
@@ -152,9 +191,12 @@ def unrevoke_node(node_name: str, reason: str = "") -> bool:
         if not isinstance(data, dict):
             return False
 
-        revoked_set = set(data.get("revoked", []))
-        revoked_set.discard(node_name)
-        _REVOKED_CACHE = revoked_set
+        revoked_raw = data.get("revoked", {})
+        if isinstance(revoked_raw, list):
+            revoked_raw = {str(e): 0 for e in revoked_raw if e}
+
+        revoked_raw.pop(node_name, None)
+        _REVOKED_CACHE = {k: float(v) for k, v in revoked_raw.items()}
 
         history = data.get("revocation_history", [])
         history.append(
@@ -165,7 +207,7 @@ def unrevoke_node(node_name: str, reason: str = "") -> bool:
                 "action": "unrevoke",
             }
         )
-        data["revoked"] = sorted(revoked_set)
+        data["revoked"] = {k: float(v) for k, v in revoked_raw.items()}
         data["revocation_history"] = history
         data["last_updated"] = time.time()
 
@@ -183,8 +225,8 @@ def unrevoke_node(node_name: str, reason: str = "") -> bool:
 
 
 def get_revoked_nodes() -> Set[str]:
-    """Retorna conjunto de nós atualmente revogados."""
-    return set(_load_revocation_list())
+    """Retorna conjunto de nós atualmente revogados (expurga vencidos automaticamente)."""
+    return set(_load_revocation_list().keys())
 
 
 def set_open_mode(enabled: bool = True) -> None:

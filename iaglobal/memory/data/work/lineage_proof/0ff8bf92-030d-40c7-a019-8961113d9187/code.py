@@ -1,1 +1,0 @@
-{'valid': True, 'sovereign_count': 125, 'rejected': [], 'batch_id': 'pipeline-integration', 'total': 125}
