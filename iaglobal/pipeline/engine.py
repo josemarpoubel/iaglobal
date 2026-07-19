@@ -9,7 +9,7 @@ import uuid
 from pathlib import Path
 from typing import Optional, Dict, Any
 
-from .pipelinestate import PipelineState
+from .pipelinestate import PipelineState, TaskIntent
 from .result import PipelineResult
 from .stages import PipelineStage
 
