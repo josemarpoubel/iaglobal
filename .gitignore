@@ -14,3 +14,9 @@ iaglobal/memory/data/ancestry_tree.jsonl
 iaglobal/obsidian/**/*.md
 ```
 .env
+
+# Python artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
