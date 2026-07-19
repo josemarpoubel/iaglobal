@@ -23,3 +23,8 @@ __pycache__/
 
 # Virtual environment
 venv/
+
+# Runtime artifacts
+iaglobal/memory/data/result/*
+iaglobal/memory/data/script/*
+iaglobal/memory/data/*.log

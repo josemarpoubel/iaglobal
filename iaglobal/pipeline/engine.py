@@ -506,23 +506,14 @@ class PipelineEngine:
         return code
 
     def _save_script(self, state: PipelineState) -> Optional[Path]:
-        """Salva o script em disco — deve ser chamado via asyncio.to_thread."""
-        if state.script_path:
-            return Path(state.script_path)
+        """Salva o script em disco via save_result_artifact."""
+        from iaglobal._paths import save_result_artifact
         code = state.generated_code
         if not code or not code.strip():
             return None
-        safe_name = re.sub(r"[^\w]", "_", state.prompt.strip()[:48])
-        safe_name = safe_name.strip("_") or "script"
+        project_dir = save_result_artifact(state.prompt, {}, code)
         ext = self._detect_extension(code)
-        filename = f"{safe_name}_{state.task_id}{ext}"
-        script_path = SCRIPTS_DIR / filename
-        script_path.write_text(code, encoding="utf-8")
-        logger.info("💾 Script salvo em: %s", script_path)
-        result_path = RESULTS_DIR / filename
-        result_path.write_text(code, encoding="utf-8")
-        logger.info("📦 Resultado salvo em: %s", result_path)
-        return script_path
+        return project_dir / f"output{ext}"
 
     LANG_EXT = {
         "asp": ".asp",
