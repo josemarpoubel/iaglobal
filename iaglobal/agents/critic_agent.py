@@ -512,6 +512,27 @@ class CriticAgent(AgentBase):
                 CONF_THRESHOLD_MEMORY,
             )
 
+        # 2.5 SocialRegistry — cooperação horizontal antes de escalar para LLM
+        _social_peer = await self._tentar_social(node_id, task_type)
+        if _social_peer is not None:
+            logger.info(
+                "[ARBITER mode=%s] %s delegado horizontalmente para %s — "
+                "fast-path local, sem Bandit",
+                mode, node_id, _social_peer,
+            )
+            await self._creditar_cooperacao(node_id, resolved_locally=True, via=f"social:{_social_peer}")
+            try:
+                from iaglobal.providers.ollama_provider import async_generate as _ollama_fast
+                _social_result = await _ollama_fast(prompt, timeout=30)
+                if _social_result:
+                    return _social_result
+            except Exception as _social_err:
+                logger.warning(
+                    "[ARBITER] fallback social %s -> Ollama falhou: %s",
+                    node_id, _social_err,
+                )
+            # Fallback: se o fast-path social falhou, escala via Bandit
+
         logger.info(
             "[ARBITER mode=%s] %s nao resolvido em casa — escalando via critic",
             mode,
@@ -530,6 +551,8 @@ class CriticAgent(AgentBase):
             return ""
 
         candidates = getattr(self, "DEFAULT_CANDIDATES", ["ollama/qwen2.5:0.5b"])
+        from iaglobal.providers.provider_router import _provider_has_key
+        candidates = [c for c in candidates if _provider_has_key(c.split("/")[0])]
         try:
             resultado = await self.bandit.generate(
                 node_id="critic",
@@ -595,6 +618,51 @@ class CriticAgent(AgentBase):
             )
         except Exception:
             pass
+
+    _TASK_DOMAIN_MAP = {
+        "coding": "code",
+        "code": "code",
+        "debug": "debug",
+        "test": "test",
+        "design": "design",
+        "search": "search",
+        "plan": "plan",
+        "writing": "writing",
+        "review": "review",
+        "general": "general",
+    }
+
+    async def _tentar_social(self, node_id: str, task_type: str) -> Optional[str]:
+        """Consulta SocialRegistry por peer com proficiência no domínio.
+
+        Retorna agent_id do peer se encontrado com proficiency >= 0.7 e
+        load_factor < 0.8.  None se não houver peer adequado.
+        """
+        try:
+            from iaglobal.agents.social import social_registry
+
+            domain = self._TASK_DOMAIN_MAP.get(task_type, "general")
+            peers = social_registry.query(domain, min_proficiency=0.7)
+            if not peers:
+                return None
+            best = peers[0]
+            cap = best.skills.get(domain)
+            if cap is None or cap.proficiency < 0.7:
+                return None
+            if best.load_factor >= 0.8:
+                logger.debug(
+                    "[SOCIAL] %s: peer %s tem prof=%.2f mas load=%.2f — saturado, ignorando",
+                    node_id, best.agent_id, cap.proficiency, best.load_factor,
+                )
+                return None
+            logger.info(
+                "[SOCIAL] %s: peer %s disponivel (prof=%.2f load=%.2f) — cooperacao horizontal",
+                node_id, best.agent_id, cap.proficiency, best.load_factor,
+            )
+            return best.agent_id
+        except Exception as e:
+            logger.debug("[SOCIAL] _tentar_social falhou: %s", e)
+            return None
 
     async def _montar_prompt_avaliacao(self, task: str, codigo: str) -> str:
         """Prompt de avaliação com few-shot dinâmico de avaliações anteriores."""

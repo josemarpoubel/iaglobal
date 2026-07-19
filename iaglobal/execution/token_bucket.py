@@ -10,80 +10,46 @@ por um sistema de cadência dinâmica:
   - Cadência estrita sob carga (rate controlado por latência)
   - Priorização: agentes de baixo IVM são rejeitados sob pressão
   - Circuit breaker: latência > 1000ms → só agentes críticos passam
+
+ETAPA 4 (ROADMAP_2): LocalModelGate com buckets independentes por tier
+cognitivo (JUIZ/glm4=2, OPERARIO/qwen=6, SENTINELA/lfm=8). Integra com
+TaskRouter para classificar node_id → tier e publica sinalização de
+congestão no AcetylcholineBus para degradação adaptativa proativa.
 """
 
 import asyncio
 import time
-from typing import ClassVar
+from typing import ClassVar, Dict, Optional
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.metabolism.bucket_manager import TokenBucket
 
 logger = get_logger("iaglobal.token_bucket")
 
 
-class TokenBucket:
-    """Rate limiter token bucket com priorização e empréstimo controlado.
-
-    Parâmetros:
-        rate: tokens por segundo (default 2.0 → 500ms entre inferências)
-        burst: tokens acumuláveis quando ocioso (default 3 → 3 starts rápidos)
-        max_debt: quantos tokens negativos um request de alta prioridade pode
-                  tomar emprestado (default 1)
-    """
-
-    def __init__(self, rate: float = 2.0, burst: int = 3, max_debt: int = 1) -> None:
-        self.rate = rate
-        self.burst = float(burst)
-        self.max_debt = float(max_debt)
-        self._tokens = self.burst
-        self._last_refill = time.monotonic()
-        self._lock = asyncio.Lock()
-
-    def _refill(self) -> None:
-        now = time.monotonic()
-        elapsed = now - self._last_refill
-        self._tokens = min(self.burst, self._tokens + elapsed * self.rate)
-        self._last_refill = now
-
-    async def acquire(self, priority: float = 0.5) -> bool:
-        """Tenta consumir um token.
-
-        Retorna True se permitido, False se deve pular (synthetic_success).
-
-        priority: 0.0-1.0, maior = mais importante.
-          - Se há tokens → consome e retorna True.
-          - Se sem tokens + priority >= 0.7 → toma emprestado (vai a negativo).
-          - Se sem tokens + priority < 0.7 → retorna False.
-        """
-        async with self._lock:
-            self._refill()
-            if self._tokens >= 1.0:
-                self._tokens -= 1.0
-                return True
-            if priority >= 0.7 and self._tokens > -self.max_debt:
-                self._tokens -= 1.0
-                return True
-            return False
-
-    @property
-    def utilization(self) -> float:
-        """0.0 (vazio/sob carga) a 1.0 (cheio/ocioso)."""
-        return max(0.0, min(1.0, self._tokens / self.burst))
-
-
 class LocalModelGate:
-    """Portão adaptativo para acesso ao modelo local.
+    """Portão adaptativo para acesso ao modelo local com buckets por tier.
 
-    Combina TokenBucket + mapeamento de prioridade por node_id +
-    circuit breaker por latência + ajuste dinâmico de taxa.
+    Implementa o Etapa 4 do ROADMAP_2: buckets independentes por tier
+    cognitivo (GLM4=2, Qwen=6, LFM=8). Integra com TaskRouter para classificar
+    node_id → tier e publica sinalização de congestão no AcetylcholineBus para
+    degradação adaptativa proativa.
 
-    Uso como singleton global via get_local_model_gate().
+    Mapeia node_id para tier baseado no mapeamento semântico:
+    - Prefixo "no_critic*" / "critic" → tier "glm4" (Juiz)
+    - Prefixo "no_coder*" / "coder" / o padrão geral → tier "qwen" (Operário)
+    - Prefixo "no_sentinel*" / "sentinel" → tier "lfm" (Sentinela)
+
+    Evento de congestão: se as rejeições do bucket > 70%, publica
+    't congestion' com métricas por tier (utilization_, rejections_) no
+    barramento, permitindo ao PipelineEngine reduzir a complexidade por
+    tier automaticamente.
     """
 
     _instance: ClassVar["LocalModelGate | None"] = None
     _instance_lock = asyncio.Lock()
 
-    # Mapa de prioridade base — node_id → score 0.0-1.0
+    # Mapa base de prioridade — node_id → score 0.0-1.0
     _PRIORITY_MAP: ClassVar[dict[str, float]] = {
         "critic": 0.95,
         "planner": 0.75,
@@ -106,11 +72,31 @@ class LocalModelGate:
         "evolution": 0.65,
     }
 
+    # Capacidades por tier do ROADMAP_2
+    BUCKET_CAPACITY: ClassVar[dict[str, int]] = {
+        "glm4": 2,   # Juiz: processamento crítico, 1 por vez
+        "qwen": 6,   # Operário: fluxo principal, throughput moderado
+        "lfm": 8,    # Sentinela: monitor+validation rápido, paralelismo máximo
+    }
+
     def __init__(self) -> None:
-        self.bucket = TokenBucket(rate=2.0, burst=3, max_debt=1)
-        self._latency_samples: list[float] = []
-        self._avg_latency = 0.0
-        self._circuit_until = 0.0
+        # Importar TaskRouter para classificação de node_id → tier
+        from iaglobal.providers.task_router import TaskRouter
+        self.router = TaskRouter()
+
+        # Buckets independentes por tier
+        self.buckets: Dict[str, TokenBucket] = {}
+        for tier in self.BUCKET_CAPACITY:
+            self.buckets[tier] = TokenBucket(
+                capacity=self.BUCKET_CAPACITY[tier],
+                fill_rate=self.BUCKET_CAPACITY[tier] / 60.0,  # 1 tok/s
+                max_concurrent=self.BUCKET_CAPACITY[tier],
+            )
+
+        # Métricas de operação por tier
+        self._rejected_counts: Dict[str, int] = {"glm4": 0, "qwen": 0, "lfm": 0}
+        self._alerts_fired: Dict[str, int] = {"glm4": 0, "qwen": 0, "lfm": 0}
+        self._event: asyncio.Event = asyncio.Event()
 
     @classmethod
     async def get_instance(cls) -> "LocalModelGate":
@@ -120,12 +106,20 @@ class LocalModelGate:
         return cls._instance
 
     @classmethod
+    async def reset_instance(cls) -> "LocalModelGate":
+        async with cls._instance_lock:
+            cls._instance = cls()
+        return cls._instance
+
+    def _get_tier_from_node(self, node_id: str) -> str:
+        """Mapeia node_id para tier cognitivo usando TaskRouter."""
+        return self.router.get_role_for_node(node_id)
+
+    @classmethod
     def get_priority(cls, node_id: str) -> float:
-        """Mapeia node_id para prioridade 0.0-1.0."""
-        if not node_id:
-            return 0.3
+        """Mapeia node_id para prioridade 0.0-1.0 para o tier correspondente."""
         nid = (
-            node_id.lower()
+            (node_id or "").lower()
             .replace("_agent", "")
             .replace("agent_", "")
             .replace("no_", "")
@@ -135,69 +129,163 @@ class LocalModelGate:
                 return prio
         return 0.35  # default baixo — fail-safe
 
+    async def release(self, node_id: str) -> None:
+        """Libera slot no bucket do tier do node_id."""
+        tier = self._get_tier_from_node(node_id)
+        bucket = self.buckets.get(tier)
+        if bucket:
+            await bucket.release()
+
     async def try_acquire(self, node_id: str) -> bool:
-        """Tenta adquirir permissão para inferência local.
+        """Tenta adquirir um slot no bucket do tier do node_id.
 
-        Retorna False → o chamador deve usar synthetic_success (fallback sem LLM).
+        Retorna True se adquirido, False se deve usar synthetic_success (fallback).
+        Se rejeição por tier > 70%, dispara um sinal de “altamente congestionado”.
         """
-        now = time.monotonic()
-        priority = self.get_priority(node_id)
+        tier = self._get_tier_from_node(node_id)
+        bucket = self.buckets.get(tier)
+        if not bucket:
+            # Em caso de tier desconhecido, assume fall back (sem aquisição)
+            return False
 
-        if now < self._circuit_until:
-            if priority < 0.7:
-                logger.info(
-                    "[LOCAL_GATE] Circuit breaker aberto — rejeitando %s "
-                    "(priority=%.2f, avg_latency=%.0fms)",
-                    node_id,
-                    priority,
-                    self._avg_latency,
-                )
-                return False
+        # priority retido para uso futuro (circuit breaker por tier);
+        # o BucketManager.TokenBucket controla concorrência por capacidade.
+        _ = self.get_priority(node_id)
+        acquired = await bucket.acquire(
+            estimated_tokens=1,
+            timeout=0.5,  # timeout curto — proxy para queue sem bloqueio
+        )
 
-        allowed = await self.bucket.acquire(priority=priority)
-        if not allowed:
-            logger.info(
-                "[LOCAL_GATE] Bucket vazio — rejeitando %s "
-                "(priority=%.2f, utilization=%.0f%%)",
-                node_id,
-                priority,
-                self.bucket.utilization * 100,
+        # Registrar rejeição para métricas
+        if not acquired:
+            self._rejected_counts[tier] = self._rejected_counts.get(tier, 0) + 1
+            # Alerta > 70% de rejeições (filtrado por bateria)
+            if self._rejected_counts[tier] >= self.BUCKET_CAPACITY[tier] * 0.7:
+                await self._fire_tier_congestion_alert(tier, bucket)
+        else:
+            # Resetar contador de rejeições em cada sucesso (por bateria)
+            self._rejected_counts[tier] = 0
+
+        return acquired
+
+    async def _fire_tier_congestion_alert(self, tier: str, bucket: TokenBucket) -> None:
+        """Dispara sinal de congestão no barramento se ainda não disparado.
+
+        Anexa o estado da fila (current_concurrency) para que o
+        JOLMetricsCollector calcule a tendência de exaustão antes do
+        threshold de rejeição ser atingido.
+        """
+        if self._alerts_fired.get(tier, 0) >= 1:
+            return
+        self._alerts_fired[tier] = 1
+
+        try:
+            from iaglobal.graphs.comms.acetylcholine_bus import AgentMessage, bus
+
+            payload = {
+                "tier": tier,
+                "status": "highly_congested",
+                "usage_pct": round(bucket.utilization * 100, 1),
+                "rejections": self._rejected_counts[tier],
+                "capacity": bucket.capacity,
+                "current_concurrency": bucket.current_concurrent,
+                "fill_rate": round(bucket.fill_rate, 2),
+                "timestamp": time.time(),
+            }
+            msg = AgentMessage(
+                sender="local_model_gate",
+                recipient="pipeline_engine",
+                message_type="tier_congestion_alert",
+                content=payload,
             )
-        return allowed
+            await bus.publish(msg)
+            logger.info(
+                "[LOCAL_GATE] Congestion alert -> tier=%s usage=%.1f%% "
+                "conc=%d/%d rejections=%d",
+                tier, payload["usage_pct"], payload["current_concurrency"],
+                payload["capacity"], payload["rejections"]
+            )
+        except Exception as e:
+            logger.debug("[LOCAL_GATE] Falha ao publicar congestão: %s", e)
+
+    def get_metrics(self) -> Dict:
+        """Retorna métricas operacionais por tier para coleta JOL.
+
+        Integração directa com `metabolism/bucket_manager.py`'s TokenBucket.
+        """
+        return {
+            tier: {
+                "tokens": bucket.tokens,
+                "capacity": bucket.capacity,
+                "utilization_pct": round(bucket.utilization * 100, 1),
+                "rejections": self._rejected_counts[tier],
+                "max_concurrent": bucket.max_concurrent,
+            }
+            for tier, bucket in self.buckets.items()
+        }
 
     def report_latency(self, latency_ms: float) -> None:
-        """Registra latência e ajusta circuit breaker / taxa dinâmica."""
-        self._latency_samples.append(latency_ms)
-        if len(self._latency_samples) > 20:
-            self._latency_samples.pop(0)
-        self._avg_latency = sum(self._latency_samples) / len(self._latency_samples)
+        """Registra latência média por tier para circuit breaker adaptativo por tier.
 
-        # Circuit breaker: latência alta → abre por 30s
-        if self._avg_latency > 1000 and self._circuit_until < time.monotonic():
-            self._circuit_until = time.monotonic() + 30.0
-            logger.warning(
-                "[LOCAL_GATE] Circuit breaker ACIONADO (avg_latency=%.0fms > 1000ms)",
-                self._avg_latency,
-            )
+        Ajusta dinamicamente fill_rate do bucket (capacidade por segundo)
+        baseado no backlog acumulativo. Versão síncrona para chamada no
+        finally block de BanditPolicy (não em corrotina).
+        """
+        # Rate-limita atualizações para evitar spam
+        if not hasattr(self, "_last_latency_report"):
+            self._last_latency_report = time.monotonic()
+        now = time.monotonic()
+        if now - self._last_latency_report < 10:
+            return
+        self._last_latency_report = now
 
-        # Ajuste dinâmico de taxa
-        old_rate = self.bucket.rate
-        if self._avg_latency > 1000:
-            self.bucket.rate = 1.0  # 1 inferência por segundo
-        elif self._avg_latency < 300:
-            self.bucket.rate = 4.0  # 4 inferências por segundo (burst)
-        else:
-            self.bucket.rate = 2.0  # nominal
+        for tier, bucket in self.buckets.items():
+            # Define floor mínimo por tier
+            _floors = {"glm4": 0.5, "qwen": 1.0, "lfm": 0.5}
+            floor = _floors.get(tier, 0.3)
 
-        if abs(old_rate - self.bucket.rate) > 0.01:
-            logger.debug(
-                "[LOCAL_GATE] Taxa ajustada: %.1f → %.1f tok/s (latency=%.0fms)",
-                old_rate,
-                self.bucket.rate,
-                self._avg_latency,
-            )
+            # Rastreia reduções consecutivas para evitar estrangulamento
+            if not hasattr(self, "_consecutive_reductions"):
+                self._consecutive_reductions: dict[str, int] = {}
+            cons = self._consecutive_reductions.get(tier, 0)
+
+            # Só reduz se latência > 5s (antes 800ms) e ainda não estabilizou
+            if latency_ms > 5000 and cons < 3:
+                bucket.fill_rate = max(floor, bucket.fill_rate - 0.2)
+                self._consecutive_reductions[tier] = cons + 1
+                logger.warning(
+                    "[LOCAL_GATE] Tier %s fill_rate reduzido para %.1f tok/s (latency=%.0fms, reduction=%d/3)",
+                    tier, bucket.fill_rate, latency_ms, cons + 1
+                )
+            elif latency_ms < 300:
+                # Recupera fill_rate em baixa carga
+                bucket.fill_rate = min(10.0, bucket.fill_rate + 1.0)
 
     @property
     def is_degraded(self) -> bool:
-        """True se o sistema está sob estresse (latência > 800ms ou bucket vazio)."""
-        return self._avg_latency > 800 or self.bucket.utilization < 0.3
+        """True se qualquer tier está altamente congestionado.
+
+        Lógica de degradação: se qualquer tier tem > 70% rejeições, o sistema todo
+        é considerado degradado para acionamento proativo no pipeline.
+        """
+        for tier, count in self._rejected_counts.items():
+            if count >= self.BUCKET_CAPACITY[tier] * 0.7:
+                return True
+        return False
+
+    async def waiter_deferred_reduction(self, tier: str, reduction: float = 0.3) -> None:
+        """Reduz fill_rate de um tier em resposta a um alerta (único por tier).
+
+        Chamado pelo PipelineEngine quando recebe um alert de tier_congestion_alert.
+        Permite redução gradual em vez de AIYM abrupta.
+        """
+        bucket = self.buckets.get(tier)
+        if not bucket:
+            return
+        old = bucket.fill_rate
+        bucket.fill_rate = max(0.1, bucket.fill_rate * (1.0 - reduction))
+        if old != bucket.fill_rate:
+            logger.info(
+                "[LOCAL_GATE] Tier %s fill_rate reduzido %.1f→%.1f tok/s (redução de %.0f%%)",
+                tier, old, bucket.fill_rate, reduction * 100
+            )

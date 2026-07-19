@@ -18,6 +18,19 @@ from iaglobal.graphs.comms.acetylcholine_bus import AgentMessage
 logger = logging.getLogger(__name__)
 _coder = CoderAgent()
 
+_CODER_CONTRACT = None
+
+
+def _get_coder_contract():
+    global _CODER_CONTRACT
+    if _CODER_CONTRACT is None:
+        from iaglobal.graphs.contracts.node_contract import NodeContract
+        _CODER_CONTRACT = NodeContract(
+            required_inputs=["prompt_builder"],
+            optional_inputs=["agentmailbox"],
+        )
+    return _CODER_CONTRACT
+
 
 async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -29,6 +42,8 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
+
+    _get_coder_contract().validate("coder", memory)
 
     # Recupera instâncias de comunicação injetadas no ecossistema
     ag_mailbox = memory.get("agentmailbox", {}) or ctx.get("agentmailbox", {})

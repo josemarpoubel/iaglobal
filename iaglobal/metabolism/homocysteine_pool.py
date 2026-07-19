@@ -11,6 +11,7 @@ import time
 from iaglobal._paths import HOMOCYSTEINE_POOL_FILE
 from iaglobal.evolution.skills.native.skill import Skill
 from iaglobal.evolution.skills.native.skill_registry import skill_registry
+from iaglobal.utils.atomic_io import AtomicJSONStore
 
 logger = logging.getLogger(__name__)
 
@@ -69,42 +70,35 @@ class HomocysteinePool:
         self.path = path or POOL_FILE
         self.candidates: List[CandidateSkill] = []
         self._io_lock = threading.Lock()
+        self._store = AtomicJSONStore(self.path, default=[])
         self._load()
 
     def _load(self):
         with self._io_lock:
             try:
-                if self.path.exists():
-                    with open(self.path) as f:
-                        data = json.load(f)
-                        self.candidates = [CandidateSkill.from_dict(d) for d in data]
-                        # Saneamento: reverte promoções inválidas já persistidas
-                        # (ex.: skill lixo promovido a production por dump de IVM).
-                        dirty = False
-                        for c in self.candidates:
-                            if (
-                                c.route == "production"
-                                and not self._is_production_worthy(c)[0]
-                            ):
-                                c.route = "guardrail"
-                                dirty = True
-                        if dirty:
-                            self._save()
+                data = self._store.read_sync()
+                self.candidates = [CandidateSkill.from_dict(d) for d in data]
+                dirty = False
+                for c in self.candidates:
+                    if (
+                        c.route == "production"
+                        and not self._is_production_worthy(c)[0]
+                    ):
+                        c.route = "guardrail"
+                        dirty = True
+                if dirty:
+                    self._store.mutate_sync(
+                        lambda _: [c.to_dict() for c in self.candidates]
+                    )
             except Exception as e:
                 logger.debug("[HOMOCYSTEINE] Erro ao carregar: %s", e)
 
-    def _save(self):
-        with self._io_lock:
-            try:
-                self.path.parent.mkdir(parents=True, exist_ok=True)
-                with open(self.path, "w") as f:
-                    json.dump([c.to_dict() for c in self.candidates], f, indent=2)
-            except Exception as e:
-                logger.debug("[HOMOCYSTEINE] Erro ao salvar: %s", e)
-
     def add(self, candidate: CandidateSkill):
-        self.candidates.append(candidate)
-        self._save()
+        with self._io_lock:
+            self.candidates.append(candidate)
+            self._store.mutate_sync(
+                lambda _: [c.to_dict() for c in self.candidates]
+            )
         logger.info(
             "[HOMOCYSTEINE] Candidate '%s' adicionada (score=%.2f)",
             candidate.skill.name,
@@ -154,7 +148,6 @@ class HomocysteinePool:
     def route_to_production(self, candidate: CandidateSkill) -> bool:
         worthy, reason = self._is_production_worthy(candidate)
         if not worthy:
-            # Disposição segura: manda para guardrail em vez de 'production' falso.
             logger.warning(
                 "[HOMOCYSTEINE] Promoção NEGADA para '%s': %s",
                 candidate.skill.name,
@@ -176,8 +169,11 @@ class HomocysteinePool:
                 status="production",
             )
             skill_registry.register_or_update(promoted)
-            candidate.route = "production"
-            self._save()
+            with self._io_lock:
+                candidate.route = "production"
+                self._store.mutate_sync(
+                    lambda _: [c.to_dict() for c in self.candidates]
+                )
             logger.info(
                 "[HOMOCYSTEINE] '%s' promovida a production (score=%.1f)",
                 candidate.skill.name,
@@ -206,8 +202,11 @@ class HomocysteinePool:
                 tags=["guardrail", "auto_generated"],
             )
             skill_registry.register_or_update(guardrail)
-            candidate.route = "guardrail"
-            self._save()
+            with self._io_lock:
+                candidate.route = "guardrail"
+                self._store.mutate_sync(
+                    lambda _: [c.to_dict() for c in self.candidates]
+                )
             logger.info(
                 "[HOMOCYSTEINE] '%s' → guardrail '%s'",
                 candidate.skill.name,
@@ -240,21 +239,14 @@ class HomocysteinePool:
         return len(self.candidates)
 
     def remove(self, skill_name: str) -> bool:
-        """
-        Remove skill do pool por nome.
-
-        Usado para apoptose de skills de baixa qualidade.
-
-        Args:
-            skill_name: Nome da skill a remover
-
-        Returns:
-            True se removida, False se não encontrada
-        """
-        for i, candidate in enumerate(self.candidates):
-            if candidate.skill.name == skill_name:
-                self.candidates.pop(i)
-                self._save()
+        """Remove skill do pool por nome (apoptose de skills de baixa qualidade)."""
+        with self._io_lock:
+            before = len(self.candidates)
+            self.candidates = [c for c in self.candidates if c.skill.name != skill_name]
+            if len(self.candidates) < before:
+                self._store.mutate_sync(
+                    lambda _: [c.to_dict() for c in self.candidates]
+                )
                 logger.info("[HomocysteinePool] Skill removida: %s", skill_name)
                 return True
         return False

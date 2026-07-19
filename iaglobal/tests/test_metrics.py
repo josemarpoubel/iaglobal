@@ -155,7 +155,7 @@ async def test_metrics_content_type():
 
     content_type = response.headers.get("content-type", "")
     assert "text/plain" in content_type
-    assert "0.0.4" in content_type or "prometheus" in content_type.lower()
+    assert "text/plain" in content_type and ("0.0.4" in content_type or "1.0.0" in content_type or "prometheus" in content_type.lower())
 
 
 @pytest.mark.asyncio

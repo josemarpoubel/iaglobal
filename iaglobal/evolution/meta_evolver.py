@@ -10,6 +10,7 @@ from typing import Any, Dict, List, Optional
 from iaglobal._paths import META_EVOLUTION_FILE
 from iaglobal.cognition.learning.classifier_memory import ClassifierMemory
 from iaglobal.utils.logger import logger
+from iaglobal.utils.atomic_io import AtomicJSONStore
 
 META_CONFIG_FILE = META_EVOLUTION_FILE
 MAX_TRIALS_WINDOW = (
@@ -89,50 +90,43 @@ class MetaEvolver:
 
         # 🔒 Lock atómico para mitigar condições de corrida concorrentes no disco e vetor de trials
         self._lock = threading.Lock()
+        self._store = AtomicJSONStore(self.path, default={})
         self._load()
 
     def _load(self):
         with self._lock:
             try:
-                if self.path.exists() and self.path.stat().st_size > 0:
-                    with open(self.path, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                        self.current_params = EvolutionParams.from_dict(
-                            data.get("current_params", {})
+                data = self._store.read_sync()
+                if isinstance(data, dict):
+                    self.current_params = EvolutionParams.from_dict(
+                        data.get("current_params", {})
+                    )
+                    raw_trials = data.get("trials", [])
+                    self.trials = [
+                        MetaTrial.from_dict(t)
+                        for t in raw_trials[-MAX_TRIALS_WINDOW:]
+                    ]
+                    if self.trials:
+                        self._best_improvement = max(
+                            t.improvement for t in self.trials
                         )
-
-                        raw_trials = data.get("trials", [])
-                        # Garante a importação cortando o excesso se o arquivo antigo estivesse inflado
-                        self.trials = [
-                            MetaTrial.from_dict(t)
-                            for t in raw_trials[-MAX_TRIALS_WINDOW:]
-                        ]
-
-                        if self.trials:
-                            self._best_improvement = max(
-                                t.improvement for t in self.trials
-                            )
             except json.JSONDecodeError:
                 logger.error(
-                    "[META] Arquivo meta_evolution.json corrompido. Inicializando novos parâmetros de fábrica."
+                    "[META] Arquivo meta_evolution.json corrompido. Inicializando novos parâmetros."
                 )
             except Exception as e:
-                logger.debug("[META] Aviso ao carregar histórico meta-evolutivo: %s", e)
+                logger.debug("[META] Aviso ao carregar histórico: %s", e)
 
     def _save(self):
         # NOTA DE DESIGN: Sempre invocado sob o contexto seguro do self._lock externo
         try:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            data = {
+            self._store.mutate_sync(lambda _: {
                 "current_params": self.current_params.to_dict(),
                 "trials": [t.to_dict() for t in self.trials],
-            }
-            with open(self.path, "w", encoding="utf-8") as f:
-                json.dump(data, f, indent=2)
+            })
         except Exception as e:
             logger.error(
-                "[META-CRITICAL] Falha catastrófica ao persistir metadados evolutivos: %s",
-                e,
+                "[META-CRITICAL] Falha ao persistir metadados evolutivos: %s", e,
             )
 
     def record_trial(

@@ -8,6 +8,7 @@ Manter apenas para compatibilidade reversa.
 import warnings
 from typing import Any, Dict, List
 
+from iaglobal.agents.agent_base import AgentBase
 from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.agents.evolution_agent")
@@ -21,6 +22,9 @@ warnings.warn(
 
 
 class EvolutionCommitteeAgent(AgentBase):
+    def __init__(self):
+        super().__init__(agent_name="evolution_committee")
+
     def evaluate(self, context: Dict[str, Any]) -> Dict[str, Any]:
         report = context.get("evolution_report", {})
         score = report.get("score", 0)
@@ -35,6 +39,9 @@ class EvolutionCommitteeAgent(AgentBase):
 
 
 class EvolutionTriggerAgent(AgentBase):
+    def __init__(self):
+        super().__init__(agent_name="evolution_trigger")
+
     def should_evolve(self, context: Dict[str, Any]) -> Dict[str, Any]:
         metrics = context.get("metrics", {})
         generations = metrics.get("generations", 0)
@@ -54,6 +61,9 @@ class EvolutionTriggerAgent(AgentBase):
 
 
 class PipelineUpdaterAgent(AgentBase):
+    def __init__(self):
+        super().__init__(agent_name="pipeline_updater")
+
     def update(self, context: Dict[str, Any]) -> List[Dict[str, Any]]:
         evolution_result = context.get("evolution_result", {})
         changes = evolution_result.get("suggested_changes", [])

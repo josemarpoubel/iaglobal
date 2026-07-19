@@ -41,6 +41,9 @@ def _contem_padrao_regex_perigoso(code: str) -> bool:
 class SecurityAuditAgent(AgentBase):
     """Audita o código gerado contra requisitos de segurança."""
 
+    def __init__(self):
+        super().__init__(agent_name="security_audit")
+
     def audit(
         self,
         code: str,

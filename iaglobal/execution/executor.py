@@ -42,19 +42,20 @@ async def executar(modelo: str, payload: dict) -> str:
     prompt = payload.get("task") or payload.get("prompt") or ""
 
     if not model or model == "auto":
-        if os.environ.get("ARBITER_MODE", "enforce") == "shadow":
-            await _get_critic().arbitrar_geracao(
-                node_id="executor",
-                prompt=prompt,
-                task_type="general",
-            )
-            result = await route_generate("", prompt, task_type="general")
+        result = await _get_critic().arbitrar_geracao(
+            node_id="executor",
+            prompt=prompt,
+            task_type="general",
+        )
+        if result:
             return result
+
+        logger.warning(
+            "[EXECUTOR] Crítico retornou vazio — fallback para route_generate (critic_batch)"
+        )
         return (
-            await _get_critic().arbitrar_geracao(
-                node_id="executor",
-                prompt=prompt,
-                task_type="general",
+            await route_generate(
+                "", prompt, task_type="general", node_id="critic_batch"
             )
             or ""
         )

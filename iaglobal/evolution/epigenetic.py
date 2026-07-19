@@ -2,8 +2,9 @@
 
 import json
 from pathlib import Path
-from typing import Optional
+from typing import Any, Dict, Optional
 from iaglobal.utils.logger import get_logger
+from iaglobal.utils.atomic_io import AtomicJSONStore
 
 logger = get_logger("iaglobal.evolution.epigenetic")
 
@@ -18,6 +19,7 @@ DEFAULT_FLAGS = {
     "evo_reflexion_enabled": False,  # ReflexionEngine (consome ATP/LLM) — off por padrão
     "evo_learning_enabled": False,  # LearningLoop automático — off por padrão
     "evo_vaccine_persist": True,  # persistir failure_patterns no Obsidian + vacinas
+    "immune_cycle": True,  # Fase 3: FailureAnalyzer + code_executor + VaccineLedger + JOL no handle()
     # Membrana seletiva: só o agente crítico (critic) tem direito a modelo externo
     # (cloud). Demais agentes usam Ollama local, forçando-os a evoluir com o
     # próprio substrato. Env EXTERNAL_ACCESS_ONLY_CRITIC=false desativa.
@@ -62,40 +64,45 @@ class EpigeneticMemory:
     Permite que o organismo grave 'cicatrizes' (estresses metabólicos)
     ou 'vantagens' (sucessos recorrentes) no genome.json sem alterar
     o DNA base.
+
+    Cada agente tem seu próprio arquivo genoma; o AtomicJSONStore é
+    criado sob demanda por agent_id e cacheado em self._stores.
     """
 
     def __init__(self):
         self._cache = {}
-
-    """
-    Sistema de Memória Epigenética do iaglobal.
-    
-    Permite que o organismo grave 'cicatrizes' (estresses metabólicos) 
-    ou 'vantagens' (sucessos recorrentes) no genome.json sem alterar 
-    o DNA base.
-    """
-
-    def __init__(self):
-        self._cache = {}
-
-    """
-    Sistema de Memória Epigenética do iaglobal.
-    
-    Permite que o organismo grave 'cicatrizes' (estresses metabólicos) 
-    ou 'vantagens' (sucessos recorrentes) no genome.json sem alterar 
-    o DNA base.
-    """
-
-    def __init__(self):
-        self._cache = {}
+        self._stores: Dict[str, AtomicJSONStore] = {}
 
     def _resolve_genome_path(self, agent_id: str) -> Optional[Path]:
         try:
             from iaglobal._paths import JSON_DIR
-
             return JSON_DIR / f"genome_{agent_id}.json"
         except Exception:
             return None
+
+    def _get_store(self, agent_id: str) -> Optional[AtomicJSONStore]:
+        path = self._resolve_genome_path(agent_id)
+        if not path:
+            return None
+        key = str(path.resolve())
+        if key not in self._stores:
+            self._stores[key] = AtomicJSONStore(path, default={})
+        return self._stores[key]
+
+    @staticmethod
+    def _apply_cicatriz(data: Any, trauma: str, severidade: float) -> Any:
+        if not isinstance(data, dict):
+            data = {}
+        epigenetics = data.get("epigenetics", {})
+        if not isinstance(epigenetics, dict):
+            epigenetics = {}
+        markers = epigenetics.get("markers", {})
+        if not isinstance(markers, dict):
+            markers = {}
+        markers[trauma] = markers.get(trauma, 0.0) + severidade
+        epigenetics["markers"] = markers
+        data["epigenetics"] = epigenetics
+        return data
 
     def gravar_cicatriz(self, agent_id: str, trauma: str, severidade: float):
         """
@@ -103,27 +110,16 @@ class EpigeneticMemory:
 
         Trauma: Ex: 'baixa_viabilidade_metabolica', 'violacao_lei_pensamento'
         Severidade: 0.0 a 1.0
+
+        Usa AtomicJSONStore.mutate_sync() para garantir atomicidade
+        (torn write + lost update) sob concorrência inter-processo.
         """
-        path = self._resolve_genome_path(agent_id)
-        if not path:
+        store = self._get_store(agent_id)
+        if not store:
             return
 
         try:
-            path.parent.mkdir(parents=True, exist_ok=True)
-            data = {}
-            if path.exists():
-                data = json.loads(path.read_text())
-
-            epigenetics = data.get("epigenetics", {})
-            markers = epigenetics.get("markers", {})
-
-            # Acumula a severidade do trauma
-            markers[trauma] = markers.get(trauma, 0.0) + severidade
-
-            epigenetics["markers"] = markers
-            data["epigenetics"] = epigenetics
-
-            path.write_text(json.dumps(data, indent=2, ensure_ascii=False))
+            store.mutate_sync(lambda data: self._apply_cicatriz(data, trauma, severidade))
             logger.info(
                 "[EPIGENÉTICA] Cicatriz gravada para %s: %s (+%.2f)",
                 agent_id,

@@ -92,6 +92,30 @@ def _normalize_indentation(code: str) -> str:
     return fixed
 
 
+def _fix_decimal_literal(code: str) -> str:
+    """Corrige 'invalid decimal literal' causado por LLMs que geram
+    números com leading zeros (ex: `0123`) ou trailing underscores (ex: `1_234_`).
+    Isso é comum quando o LLM tenta formatar números.
+    """
+    lines = code.split("\n")
+    fixed_lines = []
+    changed = False
+    for line in lines:
+        original = line
+        # Remove leading zeros de números decimais (mas preserva 0x, 0o, 0b, 0., 0)
+        line = re.sub(r'(?<!\w)0+(\d+)(?!\w)', lambda m: m.group(1), line)
+        # Remove trailing underscores em números (ex: 1_234_ → 1_234)
+        line = re.sub(r'(\d[\d_]*?)_(?=\W|$)', r'\1', line)
+        # Remove underscores duplicados consecutivos (ex: 1__000)
+        line = re.sub(r'(\d)__+(\d)', r'\1_\2', line)
+        if line != original:
+            changed = True
+        fixed_lines.append(line)
+    if changed:
+        logger.info("[SYNTAX_SENTINEL] Corrigindo invalid decimal literal")
+    return "\n".join(fixed_lines)
+
+
 # Heurísticas de correção sintática nativa (ATP ≈ 0)
 _AUTO_FIXERS = [
     {
@@ -111,6 +135,15 @@ _AUTO_FIXERS = [
         "priority": 3,
         "detect": lambda code: "\t" in code,
         "fix": _normalize_indentation,
+    },
+    {
+        "id": "decimal_literal",
+        "priority": 4,
+        "detect": lambda code: bool(
+            re.search(r"(?<!\w)0+\d+", code)
+            or re.search(r"\d_\b", code)
+        ),
+        "fix": _fix_decimal_literal,
     },
 ]
 
@@ -261,11 +294,17 @@ async def run_syntax_sentinel(ctx: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     # Aplica auto-fixers priorizados
+    error_msg = (error_details or {}).get("message", "")
     fixed_code = code
     applied_fixes = []
     for fixer in sorted(_AUTO_FIXERS, key=lambda f: f["priority"]):
         try:
-            if fixer["detect"](fixed_code):
+            # Tenta o fixer se o detect match no código OU se o erro contém palavra-chave
+            code_match = fixer["detect"](fixed_code)
+            error_match = (
+                "decimal" in error_msg and fixer["id"] == "decimal_literal"
+            )
+            if code_match or error_match:
                 new_code = fixer["fix"](fixed_code)
                 if new_code != fixed_code:
                     fixed_code = new_code

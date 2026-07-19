@@ -183,6 +183,28 @@ class Bootstrap:
             except Exception as e:
                 logger.debug("[BOOTSTRAP] MitochondrialProbe skip: %s", e)
 
+            # 7.2 Warmup metabólico — aquece modelos LLM antes do primeiro uso
+            try:
+                from iaglobal.providers.contract import registry as _provider_registry
+
+                _warmup_results = await _provider_registry.warmup_all(timeout=120)
+                _ok = sum(1 for v in _warmup_results.values() if v)
+                _total = len(_warmup_results)
+                if _total == 0:
+                    logger.info("[WARMUP] Nenhum provider com warmup registrado")
+                elif _ok == _total:
+                    logger.info(
+                        "[WARMUP] %d/%d providers aquecidos com sucesso",
+                        _ok, _total,
+                    )
+                else:
+                    logger.warning(
+                        "[WARMUP] %d/%d providers aquecidos (%d falharam — continuando)",
+                        _ok, _total, _total - _ok,
+                    )
+            except Exception as e:
+                logger.warning("[WARMUP] Bootstrap ignorado: %s", e)
+
             self.initialized = True
             logger.info("✅ [BOOTSTRAP] Orchestrator e serviços prontos.")
             return self.orchestrator

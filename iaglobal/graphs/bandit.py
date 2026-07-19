@@ -318,12 +318,20 @@ class BanditPolicy:
                 avg_reward = total_reward / reward_count if reward_count > 0 else 0.0
                 new_weight = (success_rate * 0.7) + (avg_reward * 0.3)
 
-                # Atualiza peso se houver histórico
-                if self.weights[model] == 0.0 and new_weight > 0.0:
+                # Atualização contínua com suavização — não apenas quando weight == 0
+                current = self.weights.get(model, 0.0)
+                if current == 0.0 and new_weight > 0.0:
                     self.weights[model] = new_weight
                     self.logger.info(
-                        f"📈 {model}: peso atualizado para {new_weight:.2f} (success={success_rate:.2f}, reward={avg_reward:.2f})"
+                        f"📈 {model}: peso inicial {new_weight:.2f} (success={success_rate:.2f}, reward={avg_reward:.2f})"
                     )
+                elif current > 0.0:
+                    smoothed = current * 0.7 + new_weight * 0.3
+                    if abs(smoothed - current) > 0.005:
+                        self.weights[model] = smoothed
+                        self.logger.info(
+                            f"📊 {model}: peso ajustado {current:.4f} → {smoothed:.4f} (success={success_rate:.2f}, reward={avg_reward:.2f})"
+                        )
 
     def get_provider_weight(
         self, provider_name: str, task_type: str = "general"
@@ -701,7 +709,7 @@ class BanditPolicy:
         candidates: List[str],
         context: Optional[dict] = None,
         task_type: str = "general",
-        timeout: float = 30.0,
+        timeout: float = 600.0,
     ) -> str:
         """
         Método completo de geração via Bandit:
@@ -794,6 +802,26 @@ class BanditPolicy:
                         c for c in candidates if c.split("/", 1)[0] in _LOCAL_PROVIDERS
                     ] or ["ollama/qwen2.5:0.5b"]
 
+            # ── Tribunal Cognitivo: TaskRouter resolve tier para node_id ──
+            try:
+                from iaglobal.providers.task_router import get_task_router
+                router = get_task_router()
+                tier = router.get_role_for_node(node_id)
+                route = router.route_for_tier(tier)
+                # Prioriza a rota do tier correto
+                if route in candidates or any(route.split("_")[0] in c for c in candidates):
+                    prioritized = [route if r in candidates else r for r in [route] + candidates]
+                    candidates = prioritized
+                # Timeout baseado no tier cognitivo
+                tier_timeout = router.get_timeout_for_tier(tier)
+                timeout = min(timeout, tier_timeout) if timeout else tier_timeout
+                self.logger.debug(
+                    "[TRIBUNAL] node_id=%s tier=%s route=%s timeout=%.1fs",
+                    node_id, tier, route, timeout
+                )
+            except Exception:
+                pass
+
             # 1. Seleciona modelo com semáforo
             model_selected = await self.select_model_with_lock(
                 node_id=node_id,
@@ -808,6 +836,14 @@ class BanditPolicy:
                 self.logger.warning(
                     f"⏰ Timeout aguardando semáforo para {model_selected}"
                 )
+                # Libera recursos do modelo original (token bucket pode ter consumido)
+                self.release_model(model_selected)
+                try:
+                    from iaglobal.execution.token_bucket import LocalModelGate
+                    gate = await LocalModelGate.get_instance()
+                    await gate.release(effective_agent)
+                except Exception:
+                    pass
                 # Tenta fallback
                 fallback_candidates = [c for c in candidates if c != model_selected]
                 if fallback_candidates:
@@ -874,6 +910,15 @@ class BanditPolicy:
             else:
                 self.rewards[model_selected].append(0.0)
                 self.trigger_circuit_breaker(model_selected, cooldown=30.0)
+
+            # JOL: Sincroniza pesos com aprendizado contínuo
+            try:
+                from iaglobal.metabolism.joint_optimization import joint_optimization_loop
+
+                await joint_optimization_loop.sync_bandit_weights(self, candidates)
+                await joint_optimization_loop.apply_decay(self.credit_engine)
+            except Exception:
+                pass
 
             # ── PSC §1.3: Ancestry tracking ──
             task_hash = hashlib.sha3_512(prompt.encode()).hexdigest()[:16]
@@ -944,6 +989,17 @@ class BanditPolicy:
             # 7. SEMPRE libera o semáforo
             if model_selected:
                 self.release_model(model_selected)
+                # Libera também o token bucket do LocalModelGate (via effective_agent)
+                if not any(
+                    p in model_selected
+                    for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
+                ):
+                    try:
+                        from iaglobal.execution.token_bucket import LocalModelGate
+                        gate = await LocalModelGate.get_instance()
+                        await gate.release(effective_agent)
+                    except Exception:
+                        pass
             # 8. Telemetria metabólica (IVM) — portão universal de todo acesso a
             # modelo de IA. Captura AgentBase e chamadas diretas de nós sem
             # distinção, curando o split-brain de observabilidade do IVMAxiom.

@@ -2,6 +2,7 @@
 # iaglobal/agents/planner_agent.py
 
 import json
+import asyncio
 from typing import Dict, Any, Optional, Union, List
 
 from iaglobal.models.task import Task
@@ -397,14 +398,23 @@ EXEMPLO DE RETORNO EXATO DE MARCAÇÃO ESPERADO (SIGA ESTA ARQUITETURA):
 
         try:
             # =================================================
-            # EXECUÇÃO LLM
+            # EXECUÇÃO LLM (com 2 retries e fallback)
             # =================================================
-            resposta = await executar(
-                modelo, {"task": prompt, "system_constraints": []}
-            )
+            resposta = ""
+            for attempt in range(3):
+                resposta = await executar(
+                    modelo, {"task": prompt, "system_constraints": []}
+                )
+                if resposta:
+                    break
+                logger.warning(
+                    "[PLANNER] Tentativa %d/3 retornou vazia — retrying...", attempt + 1
+                )
+                if attempt < 2:
+                    await asyncio.sleep(1.0 * (attempt + 1))
 
             if not resposta:
-                logger.error("Planner retornou resposta vazia.")
+                logger.error("Planner retornou resposta vazia após 3 tentativas.")
                 return self._fallback_plan(task_text)
 
             # =================================================

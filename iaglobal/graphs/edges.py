@@ -46,7 +46,8 @@ EDGES = [
     # Fase 7: LSP Validation (syntax + imports)
     ("coder", "lsp_validator"),
     ("multi_coder", "lsp_validator"),
-    ("lsp_validator", "debug_unificado"),
+    ("lsp_validator", "validator_retry"),
+    ("validator_retry", "debug_unificado"),
     # Fase 8: Depuração Unificada + Integração
     ("tester", "debug_unificado"),
     ("debug_unificado", "fix_validator"),

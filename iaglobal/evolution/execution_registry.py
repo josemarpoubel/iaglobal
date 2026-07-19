@@ -164,6 +164,21 @@ class ExecutionRegistry:
         """Alias para complete_node."""
         self.complete_node(execution_id, node_id)
 
+    def reset_node(self, execution_id: str, node_id: str):
+        """Remove claim e reseta status para permitir re-execução do nó.
+
+        Toda a mutação está sob o mesmo lock — garante atomicidade
+        entre _executed_nodes, _entries e _executed (FIX-5).
+        """
+        with self._lock:
+            if hasattr(self, "_executed_nodes"):
+                self._executed_nodes.discard((execution_id, node_id))
+            if execution_id in self._entries and node_id in self._entries[execution_id]:
+                self._entries[execution_id][node_id].status = NodeStatus.PENDING
+                self._entries[execution_id][node_id].result = None
+                self._entries[execution_id][node_id].error = None
+            self._executed.get(execution_id, set()).discard(node_id)
+
     def clear(self):
         """Limpa de forma total e absoluta o barramento (Uso exclusivo para resets de testes unitários)."""
         with self._lock:

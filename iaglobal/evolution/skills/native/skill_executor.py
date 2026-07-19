@@ -100,7 +100,7 @@ class SkillExecutor:
         ctx: Dict[str, Any],
         version: Optional[str] = None,
     ) -> Dict[str, Any]:
-        from ..skill_quarantine import quarantine
+        from ..utils.skill_quarantine import quarantine
 
         if quarantine.is_quarantined(skill_name):
             raise SkillExecutionError(f"Skill '{skill_name}' está em quarentena")
@@ -171,7 +171,7 @@ class SkillExecutor:
 
         except Exception as e:
             logger.error("[SKILL] Falha ao executar '%s': %s", skill_name, e)
-            from ..skill_quarantine import quarantine
+            from ..utils.skill_quarantine import quarantine
 
             quarantine.record_failure(skill_name, str(e), impact=1)
             raise SkillExecutionError(f"Falha na execução de '{skill_name}': {e}")

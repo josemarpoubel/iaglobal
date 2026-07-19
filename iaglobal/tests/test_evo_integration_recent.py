@@ -242,14 +242,18 @@ class TestCallLlmAutoEvolution:
 
         async def _t():
             a = _DummyAgent()
-            fut = asyncio.Future()
-            a.bandit.generate = lambda **kw: fut
-            fut.set_result("def f():\n    return 1\n")
-            out = await a._call_llm(prompt="faça uma função", task_type="code")
-            evo = await a.get_evo_agent()
-            crit = a._last_evo_critique
-            await evo.apoptose("t")
-            return out, crit
+            original = a.bandit.generate
+            try:
+                fut = asyncio.Future()
+                a.bandit.generate = lambda **kw: fut
+                fut.set_result("def f():\n    return 1\n")
+                out = await a._call_llm(prompt="faça uma função", task_type="code")
+                evo = await a.get_evo_agent()
+                crit = a._last_evo_critique
+                await evo.apoptose("t")
+                return out, crit
+            finally:
+                a.bandit.generate = original
 
         out, crit = _run(_t())
         assert isinstance(out, str) and out
@@ -260,15 +264,19 @@ class TestCallLlmAutoEvolution:
 
         async def _t():
             a = _DummyAgent()
-            a.bandit.generate = lambda **kw: (_ for _ in ()).throw(RuntimeError("down"))
+            original = a.bandit.generate
             try:
-                await a._call_llm(prompt="x", task_type="code")
-            except RuntimeError:
-                pass
-            evo = await a.get_evo_agent()
-            n = len(evo._failure_patterns)
-            await evo.apoptose("t")
-            return n
+                a.bandit.generate = lambda **kw: (_ for _ in ()).throw(RuntimeError("down"))
+                try:
+                    await a._call_llm(prompt="x", task_type="code")
+                except RuntimeError:
+                    pass
+                evo = await a.get_evo_agent()
+                n = len(evo._failure_patterns)
+                await evo.apoptose("t")
+                return n
+            finally:
+                a.bandit.generate = original
 
         assert _run(_t()) >= 1
 
@@ -399,34 +407,38 @@ class TestIntegrationEndToEnd:
 
         async def _t():
             a = _DummyAgent(name="evo_e2e_agent")
+            original_generate = a.bandit.generate
 
-            # 1) Sucesso → auto-crítica evolutiva
-            fut = asyncio.Future()
-            a.bandit.generate = lambda **kw: fut
-            fut.set_result("def f():\n    return 1\n")
-            out = await a._call_llm(prompt="gere função", task_type="code")
-            crit = a._last_evo_critique
-
-            # 2) Falha → análise de falha + vacina persistida no Obsidian
-            a.bandit.generate = lambda **kw: (_ for _ in ()).throw(
-                RuntimeError("db down")
-            )
             try:
-                await a._call_llm(prompt="x", task_type="code")
-            except RuntimeError:
-                pass
+                # 1) Sucesso → auto-crítica evolutiva
+                fut = asyncio.Future()
+                a.bandit.generate = lambda **kw: fut
+                fut.set_result("def f():\n    return 1\n")
+                out = await a._call_llm(prompt="gere função", task_type="code")
+                crit = a._last_evo_critique
 
-            evo = await a.get_evo_agent()
-            marker = evo.lineage_marker
-            vac = await vaccine_ledger.vacinas(marker)
+                # 2) Falha → análise de falha + vacina persistida no Obsidian
+                a.bandit.generate = lambda **kw: (_ for _ in ()).throw(
+                    RuntimeError("db down")
+                )
+                try:
+                    await a._call_llm(prompt="x", task_type="code")
+                except RuntimeError:
+                    pass
 
-            # 3) Filho por mitose herda a vacina da família
-            child = await evo.replicate(mutation_hint="e2e")
-            n_herdadas = await vaccine_ledger.aplicar_vacina(child)
+                evo = await a.get_evo_agent()
+                marker = evo.lineage_marker
+                vac = await vaccine_ledger.vacinas(marker)
 
-            await evo.apoptose("t")
-            await child.apoptose("t")
-            return out, crit, vac, n_herdadas
+                # 3) Filho por mitose herda a vacina da família
+                child = await evo.replicate(mutation_hint="e2e")
+                n_herdadas = await vaccine_ledger.aplicar_vacina(child)
+
+                await evo.apoptose("t")
+                await child.apoptose("t")
+                return out, crit, vac, n_herdadas
+            finally:
+                a.bandit.generate = original_generate
 
         out, crit, vac, n_herdadas = _run(_t())
         assert out and isinstance(crit, dict) and "score" in crit

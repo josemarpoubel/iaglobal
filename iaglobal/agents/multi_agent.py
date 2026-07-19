@@ -122,7 +122,6 @@ class PipelineOrchestrator:
     """
 
     def __init__(self, **kwargs):
-        super().__init__(agent_name="multi")
         logger.warning(
             "[MULTI_AGENT] PipelineOrchestrator instanciado - use graph-based orchestration"
         )

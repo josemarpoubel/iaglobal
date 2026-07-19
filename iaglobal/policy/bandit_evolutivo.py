@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+# iaglobal/policy/bandit_evolutivo.py
 """
 BanditPolicy Evolutiva — Aprendizado Contínuo com Histórico de IVM
 
@@ -12,24 +12,39 @@ DNA Evolutivo:
 - Fitness = média móvel de IVM dos últimos N usos
 - Banimento = 3 strikes consecutivos com IVM < 0.3
 - Weight adjustment = gradient descent no espaço de rewards
+
+Proteção de concorrência:
+- Toda mutação de estado passa por _registrar_execucao_sync(),
+  executada em thread pool sob threading.Lock + AtomicJSONStore.mutate_sync().
+- Leitores snapshot os dicts sob _lock e operam sobre cópias.
+- ProviderFitnessRecord é imutável — atualizar_fitness() retorna novo record.
 """
 
-import json
-import random
+import asyncio
 import logging
+import random
+import threading
 from pathlib import Path
 from datetime import datetime, timedelta, UTC
 from typing import Dict, List, Optional, Any, Tuple
 from dataclasses import dataclass, field
 
 from iaglobal.graphs.bandit import BanditPolicy
+from iaglobal.utils.atomic_io import AtomicJSONStore
 
 logger = logging.getLogger("iaglobal.policy.bandit_evolutivo")
 
+_INITIAL_EVOLUTIVE_STATE: dict = {
+    "fitness_records": {},
+    "banned_providers": {},
+    "weights": {},
+    "updated_at": None,
+}
 
-@dataclass
+
+@dataclass(frozen=True)
 class ProviderFitnessRecord:
-    """Registro de fitness evolutivo de um provider."""
+    """Registro de fitness evolutivo de um provider. Imutável."""
 
     provider_id: str
     total_uses: int = 0
@@ -51,43 +66,42 @@ class ProviderFitnessRecord:
     # Fitness score (0-1)
     fitness_score: float = 0.0
 
-    def atualizar_fitness(self, ivm: float, latencia_ms: float, custo: float):
-        """Atualiza fitness score baseado em nova execução."""
-        self.total_uses += 1
+    def atualizar_fitness(
+        self, ivm: float, latencia_ms: float, custo: float
+    ) -> "ProviderFitnessRecord":
+        """Retorna NOVO ProviderFitnessRecord com fitness atualizado."""
+        total_uses = self.total_uses + 1
+        sucesso = ivm >= 0.7
 
-        if ivm >= 0.7:
-            self.successful_uses += 1
-            self.strikes_consecutivos = 0  # Reseta strikes
-        else:
-            self.failed_uses += 1
-            self.strikes_consecutivos += 1
+        successful_uses = self.successful_uses + (1 if sucesso else 0)
+        failed_uses = self.failed_uses + (0 if sucesso else 1)
+        strikes_consecutivos = 0 if sucesso else self.strikes_consecutivos + 1
 
-        # Atualiza histórico de IVM (mantém últimos 100)
-        self.ivm_history.append(ivm)
-        if len(self.ivm_history) > 100:
-            self.ivm_history.pop(0)
+        ivm_history = self.ivm_history[-99:] + [ivm]
+        ivm_media_movel = sum(ivm_history) / len(ivm_history)
 
-        # Calcula média móvel de IVM
-        self.ivm_media_movel = sum(self.ivm_history) / len(self.ivm_history)
-
-        # Atualiza latência média (média exponencial)
         alpha = 0.1
-        self.latencia_media_ms = (
-            alpha * latencia_ms + (1 - alpha) * self.latencia_media_ms
+        latencia_media_ms = alpha * latencia_ms + (1 - alpha) * self.latencia_media_ms
+        custo_medio_creditos = alpha * custo + (1 - alpha) * self.custo_medio_creditos
+
+        latency_score = min(1.0, 1000 / max(latencia_media_ms, 100))
+        cost_score = min(1.0, 10 / max(custo_medio_creditos, 0.1))
+        fitness_score = (
+            ivm_media_movel * 0.6 + latency_score * 0.2 + cost_score * 0.2
         )
 
-        # Atualiza custo médio
-        self.custo_medio_creditos = (
-            alpha * custo + (1 - alpha) * self.custo_medio_creditos
-        )
-
-        # Calcula fitness score composto
-        # Fitness = (IVM média × 0.6) + (1/latência × 0.2) + (1/custo × 0.2)
-        latency_score = min(1.0, 1000 / max(self.latencia_media_ms, 100))
-        cost_score = min(1.0, 10 / max(self.custo_medio_creditos, 0.1))
-
-        self.fitness_score = (
-            self.ivm_media_movel * 0.6 + latency_score * 0.2 + cost_score * 0.2
+        return ProviderFitnessRecord(
+            provider_id=self.provider_id,
+            total_uses=total_uses,
+            successful_uses=successful_uses,
+            failed_uses=failed_uses,
+            ivm_history=ivm_history,
+            ivm_media_movel=ivm_media_movel,
+            strikes_consecutivos=strikes_consecutivos,
+            ultimo_banimento=self.ultimo_banimento,
+            latencia_media_ms=latencia_media_ms,
+            custo_medio_creditos=custo_medio_creditos,
+            fitness_score=fitness_score,
         )
 
     def deve_ser_banido(self) -> bool:
@@ -102,21 +116,17 @@ class ProviderFitnessRecord:
         Providers com fitness alto (>0.7) NÃO devem ser banidos
         mesmo com alguns failures isolados.
         """
-        # Protege providers com fitness alto
         if self.fitness_score >= 0.7:
             return False
 
-        # Banimento por performance crônica ruim
         if self.ivm_media_movel < 0.3 and self.total_uses >= 10:
             return True
 
-        # Banimento por taxa de falha alta
         if self.total_uses > 0:
             taxa_falha = self.failed_uses / self.total_uses
             if taxa_falha > 0.8 and self.total_uses >= 10:
                 return True
 
-        # Banimento por strikes consecutivos (apenas se fitness baixo)
         return self.strikes_consecutivos >= 3 and self.fitness_score < 0.5
 
     def to_dict(self) -> Dict[str, Any]:
@@ -126,7 +136,7 @@ class ProviderFitnessRecord:
             "total_uses": self.total_uses,
             "successful_uses": self.successful_uses,
             "failed_uses": self.failed_uses,
-            "ivm_history": self.ivm_history[-20:],  # Últimos 20 para persistência
+            "ivm_history": self.ivm_history[-20:],
             "ivm_media_movel": self.ivm_media_movel,
             "strikes_consecutivos": self.strikes_consecutivos,
             "ultimo_banimento": self.ultimo_banimento.isoformat()
@@ -140,21 +150,22 @@ class ProviderFitnessRecord:
     @classmethod
     def from_dict(cls, data: Dict[str, Any]) -> "ProviderFitnessRecord":
         """Deserializa de dict."""
-        record = cls(provider_id=data["provider_id"])
-        record.total_uses = data.get("total_uses", 0)
-        record.successful_uses = data.get("successful_uses", 0)
-        record.failed_uses = data.get("failed_uses", 0)
-        record.ivm_history = data.get("ivm_history", [])
-        record.ivm_media_movel = data.get("ivm_media_movel", 0.0)
-        record.strikes_consecutivos = data.get("strikes_consecutivos", 0)
-        record.latencia_media_ms = data.get("latencia_media_ms", 0.0)
-        record.custo_medio_creditos = data.get("custo_medio_creditos", 0.0)
-        record.fitness_score = data.get("fitness_score", 0.0)
-
+        ultimo_banimento = None
         if data.get("ultimo_banimento"):
-            record.ultimo_banimento = datetime.fromisoformat(data["ultimo_banimento"])
-
-        return record
+            ultimo_banimento = datetime.fromisoformat(data["ultimo_banimento"])
+        return cls(
+            provider_id=data["provider_id"],
+            total_uses=data.get("total_uses", 0),
+            successful_uses=data.get("successful_uses", 0),
+            failed_uses=data.get("failed_uses", 0),
+            ivm_history=data.get("ivm_history", []),
+            ivm_media_movel=data.get("ivm_media_movel", 0.0),
+            strikes_consecutivos=data.get("strikes_consecutivos", 0),
+            ultimo_banimento=ultimo_banimento,
+            latencia_media_ms=data.get("latencia_media_ms", 0.0),
+            custo_medio_creditos=data.get("custo_medio_creditos", 0.0),
+            fitness_score=data.get("fitness_score", 0.0),
+        )
 
 
 class BanditPolicyEvolutiva(BanditPolicy):
@@ -166,6 +177,11 @@ class BanditPolicyEvolutiva(BanditPolicy):
     2. Ajusta weights automaticamente baseado em IVM histórico
     3. Bane providers com performance consistentemente ruim
     4. Prioriza exploration de providers com alto fitness mas pouco usados
+
+    Toda mutação de estado é serializada por threading.Lock + fcntl.flock
+    via AtomicJSONStore.mutate_sync(). A lambda recebe o estado FRESCO do
+    disco e aplica APENAS o delta desta execução — nunca serializa a cópia
+    residente. Leitores snapshot os dicts sob lock e operam sobre cópias.
     """
 
     def __init__(
@@ -175,35 +191,34 @@ class BanditPolicyEvolutiva(BanditPolicy):
         min_sample_size: int = 10,
         db_path: Optional[Path] = None,
     ):
-        # Inicializa rewards antes de chamar super
-        self.rewards: Dict[str, float] = {}
-
         super().__init__(
             epsilon=epsilon,
             decay=decay,
         )
 
-        # Registro de fitness de providers
+        self.evolutionary_weights: Dict[str, float] = {}
         self.fitness_records: Dict[str, ProviderFitnessRecord] = {}
-
-        # Providers banidos temporariamente
         self.banned_providers: Dict[str, datetime] = {}
 
-        # Configurações de evolução
         self.db_path = db_path or Path("iaglobal/memory/bandit_evolutivo.json")
         self.ban_duration_hours = 24
         self.min_fitness_for_selection = 0.3
 
-        # Carrega estado persistido
-        self._carregar_estado()
+        self._lock = threading.Lock()
+        self._store = AtomicJSONStore(self.db_path, default=_INITIAL_EVOLUTIVE_STATE)
+        self._sincronizar_de(self._store.read_sync())
 
-    def _get_fitness_record(self, provider_id: str) -> ProviderFitnessRecord:
-        """Obtém ou cria registro de fitness de um provider."""
-        if provider_id not in self.fitness_records:
-            self.fitness_records[provider_id] = ProviderFitnessRecord(
-                provider_id=provider_id
-            )
-        return self.fitness_records[provider_id]
+    def _sincronizar_de(self, estado: dict) -> None:
+        """Atualiza resident memory a partir de estado serializado (dicts)."""
+        self.fitness_records = {
+            pid: ProviderFitnessRecord.from_dict(data)
+            for pid, data in estado.get("fitness_records", {}).items()
+        }
+        self.banned_providers = {
+            pid: datetime.fromisoformat(ban_str)
+            for pid, ban_str in estado.get("banned_providers", {}).items()
+        }
+        self.evolutionary_weights = dict(estado.get("weights", {}))
 
     async def registrar_execucao(
         self,
@@ -212,126 +227,136 @@ class BanditPolicyEvolutiva(BanditPolicy):
         latencia_ms: float,
         custo_creditos: float,
         sucesso: bool,
-    ):
+    ) -> None:
         """
         Registra execução de provider e atualiza fitness evolutivo.
 
-        Este método conecta o IVM do agent com o fitness do provider,
-        criando feedback loop evolutivo.
+        Conecta o IVM do agent com o fitness do provider,
+        criando feedback loop evolutivo. Síncrono em thread pool.
         """
-        # Atualiza registro de fitness
-        record = self._get_fitness_record(provider_id)
-        record.atualizar_fitness(ivm, latencia_ms, custo_creditos)
-
-        # Verifica banimento
-        if record.deve_ser_banido():
-            await self._banir_provider(provider_id)
-            logger.warning(
-                f"[BANIMENTO] Provider {provider_id} banido por {self.ban_duration_hours}h "
-                f"(strikes={record.strikes_consecutivos}, fitness={record.fitness_score:.3f})"
-            )
-
-        # Ajusta weights baseado em fitness
-        await self._ajustar_weights_evolutivo()
-
-        # Persiste estado
-        self._salvar_estado()
-
-        logger.debug(
-            f"[FITNESS] {provider_id}: fitness={record.fitness_score:.3f}, "
-            f"IVM_médio={record.ivm_media_movel:.3f}, "
-            f"strikes={record.strikes_consecutivos}"
+        loop = asyncio.get_running_loop()
+        await loop.run_in_executor(
+            None,
+            self._registrar_execucao_sync,
+            provider_id,
+            ivm,
+            latencia_ms,
+            custo_creditos,
+            sucesso,
         )
 
-    async def _banir_provider(self, provider_id: str):
-        """Bane provider temporariamente."""
+    def _registrar_execucao_sync(
+        self,
+        provider_id: str,
+        ivm: float,
+        latencia_ms: float,
+        custo_creditos: float,
+        sucesso: bool,
+    ) -> None:
+        """Seção crítica síncrona — muta estado sob threading.Lock + flock."""
 
-        ban_until = datetime.now(UTC) + timedelta(hours=self.ban_duration_hours)
-        self.banned_providers[provider_id] = ban_until
+        def apply_delta(fresh: dict) -> dict:
+            estado = dict(fresh) if fresh else dict(_INITIAL_EVOLUTIVE_STATE)
+            agora = datetime.now(UTC)
 
-        # Remove dos weights atuais
-        if provider_id in self.rewards:
-            del self.rewards[provider_id]
+            # Expurga bans expirados do estado fresco
+            estado["banned_providers"] = {
+                pid: ban_str
+                for pid, ban_str in estado["banned_providers"].items()
+                if datetime.fromisoformat(ban_str) > agora
+            }
 
-        logger.info(f"[BANIMENTO] {provider_id} até {ban_until.isoformat()}")
+            # Cria/atualiza fitness record sobre o fresco
+            fitness = estado["fitness_records"]
+            existente = fitness.get(provider_id)
+            record = (
+                ProviderFitnessRecord.from_dict(existente)
+                if existente
+                else ProviderFitnessRecord(provider_id=provider_id)
+            )
+            novo = record.atualizar_fitness(ivm, latencia_ms, custo_creditos)
+            fitness[provider_id] = novo.to_dict()
 
-    def _verificar_banimentos_expirados(self):
-        """Verifica e remove banimentos expirados."""
-        agora = datetime.now(UTC)
+            # Banimento
+            if novo.deve_ser_banido():
+                estado["banned_providers"][provider_id] = (
+                    agora + timedelta(hours=self.ban_duration_hours)
+                ).isoformat()
+                estado["weights"].pop(provider_id, None)
+                logger.warning(
+                    "[BANIMENTO] Provider %s banido por %sh "
+                    "(strikes=%d, fitness=%.3f)",
+                    provider_id,
+                    self.ban_duration_hours,
+                    novo.strikes_consecutivos,
+                    novo.fitness_score,
+                )
 
-        providers_expirados = [
-            provider
-            for provider, ban_until in self.banned_providers.items()
-            if ban_until <= agora
-        ]
+            # Recalcula weights sobre o fitness fresco
+            estado["weights"] = BanditPolicyEvolutiva._calcular_weights(
+                fitness,
+                estado["banned_providers"],
+                estado.get("weights", {}),
+            )
+            estado["updated_at"] = agora.isoformat()
+            return estado
 
-        for provider in providers_expirados:
-            del self.banned_providers[provider]
-            logger.info(f"[UNBAN] Provider {provider} liberado")
+        with self._lock:
+            estado = self._store.mutate_sync(apply_delta)
+            self._sincronizar_de(estado)
 
-    async def _ajustar_weights_evolutivo(self):
-        """
-        Ajusta weights dos providers baseado em fitness evolutivo.
+        logger.debug(
+            "[FITNESS] %s: fitness=%.3f, IVM_médio=%.3f, strikes=%d",
+            provider_id,
+            self.fitness_records.get(provider_id, ProviderFitnessRecord(provider_id)).fitness_score,
+            self.fitness_records.get(provider_id, ProviderFitnessRecord(provider_id)).ivm_media_movel,
+            self.fitness_records.get(provider_id, ProviderFitnessRecord(provider_id)).strikes_consecutivos,
+        )
 
-        Providers com alto fitness ganham weight, baixo fitness perdem.
-        Usa gradient descent suave para evitar oscilações bruscas.
-        """
-        if not self.fitness_records:
-            return
-
-        # Calcula fitness médio de todos providers
-        fitness_medio = sum(
-            r.fitness_score for r in self.fitness_records.values()
-        ) / len(self.fitness_records)
-
-        # Ajusta weights proporcionalmente ao fitness
-        for provider_id, record in self.fitness_records.items():
-            if record.provider_id in self.banned_providers:
+    @staticmethod
+    def _calcular_weights(
+        fitness: Dict[str, dict],
+        banned: Dict[str, str],
+        prev_weights: Dict[str, float],
+    ) -> Dict[str, float]:
+        """Função pura: calcula weights a partir de fitness serializado + bans."""
+        if not fitness:
+            return {}
+        fitness_values = [r["fitness_score"] for r in fitness.values()]
+        fitness_medio = sum(fitness_values) / len(fitness_values)
+        weights = {}
+        for pid, r in fitness.items():
+            if pid in banned:
                 continue
-
-            # Weight alvo baseado em fitness relativo
-            weight_alvo = record.fitness_score / max(fitness_medio, 0.1)
-
-            # Gradual adjustment (evita mudanças bruscas)
-            weight_atual = self.rewards.get(provider_id, 1.0)
-            alpha = 0.05  # Learning rate
-
+            weight_alvo = r["fitness_score"] / max(fitness_medio, 0.1)
+            weight_atual = prev_weights.get(pid, 1.0)
+            alpha = 0.05
             novo_weight = (1 - alpha) * weight_atual + alpha * weight_alvo
-            self.rewards[provider_id] = max(0.1, novo_weight)  # Mínimo 0.1
+            weights[pid] = max(0.1, novo_weight)
+        return weights
 
     def rank_providers(self, task_type: str = "general") -> List[Tuple[str, float]]:
         """
-        Rankeia providers por fitness + IVM do agent + task suitability.
+        Rankeia providers por fitness + task suitability.
 
         Retorna lista de (provider_id, score) ordenada por score decrescente.
         """
-        # Verifica banimentos expirados
-        self._verificar_banimentos_expirados()
+        with self._lock:
+            fitness = dict(self.fitness_records)
+            banned = dict(self.banned_providers)
 
         rankings = []
-
-        for provider_id, record in self.fitness_records.items():
-            # Pula providers banidos
-            if provider_id in self.banned_providers:
+        for provider_id, record in fitness.items():
+            if provider_id in banned:
                 continue
-
-            # Pula providers com fitness muito baixo
             if record.fitness_score < self.min_fitness_for_selection:
                 continue
-
-            # Score composto: fitness + IVM agent + bonus task_type
             score_base = record.fitness_score
-
-            # Bonus por especialização (se implementado)
             bonus_task = 1.0  # TODO: Implementar por task_type
-
             score_final = score_base * bonus_task
-
             rankings.append((provider_id, score_final))
 
-        # Ordena por score decrescente
         rankings.sort(key=lambda x: x[1], reverse=True)
-
         return rankings
 
     def select_provider(
@@ -349,122 +374,52 @@ class BanditPolicyEvolutiva(BanditPolicy):
         if not available_providers:
             raise ValueError("Nenhum provider disponível")
 
-        # Filtra providers banidos
-        available = [p for p in available_providers if p not in self.banned_providers]
+        with self._lock:
+            fitness = dict(self.fitness_records)
+            banned = dict(self.banned_providers)
+
+        available = [p for p in available_providers if p not in banned]
 
         if not available:
-            # Fallback: usa ollama local se tudo banido
             logger.warning("Todos providers banidos! Fallback para ollama")
             return "ollama"
 
-        # Verifica exploração
         if use_exploration and random.random() < self.epsilon:
-            # Exploração: escolhe provider pouco usado com fitness decente
             pouco_usados = [
-                (p, self.fitness_records.get(p, ProviderFitnessRecord(p)))
+                (p, fitness.get(p, ProviderFitnessRecord(p)))
                 for p in available
-                if self.fitness_records.get(p, ProviderFitnessRecord(p)).total_uses < 10
+                if fitness.get(p, ProviderFitnessRecord(p)).total_uses < 10
             ]
-
             if pouco_usados:
-                # Escolhe o com maior fitness entre pouco usados
                 escolhido = max(pouco_usados, key=lambda x: x[1].fitness_score)[0]
-                logger.debug(f"[EXPLORAÇÃO] {escolhido}")
+                logger.debug("[EXPLORAÇÃO] %s", escolhido)
                 return escolhido
 
-        # Exploração: usa ranking de fitness
         rankings = self.rank_providers(task_type)
-
         for provider_id, _ in rankings:
             if provider_id in available:
-                logger.debug(f"[EXPLORAÇÃO] {provider_id}")
+                logger.debug("[EXPLORAÇÃO] %s", provider_id)
                 return provider_id
 
-        # Fallback: primeiro disponível
         return available[0]
-
-    def _salvar_estado(self):
-        """Persiste estado evolutivo em disco."""
-        try:
-            self.db_path.parent.mkdir(parents=True, exist_ok=True)
-
-            estado = {
-                "fitness_records": {
-                    k: v.to_dict() for k, v in self.fitness_records.items()
-                },
-                "banned_providers": {
-                    k: v.isoformat() for k, v in self.banned_providers.items()
-                },
-                "weights": dict(self.rewards),
-                "updated_at": datetime.now(UTC).isoformat(),
-            }
-
-            with open(self.db_path, "w", encoding="utf-8") as f:
-                json.dump(estado, f, indent=2)
-
-            logger.debug(f"[PERSISTÊNCIA] Estado salvo em {self.db_path}")
-
-        except Exception as e:
-            logger.error(f"[PERSISTÊNCIA] Erro ao salvar: {e}")
-
-    def _carregar_estado(self):
-        """Carrega estado evolutivo persistido."""
-        if not self.db_path.exists():
-            logger.info("[PERSISTÊNCIA] Nenhum estado persistido encontrado")
-            return
-
-        try:
-            with open(self.db_path, "r", encoding="utf-8") as f:
-                estado = json.load(f)
-
-            # Carrega fitness records
-            for provider_id, data in estado.get("fitness_records", {}).items():
-                self.fitness_records[provider_id] = ProviderFitnessRecord.from_dict(
-                    data
-                )
-
-            # Carrega banimentos
-            for provider_id, ban_until_str in estado.get(
-                "banned_providers", {}
-            ).items():
-                ban_until = datetime.fromisoformat(ban_until_str)
-                if ban_until > datetime.now(UTC):
-                    self.banned_providers[provider_id] = ban_until
-                    logger.info(
-                        f"[PERSISTÊNCIA] {provider_id} ainda banido até {ban_until}"
-                    )
-
-            # Carrega weights
-            for provider_id, reward in estado.get("weights", {}).items():
-                self.rewards[provider_id] = reward
-
-            logger.info(
-                f"[PERSISTÊNCIA] Estado carregado: {len(self.fitness_records)} providers, "
-                f"{len(self.banned_providers)} banidos"
-            )
-
-        except Exception as e:
-            logger.error(f"[PERSISTÊNCIA] Erro ao carregar: {e}")
 
     def get_status_evolutivo(self) -> Dict[str, Any]:
         """Retorna status detalhado da evolução."""
-        if not self.fitness_records:
-            return {"status": "sem_dados"}
+        with self._lock:
+            if not self.fitness_records:
+                return {"status": "sem_dados"}
+            fitness = dict(self.fitness_records)
+            banned = dict(self.banned_providers)
 
-        # Estatísticas de fitness
-        fitness_scores = [r.fitness_score for r in self.fitness_records.values()]
-        ivm_medias = [r.ivm_media_movel for r in self.fitness_records.values()]
-
-        # providers banidos
-        banidos = list(self.banned_providers.keys())
-
-        # Top 5 providers
+        fitness_scores = [r.fitness_score for r in fitness.values()]
+        ivm_medias = [r.ivm_media_movel for r in fitness.values()]
+        banidos = list(banned.keys())
         rankings = self.rank_providers()
         top_5 = rankings[:5]
 
         return {
             "status": "operacional",
-            "total_providers": len(self.fitness_records),
+            "total_providers": len(fitness),
             "providers_banidos": len(banidos),
             "fitness_medio": sum(fitness_scores) / len(fitness_scores)
             if fitness_scores

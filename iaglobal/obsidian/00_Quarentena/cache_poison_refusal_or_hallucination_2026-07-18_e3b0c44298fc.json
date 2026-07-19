@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-07-18T13:37:29.520053+00:00",
+  "reason": "refusal_or_hallucination",
+  "prompt_snippet": "ollama_glm4:ollama_glm4:analise se ha alguma inconsistencia na pipeline evolutiva de iaglobal e deixe registrado em arquivo txt",
+  "response_snippet": "Olá! Parece que a sua solicitação contém várias instruções específicas que não correspondem necessariamente ao formato esperado para extrair o texto corretamente. Vou analisar seus pedidos e organizá-",
+  "response_length": 4104,
+  "model_hint": "",
+  "source": "cache_immune_barrier"
+}

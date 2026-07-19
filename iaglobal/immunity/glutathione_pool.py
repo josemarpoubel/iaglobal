@@ -1,12 +1,14 @@
 """GlutathionePool — pool de skills de proteção com ImmuneResponse."""
 
 import logging
+import threading
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from pathlib import Path
 import json
 
 from iaglobal._paths import GLUTATHIONE_POOL_FILE
+from iaglobal.utils.atomic_io import AtomicJSONStore
 
 logger = logging.getLogger(__name__)
 
@@ -25,33 +27,22 @@ class GlutathionePool:
     def __init__(self, path: Optional[Path] = None):
         self.path = path or POOL_FILE
         self.guardrails: List[Dict[str, Any]] = []
+        self._io_lock = threading.Lock()
+        self._store = AtomicJSONStore(self.path, default=[])
         self._load()
 
     def _load(self):
         try:
-            if self.path.exists():
-                with open(self.path) as f:
-                    self.guardrails = json.load(f)
+            data = self._store.read_sync()
+            self.guardrails = list(data) if isinstance(data, list) else []
         except Exception as e:
             logger.debug("[GLUTATHIONE] Erro ao carregar: %s", e)
 
-    def _save(self):
-        try:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.path, "w") as f:
-                json.dump(self.guardrails, f, indent=2)
-        except Exception as e:
-            logger.debug("[GLUTATHIONE] Erro ao salvar: %s", e)
-
     def add_guardrail(self, name: str, description: str, detector: str):
-        self.guardrails.append(
-            {
-                "name": name,
-                "description": description,
-                "detector": detector,
-            }
-        )
-        self._save()
+        with self._io_lock:
+            new_guardrail = {"name": name, "description": description, "detector": detector}
+            self.guardrails = self.guardrails + [new_guardrail]
+            self._store.mutate_sync(lambda _: self.guardrails)
 
     def respond(self, threat_type: str, threat_data: Dict[str, Any]) -> Dict[str, Any]:
         if threat_type == "loop":

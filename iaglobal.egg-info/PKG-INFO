@@ -848,6 +848,42 @@ Node A (Internet)                  Node B (iaglobal)
 
 ---
 
+## 🧬 Interface — Membrana de Sinalização Externa
+
+`iaglobal/interface/chat_agent.py` é a **membrana semi-permeável** do organismo —
+o ponto único de entrada para linguagem natural. Ela **nunca** chama um LLM diretamente:
+toda geração passa por `_get_critic().arbitrar_geracao()`, respeitando o PSC, a
+BanditPolicy e o chokepoint centralizado.
+
+### Fluxo
+
+```
+Input → pydantic_ai Agent (FunctionModel → critic.arbitrar_geracao → BanditPolicy)
+     ↓ IntencaoBiologica (comando, urgencia, familia_alvo)
+     ↓ EvoAgentColony.selecionar() → EvoAgent.handle()
+     ↓ { resposta, synthesis, execution_metrics }
+```
+
+### Componentes
+
+| Componente | Função |
+|-----------|--------|
+| `IntencaoBiologica` | Schema pydantic da intenção extraída |
+| `_modelo_roteado_por_bandit` | Proxy `FunctionModel` que delega ao crítico |
+| `EvoAgentColony` | Pool thread-safe de EvoAgents com DNA gate |
+| `interagir_com_colonia()` | Ponto de entrada único |
+| `criar_colonia_evoagents()` | Fábrica que instancia EvoAgents |
+
+### Testes
+
+```
+pytest iaglobal/tests/test_chat_agent_integration.py -v   # 15 testes
+```
+
+Detalhes: [`docs/interface.md`](docs/interface.md)
+
+---
+
 ## 🚀 Quick Start
 
 ## 1. Clone and install
@@ -1581,6 +1617,9 @@ MIT — Build on it. Evolve it. Let it teach you what biology already knows.
     │   └── obsidian
     │       └── 04_Synapses
     │           └── proposals
+    ├── interface
+    │   ├── __init__.py
+    │   └── chat_agent.py
     ├── immunity
     │   ├── adaptive_threat_detector.py
     │   ├── apoptosis_engine.py
@@ -1903,4 +1942,126 @@ MIT — Build on it. Evolve it. Let it teach you what biology already knows.
   The difference between biology and computation is only the substrate.<br>
   The principle is the same: adapt or perish."</em>
 </p>
+
+---
+
+## 🛡️ Sistema Imunológico Adaptativo — Ciclo de Correção Imune
+
+O iaglobal implementa um **metabolismo imunológico funcional** que diferencia resposta inata de adaptativa, integrado ao ciclo de vida do EvoAgent:
+
+```
+                              ┌──────────────────────┐
+                              │   EvoAgent.handle()   │
+                              │  (córtex consciente)   │
+                              └──────────┬───────────┘
+                                         │ gera código
+                                         ▼
+                              ┌──────────────────────┐
+                              │    code_executor      │
+                              │  (ação no mundo real) │
+                              └──────────┬───────────┘
+                                         │ falha?
+                                ┌────────┴────────┐
+                                ▼                  ▼
+                      ┌──────────────────┐   ┌──────────────┐
+                      │ FailureAnalyzer  │   │  sucesso →   │
+                      │  (macrófago)     │   │  Expression   │
+                      └────────┬─────────┘   └──────────────┘
+                               │ fingerprint (SHA256 sanitizado)
+                               ▼
+                      ┌──────────────────┐
+                      │  VaccineLedger   │
+                      │ (memória B —     │
+                      │  ledger JSON +   │
+                      │  Obsidian)       │
+                      └────────┬─────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    ▼                     ▼
+             ┌──────────────┐    ┌──────────────────┐
+             │ HIT (inata)  │    │ MISS (adaptativa) │
+             │ ← 36ms       │    └────────┬─────────┘
+             │ Vacina       │             │ generate_
+             │ aplicada     │             │ correction_plan
+             └──────────────┘             │
+                                   ┌──────┴──────┐
+                                   ▼              ▼
+                           ┌────────────┐  ┌──────────────┐
+                           │ Determin.  │  │  Crítico     │
+                           │ ← 33ms     │  │  (LLM via    │
+                           │ 6 padrões  │  │  Bandit)     │
+                           └──────┬─────┘  └──────┬───────┘
+                                  │               │
+                                  ▼               ▼
+                           ┌──────────────────────────┐
+                           │   register_vaccine()      │
+                           │   → VaccineLedger         │
+                           │   → ImmuneMemoryExchange  │
+                           └──────────┬───────────────┘
+                                      │ RecoveryMetrics
+                                      ▼
+                           ┌──────────────────────┐
+                           │  JointOptimization   │
+                           │  Loop (JOL)          │
+                           │  → recalibra pesos   │
+                           │  → IVM tracking      │
+                           │  → apoptose/mitose   │
+                           └──────────────────────┘
+```
+
+### Cinética da Resposta Imune (simulada)
+
+| Resposta | Latência | Cobertura | Gatilho |
+|----------|----------|-----------|---------|
+| 🟢 **Inata** (vacina existente) | ~36ms | Erro já visto pela linhagem | `VaccineLedger` hit |
+| 🟡 **Adaptativa determinística** | ~33ms | SyntaxError, ImportError, NameError, EmptyOutput, Timeout, IndentationError | `generate_correction_plan()` |
+| 🔴 **Adaptativa via Crítico** | variável (LLM) | RuntimeError, lógica complexa, AttributeError sem padrão | `arbitrar_geracao()` delegado ao crítico |
+
+### Componentes do Sistema Imune
+
+| Módulo | Arquivo | Função Biológica |
+|--------|---------|------------------|
+| `FailureAnalyzer` | `iaglobal/immunity/failure_analyzer.py` | Macrófago — patrulha output do `code_executor`, reconhece padrões de erro |
+| `DiagnosticoFalha` | `iaglobal/interface/diagnostico.py` | mRNA — schema estruturado do erro (tipo, linha, fingerprint) |
+| `RecoveryMetrics` | `iaglobal/interface/diagnostico.py` | Marcador de recuperação — delta erro→correção, tentativas, vacina |
+| `VaccineLedger` | `iaglobal/immunity/vaccine_ledger.py` | Memória B — persistência de padrões de falha (JSON + Obsidian) |
+| `code_executor` | `iaglobal/tools/builtins/code_executor.py` | Ação — executa código em subprocesso isolado com timeout |
+| `ImmuneMemoryExchange` | `iaglobal/immunity/immune_memory_exchange.py` | Transporte — distribui vacinas entre nós da mesma linhagem |
+| `JointOptimizationLoop` | `iaglobal/metabolism/joint_optimization.py` | Ribossomo — recalibra BanditPolicy com métricas de recuperação |
+
+### Fingerprint de Erro (Vacina Universal)
+
+O `fingerprint_error()` gera SHA256 do traceback **sanitizado**:
+
+- Caminhos absolutos → `/sanitized/path`
+- Números de linha → `line N`
+- Timestamps → `<TIMESTAMP>`
+
+Isso garante que o mesmo erro em ambientes diferentes produza o mesmo fingerprint → **vacina universal** entre agentes da mesma linhagem.
+
+### Ativação
+
+A Fase 3 (ciclo imune integrado ao `handle()`) é controlada por flag epigenética:
+
+```python
+from iaglobal.evolution.epigenetic import set_flag, get_flag
+
+# Ativar
+set_flag("immune_cycle", True)
+
+# Verificar
+assert get_flag("immune_cycle") is True
+```
+
+Quando ativa, todo `EvoAgent.handle()` que gerar código com erro de execução passará automaticamente pelo ciclo: `code_executor → FailureAnalyzer → VaccineLedger → correção → JOL`.
+
+### Testes
+
+```bash
+# Testes do sistema imune (77 testes)
+pytest iaglobal/tests/test_failure_analyzer.py -v
+pytest iaglobal/tests/test_immune_stress.py -v
+pytest iaglobal/tests/test_immune_activation.py -v
+pytest iaglobal/tests/test_joint_optimization.py -v
+```
 

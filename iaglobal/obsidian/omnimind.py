@@ -275,6 +275,7 @@ class OmniMind:
         self._state_path: Optional[Path] = state_path or (
             DATA_DIR / "omnimind_state.json"
         )
+        self._io_lock = threading.Lock()  # Protege append + save atômico
 
         self._carregar_estado()
 
@@ -303,17 +304,75 @@ class OmniMind:
             logger.warning("[OmniMind] Falha ao carregar estado do disco: %s", e)
 
     def _salvar_estado(self) -> None:
-        """Persiste memória coletiva em disco como JSON."""
+        """Persiste memória coletiva em disco como JSON (thread-safe).
+
+        Usa escrita atômica: temp file no MESMO diretório que o arquivo final
+        + os.replace() para evitar corrupção quando múltiplas threads escrevem
+        concorrentemente. Limpa arquivos temporários antigos após escrita.
+        """
         if not self._state_path:
             return
         try:
+            import tempfile
+            import os
+            from pathlib import Path
+
             self._state_path.parent.mkdir(parents=True, exist_ok=True)
-            self._state_path.write_text(
-                json.dumps(self._memoria_coletiva, indent=2, ensure_ascii=False),
-                encoding="utf-8",
+
+            # Diretório temporário dedicado no MESMO filesystem que o arquivo final
+            temp_dir = self._state_path.parent / "omnimind_temp"
+            temp_dir.mkdir(parents=True, exist_ok=True)
+
+            # Escreve em arquivo temporário no mesmo filesystem
+            fd, tmp_path = tempfile.mkstemp(
+                suffix=".tmp",
+                prefix=self._state_path.stem + "_",
+                dir=str(temp_dir),
             )
+            try:
+                with os.fdopen(fd, "w", encoding="utf-8") as f:
+                    json.dump(
+                        self._memoria_coletiva, f, indent=2, ensure_ascii=False
+                    )
+                    f.flush()
+                    os.fsync(f.fileno())
+                # Rename atômico (mesmo filesystem)
+                os.replace(tmp_path, self._state_path)
+            except Exception:
+                # Limpa temp file em caso de erro
+                try:
+                    os.unlink(tmp_path)
+                except Exception:
+                    pass
+                raise
+
+            # Limpeza de arquivos temporários antigos (> 1 hora)
+            self._cleanup_old_temp_files(temp_dir, max_age_seconds=3600)
+
         except Exception as e:
             logger.warning("[OmniMind] Falha ao salvar estado em disco: %s", e)
+
+    def _cleanup_old_temp_files(self, temp_dir: Path, max_age_seconds: int = 3600) -> None:
+        """Remove arquivos temporários mais antigos que max_age_seconds."""
+        import os
+        import time
+
+        try:
+            now = time.time()
+            for entry in temp_dir.iterdir():
+                if entry.is_file() and entry.suffix == ".tmp":
+                    mtime = entry.stat().st_mtime
+                    if now - mtime > max_age_seconds:
+                        try:
+                            os.unlink(entry)
+                            logger.debug(
+                                "[OmniMind] Temp file antigo removido: %s", entry.name
+                            )
+                        except Exception:
+                            pass
+        except Exception:
+            # Limpeza é best-effort, não crítica
+            pass
 
     # ── Registro de Agentes ───────────────────────────────────────────────────
 
@@ -964,20 +1023,22 @@ class OmniMind:
         except RuntimeError:
             pass
 
-        self._memoria_coletiva.append(
-            {
-                "type": "apoptose_contratual",
-                "agent_id": agent_id,
-                "motivo": motivo,
-                "violation_type": violation_type,
-                "duration_hours": duration_hours,
-                "law": "Lei da Obediencia",
-                "timestamp": time.time(),
-            }
-        )
-        if len(self._memoria_coletiva) > 1000:
-            self._memoria_coletiva = self._memoria_coletiva[-500:]
-        self._salvar_estado()
+        # Thread-safe append + save (evita race condition em escritas concorrentes)
+        with self._io_lock:
+            self._memoria_coletiva.append(
+                {
+                    "type": "apoptose_contratual",
+                    "agent_id": agent_id,
+                    "motivo": motivo,
+                    "violation_type": violation_type,
+                    "duration_hours": duration_hours,
+                    "law": "Lei da Obediencia",
+                    "timestamp": time.time(),
+                }
+            )
+            if len(self._memoria_coletiva) > 1000:
+                self._memoria_coletiva = self._memoria_coletiva[-500:]
+            self._salvar_estado()
 
         # Aplica revogacao no CRL (bloqueia execucao futura do agente)
         duration_str = "permanentemente" if duration_hours is None else f"por {duration_hours}h"

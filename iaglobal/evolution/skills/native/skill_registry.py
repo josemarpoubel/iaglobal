@@ -206,7 +206,7 @@ class SkillRegistry:
 
     def is_quarantined(self, name: str) -> bool:
         # Import dinâmico mantido para evitar acoplamento circular em cascata
-        from ..skill_quarantine import quarantine
+        from ..utils.skill_quarantine import quarantine
 
         return quarantine.is_quarantined(name)
 

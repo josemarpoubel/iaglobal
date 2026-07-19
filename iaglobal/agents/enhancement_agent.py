@@ -48,6 +48,9 @@ def _suggest_libs(task: str) -> list:
 class EnhancementAgent(AgentBase):
     """Enriquece e refina o prompt de entrada após o intake."""
 
+    def __init__(self, agent_name: str = "enhancement"):
+        super().__init__(agent_name=agent_name)
+
     def enhance(
         self,
         task: str,

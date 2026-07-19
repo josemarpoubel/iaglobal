@@ -2,6 +2,17 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional
 
 
+
+class TaskIntent(str, Enum):
+    CHAT = "chat"
+    CODE = "code"
+    HTML = "html"
+    JSON = "json"
+    DOCUMENT = "document"
+    ANALYSIS = "analysis"
+    GENERAL = "general"
+
+
 @dataclass
 class PipelineState:
     """
@@ -33,3 +44,5 @@ class PipelineState:
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     context: Dict[str, Any] = field(default_factory=dict)
+
+    intent: TaskIntent = TaskIntent.GENERAL

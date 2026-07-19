@@ -52,6 +52,9 @@ class SecurityReport:
 
 
 class SecurityDesignAgent(AgentBase):
+    def __init__(self):
+        super().__init__(agent_name="security_design")
+
     # --- 2. Regex Pré-compiladas com Word Boundaries (\b) ---
     # Evita que "auth" dê match em "author" ou "sql" dê match em "mysql"
     _AUTH_REGEX = re.compile(

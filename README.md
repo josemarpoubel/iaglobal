@@ -516,13 +516,81 @@ print(f'Selected model: {model}')
 Pipeline of Nodes and Skills → AgentBase → Chappie + BanditPolicy → IVMAxiom → OmniMind .
 ```
 
+---
+
+## 🫀 The SocialRegistry — Horizontal Agent Cooperation (July 2026)
+
+Before July 2026, agents could only communicate **vertically** (Agent → Critic → Bandit → Provider). There was no protocol for one agent to discover another agent's capabilities and delegate work directly.
+
+The `SocialRegistry` solved this by introducing a **hormonal advertisement system**:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│  SocialRegistry (singleton)                                      │
+│                                                                  │
+│  publish(adv)   → upsert skills + load_factor                   │
+│  heartbeat(id)  → update last_seen (TTL=120s)                   │
+│  withdraw(id)   → remove agent (voluntary apoptosis)            │
+│  query(domain)  → live list sorted by proficiency descending    │
+│  get(id)        → Advertisement or None (stale returns None)    │
+│                                                                  │
+│  AcetylcholineBus channels:                                      │
+│    social.agent.advertise  → _on_advertise  → publish()         │
+│    social.agent.heartbeat  → _on_heartbeat  → heartbeat()       │
+│    social.agent.withdraw   → _on_withdraw   → withdraw()        │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+**Before** (vertical only):
+```
+Agent A ──request──→ Critic ──evaluate──→ Bandit ──select──→ Provider
+```
+
+**After** (vertical + horizontal):
+```
+                        ┌─ SocialRegistry ──────────────────────┐
+                        │  agent-b: code(0.92)  load=0.3       │
+                        │  agent-c: test(0.85)  load=0.1       │
+                        └──────────────────────────────────────┘
+                               ↑ heartbeat / advertise
+                               ↑
+Agent A ──request──→ Critic ──evaluate──→ Bandit ──select──→ Provider
+      │                                                              │
+      └── query("test", min=0.8) → [agent-c] ──delegate──→──────────┘
+                 (horizontal cooperation, bypasses pipeline)
+```
+
+### The Advertisement Protocol
+
+```python
+@dataclass
+class Advertisement:
+    agent_id: str
+    skills: dict[str, Capability]   # domain → proficiency + latency profile
+    load_factor: float              # 0.0 (idle) to 1.0 (saturated)
+    last_seen: float                # heartbeat TTL (120s, stale auto-cleanup)
+```
+
+The agent's IVM feeds back into `Capability.proficiency`, creating a virtuous cycle:
+high-IVM agents in a domain get more requests → more cooperation → higher IVM
+(since the "C" in IVM is Cooperation).
+
+### Key Files
+
+| File | Responsibility |
+|------|---------------|
+| `iaglobal/agents/social.py` | SocialRegistry, Advertisement, Capability, bus integration |
+| `iaglobal/tests/test_social.py` | 19 tests (publish, query, stale, thread-safety, heartbeat, withdraw) |
+
+---
+
 **Summary:** You don't "chat" with LLMs. You submit tasks to the iaglobal organism, and the organism decides which agent, which model, and which provider to use — with all immune defenses active following **the 11 Universal Laws** in **OmniMind** dictated by **Raymond Holliwell** from the book **Working With the Law**. 🛡️
 
 **iaglobal** is not a framework. It is not a wrapper around an LLM API.
 It is a **living computational organism** — the first AI system architected around the laws of biological metabolism, designed to learn from failure, self-repair without restart, and evolve across generations of execution.
 
 While the industry burns megawatts in GPU-dense data centers, iaglobal reached its architectural **Zenith** —
-**107/107 evolutionary steps completed. 782 tests passing. Running fluently on a 4-core CPU. Zero GPU required.**
+**107/107 evolutionary steps completed. 1152 tests passing. Running fluently on a 4-core CPU. Zero GPU required.**
 
 This is not a performance claim. It is a proof of principle:
 **true intelligence is not brute force — it is elegant application of universal laws.**
@@ -534,7 +602,7 @@ This is not a performance claim. It is a proof of principle:
 | Metric | Value |
 |--------|-------|
 | **Evolutionary Steps Completed** | 107 / 107 ✅ |
-| **Tests Passing** | 763 / 763 ✅ |
+| **Tests Passing** | 1152 / 1153 ✅ |
 | **Hardware Required** | 4-core CPU · No GPU |
 | **Work Units Delivered** | 10 per 1 unit of energy consumed |
 | **Integrity Score** | 95% |
@@ -767,6 +835,42 @@ Node A (Internet)                  Node B (iaglobal)
 
 ---
 
+## 🧬 Interface — Membrana de Sinalização Externa
+
+`iaglobal/interface/chat_agent.py` é a **membrana semi-permeável** do organismo —
+o ponto único de entrada para linguagem natural. Ela **nunca** chama um LLM diretamente:
+toda geração passa por `_get_critic().arbitrar_geracao()`, respeitando o PSC, a
+BanditPolicy e o chokepoint centralizado.
+
+### Fluxo
+
+```
+Input → pydantic_ai Agent (FunctionModel → critic.arbitrar_geracao → BanditPolicy)
+     ↓ IntencaoBiologica (comando, urgencia, familia_alvo)
+     ↓ EvoAgentColony.selecionar() → EvoAgent.handle()
+     ↓ { resposta, synthesis, execution_metrics }
+```
+
+### Componentes
+
+| Componente | Função |
+|-----------|--------|
+| `IntencaoBiologica` | Schema pydantic da intenção extraída |
+| `_modelo_roteado_por_bandit` | Proxy `FunctionModel` que delega ao crítico |
+| `EvoAgentColony` | Pool thread-safe de EvoAgents com DNA gate |
+| `interagir_com_colonia()` | Ponto de entrada único |
+| `criar_colonia_evoagents()` | Fábrica que instancia EvoAgents |
+
+### Testes
+
+```
+pytest iaglobal/tests/test_chat_agent_integration.py -v   # 15 testes
+```
+
+Detalhes: [`docs/interface.md`](docs/interface.md)
+
+---
+
 ## 🚀 Quick Start
 
 ## 1. Clone and install
@@ -953,6 +1057,89 @@ Forces 4-step decomposition (ANALYSIS → STRUCTURE PLAN → IMPLEMENTATION → 
 
 ---
 
+## 🧠 Tribunal Cognitivo — Arquitetura Multi-Modelo (3 Camadas)
+
+iaglobal operava com um único modelo local (`qwen2.5:0.5b` como Operário). A partir de Julho/2026, o sistema foi expandido para um **córtex de três camadas**, onde cada papel cognitivo (Juiz, Operário, Sentinela) tem seu próprio modelo, limites metabólicos e rota de degradação:
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                    TRIBUNAI COGNITIVO (3 Camadas)                │
+├──────────────────────────────────────────────────────────────────┤
+│                                                                  │
+│  CognitiveRouter.resolve_route(node_id, task_type) → route_name │
+│                                                                  │
+│  ┌─────────────────────┐  ┌────────────┐  ┌──────────────────┐  │
+│  │ JUIZ (GLM4-1.2B)    │  │ OPERÁRIO   │  │ SENTINELA        │  │
+│  │                     │  │ (Qwen0.5B) │  │ (LFM-230M)       │  │
+│  │ critic, failure_    │  │ coder,     │  │ sandbox_valid,   │  │
+│  │ analysis, system_   │  │ planner,   │  │ lsp_valid, audit,│  │
+│  │ design, req_corr    │  │ pm, etc.   │  │ monitor, etc.    │  │
+│  │ max_conc=1          │  │ max_conc=3 │  │ max_conc=5       │  │
+│  │ timeout=120s        │  │ timeout=60s│  │ timeout=30s      │  │
+│  │ fallback→operário   │  │ (sem fb)   │  │ (sem fb)         │  │
+│  └─────────┬───────────┘  └──────┬─────┘  └────────┬─────────┘  │
+│            │                     │                  │            │
+│            └──────────┬──────────┴──────┬───────────┘            │
+│                       ▼                  ▼                       │
+│           ┌──────────────────────────────────────────┐           │
+│           │         BucketManager (Sist. Endócrino)  │           │
+│           │  TokenBucket por rota: capacity, fill_   │           │
+│           │  rate, max_concurrent. acquire() com     │           │
+│           │  timeout + fallback_role do ProviderCfg  │           │
+│           └──────────────────┬───────────────────────┘           │
+│                              │                                   │
+│                              ▼                                   │
+│           ┌──────────────────────────────────────────┐           │
+│           │          async_route_generate()          │           │
+│           │      (dispara para o provider certo)     │           │
+│           └──────────────────────────────────────────┘           │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+```
+
+### Componentes
+
+| Camada | Módulo | Função |
+|--------|--------|--------|
+| **CognitiveRouter** | `providers/provider_router.py:91` | Mapeia node_id/task_type → rota (ollama, ollama_glm4, ollama_lfm) |
+| **TokenBucket** | `metabolism/bucket_manager.py:27` | 3 buckets independentes com capacity + fill_rate + max_concurrent |
+| **BucketManager** | `metabolism/bucket_manager.py:102` | Singleton — itera `COGNITIVE_MODELS` e cria buckets. `acquire_with_fallback()` re-roteia se exausto |
+| **cognitive_dispatch** | `providers/provider_router.py:196` | Integração: Router → Bucket → Provider em uma chamada |
+| **SentinelOrchestrator** | `metabolism/sentinel.py:36` | Monitor paralelo não-bloqueante via `asyncio.Future` — detecta violações de requisito |
+| **AcetylcholineBus** | `graphs/comms/acetylcholine_bus.py:57` | Fila por task_id (`register/consume/unregister`) + broadcast pub/sub |
+
+### Fluxo de Execução
+
+```
+PipelineEngine.async_execute()
+  │
+  ├─ register_task(task_id)          → fila isolada no bus
+  ├─ asyncio.Future()                → promessa de código
+  ├─ create_task(sentinel.monitor)   → background não-bloqueante
+  │
+  ├─ _async_generation_stage()       → Operário (ollama/qwen2.5:0.5b)
+  │     └─ code_future.set_result(code)
+  │
+  ├─ validação + req check (existente)
+  │
+  ├─ consume_event_payload(task_id)  → Escuta do Córtex
+  │     ├─ None                      → segue
+  │     └─ violations LFM-confirmadas → escalona Juiz (GLM4-1.2B)
+  │
+  ├─ persistência + aprendizado
+  └─ finally: unregister_task()      → coleta de lixo metabólica
+```
+
+### Degradação Graciosa
+
+| Cenário | Comportamento |
+|---------|---------------|
+| Sentinela exausto | 0.5s de fila → bypass (pipeline não bloqueia) |
+| Juiz exausto | Fallback automático para Operário via `build_candidates()` |
+| Todos os tiers exaustos | Retorno vazio + log — degradação controlada |
+
+Detalhes completos: [`docs/ENGINE_INTEGRATION.md`](docs/ENGINE_INTEGRATION.md)
+
 ## 🔭 Evolutionary ROADMAP_1 and ROADMAP_2
 
 The organism is ready for:
@@ -1068,752 +1255,7 @@ MIT — Build on it. Evolve it. Let it teach you what biology already knows.
 
 ## DIRECTORY TREE
 ```
-    iaglobal/
-    .
-    ├── agents
-    │   ├── agent_base.py
-    │   ├── coder_agent.py
-    │   ├── critic_agent.py
-    │   ├── debugger_agent.py
-    │   ├── dependency_agent.py
-    │   ├── enhancement_agent.py
-    │   ├── evolution_agent.py
-    │   ├── failure_analysis_agent.py
-    │   ├── ingestion
-    │   │   ├── consolidation.py
-    │   │   ├── experiment_runner.py
-    │   │   ├── file_ingestion_agent.py
-    │   │   ├── hypothesis_generator.py
-    │   │   ├── __init__.py
-    │   │   ├── meta_learner.py
-    │   │   ├── paper_ingestor.py
-    │   │   └── paper_parser.py
-    │   ├── __init__.py
-    │   ├── intent_classifier_agent.py
-    │   ├── knowledge_writer_agent.py
-    │   ├── mitosis_engine.py
-    │   ├── multi_agent.py
-    │   ├── multi_coder_agent.py
-    │   ├── orchestrator_agent.py
-    │   ├── performance_audit_agent.py
-    │   ├── performance_design_agent.py
-    │   ├── planner_agent.py
-    │   ├── pm_agent.py
-    │   ├── prompt_improver.py
-    │   ├── reflexion_agent.py
-    │   ├── requirements_agent.py
-    │   ├── result_agent.py
-    │   ├── search_agent.py
-    │   ├── security_audit_agent.py
-    │   ├── security_design_agent.py
-    │   ├── semantic_validator.py
-    │   ├── tester_agent.py
-    │   ├── tool_caller_agent.py
-    │   ├── typing_agent.py
-    │   └── validator.py
-    ├── api
-    │   ├── __init__.py
-    │   └── mcp_server.py
-    ├── artifacts
-    │   ├── artifact_factory.py
-    │   └── __init__.py
-    ├── chappie
-    │   ├── bandit_evolution.py
-    │   ├── error_enricher.py
-    │   ├── __init__.py
-    │   ├── ivm_axiom.py
-    │   ├── ivm_compliance.py
-    │   ├── lineage_guardian.py
-    │   └── vacuum_daemon.py
-    ├── cli
-    │   ├── bootstrap_engine.py
-    │   ├── bootstrap.py
-    │   ├── evolution_lab.py
-    │   ├── __init__.py
-    │   ├── learn.py
-    │   ├── life_signals.py
-    │   ├── __main__.py
-    │   ├── main.py
-    │   ├── output.py
-    │   ├── status.py
-    │   └── ui_cli.py
-    ├── cognition
-    │   ├── adaptive_router.py
-    │   ├── agents
-    │   │   ├── __init__.py
-    │   │   └── task_classifier_agent.py
-    │   ├── __init__.py
-    │   ├── learning
-    │   │   ├── classifier_memory.py
-    │   │   └── __init__.py
-    │   ├── memory_first_router.py
-    │   ├── outcome_tracker.py
-    │   ├── reputation_engine.py
-    │   └── task_fingerprint.py
-    ├── colony_comms
-    │   ├── fitness.py
-    │   ├── genesis_handshake.py
-    │   ├── __init__.py
-    │   ├── integrator.py
-    │   ├── queen.py
-    │   └── worker.py
-    ├── core
-    │   ├── acetylcholine_bus.py
-    │   ├── apoptosis.py
-    │   ├── assistant.py
-    │   ├── auto_correction.py
-    │   ├── code_assembler.py
-    │   ├── cognitive_proxy.py
-    │   ├── cognitive_runtime.py
-    │   ├── config.py
-    │   ├── critic_batch_queue.py
-    │   ├── decision_engine.py
-    │   ├── dependency_enforcer.py
-    │   ├── diagnostico.py
-    │   ├── env_loader.py
-    │   ├── evolution_controller.py
-    │   ├── few_shot_provider.py
-    │   ├── governance.py
-    │   ├── graceful_shutdown.py
-    │   ├── __init__.py
-    │   ├── law_enforcement.py
-    │   ├── mitochondrial_probe.py
-    │   ├── neuro_orchestrator.py
-    │   ├── orchestrator.py
-    │   ├── organism_main.py
-    │   ├── organism.py
-    │   ├── registry.py
-    │   ├── retry_handler.py
-    │   └── structure.py
-    ├── dashboard
-    │   ├── __init__.py
-    │   ├── metabolic_sleep_dashboard.py
-    │   └── phospholipid_dashboard.py
-    ├── debug
-    │   ├── __init__.py
-    │   └── node_timing.py
-    ├── events
-    │   ├── acetylcholine_bus.py
-    │   ├── decision_event.py
-    │   ├── event_dispatcher.py
-    │   ├── event_store.py
-    │   ├── event_types.py
-    │   ├── __init__.py
-    │   └── replay.py
-    ├── evolution
-    │   ├── agents
-    │   │   ├── gap_analyzer.py
-    │   │   ├── __init__.py
-    │   │   └── knowledge_agent.py
-    │   ├── canonical_graph.py
-    │   ├── collapse_detector.py
-    │   ├── darwin_harness.py
-    │   ├── epigenetic.py
-    │   ├── evo_agent.py
-    │   ├── evolutionengine.py
-    │   ├── evolution_replay.py
-    │   ├── evolutionruntime.py
-    │   ├── execution_context.py
-    │   ├── execution_registry.py
-    │   ├── fusion_engine.py
-    │   ├── ga
-    │   │   ├── ga_runner.py
-    │   │   ├── __init__.py
-    │   │   ├── population.py
-    │   │   └── selector.py
-    │   ├── ga_router_optimizer.py
-    │   ├── genomic_reflection.py
-    │   ├── handler_evolution.py
-    │   ├── homeostasis_controller.py
-    │   ├── __init__.py
-    │   ├── memory_apoptosis.py
-    │   ├── meta_agent_designer.py
-    │   ├── metabolic_lifecycle.py
-    │   ├── metabolic_rhythm.py
-    │   ├── metacognition
-    │   │   ├── evaluator.py
-    │   │   ├── evolution_backlog.py
-    │   │   ├── evolution_committee.py
-    │   │   ├── evolution_trigger.py
-    │   │   ├── failure_taxonomy.py
-    │   │   ├── gap_analyzer.py
-    │   │   ├── __init__.py
-    │   │   ├── pipeline_updater.py
-    │   │   └── sandbox_validator.py
-    │   ├── meta_evolver.py
-    │   ├── proposal_quarantine.py
-    │   ├── reward_aggregator.py
-    │   ├── same_engine.py
-    │   ├── self_optimizer.py
-    │   ├── skills
-    │   │   ├── __init__.py
-    │   │   ├── native
-    │   │   │   ├── reactpy_skill_registry.py
-    │   │   │   ├── README_SKILL_MODEL_ROUTER.md
-    │   │   │   ├── skill_debug_unificado.py
-    │   │   │   ├── skill_executor.py
-    │   │   │   ├── skill_generator_agent.py
-    │   │   │   ├── skill_generator.py
-    │   │   │   ├── skill_model_router.py
-    │   │   │   ├── skill_prompt_structurer.py
-    │   │   │   ├── skill.py
-    │   │   │   ├── skill_python_autocomplete.py
-    │   │   │   ├── skill_rag_optimizer.py
-    │   │   │   ├── skill_registry.py
-    │   │   │   └── skill_versions.py
-    │   │   ├── README.md
-    │   │   ├── templates
-    │   │   │   ├── api_builder.txt
-    │   │   │   ├── api_design.txt
-    │   │   │   ├── architect.txt
-    │   │   │   ├── backend_builder.txt
-    │   │   │   ├── business_rules.txt
-    │   │   │   ├── coder.txt
-    │   │   │   ├── critic.txt
-    │   │   │   ├── database_design.txt
-    │   │   │   ├── documentation.txt
-    │   │   │   ├── domain_analysis.txt
-    │   │   │   ├── frontend_builder.txt
-    │   │   │   ├── integrator.txt
-    │   │   │   ├── performance_audit.txt
-    │   │   │   ├── planner.txt
-    │   │   │   ├── README.md
-    │   │   │   ├── requirements.txt
-    │   │   │   ├── security_audit.txt
-    │   │   │   ├── skill_debug_unificado.txt
-    │   │   │   ├── skill_executor.txt
-    │   │   │   ├── skill_generator.txt
-    │   │   │   ├── skill_prompt_structurer.txt
-    │   │   │   ├── skill_python_autocomplete.txt
-    │   │   │   ├── system_design.txt
-    │   │   │   ├── technology_selection.txt
-    │   │   │   └── test_generator.txt
-    │   │   └── utils
-    │   │       ├── dynamic_registry.py
-    │   │       ├── __init__.py
-    │   │       ├── run_fn_factory.py
-    │   │       ├── skill_quarantine.py
-    │   │       ├── skill_recycler.py
-    │   │       └── template_loader.py
-    │   ├── task_agent_factory.py
-    │   ├── task_analyzer.py
-    │   └── watchdog.py
-    ├── exceptions.py
-    ├── execution
-    │   ├── cpu_affinity.py
-    │   ├── executor.py
-    │   ├── __init__.py
-    │   ├── sandbox.py
-    │   └── token_bucket.py
-    ├── feedback
-    │   ├── benchmark_runner.py
-    │   ├── betaine_judge.py
-    │   ├── __init__.py
-    │   ├── reward_aggregator.py
-    │   ├── reward_signal.py
-    │   └── user_feedback.py
-    ├── genesis
-    │   ├── certify_block.py
-    │   ├── check_cbor.py
-    │   ├── data
-    │   │   ├── check_genesis_integrity.py
-    │   │   ├── integrity_tree.cbor
-    │   │   ├── webhidden_genesis_blueprint.cbor
-    │   │   └── webhidden_genesis_evolutive.cbor
-    │   ├── fusion_engine.py
-    │   ├── genesis_purifier.py
-    │   ├── genesis_verifier.py
-    │   ├── identity.py
-    │   ├── __init__.py
-    │   ├── lineage_gate.py
-    │   ├── tribunal.py
-    │   └── verifygenesis.py
-    ├── graphs
-    │   ├── artifact.py
-    │   ├── bandit.py
-    │   ├── builder.py
-    │   ├── comms
-    │   │   ├── acetylcholine_bus.py
-    │   │   ├── agent_mailbox.py
-    │   │   ├── __init__.py
-    │   │   └── membrane_key.py
-    │   ├── credit.py
-    │   ├── edge.py
-    │   ├── edges.py
-    │   ├── execution_context.py
-    │   ├── execution_engine.py
-    │   ├── execution_graph.py
-    │   ├── graph_builder_v2.py
-    │   ├── __init__.py
-    │   ├── instrumentation.py
-    │   ├── membrane.py
-    │   ├── migrar_nodes.py
-    │   ├── node_lineage_registry.py
-    │   ├── node.py
-    │   ├── nodes
-    │   │   ├── _disk_swap.py
-    │   │   ├── __init__.py
-    │   │   ├── js_syntax_sentinel.py
-    │   │   ├── no_adaptive_router.py
-    │   │   ├── no_agentmailbox.py
-    │   │   ├── no_ai_audit_compliance.py
-    │   │   ├── no_api_builder.py
-    │   │   ├── no_api_design.py
-    │   │   ├── no_apoptosis_kill.py
-    │   │   ├── no_applied_ai_engineer.py
-    │   │   ├── no_architect.py
-    │   │   ├── no_architecture_validator.py
-    │   │   ├── no_artifact_writer.py
-    │   │   ├── no_async_violation_detector.py
-    │   │   ├── no_auditor_sentinel.py
-    │   │   ├── no_backend_builder.py
-    │   │   ├── no_business_rules.py
-    │   │   ├── no_chappie_bandit_evolution.py
-    │   │   ├── no_clarity_directive.py
-    │   │   ├── no_code_executor.py
-    │   │   ├── no_coder.py
-    │   │   ├── no_compliance_audit.py
-    │   │   ├── no_context_weaver.py
-    │   │   ├── no_critic.py
-    │   │   ├── no_darwin_harness.py
-    │   │   ├── no_database_builder.py
-    │   │   ├── no_database_design.py
-    │   │   ├── no_debug_coder.py
-    │   │   ├── no_debugger.py
-    │   │   ├── no_debug_unificado.py
-    │   │   ├── no_dependency.py
-    │   │   ├── no_deployment_plan.py
-    │   │   ├── no_documentation.py
-    │   │   ├── no_domain_analysis.py
-    │   │   ├── no_enhancement.py
-    │   │   ├── no_entropy_sentinel.py
-    │   │   ├── no_evaluator.py
-    │   │   ├── no_evolution_committee.py
-    │   │   ├── no_evolution_dynamic_registry.py
-    │   │   ├── no_evolution_homocysteine.py
-    │   │   ├── no_evolution_knowledge.py
-    │   │   ├── no_evolution_methylation.py
-    │   │   ├── no_evolution_skill_executor.py
-    │   │   ├── no_evolution_trigger.py
-    │   │   ├── no_execution_plan.py
-    │   │   ├── no_failure_analysis.py
-    │   │   ├── no_fix_validator.py
-    │   │   ├── no_frontend_builder.py
-    │   │   ├── no_fugue_compartment.py
-    │   │   ├── no_fusion.py
-    │   │   ├── no_gap_analyzer.py
-    │   │   ├── no_ga_router_evolve.py
-    │   │   ├── no_genesis_builder.py
-    │   │   ├── no_immune_check_build.py
-    │   │   ├── no_immune_check.py
-    │   │   ├── no_immune_exchange.py
-    │   │   ├── no_immune_monitor.py
-    │   │   ├── no_ingestion.py
-    │   │   ├── no_integrator.py
-    │   │   ├── no_integrator.py.backup.before_fix
-    │   │   ├── no_interpreter.py
-    │   │   ├── no_knowledge_analyzer.py
-    │   │   ├── no_knowledge.py
-    │   │   ├── no_knowledge_writer.py
-    │   │   ├── no_law_of_thought_enforcer.py
-    │   │   ├── no_lineage_proof.py
-    │   │   ├── no_local_knowledge.py
-    │   │   ├── no_lsp_validator.py
-    │   │   ├── no_memory_cleaner.py
-    │   │   ├── no_memory_writer.py
-    │   │   ├── no_metabolic_pruning.py
-    │   │   ├── no_meta_director.py
-    │   │   ├── no_metrics.py
-    │   │   ├── no_mini_evaluator_post_arch.py
-    │   │   ├── no_mini_evaluator_post_build.py
-    │   │   ├── no_multi_agent.py
-    │   │   ├── no_multi_coder.py
-    │   │   ├── no_observability_design.py
-    │   │   ├── no_optimization.py
-    │   │   ├── no_orchestrator_agent.py
-    │   │   ├── no_orchestrator_pump.py
-    │   │   ├── no_performance_audit.py
-    │   │   ├── no_performance_design.py
-    │   │   ├── no_performance.py
-    │   │   ├── no_pipeline_updater.py
-    │   │   ├── no_pip_install.py
-    │   │   ├── no_planner.py
-    │   │   ├── no_pm.py
-    │   │   ├── no_prompt_builder.py
-    │   │   ├── no_prompt_improver.py
-    │   │   ├── no_prompt_intake.py
-    │   │   ├── no_proposal_quarantine.py
-    │   │   ├── no_qa.py
-    │   │   ├── no_reactpy.py
-    │   │   ├── no_reflexion.py
-    │   │   ├── no_release.py
-    │   │   ├── no_requirements.py
-    │   │   ├── no_result_agent.py
-    │   │   ├── no_retrospective.py
-    │   │   ├── no_reviewer.py
-    │   │   ├── no_risk_analysis.py
-    │   │   ├── no_sandbox_validator.py
-    │   │   ├── no_scheduler.py
-    │   │   ├── no_search_agent.py
-    │   │   ├── no_search.py
-    │   │   ├── no_search_web_brain.py
-    │   │   ├── no_search_wikipedia.py
-    │   │   ├── no_security_audit.py
-    │   │   ├── no_security_design.py
-    │   │   ├── no_security.py
-    │   │   ├── no_semantic_validator.py
-    │   │   ├── no_skill_generator.py
-    │   │   ├── no_success_ritual.py
-    │   │   ├── no_symbiont_handshake.py
-    │   │   ├── no_system_analysis.py
-    │   │   ├── no_system_design.py
-    │   │   ├── no_task_breakdown.py
-    │   │   ├── no_technology_selection.py
-    │   │   ├── no_tester.py
-    │   │   ├── no_test_generator.py
-    │   │   ├── no_threat_modeling.py
-    │   │   ├── no_typing_agent.py
-    │   │   ├── no_vacuum_strength.py
-    │   │   ├── no_validator.py
-    │   │   ├── no_web_classifier.py
-    │   │   ├── _search_capabilities.py
-    │   │   ├── _search_enhanced.py
-    │   │   ├── _search_queries.py
-    │   │   ├── _search_router.py
-    │   │   ├── _search_shared.py
-    │   │   ├── _search_sources.py
-    │   │   ├── _search_wikipedia.py
-    │   │   └── syntax_sentinel.py
-    │   ├── nodes.py
-    │   ├── pipeline_definition.py
-    │   ├── policy.py
-    │   ├── registry.py
-    │   ├── scheduler.py
-    │   ├── skill_node.py
-    │   ├── state_store.py
-    │   ├── task.py
-    │   ├── task_runner.py
-    │   ├── telemetry.py
-    │   ├── topology.py
-    │   └── workdir.py
-    ├── iaglobal
-    │   └── obsidian
-    │       └── 04_Synapses
-    │           └── proposals
-    ├── immunity
-    │   ├── adaptive_threat_detector.py
-    │   ├── apoptosis_engine.py
-    │   ├── async_violation_detector.py
-    │   ├── autoimmunity_detector.py
-    │   ├── emergent_behavior_detector.py
-    │   ├── entropy_sentinel.py
-    │   ├── epigenetic_masking.py
-    │   ├── error_persistence.py
-    │   ├── glutathione_guardrails.py
-    │   ├── glutathione_pool.py
-    │   ├── hallucination_detector.py
-    │   ├── immune_memory_exchange.py
-    │   ├── immune_orchestrator.py
-    │   ├── __init__.py
-    │   ├── loop_detector.py
-    │   ├── metabolic_immune_barrier.py
-    │   ├── metabolic_pruner.py
-    │   ├── mhc_detector.py
-    │   ├── pathogen_analyzer.py
-    │   ├── regression_detector.py
-    │   ├── symbiosis_score.py
-    │   ├── vaccine_ledger.py
-    │   └── vacuum_trigger.py
-    ├── __init__.py
-    ├── intention
-    │   ├── __init__.py
-    │   └── meta_director.py
-    ├── mcp
-    │   ├── client.py
-    │   ├── code_executor.py
-    │   ├── discovery.py
-    │   ├── file_system.py
-    │   ├── __init__.py
-    │   ├── mcp_agent.py
-    │   ├── mcp_server.py
-    │   ├── search_web.py
-    │   └── server.py
-    ├── memory
-    │   ├── async_memory.py
-    │   ├── backup_manager.py
-    │   ├── cache.py
-    │   ├── check_db.py
-    │   ├── cognitive_cache.py
-    │   ├── consolidation.py
-    │   ├── core.py
-    │   ├── data
-    │   ├── db_manager.py
-    │   ├── db_utils.py
-    │   ├── fusion_engine.py
-    │   ├── __init__.py
-    │   ├── memory_error.py
-    │   ├── memory.py
-    │   ├── memory_storage.py
-    │   ├── memory_vector.py
-    │   ├── persistence.py
-    │   ├── ranking.py
-    │   ├── raw_pool.py
-    │   ├── semantic_cache.py
-    │   ├── synthesis_sweeper.py
-    │   ├── term_long.py
-    │   ├── term_short.py
-    │   └── vault_unifier.py
-    ├── meta
-    │   ├── __init__.py
-    │   └── meta_learner.py
-    ├── metabolism
-    │   ├── clarity_directive.py
-    │   ├── homocysteine_pool.py
-    │   ├── __init__.py
-    │   ├── metabolic_autocorrect.py
-    │   ├── metabolic_invariants.py
-    │   ├── metabolic_metrics.py
-    │   ├── methylation_cycle.py
-    │   ├── methylation_engine.py
-    │   ├── opportunity_cost_detector.py
-    │   └── transsulfuration_cycle.py
-    ├── models
-    │   ├── agent_context.py
-    │   ├── event_bus.py
-    │   ├── __init__.py
-    │   └── task.py
-    ├── observability
-    │   ├── entropy_interceptor.py
-    │   ├── health.py
-    │   ├── __init__.py
-    │   ├── load_balancer.py
-    │   ├── metrics_collector.py
-    │   ├── phospholipid_bridge.py
-    │   ├── registry.py
-    │   ├── search_bridge.py
-    │   └── tracing.py
-    ├── obsidian
-    │   ├── 00_Quarentena
-    │   ├── 01_Instincts
-    │   ├── 02_Short_Term
-    │   ├── 03_Long_Term
-    │   ├── 04_Synapses
-    │   ├── 05_Vaccines
-    │   ├── ancestry_tree.py
-    │   ├── compliance.py
-    │   ├── consolidation.py
-    │   ├── delta_sleep.py
-    │   ├── epigenetic
-    │   ├── epigenetic_registry.py
-    │   ├── error_capture.py
-    │   ├── fugue_compartment.py
-    │   ├── __init__.py
-    │   ├── law_compliance_logger.py
-    │   ├── learning_system.py
-    │   ├── omnimind.py
-    │   ├── subconsciousapi.py
-    │   └── success_cycle_logger.py
-    ├── _paths.py
-    ├── pipeline
-    │   ├── engine.py
-    │   ├── __init__.py
-    │   ├── pipelinestate.py
-    │   ├── result.py
-    │   └── stages.py
-    ├── policy
-    │   ├── bandit_evolutivo.py
-    │   └── __init__.py
-    ├── providers
-    │   ├── async_http.py
-    │   ├── batch_writer.py
-    │   ├── gemini_provider.py
-    │   ├── groq_provider.py
-    │   ├── groq_provider.py.bkp
-    │   ├── hf_image_provider.py
-    │   ├── hf_inference_provider.py
-    │   ├── hf_router_provider.py
-    │   ├── hf_video_provider.py
-    │   ├── huggingchat_provider.py
-    │   ├── __init__.py
-    │   ├── nvidia_provider.py
-    │   ├── ollama_provider.py
-    │   ├── openai_provider.py
-    │   ├── opencode_provider.py
-    │   ├── openrouter_provider.py
-    │   ├── perplexity_provider.py
-    │   ├── poe_provider.py
-    │   ├── provider_config.py
-    │   ├── provider_metrics.py
-    │   ├── provider_registry.py
-    │   ├── provider_router.py
-    │   ├── provider_router.py.backup
-    │   ├── provider_scorer.py
-    │   ├── provider_state.py
-    │   ├── task_router.py
-    │   └── token_usage.py
-    ├── recycling
-    │   ├── embedding_pruner.py
-    │   ├── __init__.py
-    │   ├── mta_pool.py
-    │   └── prompt_recycler.py
-    ├── reflection
-    │   ├── claim_detection.py
-    │   ├── contamination_report.py
-    │   ├── failure_analysis.py
-    │   ├── __init__.py
-    │   ├── learning_loop.py
-    │   ├── reflexion_engine.py
-    │   ├── self_critique_evolutivo.py
-    │   └── self_critique.py
-    ├── sandbox
-    │   ├── __init__.py
-    │   └── sandbox_expansion.py
-    ├── search
-    │   ├── confidence_tracker.py
-    │   ├── feedback_loop.py
-    │   ├── __init__.py
-    │   ├── local_summarizer.py
-    │   ├── query_expander.py
-    │   ├── search_code_extractor.py
-    │   ├── search_memory.py
-    │   ├── search_middleware.py
-    │   ├── snippet_synthesizer.py
-    │   └── source_validator.py
-    ├── security
-    │   ├── ast_gateway.py
-    │   ├── __init__.py
-    │   ├── mcp_sandbox.py
-    │   ├── network_guard.py
-    │   ├── pysecurity1024.py
-    │   ├── resource_limits.py
-    │   ├── sandbox_executor.py
-    │   └── sandbox_rules.py
-    ├── server
-    │   ├── asgi.py
-    │   ├── health_aggregator.py
-    │   ├── __init__.py
-    │   ├── __main__.py
-    │   ├── mcp_server.py
-    │   └── server.py
-    ├── storage
-    │   ├── batch_writer.py
-    │   ├── converter.py
-    │   ├── daemon_monitor.py
-    │   ├── __init__.py
-    │   ├── metabolic_adapter.py
-    │   └── snapshotter.py
-    ├── tests
-    │   ├── conftest.py
-    │   ├── __init__.py
-    │   ├── integration
-    │   │   ├── test_stress_fase31.py
-    │   │   └── test_synapse_full_flow.py
-    │   ├── temp
-    │   ├── test_agents_tribunal.py
-    │   ├── test_apoptosis_kill.py
-    │   ├── test_artifact_contract.py
-    │   ├── test_artifact_extension.py
-    │   ├── test_autonomous_research_loop_e2e.py
-    │   ├── test_autonomous_research_loop_pipeline.py
-    │   ├── test_autonomous_research_loop.py
-    │   ├── test_await_detection.py
-    │   ├── test_bandit_membrane_chokepoint.py
-    │   ├── test_cache_immune_barrier.py
-    │   ├── test_circuit_breaker.py
-    │   ├── test_cli_log_level.py
-    │   ├── test_colony_intelligence.py
-    │   ├── test_confidence_tracker.py
-    │   ├── test_consolidation.py
-    │   ├── test_contamination_report.py
-    │   ├── test_cpu_priority_boost.py
-    │   ├── test_critic_batch_queue.py
-    │   ├── test_debug_unificado.py
-    │   ├── test_dependency_enforcer_autoinstall.py
-    │   ├── test_e2e_membrane_validation.py
-    │   ├── test_entropy_integration.py
-    │   ├── test_evo_agent_reflection_integration.py
-    │   ├── test_evo_integration_recent.py
-    │   ├── test_evolution_standalone.py
-    │   ├── test_experiment_runner.py
-    │   ├── test_fake_noise_detector.py
-    │   ├── test_feedback_loop.py
-    │   ├── test_fewshot_embedding_cache.py
-    │   ├── test_fewshot_vaccine_expiry.py
-    │   ├── test_ga_tuning.py
-    │   ├── test_health_unified.py
-    │   ├── test_hypothesis_generator.py
-    │   ├── test_instrument_decorator.py
-    │   ├── test_integration_phospholipid_registry_pipeline.py
-    │   ├── test_integration_pipeline_genetic_algorithm_tuning.py
-    │   ├── test_ivm_singleton_unification.py
-    │   ├── test_lineage_proof.py
-    │   ├── test_local_summarizer.py
-    │   ├── test_mcp_protocol_expansion.py
-    │   ├── test_metabolic_apoptosis.py
-    │   ├── test_metabolic_immune_barrier.py
-    │   ├── test_meta_learner.py
-    │   ├── test_metrics.py
-    │   ├── test_mitochondrial_probe.py
-    │   ├── test_model_router.py
-    │   ├── test_no_false_metrics_deployment.py
-    │   ├── test_omnimind_lineage.py
-    │   ├── test_phospholipid_bridge.py
-    │   ├── test_phospholipid_registry.py
-    │   ├── test_psc_hierarchy.py
-    │   ├── test_pysecurity1024.py
-    │   ├── test_python_autocomplete.py
-    │   ├── test_query_expander.py
-    │   ├── test_rag_web_search_full.py
-    │   ├── test_remsleep_dlq_scan.py
-    │   ├── test_search_memory.py
-    │   ├── test_self_critique_evolutivo.py
-    │   ├── test_snippet_synthesizer.py
-    │   ├── test_source_validator.py
-    │   ├── test_token_bucket.py
-    │   └── test_vaccine_ledger.py
-    ├── tools
-    │   ├── builtins
-    │   │   ├── __init__.py
-    │   │   └── pdf_tools.py
-    │   ├── __init__.py
-    │   ├── search.py
-    │   ├── search_tools.py
-    │   ├── tool_library.py
-    │   ├── tool_router.py
-    │   └── web_brain.py
-    ├── ui
-    │   ├── data_converter.py
-    │   ├── fastapi_app.py
-    │   ├── git_workspace.py
-    │   ├── __init__.py
-    │   ├── reactpy_components.py
-    │   ├── templates
-    │   │   ├── dashboard.html
-    │   │   └── index.html
-    │   ├── urls.py
-    │   ├── views.py
-    │   └── workspace_runner.py
-    ├── utils
-    │   ├── ansi_colors.py
-    │   ├── controlled_subprocess.py
-    │   ├── hash_utils.py
-    │   ├── helpers.py
-    │   ├── __init__.py
-    │   ├── integrity.py
-    │   ├── life_signal_collector.py
-    │   ├── logger.py
-    │   └── playwright_util.py
-    └── validation
-        ├── ast_security.py
-        ├── engine.py
-        ├── gateway.py
-        ├── __init__.py
-        ├── js_validator.py
-        ├── normalization.py
-        ├── scoring.py
-        └── syntax.py
-
-    70 directories, 673 files
+    iaglobal/...
 ```
 
 <p align="center">
@@ -1822,4 +1264,164 @@ MIT — Build on it. Evolve it. Let it teach you what biology already knows.
   The difference between biology and computation is only the substrate.<br>
   The principle is the same: adapt or perish."</em>
 </p>
+
+---
+
+## 🛡️ Sistema Imunológico Adaptativo — Ciclo de Correção Imune
+
+O iaglobal implementa um **metabolismo imunológico funcional** que diferencia resposta inata de adaptativa, integrado ao ciclo de vida do EvoAgent:
+
+```
+                              ┌──────────────────────┐
+                              │   EvoAgent.handle()   │
+                              │  (córtex consciente)   │
+                              └──────────┬───────────┘
+                                         │ gera código
+                                         ▼
+                              ┌──────────────────────┐
+                              │    code_executor      │
+                              │  (ação no mundo real) │
+                              └──────────┬───────────┘
+                                         │ falha?
+                                ┌────────┴────────┐
+                                ▼                  ▼
+                      ┌──────────────────┐   ┌──────────────┐
+                      │ FailureAnalyzer  │   │  sucesso →   │
+                      │  (macrófago)     │   │  Expression   │
+                      └────────┬─────────┘   └──────────────┘
+                               │ fingerprint (SHA256 sanitizado)
+                               ▼
+                      ┌──────────────────┐
+                      │  VaccineLedger   │
+                      │ (memória B —     │
+                      │  ledger JSON +   │
+                      │  Obsidian)       │
+                      └────────┬─────────┘
+                               │
+                    ┌──────────┴──────────┐
+                    ▼                     ▼
+             ┌──────────────┐    ┌──────────────────┐
+             │ HIT (inata)  │    │ MISS (adaptativa) │
+             │ ← 36ms       │    └────────┬─────────┘
+             │ Vacina       │             │ generate_
+             │ aplicada     │             │ correction_plan
+             └──────────────┘             │
+                                   ┌──────┴──────┐
+                                   ▼              ▼
+                           ┌────────────┐  ┌──────────────┐
+                           │ Determin.  │  │  Crítico     │
+                           │ ← 33ms     │  │  (LLM via    │
+                           │ 6 padrões  │  │  Bandit)     │
+                           └──────┬─────┘  └──────┬───────┘
+                                  │               │
+                                  ▼               ▼
+                           ┌──────────────────────────┐
+                           │   register_vaccine()      │
+                           │   → VaccineLedger         │
+                           │   → ImmuneMemoryExchange  │
+                           └──────────┬───────────────┘
+                                      │ RecoveryMetrics
+                                      ▼
+                           ┌──────────────────────┐
+                           │  JointOptimization   │
+                           │  Loop (JOL)          │
+                           │  → recalibra pesos   │
+                           │  → IVM tracking      │
+                           │  → apoptose/mitose   │
+                           └──────────────────────┘
+```
+
+### Cinética da Resposta Imune (simulada)
+
+| Resposta | Latência | Cobertura | Gatilho |
+|----------|----------|-----------|---------|
+| 🟢 **Inata** (vacina existente) | ~36ms | Erro já visto pela linhagem | `VaccineLedger` hit |
+| 🟡 **Adaptativa determinística** | ~33ms | SyntaxError, ImportError, NameError, EmptyOutput, Timeout, IndentationError | `generate_correction_plan()` |
+| 🔴 **Adaptativa via Crítico** | variável (LLM) | RuntimeError, lógica complexa, AttributeError sem padrão | `arbitrar_geracao()` delegado ao crítico |
+
+### Componentes do Sistema Imune
+
+| Módulo | Arquivo | Função Biológica |
+|--------|---------|------------------|
+| `FailureAnalyzer` | `iaglobal/immunity/failure_analyzer.py` | Macrófago — patrulha output do `code_executor`, reconhece padrões de erro |
+| `DiagnosticoFalha` | `iaglobal/interface/diagnostico.py` | mRNA — schema estruturado do erro (tipo, linha, fingerprint) |
+| `RecoveryMetrics` | `iaglobal/interface/diagnostico.py` | Marcador de recuperação — delta erro→correção, tentativas, vacina |
+| `VaccineLedger` | `iaglobal/immunity/vaccine_ledger.py` | Memória B — persistência de padrões de falha (JSON + Obsidian) |
+| `code_executor` | `iaglobal/tools/builtins/code_executor.py` | Ação — executa código em subprocesso isolado com timeout |
+| `ImmuneMemoryExchange` | `iaglobal/immunity/immune_memory_exchange.py` | Transporte — distribui vacinas entre nós da mesma linhagem |
+| `JointOptimizationLoop` | `iaglobal/metabolism/joint_optimization.py` | Ribossomo — recalibra BanditPolicy com métricas de recuperação |
+
+### Fingerprint de Erro (Vacina Universal)
+
+O `fingerprint_error()` gera SHA256 do traceback **sanitizado**:
+
+- Caminhos absolutos → `/sanitized/path`
+- Números de linha → `line N`
+- Timestamps → `<TIMESTAMP>`
+
+Isso garante que o mesmo erro em ambientes diferentes produza o mesmo fingerprint → **vacina universal** entre agentes da mesma linhagem.
+
+### Ativação
+
+A Fase 3 (ciclo imune integrado ao `handle()`) é controlada por flag epigenética:
+
+```python
+from iaglobal.evolution.epigenetic import set_flag, get_flag
+
+# Ativar
+set_flag("immune_cycle", True)
+
+# Verificar
+assert get_flag("immune_cycle") is True
+```
+
+Quando ativa, todo `EvoAgent.handle()` que gerar código com erro de execução passará automaticamente pelo ciclo: `code_executor → FailureAnalyzer → VaccineLedger → correção → JOL`.
+
+### Testes
+
+```bash
+# Testes do sistema imune (77 testes)
+pytest iaglobal/tests/test_failure_analyzer.py -v
+pytest iaglobal/tests/test_immune_stress.py -v
+pytest iaglobal/tests/test_immune_activation.py -v
+pytest iaglobal/tests/test_joint_optimization.py -v
+```
+
+---
+
+## 🚦 Traffic Light Architecture — Release Chain
+
+O sistema de semáforos (TokenBucket + asyncio.Semaphore) protege o modelo local
+(qwen2.5:0.5b, glm4, lfm) contra thrashing de CPU. A **correção crítica** de
+Julho/2026 fechou o vazamento de `current_concurrent` que travava o tier JUIZ
+após 2 chamadas.
+
+### Cadeia de Acquire/Release (corrigida)
+
+```
+acquire_model(model, node_id)
+  ├─ LocalModelGate.try_acquire → TokenBucket.acquire()
+  │    ├─ current_concurrent += 1
+  │    └─ tokens -= 1
+  └─ asyncio.Semaphore.acquire()
+
+generate() → finally:
+  ├─ release_model(model) → asyncio.Semaphore.release()
+  └─ LocalModelGate.release(node_id) → TokenBucket.release()
+       └─ current_concurrent -= 1    ← NOVO: fecha o ciclo
+```
+
+### Fallback seguro
+
+Quando `acquire_model` retorna `False` com token já consumido, o código libera
+o bucket **antes** de tentar o fallback — evitando leak duplo.
+
+### Arquivos tocados
+
+| Arquivo | Mudança |
+|---------|---------|
+| `execution/token_bucket.py` | `LocalModelGate.release()` — novo método |
+| `graphs/bandit.py` | `generate()` finally + fallback — release simétrico |
+
+> 📖 Documentação completa: `docs/TRAFFIC_LIGHT_ARCHITECTURE/TRAFFIC_LIGHT_ARCHITECTURE.md`
 

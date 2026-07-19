@@ -14,6 +14,7 @@ from dataclasses import dataclass, asdict
 
 from iaglobal._paths import SAME_POOL_FILE
 from iaglobal.utils.logger import logger
+from iaglobal.utils.atomic_io import AtomicJSONStore
 
 POOL_FILE = SAME_POOL_FILE
 
@@ -44,71 +45,56 @@ class SAMePool:
     def __init__(self, path: Optional[Path] = None):
         self.path = path or POOL_FILE
         self.accounts: Dict[str, SAMeAccount] = {}
-        # 🔒 Lock dedicado para proteger acessos simultâneos de escrita/leitura em disco
         self._io_lock = threading.Lock()
+        self._store = AtomicJSONStore(self.path, default=[])
         self._load()
 
     def _load(self):
         with self._io_lock:
             try:
-                if self.path.exists():
-                    with open(self.path, "r", encoding="utf-8") as f:
-                        data = json.load(f)
-                        for item in data:
-                            acc = SAMeAccount(**item)
-                            self.accounts[acc.agent_name] = acc
+                data = self._store.read_sync()
+                if isinstance(data, list):
+                    for item in data:
+                        acc = SAMeAccount(**item)
+                        self.accounts[acc.agent_name] = acc
             except json.JSONDecodeError:
                 logger.error(
-                    "[SAME] Arquivo de pool corrompido detectado. Reinicializando banco local."
+                    "[SAME] Arquivo de pool corrompido. Reinicializando banco local."
                 )
             except Exception as e:
                 logger.debug("[SAME] Erro ao carregar: %s", e)
-
-    def _save(self):
-        # NOTA: Sempre chamado sob proteção do lock nas funções públicas
-        try:
-            self.path.parent.mkdir(parents=True, exist_ok=True)
-            with open(self.path, "w", encoding="utf-8") as f:
-                json.dump([a.to_dict() for a in self.accounts.values()], f, indent=2)
-        except Exception as e:
-            logger.error("[SAME] Erro catastrófico ao persistir pool no disco: %s", e)
 
     def get_account(self, agent_name: str) -> SAMeAccount:
         with self._io_lock:
             if agent_name not in self.accounts:
                 self.accounts[agent_name] = SAMeAccount(agent_name=agent_name)
-                self._save()
+                self._store.mutate_sync(lambda _: [a.to_dict() for a in self.accounts.values()])
             return self.accounts[agent_name]
 
     def can_afford(self, agent_name: str, cost: int) -> bool:
-        # Acessa get_account que já possui isolamento de lock
         acc = self.get_account(agent_name)
         return acc.balance >= cost
 
     def spend(self, agent_name: str, cost: int) -> bool:
         with self._io_lock:
-            # Busca direta no mapa local protegido
             if agent_name not in self.accounts:
                 self.accounts[agent_name] = SAMeAccount(agent_name=agent_name)
-
             acc = self.accounts[agent_name]
             if acc.balance < cost:
                 return False
-
             acc.balance -= cost
             acc.total_spent += cost
-            self._save()
+            self._store.mutate_sync(lambda _: [a.to_dict() for a in self.accounts.values()])
             return True
 
     def recharge(self, agent_name: str, amount: int = RECHARGE_RATE):
         with self._io_lock:
             if agent_name not in self.accounts:
                 self.accounts[agent_name] = SAMeAccount(agent_name=agent_name)
-
             acc = self.accounts[agent_name]
             acc.balance += amount
             acc.total_earned += amount
-            self._save()
+            self._store.mutate_sync(lambda _: [a.to_dict() for a in self.accounts.values()])
 
     def balance(self, agent_name: str) -> int:
         return self.get_account(agent_name).balance

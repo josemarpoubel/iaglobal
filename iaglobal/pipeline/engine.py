@@ -251,6 +251,17 @@ class PipelineEngine:
             logger.debug("[INGEST] Auto-detecção: %s", e)
 
         prompt = state.prompt
+        state.intent = (
+            TaskIntent.CODE
+            if any(k in prompt.lower() for k in ("crie um", "gere um", "implemente", "função", "programa", "hello world", "script", "python", "classe "))
+            else TaskIntent.HTML
+            if any(k in prompt.lower() for k in ("html", "página", "site", "frontend"))
+            else TaskIntent.JSON
+            if any(k in prompt.lower() for k in ("json", "retorne apenas"))
+            else TaskIntent.CHAT
+            if any(k in prompt.lower() for k in ("explique", "o que é", "como funciona", "descreva", "resuma"))
+            else TaskIntent.GENERAL
+        )
         if ingested_context:
             prompt = f"{state.prompt}\n\n[ARQUIVOS INGERIDOS]\n{ingested_context}"
 

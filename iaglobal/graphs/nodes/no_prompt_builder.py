@@ -15,6 +15,18 @@ from iaglobal.memory.memory_error import record_error
 
 logger = logging.getLogger(__name__)
 
+_PROMPT_BUILDER_CONTRACT = None
+
+
+def _get_pb_contract():
+    global _PROMPT_BUILDER_CONTRACT
+    if _PROMPT_BUILDER_CONTRACT is None:
+        from iaglobal.graphs.contracts.node_contract import NodeContract
+        _PROMPT_BUILDER_CONTRACT = NodeContract(
+            required_inputs=["dependency", "knowledge"],
+        )
+    return _PROMPT_BUILDER_CONTRACT
+
 
 async def run_prompt_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -26,6 +38,8 @@ async def run_prompt_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
+
+    _get_pb_contract().validate("prompt_builder", memory)
 
     logger.info(
         "[PROMPT_BUILDER] Iniciando consolidação e engenharia de contexto do prompt..."

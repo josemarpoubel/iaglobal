@@ -31,44 +31,223 @@ except ImportError:
         "⚠️  BanditPolicyEvolutiva não disponível, usando BanditPolicy clássica"
     )
 
-from iaglobal.providers.ollama_provider import generate as ollama_generate
-from iaglobal.providers.groq_provider import generate as groq_generate
-from iaglobal.providers.openrouter_provider import generate as openrouter_generate
-from iaglobal.providers.nvidia_provider import generate as nvidia_generate
-from iaglobal.providers.opencode_provider import generate as opencode_generate
-from iaglobal.providers.gemini_provider import generate as gemini_generate
-from iaglobal.providers.perplexity_provider import (
-    async_generate as perplexity_async_generate,
-)
-from iaglobal.providers.openai_provider import generate as openai_generate
-from iaglobal.providers.huggingchat_provider import (
-    async_generate as huggingchat_async_generate,
-)
-from iaglobal.providers.hf_router_provider import (
-    async_generate as hf_router_async_generate,
-)
-from iaglobal.providers.hf_router_provider import generate as hf_router_generate
-from iaglobal.providers.hf_video_provider import (
-    text_to_video_async as hf_video_text_to_video_async,
+from iaglobal.providers.ollama_provider import async_generate as ollama_async_generate
+from iaglobal.providers.contract import registry
+
+# Bootstrap: importa cada módulo provider para disparar registry.register()
+def _bootstrap_providers() -> None:
+    import importlib
+    _provider_modules = [
+        "groq", "openrouter", "nvidia", "opencode", "gemini",
+        "openai", "perplexity", "huggingchat", "poe",
+        "hf_router", "hf_video",
+    ]
+    for _name in _provider_modules:
+        try:
+            importlib.import_module(f"iaglobal.providers.{_name}_provider")
+        except ImportError:
+            logger.debug("[ROUTER] Provider %s_nao_provider nao encontrado", _name)
+    logger.debug("[ROUTER] Bootstrap de providers concluido (ollama registrado via import direto)")
+
+_bootstrap_providers()
+
+# ── CognitiveRouter: Tribunal Cognitivo de 3 Camadas ──────────────────────
+# Mapeia tipo de tarefa → rota metabólica, extraindo capacidade do
+# ProviderConfig.  Desacoplado do gerenciamento de buckets (Passo 3).
+from iaglobal.providers.provider_config import (
+    ProviderConfig, CognitiveRole, get_model_config, get_role_by_model_id,
 )
 
-from iaglobal.providers.ollama_provider import async_generate as ollama_async_generate
-from iaglobal.providers.groq_provider import async_generate as groq_async_generate
-from iaglobal.providers.openrouter_provider import (
-    async_generate as openrouter_async_generate,
-)
-from iaglobal.providers.nvidia_provider import async_generate as nvidia_async_generate
-from iaglobal.providers.opencode_provider import (
-    async_generate as opencode_async_generate,
-)
-from iaglobal.providers.gemini_provider import async_generate as gemini_async_generate
-from iaglobal.providers.openai_provider import async_generate as openai_async_generate
-from iaglobal.providers.poe_provider import async_generate as poe_async_generate
+from iaglobal.metabolism.bucket_manager import BucketManager
+
+
+GLM4_MODEL_ID = get_model_config(CognitiveRole.JUIZ)["model_id"]
+LFM_MODEL_ID = get_model_config(CognitiveRole.SENTINELA)["model_id"]
+QWEN_MODEL_ID = get_model_config(CognitiveRole.OPERARIO)["model_id"]
+
+
+async def _ollama_glm4_async(prompt: str, **kwargs) -> str:
+    """Wrapper que roteia para o modelo Juiz (GLM4-1.2B)."""
+    kwargs.pop("model", None)
+    return await ollama_async_generate(prompt, model=GLM4_MODEL_ID, **kwargs)
+
+
+async def _ollama_lfm_async(prompt: str, **kwargs) -> str:
+    """Wrapper que roteia para o modelo Sentinela (LFM-230M)."""
+    kwargs.pop("model", None)
+    return await ollama_async_generate(prompt, model=LFM_MODEL_ID, **kwargs)
+
+
+class CognitiveRouter:
+    """Arbítrio de Custo Cognitivo — decide qual área do córtex ativar.
+
+    Separa a intenção da tarefa (task_type / node_id) da capacidade do
+    provedor.  O BucketManager (Passo 3) consumirá as mesmas chaves de
+    rota para controlar concorrência por tier.
+    """
+
+    ROUTE_MAP: dict[str, str] = {
+        # Layer 1 — Juiz (GLM4-1.2B): raciocínio profundo
+        "critic": "ollama_glm4",
+        "failure_analysis": "ollama_glm4",
+        "arbitrar_geracao": "ollama_glm4",
+        "pipeline.requirement_correction": "ollama_glm4",
+        "system_design": "ollama_glm4",
+        # Layer 2 — Operário (Qwen2.5-0.5B): geração e escrita
+        "coder": "ollama",
+        "multi_coder": "ollama",
+        "backend_builder": "ollama",
+        "frontend_builder": "ollama",
+        "database_builder": "ollama",
+        "api_builder": "ollama",
+        "planner": "ollama",
+        "pm": "ollama",
+        "requirements": "ollama",
+        "technology_selection": "ollama",
+        "enhancement": "ollama",
+        "doc_writer": "ollama",
+        "artifact_writer": "ollama",
+        "knowledge_writer": "ollama",
+        "deployment_plan": "ollama",
+        "task_breakdown": "ollama",
+        "documentation": "ollama",
+        # Layer 3 — Sentinela (LFM-230M): validação rápida
+        "sandbox_validator": "ollama_lfm",
+        "lsp_validator": "ollama_lfm",
+        "semantic_validator": "ollama_lfm",
+        "fix_validator": "ollama_lfm",
+        "security_audit": "ollama_lfm",
+        "performance_audit": "ollama_lfm",
+        "compliance_audit": "ollama_lfm",
+        "system_analysis": "ollama_lfm",
+        "metrics": "ollama_lfm",
+        "pipeline_updater": "ollama_lfm",
+        "evolution_trigger": "ollama_lfm",
+        "retrospective": "ollama_lfm",
+        "gap_analyzer": "ollama_lfm",
+        "evaluator": "ollama_lfm",
+        "memory_cleaner": "ollama_lfm",
+    }
+
+    ROUTE_TO_MODEL: dict[str, str] = {
+        "ollama_glm4": GLM4_MODEL_ID,
+        "ollama": QWEN_MODEL_ID,
+        "ollama_lfm": LFM_MODEL_ID,
+    }
+
+    @classmethod
+    def resolve_route(cls, node_id: str, task_type: str = "general") -> str:
+        """Retorna o nome da rota (ollama, ollama_glm4, ollama_lfm)."""
+        route = cls.ROUTE_MAP.get(node_id)
+        if route:
+            return route
+        # Heurística: validação vai para Sentinela, o resto para Operário
+        if "valid" in task_type or "audit" in task_type or "monitor" in task_type:
+            return "ollama_lfm"
+        return "ollama"
+
+    @classmethod
+    def resolve_model_id(cls, route: str) -> str:
+        """Retorna o model_id para uma rota."""
+        return cls.ROUTE_TO_MODEL.get(route, QWEN_MODEL_ID)
+
+    @classmethod
+    def get_route_config(cls, route: str) -> dict | None:
+        """Retorna a configuração metabólica completa de uma rota."""
+        role = get_role_by_model_id(cls.ROUTE_TO_MODEL.get(route, ""))
+        if role:
+            return get_model_config(role)
+        return None
+
+    @classmethod
+    def build_candidates(cls, route: str) -> list[str]:
+        """Monta lista de candidatos para o BanditPolicy a partir de uma rota.
+
+        Inclui fallback: se a rota principal falhar, tenta o fallback_role
+        definido no ProviderConfig.  Ex: juiz → operario.
+        """
+        candidates = [f"ollama/{cls.ROUTE_TO_MODEL.get(route, QWEN_MODEL_ID)}"]
+        config = cls.get_route_config(route)
+        if config and config.get("fallback_role"):
+            fallback_model = get_model_config(config["fallback_role"])["model_id"]
+            candidates.append(f"ollama/{fallback_model}")
+        return candidates
+
+
+# ── Cognitive Dispatch: Router + Bucket + Provider ──────────────────────
+# Integra o Tribunal Cognitivo (CognitiveRouter) com o Sistema Endócrino
+# (BucketManager) para executar uma inferência no tier correto, respeitando
+# os limites metabólicos e aplicando fallback se necessário.
+
+_ROUTE_TIMEOUT: dict[str, float] = {
+    "ollama_glm4": 2.0,   # Juiz: espera até 2s por slot
+    "ollama": 1.0,        # Operário: espera até 1s
+    "ollama_lfm": 0.5,    # Sentinela: espera curta, depois bypass
+}
+
+_ESTIMATED_TOKENS: dict[str, int] = {
+    "ollama_glm4": 2048,
+    "ollama": 1024,
+    "ollama_lfm": 512,
+}
+
+
+async def cognitive_dispatch(
+    node_id: str,
+    prompt: str,
+    task_type: str = "general",
+) -> str:
+    """Roteia uma requisição LLM pelo Tribunal Cognitivo completo.
+
+    1. CognitiveRouter.resolve_route(node_id, task_type) → nome da rota
+    2. BucketManager.acquire_with_fallback(route) → concede recurso
+    3. async_route_generate(model, prompt, ...) → executa
+    4. BucketManager.release() → libera slot
+
+    Se o Sentinela estiver exausto, o timeout curto (0.5s) faz o bypass
+    automático — o Operário processa sem validação prévia.
+    """
+    bucket_mgr = await BucketManager.get_instance()
+    route = CognitiveRouter.resolve_route(node_id, task_type)
+    route_timeout = _ROUTE_TIMEOUT.get(route, 0.5)
+    estimated = _ESTIMATED_TOKENS.get(route, 512)
+
+    granted_route = await bucket_mgr.acquire_with_fallback(
+        route,
+        estimated_tokens=estimated,
+        timeout=route_timeout,
+    )
+
+    if not granted_route:
+        # Todos os níveis exaustos — degradação graciosa:
+        # bypass completo, retorna fallback vazio.
+        logger.warning(
+            "[COGNITIVE] %s (%s): todos os tiers exaustos — bypass",
+            node_id, route,
+        )
+        return ""
+
+    try:
+        raw_model = CognitiveRouter.resolve_model_id(granted_route)
+        model = f"ollama/{raw_model}"
+        logger.info(
+            "[COGNITIVE] dispatch node=%s route=%s granted=%s model=%s",
+            node_id, route, granted_route, model,
+        )
+        result = await async_route_generate(
+            model=model, prompt=prompt,
+            task_type=task_type, node_id=node_id,
+        )
+        return result or ""
+    finally:
+        await bucket_mgr.release(granted_route)
 
 
 # Timeouts por provider (aumentados para evitar falhas prematuras)
 PROVIDER_TIMEOUT = {
     "ollama": 180,
+    "ollama_glm4": 300,
+    "ollama_lfm": 120,
     "groq": 60,
     "openrouter": 90,
     "nvidia": 120,
@@ -110,85 +289,40 @@ PROVIDER_TIMEOUT = {
     "hf_inference": 60,
 }
 
-PROVIDERS = {
-    "ollama": ollama_generate,
-    "groq": groq_generate,
-    "openrouter": openrouter_generate,
-    "nvidia": nvidia_generate,
-    "opencode": opencode_generate,
-    "gemini": gemini_generate,
-    "openai": openai_generate,
-    "hf_router": hf_router_generate,
-    "hf_router_qwen": hf_router_generate,
-    "hf_router_qwenext": hf_router_generate,
-    "hf_router_30b": hf_router_generate,
-    "hf_router_32b": hf_router_generate,
-    "hf_router_opus": hf_router_generate,
-    "hf_router_llama": hf_router_generate,
-    "hf_router_groq": hf_router_generate,
-    "hf_router_groq8": hf_router_generate,
-    "hf_router_hermes": hf_router_generate,
-    "hf_router_nemotron": hf_router_generate,
-    "hf_router_nemo2": hf_router_generate,
-    "hf_router_ultra": hf_router_generate,
-    "hf_router_oss": hf_router_generate,
-    "hf_router_oss2": hf_router_generate,
-    "hf_router_glm": hf_router_generate,
-    "hf_router_glm4": hf_router_generate,
-    "hf_router_glm5": hf_router_generate,
-    "hf_router_glm45": hf_router_generate,
-    "hf_router_glm5f": hf_router_generate,
-    "hf_router_phi4": hf_router_generate,
-    "hf_router_qwen36": hf_router_generate,
-    "hf_router_v4pro": hf_router_generate,
-    "hf_router_r1": hf_router_generate,
-    "hf_router_35": hf_router_generate,
-    "hf_router_amelia": hf_router_generate,
-    "hf_router_kimi": hf_router_generate,
-    "hf_router_minimax": hf_router_generate,
-}
+# Constrói PROVIDERS e ASYNC_PROVIDERS dinamicamente a partir do Registry
+# Aliases não-padrão (ollama_glm4, ollama_lfm, hf_router_*) são adicionados explicitamente.
+_HF_ROUTER_ALIASES = [
+    "hf_router_qwen", "hf_router_qwenext", "hf_router_30b", "hf_router_32b",
+    "hf_router_opus", "hf_router_llama", "hf_router_groq", "hf_router_groq8",
+    "hf_router_hermes", "hf_router_nemotron", "hf_router_nemo2",
+    "hf_router_ultra", "hf_router_oss", "hf_router_oss2",
+    "hf_router_glm", "hf_router_glm4", "hf_router_glm5", "hf_router_glm45",
+    "hf_router_glm5f", "hf_router_phi4", "hf_router_qwen36",
+    "hf_router_v4pro", "hf_router_r1", "hf_router_35",
+    "hf_router_amelia", "hf_router_kimi", "hf_router_minimax",
+]
 
-ASYNC_PROVIDERS = {
-    "ollama": ollama_async_generate,
-    "groq": groq_async_generate,
-    "openrouter": openrouter_async_generate,
-    "nvidia": nvidia_async_generate,
-    "opencode": opencode_async_generate,
-    "gemini": gemini_async_generate,
-    "poe": poe_async_generate,
-    "perplexity": perplexity_async_generate,
-    "openai": openai_async_generate,
-    "huggingchat": huggingchat_async_generate,
-    "hf_router": hf_router_async_generate,
-    "hf_video": hf_video_text_to_video_async,
-    "hf_router_qwen": hf_router_async_generate,
-    "hf_router_qwenext": hf_router_async_generate,
-    "hf_router_30b": hf_router_async_generate,
-    "hf_router_32b": hf_router_async_generate,
-    "hf_router_opus": hf_router_async_generate,
-    "hf_router_llama": hf_router_async_generate,
-    "hf_router_groq": hf_router_async_generate,
-    "hf_router_groq8": hf_router_async_generate,
-    "hf_router_hermes": hf_router_async_generate,
-    "hf_router_nemotron": hf_router_async_generate,
-    "hf_router_nemo2": hf_router_async_generate,
-    "hf_router_ultra": hf_router_async_generate,
-    "hf_router_oss": hf_router_async_generate,
-    "hf_router_oss2": hf_router_async_generate,
-    "hf_router_glm": hf_router_async_generate,
-    "hf_router_glm4": hf_router_async_generate,
-    "hf_router_glm5": hf_router_async_generate,
-    "hf_router_glm45": hf_router_async_generate,
-    "hf_router_glm5f": hf_router_async_generate,
-    "hf_router_phi4": hf_router_async_generate,
-    "hf_router_qwen36": hf_router_async_generate,
-    "hf_router_v4pro": hf_router_async_generate,
-    "hf_router_r1": hf_router_async_generate,
-    "hf_router_35": hf_router_async_generate,
-    "hf_router_amelia": hf_router_async_generate,
-    "hf_router_kimi": hf_router_async_generate,
-    "hf_router_minimax": hf_router_async_generate,
-}
+PROVIDERS: dict[str, Callable] = dict(registry.sync)
+ASYNC_PROVIDERS: dict[str, Callable] = dict(registry.async_)
+
+# Aliases sync — ollama_glm4/lfm + hf_router_*
+if "ollama" in PROVIDERS:
+    _o_sync = PROVIDERS["ollama"]
+    PROVIDERS.setdefault("ollama_glm4", lambda p, **k: _o_sync(p, model=GLM4_MODEL_ID, **k))
+    PROVIDERS.setdefault("ollama_lfm", lambda p, **k: _o_sync(p, model=LFM_MODEL_ID, **k))
+if "hf_router" in PROVIDERS:
+    _hfr_sync = PROVIDERS["hf_router"]
+    for _a in _HF_ROUTER_ALIASES:
+        PROVIDERS.setdefault(_a, _hfr_sync)
+
+# Aliases async — wrappers + hf_router_*
+if "ollama" in ASYNC_PROVIDERS:
+    ASYNC_PROVIDERS.setdefault("ollama_glm4", _ollama_glm4_async)
+    ASYNC_PROVIDERS.setdefault("ollama_lfm", _ollama_lfm_async)
+if "hf_router" in ASYNC_PROVIDERS:
+    _hfra = ASYNC_PROVIDERS["hf_router"]
+    for _a in _HF_ROUTER_ALIASES:
+        ASYNC_PROVIDERS.setdefault(_a, _hfra)
 
 
 # ==============================================================================
@@ -288,10 +422,34 @@ def _policy_candidates(task_type: str, node_id: str) -> List[Tuple[str, str]]:
     return cands
 
 
+def _provider_has_key(provider: str) -> bool:
+    """Verifica se um provider cloud tem API key configurada.
+    Providers locais (ollama) sempre retornam True.
+    """
+    if provider == "ollama":
+        return True
+    try:
+        from iaglobal.providers.provider_config import ProviderConfig
+        key_map = {
+            "groq": ProviderConfig.GROQ_API_KEY,
+            "nvidia": ProviderConfig.NVIDIA_API_KEY,
+            "openrouter": ProviderConfig.OPENROUTER_API_KEY,
+            "gemini": ProviderConfig.GEMINI_API_KEY,
+            "poe": ProviderConfig.POE_API_KEY,
+            "opencode": ProviderConfig.OPENCODE_API_KEY,
+            "perplexity": ProviderConfig.PERPLEXITY_API_KEY,
+            "hf_router": ProviderConfig.HUGGINGFACE_API_KEY,
+        }
+        return bool(key_map.get(provider))
+    except Exception:
+        return False
+
+
 def CREDIT_CANDIDATES(task_type: str = "general"):
     """Retorna modelos candidatos baseados no tipo de tarefa.
 
     task_type: "general", "image", "video", "code", etc.
+    Filtra providers cloud que não têm API key configurada.
     """
     if task_type == "image":
         return [
@@ -304,11 +462,12 @@ def CREDIT_CANDIDATES(task_type: str = "general"):
             ("hf_video", "hf_video/ltx"),
             ("hf_video", "hf_video/hunyuan"),
         ]
-    return [
+    candidates = [
         ("groq", "groq/llama-3.3-70b-versatile"),
         ("nvidia", "nvidia/mistralai/mistral-large-3-675b-instruct-2512"),
         ("ollama", "ollama/qwen2.5:0.5b"),
     ]
+    return [(p, m) for p, m in candidates if _provider_has_key(p)]
 
 
 _credit = None  # Inicializado lazy em _get_credit() para usar singleton do Bandit

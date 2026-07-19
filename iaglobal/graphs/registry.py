@@ -70,6 +70,7 @@ NODE_REGISTRY: dict = {
     "evolution_trigger": lambda: create_skill_node("evolution_trigger"),
     "system_analysis": lambda: create_skill_node("system_analysis"),
     "lsp_validator": lambda: create_skill_node("lsp_validator"),
+    "validator_retry": lambda: create_skill_node("validator_retry"),
     "debug_unificado": lambda: create_skill_node("debug_unificado"),
 }
 

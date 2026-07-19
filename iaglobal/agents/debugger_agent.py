@@ -64,6 +64,7 @@ class DebuggerAgent(AgentBase):
         max_attempts: int = 3,
         enable_self_healing: bool = True,
     ):
+        super().__init__(agent_name="debugger")
         self.max_attempts = max_attempts
         self.enable_self_healing = enable_self_healing
         self._self_critique_count = 0

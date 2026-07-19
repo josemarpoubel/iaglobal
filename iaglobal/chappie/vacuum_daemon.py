@@ -146,14 +146,14 @@ class VacuumDaemon:
         while self._running:
             try:
                 # Verifica IVM do sistema antes de executar
-                # ivm_ok = await self._verificar_ivm_sistema()
-                # if not ivm_ok:
-                #     logger.warning(
-                #         "[VacuumDaemon] IVM abaixo do threshold (%.2f). Aguardando.",
-                #         self.ivm_threshold,
-                #     )
-                #     await asyncio.sleep(300)  # Aguarda 5 min
-                #     continue
+                ivm_ok = await self._verificar_ivm_sistema()
+                if not ivm_ok:
+                    logger.warning(
+                        "[VacuumDaemon] IVM abaixo do threshold (%.2f). Aguardando 5 min.",
+                        self.ivm_threshold,
+                    )
+                    await asyncio.sleep(300)
+                    continue
 
                 # Executa consolidação
                 await self.consolidar_uma_vez()
@@ -174,22 +174,23 @@ class VacuumDaemon:
                     "[VacuumDaemon] Erro no loop: %s. Reiniciando em 60s.", e
                 )
                 self._total_errors += 1
-                await asyncio.sleep(60)  # Aguarda 1 min antes de重试
+                await asyncio.sleep(60)
 
     async def _verificar_ivm_sistema(self) -> bool:
-        """Verifica se o IVM do sistema está acima do threshold.
+        """Verifica se o IVM do sistema está acima do threshold via JOL."""
+        try:
+            from iaglobal.metabolism.joint_optimization import joint_optimization_loop
 
-        TODO: Implementar integração com JointOptimizationLoop
-        para obter IVM global do sistema.
-
-        Por enquanto, retorna True (sempre executa).
-        """
-        # Implementação futura:
-        # from iaglobal.metabolism.ivm_calculator import IVMMonitor
-        # ivm = await IVMMonitor.get_global_ivm()
-        # return ivm >= self.ivm_threshold
-
-        return True  # Default: sempre executa
+            ivm = await joint_optimization_loop.get_global_ivm()
+            logger.info(
+                "[VacuumDaemon] IVM global via JOL: %.4f (threshold=%.2f)",
+                ivm,
+                self.ivm_threshold,
+            )
+            return ivm >= self.ivm_threshold
+        except Exception as e:
+            logger.debug("[VacuumDaemon] JOL não disponível: %s — assumindo True", e)
+            return True
 
     def get_status(self) -> Dict[str, Any]:
         """Retorna status atual do daemon."""

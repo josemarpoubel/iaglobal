@@ -14,6 +14,10 @@ class ASTResult:
     tree: Optional[ast.AST]
     errors: List[str]
     metadata: List[Dict[str, Any]] = field(default_factory=list)
+    error_type: Optional[str] = None
+    error_line: Optional[int] = None
+    error_snippet: Optional[str] = None
+    fix_hint: Optional[str] = None
 
 
 class ASTGateway:
@@ -39,7 +43,7 @@ class ASTGateway:
         """
 
         if not code or not code.strip():
-            return ASTResult(False, None, ["Empty code"], [])
+            return ASTResult(False, None, ["Empty code"], [], error_type="EmptyCode", fix_hint="Forneça código Python válido para análise")
 
         try:
             tree = ast.parse(code, mode=mode)
@@ -49,13 +53,33 @@ class ASTGateway:
             if violations:
                 errors = [v["message"] for v in violations]
                 logger.warning(f"AST BLOCKED: {errors}")
-                return ASTResult(False, tree, errors, violations)
+                first_v = violations[0]
+                return ASTResult(
+                    valid=False,
+                    tree=tree,
+                    errors=errors,
+                    metadata=violations,
+                    error_type=first_v.get("type", "Violation"),
+                    error_line=first_v.get("line"),
+                    error_snippet=None,
+                    fix_hint=first_v.get("suggestion"),
+                )
 
             return ASTResult(True, tree, [], [])
 
         except SyntaxError as e:
             logger.error(f"Syntax error: {e}")
-            return ASTResult(False, None, [str(e)], [])
+            hint = self._syntax_fix_hint(e)
+            return ASTResult(
+                valid=False,
+                tree=None,
+                errors=[str(e)],
+                metadata=[],
+                error_type=type(e).__name__,
+                error_line=getattr(e, "lineno", None),
+                error_snippet=getattr(e, "text", None),
+                fix_hint=hint,
+            )
 
     def validate(self, code: str) -> ASTResult:
         return self.parse(code)
@@ -71,6 +95,23 @@ class ASTGateway:
             "col_offset": getattr(node, "col_offset", 0),
             "suggestion": suggestion,
         }
+
+    @staticmethod
+    def _syntax_fix_hint(e: SyntaxError) -> str:
+        msg = e.msg or ""
+        text = (e.text or "").strip()
+        if "leading zeros" in msg or "invalid decimal literal" in msg:
+            match = __import__("re").search(r"0+(\d+)", text)
+            if match:
+                return f"Python 3 não aceita inteiros com zero à esquerda. Substitua '{match.group(0)}' por '{match.group(1)}'"
+            return "Remova zeros à esquerda de literais inteiros"
+        if "invalid syntax" in msg:
+            return "Verifique parênteses, colchetes e dois-pontos na linha indicada"
+        if "unindent" in msg.lower() or "indent" in msg.lower() or "IndentationError" in type(e).__name__:
+            return "Verifique indentação — tabs e espaços podem estar misturados. Use indentação uniforme (4 espaços)"
+        if "expected an indented block" in msg:
+            return "Adicione um bloco indentado após a definição da função/classe"
+        return f"Erro de sintaxe: {msg}"
 
     def _scan(self, tree: ast.AST) -> List[Dict[str, Any]]:
         violations: List[Dict[str, Any]] = []

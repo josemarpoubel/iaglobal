@@ -222,11 +222,19 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
     ("qa", {"strategy": "general", "depends_on": ["integrator"]}),
     ("tester", {"strategy": "general", "critical": True, "depends_on": ["qa"]}),
     (
+        "validator_retry",
+        {
+            "strategy": "fast",
+            "critical": True,
+            "depends_on": ["lsp_validator"],
+        },
+    ),
+    (
         "debug_unificado",
         {
             "strategy": "general",
             "critical": True,
-            "depends_on": ["tester", "lsp_validator"],
+            "depends_on": ["tester", "validator_retry"],
         },
     ),
     ("fix_validator", {"strategy": "general", "depends_on": ["debug_unificado"]}),

@@ -1,0 +1,687 @@
+{
+  "revoked": {
+    "reflexion": 0.0,
+    "coder": 0.0,
+    "executor": 0.0,
+    "evo_agent": 0.0,
+    "": 0.0,
+    "agent_0": 0.0,
+    "agent_5": 0.0,
+    "agent_2": 0.0,
+    "agent_4": 0.0,
+    "agent_3": 0.0,
+    "agent_6": 0.0,
+    "agent_7": 0.0,
+    "agent_8": 0.0,
+    "agent_9": 0.0,
+    "__test_sync__": 0.0,
+    "agent_1": 0.0
+  },
+  "revocation_history": [
+    {
+      "node": "reflexion",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.4676347,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "coder",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.4800448,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "executor",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.492494,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "evo_agent",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.5039334,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.515844,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "reflexion",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.5397625,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "executor",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.5535362,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "evo_agent",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.5675745,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344587.58085,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "reflexion",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.5544574,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "coder",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.5715468,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "executor",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.5874686,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "evo_agent",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.6003318,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.6128836,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "reflexion",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.6314154,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "executor",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.6459928,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "evo_agent",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.6594033,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344636.6721573,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_0",
+      "reason": "Apoptose contratual: Thread 0 violou contrato",
+      "timestamp": 1784344636.9070683,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_5",
+      "reason": "Apoptose contratual: Thread 5 violou contrato",
+      "timestamp": 1784344636.9084156,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_2",
+      "reason": "Apoptose contratual: Thread 2 violou contrato",
+      "timestamp": 1784344636.9102921,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_4",
+      "reason": "Apoptose contratual: Thread 4 violou contrato",
+      "timestamp": 1784344636.9119763,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_3",
+      "reason": "Apoptose contratual: Thread 3 violou contrato",
+      "timestamp": 1784344636.9131567,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_6",
+      "reason": "Apoptose contratual: Thread 6 violou contrato",
+      "timestamp": 1784344636.914506,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_7",
+      "reason": "Apoptose contratual: Thread 7 violou contrato",
+      "timestamp": 1784344636.9158466,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_8",
+      "reason": "Apoptose contratual: Thread 8 violou contrato",
+      "timestamp": 1784344636.917153,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_9",
+      "reason": "Apoptose contratual: Thread 9 violou contrato",
+      "timestamp": 1784344636.9176552,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "__test_sync__",
+      "reason": "Apoptose contratual: teste",
+      "timestamp": 1784344637.6138124,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "reflexion",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.8024285,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "coder",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.8153872,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "executor",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.8283243,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "evo_agent",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.842437,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.8570893,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "reflexion",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.877117,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "executor",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.891594,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "evo_agent",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.9061952,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "",
+      "reason": "Apoptose contratual: PSC: acesso cloud sem autorizacao do CriticAgent",
+      "timestamp": 1784344688.920558,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_1",
+      "reason": "Apoptose contratual: Thread 1 violou contrato",
+      "timestamp": 1784344689.1903317,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_0",
+      "reason": "Apoptose contratual: Thread 0 violou contrato",
+      "timestamp": 1784344689.1918242,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_3",
+      "reason": "Apoptose contratual: Thread 3 violou contrato",
+      "timestamp": 1784344689.194209,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_5",
+      "reason": "Apoptose contratual: Thread 5 violou contrato",
+      "timestamp": 1784344689.1954765,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_4",
+      "reason": "Apoptose contratual: Thread 4 violou contrato",
+      "timestamp": 1784344689.1972039,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_7",
+      "reason": "Apoptose contratual: Thread 7 violou contrato",
+      "timestamp": 1784344689.1983209,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_6",
+      "reason": "Apoptose contratual: Thread 6 violou contrato",
+      "timestamp": 1784344689.1998467,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_8",
+      "reason": "Apoptose contratual: Thread 8 violou contrato",
+      "timestamp": 1784344689.2009768,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_9",
+      "reason": "Apoptose contratual: Thread 9 violou contrato",
+      "timestamp": 1784344689.2017057,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "__test_sync__",
+      "reason": "Apoptose contratual: teste",
+      "timestamp": 1784344689.9028618,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "__test_sync__",
+      "reason": "Apoptose contratual: teste",
+      "timestamp": 1784379842.719278,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "__test_sync__",
+      "reason": "Apoptose contratual: teste",
+      "timestamp": 1784379896.8288438,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "__test_sync__",
+      "reason": "Apoptose contratual: teste",
+      "timestamp": 1784380455.3426986,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_1",
+      "reason": "Apoptose contratual: Thread 1 violou contrato",
+      "timestamp": 1784383930.6747937,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_2",
+      "reason": "Apoptose contratual: Thread 2 violou contrato",
+      "timestamp": 1784383930.676575,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_4",
+      "reason": "Apoptose contratual: Thread 4 violou contrato",
+      "timestamp": 1784383930.6783037,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_6",
+      "reason": "Apoptose contratual: Thread 6 violou contrato",
+      "timestamp": 1784383930.6798434,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_7",
+      "reason": "Apoptose contratual: Thread 7 violou contrato",
+      "timestamp": 1784383930.6833405,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_8",
+      "reason": "Apoptose contratual: Thread 8 violou contrato",
+      "timestamp": 1784383930.6857336,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_9",
+      "reason": "Apoptose contratual: Thread 9 violou contrato",
+      "timestamp": 1784383930.6863723,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_1",
+      "reason": "Apoptose contratual: Thread 1 violou contrato",
+      "timestamp": 1784384531.026644,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_0",
+      "reason": "Apoptose contratual: Thread 0 violou contrato",
+      "timestamp": 1784384531.0280483,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_2",
+      "reason": "Apoptose contratual: Thread 2 violou contrato",
+      "timestamp": 1784384531.0305882,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_3",
+      "reason": "Apoptose contratual: Thread 3 violou contrato",
+      "timestamp": 1784384531.0328493,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_4",
+      "reason": "Apoptose contratual: Thread 4 violou contrato",
+      "timestamp": 1784384531.0338383,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_6",
+      "reason": "Apoptose contratual: Thread 6 violou contrato",
+      "timestamp": 1784384531.0353725,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_7",
+      "reason": "Apoptose contratual: Thread 7 violou contrato",
+      "timestamp": 1784384531.0372431,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_8",
+      "reason": "Apoptose contratual: Thread 8 violou contrato",
+      "timestamp": 1784384531.0392044,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_9",
+      "reason": "Apoptose contratual: Thread 9 violou contrato",
+      "timestamp": 1784384531.0402832,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_0",
+      "reason": "Apoptose contratual: Thread 0 violou contrato",
+      "timestamp": 1784384705.130074,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_1",
+      "reason": "Apoptose contratual: Thread 1 violou contrato",
+      "timestamp": 1784384705.1328743,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_2",
+      "reason": "Apoptose contratual: Thread 2 violou contrato",
+      "timestamp": 1784384705.1349435,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_3",
+      "reason": "Apoptose contratual: Thread 3 violou contrato",
+      "timestamp": 1784384705.1411932,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_5",
+      "reason": "Apoptose contratual: Thread 5 violou contrato",
+      "timestamp": 1784384705.1433542,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_6",
+      "reason": "Apoptose contratual: Thread 6 violou contrato",
+      "timestamp": 1784384705.1449564,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_7",
+      "reason": "Apoptose contratual: Thread 7 violou contrato",
+      "timestamp": 1784384705.1460423,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_8",
+      "reason": "Apoptose contratual: Thread 8 violou contrato",
+      "timestamp": 1784384705.1472282,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_9",
+      "reason": "Apoptose contratual: Thread 9 violou contrato",
+      "timestamp": 1784384705.1487334,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_0",
+      "reason": "Apoptose contratual: Thread 0 violou contrato",
+      "timestamp": 1784385133.5663595,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_1",
+      "reason": "Apoptose contratual: Thread 1 violou contrato",
+      "timestamp": 1784385133.5674014,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_2",
+      "reason": "Apoptose contratual: Thread 2 violou contrato",
+      "timestamp": 1784385133.5712876,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_3",
+      "reason": "Apoptose contratual: Thread 3 violou contrato",
+      "timestamp": 1784385133.5725138,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_4",
+      "reason": "Apoptose contratual: Thread 4 violou contrato",
+      "timestamp": 1784385133.5737524,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_5",
+      "reason": "Apoptose contratual: Thread 5 violou contrato",
+      "timestamp": 1784385133.5759661,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_8",
+      "reason": "Apoptose contratual: Thread 8 violou contrato",
+      "timestamp": 1784385133.5786939,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_7",
+      "reason": "Apoptose contratual: Thread 7 violou contrato",
+      "timestamp": 1784385133.5804513,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    }
+  ],
+  "last_updated": 1784385133.580456
+}

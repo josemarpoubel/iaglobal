@@ -1,3 +1,6 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+
+import asyncio
 import logging
 import time
 from typing import Any, Dict
@@ -49,7 +52,8 @@ class EvolutionTrigger:
                 triggered = False
                 reason = f"SAMe insuficiente — evolução bloqueada (saldo: {same_pool.balance('evolution_trigger')})"
             else:
-                same_pool.spend("evolution_trigger", COST_CREATE_SKILL)
+                # Executa em thread para não bloquear o event loop com fcntl.flock
+                await asyncio.to_thread(same_pool.spend, "evolution_trigger", COST_CREATE_SKILL)
                 same_used = COST_CREATE_SKILL
                 try:
                     graph = ctx.get("graph")
@@ -77,10 +81,12 @@ class EvolutionTrigger:
 
                     before = score or 0.0
                     after = PipelineEvaluator._last_score or before
-                    meta_evolver.record_trial(
-                        params=EvolutionParams(),
-                        improvement=after - before,
-                        task_type=task or "general",
+                    # Executa em thread para não bloquear o event loop com fcntl.flock
+                    await asyncio.to_thread(
+                        meta_evolver.record_trial,
+                        EvolutionParams(),
+                        after - before,
+                        task or "general",
                     )
                     cls._record_outcome(ctx, score, True, reason)
                 except Exception as e:
@@ -90,7 +96,8 @@ class EvolutionTrigger:
                     reason = f"Falha na evolução: {e}"
 
         if score >= 70:
-            same_pool.recharge("evolution_trigger")
+            # Executa em thread para não bloquear o event loop com fcntl.flock
+            await asyncio.to_thread(same_pool.recharge, "evolution_trigger")
             logger.info(
                 "[EVO-TRIGGER] SAMe recarregado (+%d) para evolution_trigger",
                 RECHARGE_RATE,

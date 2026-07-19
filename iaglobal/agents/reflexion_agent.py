@@ -397,6 +397,7 @@ class ReflexionAgent(AgentBase):
         config: Optional[ReflexionConfig] = None,
         templates: Optional[type[PromptTemplates]] = None,
     ) -> None:
+        super().__init__(agent_name="reflexion")
         self._gateway: LLMGatewayProtocol = gateway or ProviderLLMGateway()
         self._config = config or ReflexionConfig()
         self._templates = templates or PromptTemplates

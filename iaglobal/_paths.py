@@ -333,6 +333,27 @@ def _detect_extension(code: str, task: str = "") -> str:
     return ".txt"
 
 
+def _safe_relative_path(base_dir: Path, user_path: str) -> Path:
+    """Resolve *user_path* relativo a *base_dir* e bloqueia path traversal.
+
+    Um `filepath` como ``"../../etc/passwd"`` é rejeitado porque o caminho
+    resolvido estaria fora de *base_dir*.
+
+    Raises:
+        PermissionError: se o caminho resolvido escapar de *base_dir*.
+    """
+    base = base_dir.resolve()
+    full = (base / user_path).resolve()
+    try:
+        full.relative_to(base)
+    except ValueError:
+        raise PermissionError(
+            f"Path traversal bloqueado: '{user_path}' -> {full} "
+            f"(fora de {base})"
+        )
+    return full
+
+
 def save_result_artifact(task: str, files: dict, code: str = "") -> Path:
     """Salva arquivos gerados no próximo diretório de projeto sequencial."""
     project_dir = next_project_dir()
@@ -345,14 +366,15 @@ def save_result_artifact(task: str, files: dict, code: str = "") -> Path:
     with open(project_dir / "metadata.json", "w") as f:
         json.dump(metadata, f, indent=2, ensure_ascii=False)
     for filepath, content in files.items():
-        full_path = project_dir / filepath
+        full_path = _safe_relative_path(project_dir, filepath)
         full_path.parent.mkdir(parents=True, exist_ok=True)
         with open(full_path, "w") as f:
             f.write(content)
     if code and not files:
         ext = _detect_extension(code, task)
         output_name = f"output{ext}"
-        with open(project_dir / output_name, "w") as f:
+        output_path = project_dir / output_name
+        with open(output_path, "w", encoding="utf-8") as f:
             f.write(code)
     return project_dir
 

@@ -19,6 +19,45 @@ PATTERNS = {
     "api_error": r"401|403|404|500|Unauthorized|Forbidden|Rate limit|quota",
 }
 
+# Mapa de requisitos funcionais extraídos do prompt → verificações no código gerado.
+# Cada chave é uma palavra-chave do prompt; aliases são sinônimos.
+# Cada check é uma tupla (nome, regex_pattern, hint_de_correcao).
+# Se OBRIGATÓRIO for True, a ausência do padrão é sempre reportada como violação.
+# Se OBRIGATÓRIO for False (default), a violação só é reportada se a tecnologia
+# alvo (ex: html) estiver presente no código gerado.
+REQUIREMENT_CHECKS: dict[str, list[dict]] = {
+    "autenticação": [
+        {"name": "password_input", "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate', "hint": "Implemente campo de senha ou rota de login", "mandatory": True},
+    ],
+    "autenticacao": [  # sem acento
+        {"name": "password_input", "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate', "hint": "Implemente campo de senha ou rota de login", "mandatory": True},
+    ],
+    "login": [
+        {"name": "password_input", "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate', "hint": "Implemente campo de senha ou rota de login", "mandatory": True},
+    ],
+    "tema escuro": [
+        {"name": "dark_background", "pattern": r'background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)', "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)", "mandatory": False},
+    ],
+    "dark theme": [
+        {"name": "dark_background", "pattern": r'background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)', "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)", "mandatory": False},
+    ],
+    "dark mode": [
+        {"name": "dark_background", "pattern": r'background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)', "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)", "mandatory": False},
+    ],
+        "python": [
+        {"name": "python_code", "pattern": r'^(import |from |def |class |@|#)', "hint": "A tecnologia principal solicitada foi Python, mas o código gerado está em outra linguagem", "mandatory": False, "check_language": "py"},
+    ],
+    "flask": [
+        {"name": "flask_import", "pattern": r'from flask import|import flask|Flask\(', "hint": "Implemente a aplicação usando Flask (from flask import Flask)", "mandatory": True},
+    ],
+    "django": [
+        {"name": "django_import", "pattern": r'django|from django|import django', "hint": "Implemente a aplicação usando Django", "mandatory": True},
+    ],
+    "fastapi": [
+        {"name": "fastapi_import", "pattern": r'from fastapi|import fastapi|FastAPI\(', "hint": "Implemente a API usando FastAPI", "mandatory": True},
+    ],
+}
+
 _ERRORS_PATH = JSON_DIR / "errors.json"
 _METRICS_PATH = PROVIDER_METRICS_DIR / "metrics.jsonl"
 _LOG_PATH = LOG_DIR / "app.log"
@@ -27,6 +66,9 @@ _RESULTS_DIR = ERROR_DIR
 
 class FailureAnalysisAgent(AgentBase):
     """Analisa logs de falha, dados reais do sistema e métricas de provedores."""
+
+    def __init__(self):
+        super().__init__(agent_name="failure_analysis")
 
     @classmethod
     def collect_system_data(cls) -> Dict[str, Any]:
@@ -214,6 +256,80 @@ class FailureAnalysisAgent(AgentBase):
             return {"error": str(e)}
 
     @classmethod
+    def check_requirements(
+        cls, prompt: str, code: str
+    ) -> tuple[list[dict], list[dict]]:
+        """Varre o prompt em busca de requisitos funcionais e verifica se o código os atende.
+
+        Returns:
+            (violations, guardrails): lista de violações e sugestões de guardrail.
+        """
+        if not prompt or not code:
+            return [], []
+
+        prompt_lower = prompt.lower()
+        violations: list[dict] = []
+        guardrails: list[dict] = []
+
+        detected_langs = set()
+        if re.search(r'\.py["\']|^import |^from |def |class |if __name__', code, re.MULTILINE):
+            detected_langs.add("py")
+        if re.search(r'<html|<head|<body|<!DOCTYPE|<style|<script', code, re.IGNORECASE):
+            detected_langs.add("html")
+        if re.search(r'\.js["\']|function |const |let |var |=>|document\.', code):
+            detected_langs.add("js")
+
+        for keyword, checks in REQUIREMENT_CHECKS.items():
+            if keyword not in prompt_lower:
+                continue
+
+            for check in checks:
+                name = check["name"]
+                mandatory = check.get("mandatory", False)
+                pattern = check["pattern"]
+                hint = check["hint"]
+                check_lang = check.get("check_language", "")
+
+                if check_lang:
+                    if check_lang not in detected_langs:
+                        violations.append({
+                            "category": "functional_gap",
+                            "requirement": keyword,
+                            "check": name,
+                            "detail": f"Requisito '{keyword}' espera código {check_lang}, mas o gerado é {'/'.join(sorted(detected_langs)) or 'desconhecido'}",
+                            "hint": hint,
+                        })
+                        guardrails.append({
+                            "type": "language_enforcer",
+                            "rule": f"force_{check_lang}_for_{keyword}",
+                            "description": hint,
+                        })
+                        continue
+                    # Linguagem correta — pula verificação de regex (já satisfeita)
+                    continue
+
+                if re.search(pattern, code, re.IGNORECASE):
+                    continue
+
+                # Violação: padrão não encontrado
+                severity = "crítica" if mandatory else "leve"
+                violations.append({
+                    "category": "functional_gap",
+                    "requirement": keyword,
+                    "check": name,
+                    "detail": f"Requisito '{keyword}' não satisfeito: esperava '{name}' (severidade {severity})",
+                    "hint": hint,
+                    "mandatory": mandatory,
+                })
+                guardrails.append({
+                    "type": "requirement_enforcer",
+                    "rule": f"enforce_{name}_for_{keyword}",
+                    "description": hint,
+                })
+
+        return violations, guardrails
+
+    @classmethod
     def analyze(
         cls, error_log: str, prompt: str = "", code: str = ""
     ) -> Dict[str, Any]:
@@ -264,11 +380,21 @@ class FailureAnalysisAgent(AgentBase):
                         }
                     )
 
+        # Verificação de requisitos funcionais (mesmo sem erro de runtime)
+        req_violations, req_guardrails = cls.check_requirements(prompt, code)
+        findings.extend(req_violations)
+        guardrail_suggestions.extend(req_guardrails)
+
+        error_type = "functional_gap" if req_violations else (
+            findings[0]["category"] if findings else "clean"
+        )
+
         return {
-            "error_type": findings[0]["category"] if findings else "unknown",
+            "error_type": error_type,
             "findings": findings,
             "suggestion_count": len(guardrail_suggestions),
             "guardrail_suggestions": guardrail_suggestions,
+            "requirement_violations": req_violations,
         }
 
     @classmethod

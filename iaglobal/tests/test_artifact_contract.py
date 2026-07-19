@@ -161,8 +161,9 @@ class TestAgentCooperationContract:
 
         assert inspect.iscoroutinefunction(agent.generate)
 
+class TestPipelineEngineSaveScript:
     def test_pipeline_engine_save_script_escreve_em_result(self):
-        """PipelineEngine._save_script deve salvar em memory/data/result/."""
+        """PipelineEngine._save_script deve salvar via save_result_artifact e retornar o path do arquivo."""
         from unittest.mock import MagicMock
         from iaglobal.pipeline.engine import PipelineEngine
         from iaglobal.pipeline.pipelinestate import PipelineState
@@ -171,13 +172,14 @@ class TestAgentCooperationContract:
         state = PipelineState(
             task_id="test-001",
             prompt="teste",
-            generated_code="def hello():\n    print('hi')\n",
+            generated_code="def hello():\n print('hi')\n",
         )
         result_path = engine._save_script(state)
         assert result_path is not None
         assert result_path.exists()
+        assert result_path.is_file()
         assert result_path.suffix == ".py"
-        result_path.unlink(missing_ok=True)
-        result_in_result = RESULTS_DIR / result_path.name
-        if result_in_result.exists():
-            result_in_result.unlink(missing_ok=True)
+        assert "project" in str(result_path.parent.name)
+        assert result_path.name == "output.py"
+        import shutil
+        shutil.rmtree(result_path.parent, ignore_errors=True)

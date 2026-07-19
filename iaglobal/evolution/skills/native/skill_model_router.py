@@ -138,6 +138,10 @@ class SkillModelRouter:
             result = await call_ollama(...)
     """
 
+    WEIGHT_PRECISION = 0.6
+    WEIGHT_LATENCY = 0.2
+    WEIGHT_COST = 0.2
+
     def __init__(self, cache_size: int = 1024):
         self.metrics = RouterMetrics()
         self._decision_cache = lru_cache(maxsize=cache_size)(
@@ -151,9 +155,9 @@ class SkillModelRouter:
         self, precision: float, latency_ms: float, token_cost: float
     ) -> float:
         return (
-            (precision * self.WEIGHT_PRECISION)
-            - (latency_ms / 1000.0 * self.WEIGHT_LATENCY)
-            - (token_cost * self.WEIGHT_COST)
+            (precision * SkillModelRouter.WEIGHT_PRECISION)
+            - (latency_ms / 1000.0 * SkillModelRouter.WEIGHT_LATENCY)
+            - (token_cost * SkillModelRouter.WEIGHT_COST)
         )
 
     def _hash_task(self, task: str, ivm: float) -> str:

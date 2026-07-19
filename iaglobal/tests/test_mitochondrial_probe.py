@@ -13,9 +13,9 @@ def fresh_probe():
 
 
 async def test_probe_detects_hypoxia(fresh_probe):
-    """Sonda detecta hipóxia quando lag > 50ms."""
+    """Sonda detecta hipóxia quando lag > threshold."""
     # Simula hipóxia diretamente (sem mock complexo)
-    fresh_probe.current_lag = 0.06  # 60ms
+    fresh_probe.current_lag = fresh_probe.HYPOXIA_THRESHOLD_SECONDS + 0.01  # 10ms acima do threshold
     fresh_probe.hypoxia_detected = False
 
     # Verifica que estado inicial é saudável
@@ -32,7 +32,7 @@ async def test_probe_recovers_from_hypoxia(fresh_probe):
     """Sonda detecta recuperação quando lag volta ao normal."""
     # Estado inicial: hipóxia
     fresh_probe.hypoxia_detected = True
-    fresh_probe.current_lag = 0.07  # 70ms
+    fresh_probe.current_lag = fresh_probe.HYPOXIA_THRESHOLD_SECONDS + 0.02  # acima do threshold
 
     # Simula recuperação
     fresh_probe.current_lag = 0.005  # 5ms (normal)
@@ -40,7 +40,7 @@ async def test_probe_recovers_from_hypoxia(fresh_probe):
         fresh_probe.hypoxia_detected = False
 
     assert fresh_probe.hypoxia_detected is False
-    assert fresh_probe.current_lag < 0.05
+    assert fresh_probe.current_lag < fresh_probe.HYPOXIA_THRESHOLD_SECONDS
 
 
 def test_get_health_status_healthy(fresh_probe):
@@ -53,19 +53,20 @@ def test_get_health_status_healthy(fresh_probe):
     assert status["status"] == "healthy"
     assert status["hypoxia_detected"] is False
     assert status["current_lag_ms"] == 10.0
-    assert status["threshold_ms"] == 50.0
+    assert status["threshold_ms"] == fresh_probe.HYPOXIA_THRESHOLD_SECONDS * 1000
 
 
 def test_get_health_status_hypoxic(fresh_probe):
     """Retorna status hypoxic quando hipóxia detectada."""
-    fresh_probe.current_lag = 0.07  # 70ms (hipóxia)
+    fresh_probe.current_lag = fresh_probe.HYPOXIA_THRESHOLD_SECONDS + 0.02
     fresh_probe.hypoxia_detected = True
 
     status = fresh_probe.get_health_status()
 
     assert status["status"] == "hypoxic"
     assert status["hypoxia_detected"] is True
-    assert status["current_lag_ms"] == 70.0
+    expected_lag_ms = (fresh_probe.HYPOXIA_THRESHOLD_SECONDS + 0.02) * 1000
+    assert status["current_lag_ms"] == pytest.approx(expected_lag_ms)
 
 
 async def test_register_alosteric_inhibitor(fresh_probe):
@@ -113,10 +114,10 @@ async def test_singleton_global():
 
 
 def test_probe_constants_are_reasonable(fresh_probe):
-    """Constantes da sonda têm valores razoáveis."""
-    assert fresh_probe.HYPOXIA_THRESHOLD_SECONDS == 0.05  # 50ms
+    """Constantes da sonda têm valores razoáveis para 4-core CPU."""
+    assert fresh_probe.HYPOXIA_THRESHOLD_SECONDS == 0.25  # 250ms
     assert fresh_probe.MONITOR_INTERVAL_SECONDS == 1.0  # 1s
     assert fresh_probe.PROBE_SLEEP_SECONDS == 0.01  # 10ms
 
-    # Threshold de 50ms é razoável para detecção precoce
-    assert 0.01 <= fresh_probe.HYPOXIA_THRESHOLD_SECONDS <= 0.1
+    # Threshold de 250ms é apropriado para hardware 4-core sem GPU
+    assert 0.1 <= fresh_probe.HYPOXIA_THRESHOLD_SECONDS <= 0.5

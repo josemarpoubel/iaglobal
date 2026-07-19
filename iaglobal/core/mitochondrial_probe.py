@@ -40,7 +40,7 @@ class MitochondrialProbe:
     """
 
     # Thresholds de Hipóxia
-    HYPOXIA_THRESHOLD_SECONDS = 0.05  # 50ms (início de colapso)
+    HYPOXIA_THRESHOLD_SECONDS = 0.25  # 250ms (hardware 4-core CPU, evita falso-positivo em startup spike)
     MONITOR_INTERVAL_SECONDS = 1.0  # Monitora a cada 1 segundo
     PROBE_SLEEP_SECONDS = 0.01  # 10ms (yield mínimo ao loop)
 

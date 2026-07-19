@@ -1472,6 +1472,7 @@ class PerformanceDesignAgent(AgentBase):
         mta_recycler: Optional[Any] = None,
         same_engine: Optional[Any] = None,
     ):
+        super().__init__(agent_name="performance_design")
         self._mta = mta_recycler
         self._same = same_engine
 

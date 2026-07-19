@@ -7,7 +7,7 @@ import hashlib
 import threading
 
 
-from typing import Dict, Any, Optional, Set
+from typing import Dict, Any, Optional, Set, Tuple
 
 from iaglobal.utils.logger import logger
 from iaglobal.utils.hash_utils import LineageID
@@ -34,6 +34,9 @@ from iaglobal.graphs.comms.acetylcholine_bus import (
     AgentMessage,
 )
 from iaglobal.sandbox.sandbox_expansion import sandbox_expansion
+from iaglobal.graphs.contracts.node_contract import MissingContextError
+from iaglobal.graphs.recovery import RecoveryPolicy, RecoveryDecision, RecoveryResult
+from iaglobal.obsidian.omnimind import omni_mind
 
 
 class ExecutionGraph:
@@ -52,7 +55,15 @@ class ExecutionGraph:
         self._loop_detector = LoopDetector()
         self.bus = AcetylcholineBus()
         self._homeostasis = homeostasis_controller
+        self._recovery = RecoveryPolicy()
+        self._recovery_in_flight: Set[Tuple[str, str]] = set()
+        self._background_tasks: Set["asyncio.Task"] = set()
         self._bus_handlers_registered = False
+        try:
+            from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
+            self._epigenetic = EpigeneticRegistry()
+        except Exception:
+            self._epigenetic = None
         self._init_agent_bus()
         try:
             from iaglobal.reflection.reflexion_engine import reflexion_callback_for_loop
@@ -288,6 +299,8 @@ class ExecutionGraph:
             elif contract_error:
                 last_error = contract_error
 
+        except MissingContextError:
+            raise
         except ImportError as e:
             last_error = str(e)
             result_text = ""
@@ -450,6 +463,149 @@ class ExecutionGraph:
         if tasks:
             await asyncio.gather(*tasks, return_exceptions=True)
 
+    async def _invalidate_sibling_consumers(
+        self,
+        upstream_id: str,
+        execution_id: str,
+        executed: Set[str],
+        skip_node: str,
+    ) -> None:
+        """Invalida TODOS os consumidores (transitivo) de `upstream_id`
+        exceto `skip_node`.
+
+        Percorre o DAG em BFS a partir do upstream, invalidando cada
+        nó downstream que já executou com resultado obsoleto (FIX-1 + FIX-4).
+
+        Ex: A→B→C. Se A resetar, B é invalidado como consumidor direto,
+        e C também (consumidor transitivo de A via B). `skip_node` é
+        atravessado mas não invalidado (já está sendo tratado pelo
+        handler principal), permitindo alcançar seus dependentes.
+        """
+        visited: Set[str] = {upstream_id}
+        queue: list[str] = [upstream_id]
+        while queue:
+            current = queue.pop(0)
+            for sib_name, sib_node in self.nodes.items():
+                if sib_name in visited:
+                    continue
+                if current not in (sib_node.depends_on or []):
+                    continue
+                visited.add(sib_name)
+                if sib_name != skip_node and sib_name in executed:
+                    sib_node.release()
+                    self.results.pop(sib_name, None)
+                    executed.discard(sib_name)
+                    await asyncio.to_thread(
+                        exec_registry.reset_node, execution_id, sib_name
+                    )
+                queue.append(sib_name)
+
+    async def _record_recovery_decision(
+        self,
+        node_id: str,
+        missing: list[str],
+        decision: RecoveryDecision,
+        attempt: int,
+        reason: str,
+    ) -> None:
+        """Registra decisões do RecoveryPolicy como memória imunológica (FIX-3).
+
+        RESCHEDULE  → EpigeneticRegistry.record_failure (fire-and-forget)
+        ABORT       → OmniMind.emitir_gatilho_apoptose
+        """
+        if decision is RecoveryDecision.ABORT:
+            try:
+                # emitir_gatilho_apoptose faz I/O síncrono (_salvar_estado
+                # escreve JSON em disco). Executar em thread para não bloquear
+                # o event loop (FIX-3 blocking I/O).
+                await asyncio.to_thread(
+                    omni_mind.emitir_gatilho_apoptose,
+                    agent_id=node_id,
+                    motivo=f"RecoveryPolicy ABORT após {attempt}x MissingContextError: {reason}",
+                    violation_type="recovery_abort",
+                )
+            except Exception:
+                logger.exception("[RECOVERY] Falha ao registrar apoptose no OmniMind")
+        elif self._epigenetic is not None:
+            try:
+                import hashlib
+                task_hash = hashlib.sha256(
+                    f"{node_id}:{missing}".encode()
+                ).hexdigest()[:16]
+                loop = asyncio.get_running_loop()
+                # Guarda referência + done_callback para evitar que a task
+                # seja coletada pelo GC antes de completar (FIX-2).
+                task = loop.create_task(
+                    self._epigenetic.record_failure(
+                        agent_id=node_id,
+                        task_hash=task_hash,
+                        error_type="missing_context_reschedule",
+                        context={
+                            "missing": missing,
+                            "attempt": attempt,
+                            "reason": reason,
+                        },
+                    )
+                )
+                self._background_tasks.add(task)
+                task.add_done_callback(self._on_recovery_task_done)
+            except Exception:
+                logger.exception("[RECOVERY] Falha ao registrar falha epigenética")
+
+    def _on_recovery_task_done(self, task: "asyncio.Task") -> None:
+        """Callback de background task — remove da set E loga exceção
+        no logger do iaglobal (não no logger padrão do asyncio)."""
+        self._background_tasks.discard(task)
+        if task.cancelled():
+            return
+        exc = task.exception()
+        if exc is not None:
+            logger.exception(
+                "[RECOVERY] record_failure falhou (não-fatal)", exc_info=exc
+            )
+
+    async def drain_background_tasks(self, timeout: Optional[float] = None) -> None:
+        """Aguarda conclusão das background tasks pendentes (FIX-2 shutdown).
+
+        Usado no encerramento do pipeline para garantir que memória
+        imunológica (record_failure) seja gravada antes do processo terminar.
+
+        Args:
+            timeout: Se None, espera indefinidamente (default). Se float,
+                     espera até timeout segundos — tasks não completadas
+                     NÃO são canceladas (continuam rodando em background).
+        """
+        if not self._background_tasks:
+            return
+        pending = list(self._background_tasks)
+        if pending:
+            logger.info(
+                "[RECOVERY] Drenando %d background tasks antes do shutdown...",
+                len(pending),
+            )
+            if timeout is not None:
+                # asyncio.wait com timeout NÃO cancela tasks restantes
+                done, remaining = await asyncio.wait(
+                    pending, timeout=timeout, return_when=asyncio.ALL_COMPLETED
+                )
+                if remaining:
+                    logger.warning(
+                        "[RECOVERY] %d tasks não completaram em %.1fs — continuam rodando",
+                        len(remaining),
+                        timeout,
+                    )
+                # Agrega exceções das tasks completadas
+                for task in done:
+                    exc = task.exception()
+                    if exc is not None:
+                        logger.exception(
+                            "[RECOVERY] Task falhou durante drain", exc_info=exc
+                        )
+            else:
+                # Espera indefinidamente
+                await asyncio.gather(*pending, return_exceptions=True)
+            logger.info("[RECOVERY] Background tasks drenadas.")
+
     async def async_run(
         self, input_data: Dict[str, Any], execution_id: Optional[str] = None
     ) -> Dict[str, Any]:
@@ -557,6 +713,76 @@ class ExecutionGraph:
                         else str(result)
                     )
                     logger.warning("[GRAPH] Nó '%s' falhou: %s", name, error_msg)
+
+                    if isinstance(result, MissingContextError):
+                        recovery = await self._recovery.handle_missing_context(
+                            node_id=name,
+                            missing=result.missing,
+                        )
+
+                        await self._record_recovery_decision(
+                            node_id=name,
+                            missing=result.missing,
+                            decision=recovery.decision,
+                            attempt=recovery.attempt_number,
+                            reason=recovery.reason,
+                        )
+
+                        if recovery.decision is RecoveryDecision.RESCHEDULE:
+                            reset_uids: list[str] = []
+                            try:
+                                for uid in recovery.upstream_ids:
+                                    # Guard anti-corrida (FIX-2): só adiciona
+                                    # ao _recovery_in_flight QUEM esta
+                                    # chamada realmente resetou. O finally
+                                    # só descarta reset_uids, nao todo o
+                                    # recovery.upstream_ids — assim um irmão
+                                    # que fez continue não remove o guard
+                                    # de quem está no meio do reset.
+                                    uid_flight = (execution_id, uid)
+                                    if uid_flight in self._recovery_in_flight:
+                                        continue
+                                    self._recovery_in_flight.add(uid_flight)
+                                    reset_uids.append(uid)
+                                    upstream_node = self.nodes.get(uid)
+                                    if upstream_node:
+                                        upstream_node.release()
+                                    self.results.pop(uid, None)
+                                    executed.discard(uid)
+                                    await asyncio.to_thread(
+                                        exec_registry.reset_node, execution_id, uid
+                                    )
+                                    # Invalida TODOS os consumidores
+                                    # (transitivo) do upstream (FIX-1 + FIX-4)
+                                    await self._invalidate_sibling_consumers(
+                                        uid, execution_id, executed, skip_node=name
+                                    )
+                                node.release()
+                                self.results.pop(name, None)
+                                await asyncio.to_thread(
+                                    exec_registry.reset_node, execution_id, name
+                                )
+                                await asyncio.to_thread(
+                                    checkpoint_db.update_node_status,
+                                    execution_id,
+                                    name,
+                                    "PENDING",
+                                )
+                            finally:
+                                for uid in reset_uids:
+                                    self._recovery_in_flight.discard(
+                                        (execution_id, uid)
+                                    )
+                            continue
+                        else:
+                            await self._abort_dependent_nodes_async(
+                                execution_id, name, error_msg
+                            )
+                    elif is_exception and node.critical:
+                        await self._abort_dependent_nodes_async(
+                            execution_id, name, error_msg
+                        )
+
                     await asyncio.to_thread(
                         checkpoint_db.update_node_status,
                         execution_id,
@@ -564,12 +790,6 @@ class ExecutionGraph:
                         "FAILED",
                         error_message=error_msg,
                     )
-
-                    # Só aborta cascata se for exceção real (não apenas output vazio)
-                    if is_exception and node.critical:
-                        await self._abort_dependent_nodes_async(
-                            execution_id, name, error_msg
-                        )
                 else:
                     self.results[name] = result
                     await asyncio.to_thread(

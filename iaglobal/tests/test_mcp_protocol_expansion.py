@@ -132,7 +132,7 @@ class TestFileSystemTool:
             )
         )
         assert ok is True
-        path = PACKAGE_DIR / "memory" / "data" / "json" / "_mcp_test_tmp.json"
+        path = PROJECT_ROOT / "memory" / "data" / "json" / "_mcp_test_tmp.json"
         assert path.exists()
         path.unlink(missing_ok=True)
 

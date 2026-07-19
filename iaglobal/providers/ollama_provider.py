@@ -16,13 +16,13 @@ _OLLAMA_CPU_LOCK = asyncio.Semaphore(1)
 # Export para bandit.py usar o mesmo lock
 OLLAMA_CPU_LOCK = _OLLAMA_CPU_LOCK
 _ollama_semaphore = asyncio.Semaphore(4)
-_loaded_models = set()
+_loaded_models: set[str] = set()
 
 # PATCH: Modelos quantizados menores para fallback
 _QUANTIZED_MODELS = ["qwen2.5:0.5b", "tinyllama:latest", "gemma:2b"]
 
 
-async def warmup(model: str = None) -> bool:
+async def warmup(model: str | None = None) -> bool:
     if model:
         model = model.replace("ollama/", "").strip()
     else:
@@ -55,6 +55,23 @@ async def warmup(model: str = None) -> bool:
     except Exception as e:
         print(f"⚠️  Modelo [{model}] nao disponivel: {e}")
         return False
+
+
+async def warmup_cognitive_cortex() -> dict[str, bool]:
+    """Desperta os modelos locais do Tribunal Cognitivo em paralelo."""
+    from iaglobal.providers.provider_config import get_all_active_models, CognitiveRole
+
+    models_to_wake = get_all_active_models()
+    print(f"🧠 Iniciando warmup do córtex cognitivo: {models_to_wake}")
+
+    results: dict[str, bool] = {}
+    async def _wake(m: str):
+        results[m] = await warmup(m)
+    await asyncio.gather(*[_wake(m) for m in models_to_wake], return_exceptions=True)
+
+    ok = sum(1 for v in results.values() if v)
+    print(f"✅ Córtex cognitivo ativado: {ok}/{len(results)} modelos prontos")
+    return results
 
 
 def generate(
@@ -181,3 +198,14 @@ async def async_generate(
                 last_error = str(e)
                 continue
     raise RuntimeError(f"Ollama endpoints falharam: {last_error}")
+
+
+# Auto-registro no ProviderRegistry
+from iaglobal.providers.contract import registry as _registry
+
+_registry.register_funcs(
+    "ollama",
+    generate=generate,
+    async_generate=async_generate,
+    warmup=warmup,
+)

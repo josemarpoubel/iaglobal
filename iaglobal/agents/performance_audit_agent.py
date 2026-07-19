@@ -558,6 +558,7 @@ class PerformanceAuditAgent(AgentBase):
         scorer: SeverityScorer | None = None,
         composer: ReportComposer | None = None,
     ) -> None:
+        super().__init__(agent_name="performance_audit")
         self._registry = registry or PatternRegistry()
         self._engine = engine or RegexAuditEngine()
         self._structural = structural or StructuralAnalyzer()

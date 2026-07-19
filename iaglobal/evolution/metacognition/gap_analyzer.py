@@ -7,7 +7,7 @@ from iaglobal.evolution.metacognition.failure_taxonomy import classify_errors
 logger = logging.getLogger(__name__)
 
 
-class MetaGapAnalyzer:
+class GapAnalyzer:
     """Identifica gaps baseados em erros frequentes e falhas de execução,
     classificando-os por categoria (prompt, config, modelo, infra, skill_ausente)."""
 
@@ -70,4 +70,4 @@ class MetaGapAnalyzer:
 
 
 async def _run_gap_analyzer(ctx: dict) -> dict:
-    return await MetaGapAnalyzer.analyze(ctx)
+    return await GapAnalyzer.analyze(ctx)

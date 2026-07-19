@@ -16,7 +16,7 @@ from iaglobal.agents.failure_analysis_agent import FailureAnalysisAgent
 logger = logging.getLogger(__name__)
 
 
-def _execute_sync_analysis(error_log: str, task_str: str) -> Tuple[dict, dict, dict]:
+def _execute_sync_analysis(error_log: str, task_str: str, generated_code: str = "") -> Tuple[dict, dict, dict]:
     """Encapsula toda a computação síncrona e escrita em disco para rodar em thread pool."""
     # 1. Coleta e geração de relatórios estáticos de sistema
     system_data = FailureAnalysisAgent.collect_system_data() or {}
@@ -28,24 +28,42 @@ def _execute_sync_analysis(error_log: str, task_str: str) -> Tuple[dict, dict, d
         system_data.get("metrics", {}).get("total_calls", 0),
     )
 
-    # 2. Análise cognitiva profunda do log de erro
+    # 2. Análise cognitiva profunda do log de erro + verificação de requisitos funcionais
     result = {
-        "error_type": "none",
+        "error_type": "clean",
         "findings": [],
         "suggestion_count": 0,
         "guardrail": None,
+        "requirement_violations": [],
     }
-    if error_log:
-        result = (
-            FailureAnalysisAgent.analyze(error_log=error_log, prompt=task_str) or result
+    result = (
+        FailureAnalysisAgent.analyze(
+            error_log=error_log, prompt=task_str, code=generated_code
+        ) or result
+    )
+    result["guardrail"] = FailureAnalysisAgent.generate_guardrail(result)
+
+    req_violations = result.get("requirement_violations", [])
+    if req_violations:
+        logger.warning(
+            "[FAILURE_ANALYSIS] 🧬 %d violação(ões) de requisito funcional detectada(s)!",
+            len(req_violations),
         )
-        result["guardrail"] = FailureAnalysisAgent.generate_guardrail(result)
-        logger.info(
-            "[FAILURE_ANALYSIS] Tipo de erro=%s | Sugestões=%d | Guardrail ativo=%s",
-            result.get("error_type"),
-            result.get("suggestion_count", 0),
-            bool(result.get("guardrail")),
-        )
+        for v in req_violations:
+            logger.warning(
+                "  ⚠️  [REQ] %s | check=%s | hint=%s",
+                v.get("requirement", "?"),
+                v.get("check", "?"),
+                v.get("hint", ""),
+            )
+
+    logger.info(
+        "[FAILURE_ANALYSIS] Tipo de erro=%s | Sugestões=%d | Guardrail ativo=%s | Violações funcionais=%d",
+        result.get("error_type"),
+        result.get("suggestion_count", 0),
+        bool(result.get("guardrail")),
+        len(req_violations),
+    )
 
     # 3. Escrita física do relatório em disco rígido
     paths = FailureAnalysisAgent.persist_report(system_data, report) or {}
@@ -75,6 +93,16 @@ async def run_failure_analysis(ctx: Dict[str, Any]) -> Dict[str, Any]:
         or (debugger_data.get("debug_result") or {}).get("error", "")
     )
 
+    # Extrai o código gerado para verificação de requisitos funcionais
+    generated_code = (
+        (memory.get("code_executor") or {}).get("output", "")
+        or (memory.get("code_executor") or {}).get("code", "")
+        or (memory.get("coder") or {}).get("output", "")
+        or (memory.get("multi_coder") or {}).get("output", "")
+        or (memory.get("frontend_builder") or {}).get("output", "")
+        or (memory.get("backend_builder") or {}).get("output", "")
+    ) or ""
+
     logger.info(
         "[FAILURE_ANALYSIS] Iniciando ciclo assíncrono de auditoria forense de falhas..."
     )
@@ -82,7 +110,7 @@ async def run_failure_analysis(ctx: Dict[str, Any]) -> Dict[str, Any]:
     try:
         # DESPACHA TODO O PROCESSAMENTO DE DISCO E CÁLCULO SÍNCRONO PARA A THREAD POOL ISOLADA
         result, system_data, report = await asyncio.to_thread(
-            _execute_sync_analysis, error_log, task_str
+            _execute_sync_analysis, error_log, task_str, generated_code
         )
 
         latency_ms = (time.time() - start_time) * 1000.0

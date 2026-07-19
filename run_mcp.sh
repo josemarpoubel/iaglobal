@@ -6,4 +6,4 @@ export PYTHONPATH="/home/kitohamachi/projeto-iaglobal"
 
 # Executa o módulo Python
 # O $@ permite que o script repasse quaisquer argumentos do OpenCode, se houver
-exec /home/kitohamachi/projeto-iaglobal/venv/bin/python -m iaglobal.api.mcp_server "$@"
+exec /home/kitohamachi/iaglobal-main/venv/bin/python -m iaglobal.api.mcp_server "$@"

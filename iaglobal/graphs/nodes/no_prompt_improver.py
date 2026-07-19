@@ -64,7 +64,8 @@ async def run_prompt_improver(ctx: Dict[str, Any]) -> Dict[str, Any]:
         logger.warning(
             "[PROMPT_IMPROVER] Prompt muito curto ou ausente. Repassando task original."
         )
-        latency_ms = (time.time() - start_time) * 1000.0
+        logger.info("[PROMPT_IMPROVER] Preview: %s", improved[:500])
+    latency_ms = (time.time() - start_time) * 1000.0
         return {
             "output": task,
             "improved_prompt": task,

@@ -662,38 +662,26 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
     # ── 4b. REFLEXION ENGINE (loop de geração/auto-correção) ──────────────
 
     @staticmethod
-    async def _default_reflexion_async_fn(prompt: str) -> "str":
+    async def _default_reflexion_async_fn(prompt: str) -> str:
         """
         Função de inferência assíncrona padrão para o ReflexionEngine.
 
-        Usa o provider_router real do iaglobal (respeita BanditPolicy / fallback).
-        Importada sob demanda para evitar acoplamento circular em tempo de
-        importação do módulo evo_agent.
+        Usa o crítico como portão único (Lei da Obediência — PSC): arbitrar_geracao
+        decide entre tools, memória ou escalonamento via BanditPolicy. O modo shadow
+        é tratado internamente por arbitrar_geracao (retorna "" em shadow para não
+        cortar o caminho antigo do chamador). Importada sob demanda para evitar
+        acoplamento circular em tempo de importação do módulo evo_agent.
         """
         from iaglobal.agents.critic_agent import _get_critic
-        import os
 
         try:
-            if os.environ.get("ARBITER_MODE", "enforce") == "shadow":
-                await _get_critic().arbitrar_geracao(
-                    node_id="evo_agent",
-                    prompt=prompt,
-                    task_type="reflection",
-                )
-                from iaglobal.providers.provider_router import async_route_generate
-
-                return (
-                    await async_route_generate(
-                        "", prompt, task_type="reflection", node_id="evo_agent"
-                    )
-                ) or ""
             result = await _get_critic().arbitrar_geracao(
                 node_id="evo_agent",
                 prompt=prompt,
                 task_type="reflection",
             )
             return result or ""
-        except Exception as e:  # degradação graceful — não interrompe o ciclo
+        except Exception as e:
             logger.debug("[%s] Reflexion model_fn indisponível: %s", "evo_agent", e)
             return ""
 
@@ -707,21 +695,26 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
     def _reflexion_sync_fn(self, prompt: str) -> str:
         """
         Shim síncrono exigido pelo `ReflexionEngine.model_fn` (Callable[[str], str]).
-        Executa a função assíncrona injetada (ou a padrão) num loop isolado.
+        Executa a função injetada (ou a padrão) num loop isolado.
         Deve ser chamado de dentro de `asyncio.to_thread` para não conflitar com
         o event loop principal.
-        """
-        async_fn = self._reflexion_async_fn or self._default_reflexion_async_fn
-        import asyncio
 
-        loop = asyncio.new_event_loop()
-        try:
-            return loop.run_until_complete(async_fn(prompt)) or ""
-        except Exception as e:
-            logger.debug("[%s] Reflexion sync shim falhou: %s", self.name, e)
-            return ""
-        finally:
-            loop.close()
+        Nota: a função injetada via `set_model_fn` pode ser síncrona (ex.:
+        `agent_base._evo_model_fn` que usa `asyncio.run()` internamente).
+        Detecta se o retorno é coroutine ou str e trata cada caso.
+        """
+        fn = self._reflexion_async_fn or self._default_reflexion_async_fn
+        candidate = fn(prompt)
+        if asyncio.iscoroutine(candidate):
+            try:
+                loop = asyncio.new_event_loop()
+                return loop.run_until_complete(candidate) or ""
+            except Exception as e:
+                logger.debug("[%s] Reflexion sync shim falhou: %s", self.name, e)
+                return ""
+            finally:
+                loop.close()
+        return candidate or ""
 
     async def reflexion_fix(self, prompt: str, code: str | None = None) -> str:
         """
@@ -922,6 +915,141 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
             self.nadph_reserve,
             same_pool.balance(self.name),
         )
+
+    # ── 7.5. CICLO DE CORREÇÃO IMUNOLÓGICA (Fase 3) ─────────────────────
+    # FailureAnalyzer + code_executor + VaccineLedger + JOL
+    # Gated por flag epigenética — ativado quando o agente atinge maturidade.
+    # A flag é setada externamente (epigenetic.set_flag("immune_cycle", True))
+    # ou por mutação após X falhas consecutivas de código.
+
+    async def _immune_correction_cycle(
+        self, code: str, prompt: str = ""
+    ) -> dict:
+        """
+        Ciclo completo de correção imunológica.
+
+        Plano → Execução → Falha? → FailureAnalyzer → Vacina? →
+        Correção → Reexecução → RecoveryMetrics → JOL
+
+        Args:
+            code: código gerado pelo agente
+            prompt: prompt original (para contexto)
+
+        Returns:
+            dict com "code" (corrigido), "recovery" (RecoveryMetrics),
+            e "vaccine_hit" (bool)
+        """
+        from iaglobal.tools.builtins.code_executor import execute_code
+        from iaglobal.immunity.failure_analyzer import (
+            parse_error,
+            fingerprint_error,
+            check_vaccine,
+            register_vaccine,
+        )
+        from iaglobal.interface.diagnostico import RecoveryMetrics
+
+        start = time.monotonic()
+        tentativas = 0
+        vaccine_hit = False
+        current_code = code
+        result_code = code
+        recovery = RecoveryMetrics()
+
+        while tentativas < 3:
+            tentativas += 1
+
+            # 1. Executa
+            output = execute_code(current_code, timeout=15)
+            if not output:
+                # Sucesso (sem output de erro)
+                result_code = current_code
+                recovery.tentativas = tentativas
+                recovery.delta_segundos = round(time.monotonic() - start, 3)
+                break
+
+            # 2. Analisa falha
+            d = parse_error(output, current_code)
+            recovery.fingerprint_erro = d.fingerprint
+
+            # 3. Consulta vacina
+            vacina = await check_vaccine(d, self.lineage_marker)
+            if vacina:
+                vaccine_hit = True
+                result_code = current_code  # mantém — vacina é contexto, não código
+                recovery.vacina_aplicada = True
+                recovery.tentativas = tentativas
+                recovery.delta_segundos = round(time.monotonic() - start, 3)
+                logger.info(
+                    "[%s] Vacina aplicada para %s | tentativa=%d",
+                    self.name, d.tipo_erro, tentativas,
+                )
+                break
+
+            # 4. Tenta correção determinística
+            from iaglobal.immunity.failure_analyzer import generate_correction_plan
+
+            fix = generate_correction_plan(d, current_code)
+            if fix:
+                await register_vaccine(d, fix, evo=self)
+                current_code = fix
+                logger.info(
+                    "[%s] Correção determinística: %s → tentativa %d",
+                    self.name, d.tipo_erro, tentativas,
+                )
+                continue
+
+            # 5. Sem correção determinística — delega ao crítico
+            try:
+                from iaglobal.agents.critic_agent import _get_critic
+
+                critic = _get_critic()
+                plan = await critic.arbitrar_geracao(
+                    node_id="evo_agent.immune_cycle",
+                    prompt=(
+                        f"O código abaixo falhou com:\n{output}\n\n"
+                        f"---\n{current_code}\n\n"
+                        f"Corrija o código. Responda APENAS com o código corrigido."
+                    ),
+                    context={"delegate_for": self.name},
+                )
+                fixed = self._extract_code_from_response(plan) or current_code
+                await register_vaccine(d, fixed, evo=self)
+                current_code = fixed
+                logger.info(
+                    "[%s] Correção via crítico: %s → tentativa %d",
+                    self.name, d.tipo_erro, tentativas,
+                )
+            except Exception as e:
+                logger.debug("[%s] Crítico indisponível: %s", self.name, e)
+                break
+
+        # Alimenta JOL
+        try:
+            from iaglobal.metabolism.joint_optimization import joint_optimization_loop
+
+            await joint_optimization_loop.ingest(
+                node=f"{self.name}.immune_cycle",
+                success=(result_code != code),
+                latency=time.monotonic() - start,
+                model="immune_cycle",
+            )
+        except Exception:
+            pass
+
+        return {
+            "code": result_code,
+            "recovery": recovery,
+            "vaccine_hit": vaccine_hit,
+            "tentativas": tentativas,
+        }
+
+    @staticmethod
+    def _extract_code_from_response(response: str) -> Optional[str]:
+        """Extrai primeiro bloco ```python de uma resposta."""
+        import re as _re
+
+        match = _re.search(r"```(?:python)?\n(.*?)```", response, _re.DOTALL)
+        return match.group(1).strip() if match else None
 
     # ── 8. ANÁLISE E AÇÃO (orquestrador) ──────────────────────────────────
 
