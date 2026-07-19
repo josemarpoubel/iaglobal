@@ -180,9 +180,9 @@ class CognitiveRouter:
 # os limites metabólicos e aplicando fallback se necessário.
 
 _ROUTE_TIMEOUT: dict[str, float] = {
-    "ollama_glm4": 2.0,   # Juiz: espera até 2s por slot
-    "ollama": 1.0,        # Operário: espera até 1s
-    "ollama_lfm": 0.5,    # Sentinela: espera curta, depois bypass
+    "ollama_glm4": 120.0,  # Juiz: cold-load ~59s, margin 2x
+    "ollama": 30.0,  # Operário: cold-load menor
+    "ollama_lfm": 15.0,  # Sentinela: espera curta, depois bypass
 }
 
 _ESTIMATED_TOKENS: dict[str, int] = {
