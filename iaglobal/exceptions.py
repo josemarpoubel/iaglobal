@@ -24,7 +24,6 @@ class BackpressureSignal(Exception):
 class LawViolation(Exception):
     """Raised when an agent violates one of the 11 Universal Laws (Holliwell).
 
-    Triggered by no_law_of_thought_enforcer and other law-enforcement nodes.
     The OmniMind's apply_lei_da_obediencia handles the apoptotic response.
     """
 

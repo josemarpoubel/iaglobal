@@ -129,7 +129,7 @@ def report_architectural_hallucination(
             llm_model="qwen2.5:0.5b",
             false_claims=["iaglobal não tem busca web"],
             verified_facts={
-                "nodes_existentes": ["no_search.py", "no_search_agent.py"],
+                "nodes_existentes": ["no_search.py"],
             },
         )
     """
@@ -156,9 +156,6 @@ if __name__ == "__main__":
         verified_facts={
             "nodes_existentes": [
                 "no_search.py (run_search)",
-                "no_search_agent.py (run_search_agent)",
-                "no_search_web_brain.py (run_search_web_brain)",
-                "no_search_wikipedia.py (run_search_wikipedia)",
                 "_search_router.py (run_search_router)",
             ],
             "sources_implemented": [

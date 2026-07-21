@@ -217,7 +217,7 @@ class HomocysteinePool:
 
     def get_ready_for_methylation(self) -> List[CandidateSkill]:
         """Retorna candidatos com score >= threshold e rota indefinida.
-        Chamado pelo no_evolution_homocysteine para estatísticas do pool."""
+        Usado internamente pelo pool e pelo ciclo de metilação."""
         threshold = self._promotion_threshold()
         return [
             c
@@ -227,7 +227,7 @@ class HomocysteinePool:
 
     def get_candidates_for_methylation(self) -> List[CandidateSkill]:
         """Retorna os mesmos candidatos prontos para metilação.
-        Chamado pelo no_evolution_methylation para processar a promoção."""
+        Usado internamente para processar a promoção de skills."""
         return self.get_ready_for_methylation()
 
     def count(self) -> int:

@@ -15,9 +15,7 @@ _CRITIC_NODE_IDS = frozenset(
         "critic_agent",
         "no_critic",
         "no_validator_retry",
-        "no_law_of_thought_enforcer",
         "no_reflexion",
-        "no_success_ritual",
         "no_reviewer",
     }
 )

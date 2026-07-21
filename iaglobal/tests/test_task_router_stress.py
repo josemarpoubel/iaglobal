@@ -83,7 +83,6 @@ class TestTaskRouterMapping:
         coder_nodes = [
             "no_coder",
             "coder_agent",
-            "no_debugger",
             "debugger_agent",
             "no_multi_coder",
             "no_code_generator",
