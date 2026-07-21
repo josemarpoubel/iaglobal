@@ -68,7 +68,6 @@ import time
 import statistics
 
 def run_experiment():
-    # TODO: Implementar experimento
     # Simulação placeholder - substituir com código real
     n_trials = 100
     results = [random.random() for _ in range(n_trials)]
@@ -100,7 +99,6 @@ import random
 import statistics
 
 def analyze_data():
-    # TODO: Carregar e analisar dataset
     # Simulação placeholder
     dataset_sizes = [100, 200, 500, 1000, 2000]
     performances = [0.85 + random.uniform(-0.05, 0.05) for _ in dataset_sizes]
@@ -129,7 +127,6 @@ import time
 import random
 
 def run_simulation():
-    # TODO: Implementar modelo de simulação
     # Simulação placeholder
     input_sizes = [100, 200, 500, 1000, 2000]
     times = []

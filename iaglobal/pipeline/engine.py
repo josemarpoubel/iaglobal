@@ -56,6 +56,23 @@ class PipelineEngine:
             if not prompt or not isinstance(prompt, str):
                 raise RuntimeError("🚨 [PIPELINE] Prompt vazio ou inválido.")
 
+            # -- Mission Cortex: análise da missão antes de qualquer nó --
+            from iaglobal.pipeline.mission import MissionAnalyzer
+            from iaglobal.pipeline.context import PipelineExecutionContext
+
+            analyzer = MissionAnalyzer()
+            mission = analyzer.analyze(prompt)
+            exec_ctx = PipelineExecutionContext(mission=mission)
+            state.execution_context = exec_ctx
+            # Legado: espelho para nós não migrados (remover quando todos virarem providers)
+            state.context["mission"] = mission
+            logger.info(
+                "🧠 [MISSION] domain=%s | project=%s | entities=%s",
+                mission.domain,
+                mission.project_type,
+                mission.entities,
+            )
+
             # Inicialização do grafo
             if not hasattr(state, "graph") or not state.graph:
                 from iaglobal.graphs.execution_graph import ExecutionGraph
@@ -253,13 +270,29 @@ class PipelineEngine:
         prompt = state.prompt
         state.intent = (
             TaskIntent.CODE
-            if any(k in prompt.lower() for k in ("crie um", "gere um", "implemente", "função", "programa", "hello world", "script", "python", "classe "))
+            if any(
+                k in prompt.lower()
+                for k in (
+                    "crie um",
+                    "gere um",
+                    "implemente",
+                    "função",
+                    "programa",
+                    "hello world",
+                    "script",
+                    "python",
+                    "classe ",
+                )
+            )
             else TaskIntent.HTML
             if any(k in prompt.lower() for k in ("html", "página", "site", "frontend"))
             else TaskIntent.JSON
             if any(k in prompt.lower() for k in ("json", "retorne apenas"))
             else TaskIntent.CHAT
-            if any(k in prompt.lower() for k in ("explique", "o que é", "como funciona", "descreva", "resuma"))
+            if any(
+                k in prompt.lower()
+                for k in ("explique", "o que é", "como funciona", "descreva", "resuma")
+            )
             else TaskIntent.GENERAL
         )
         if ingested_context:
@@ -270,8 +303,8 @@ class PipelineEngine:
         chosen_model = None
         try:
             chosen_model = self.orchestrator.bandit.select_model(
-                node="cognitive_dag_root",
-                strategy="dev_fast",
+                node_id="cognitive_dag_root",
+                task_type="dev_fast",
                 candidates=candidates,
             )
             logger.info("🎯 BANDIT selecionou: %s", chosen_model)
@@ -315,13 +348,14 @@ class PipelineEngine:
                 "memory": getattr(state, "memory", {}),
                 "chosen_model": chosen_model,
                 "parallel": parallel,
+                "__exec_ctx": exec_ctx,
             }
             graph_result = await state.graph.async_run(ctx)
         except Exception as e:
-            from iaglobal.core.apoptosis import ApoptosisEngine
+            from iaglobal.core.apoptosis import EvolutionRecoveryEngine
 
-            apoptosis = ApoptosisEngine()
-            new_agent_id = await apoptosis.trigger_apoptosis(
+            recovery = EvolutionRecoveryEngine()
+            new_agent_id = await recovery.trigger_apoptosis(
                 agent_id=state.task_id,
                 failure_count=1,
                 max_retries=3,
@@ -508,6 +542,7 @@ class PipelineEngine:
     def _save_script(self, state: PipelineState) -> Optional[Path]:
         """Salva o script em disco via save_result_artifact."""
         from iaglobal._paths import save_result_artifact
+
         code = state.generated_code
         if not code or not code.strip():
             return None

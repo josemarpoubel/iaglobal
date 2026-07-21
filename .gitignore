@@ -28,3 +28,12 @@ venv/
 iaglobal/memory/data/result/*
 iaglobal/memory/data/script/*
 iaglobal/memory/data/*.log
+
+# Test artifacts
+tests/temp/
+
+# Root-level runtime artifacts (avoid accidental commits)
+*.db
+*.log
+*.pkl
+*.lock

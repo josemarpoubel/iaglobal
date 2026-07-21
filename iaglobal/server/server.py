@@ -45,7 +45,7 @@ from iaglobal.evolution.evolutionruntime import (
     DeepEvolutionStrategy,
     FastEvolutionStrategy,
 )
-from iaglobal.evolution.execution_context import make_context
+from iaglobal.evolution.execution_context import make_context, EvolutionExecutionContext
 from iaglobal.evolution.execution_registry import registry
 from iaglobal.evolution.evolution_replay import EvolutionReplay
 

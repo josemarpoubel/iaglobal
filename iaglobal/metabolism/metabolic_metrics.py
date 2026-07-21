@@ -99,7 +99,7 @@ class MetabolicMetrics:
         )
 
     def _get_vault_usage(self) -> float:
-        """Retorna uso do vault em percentual (simulado). TODO: Implementar get_vault_stats em DeltaSleepSync."""
+        """Retorna uso do vault em percentual (simulado)."""
         # Simulação baseada em limpeza de toxinas
         toxinas_percent = self.delta_sleep.get_toxin_percent()
         # Se toxinas estiverem altas (> 70%), vault está cheio
@@ -119,10 +119,7 @@ class MetabolicMetrics:
         return 100.0 + (hash_val % 1400)
 
     def _get_toxin_level(self) -> float:
-        """Retorna nível de toxinas como percentual da cota (simulado).
-
-        TODO: Implementar get_toxin_percent em DeltaSleepSync.
-        """
+        """Retorna nível de toxinas como percentual da cota (simulado)."""
         # Simulação baseada no tempo desde a última limpeza
         last_cleanup = self.delta_sleep.get_last_cleanup_time()
         hours_since_cleanup = (time.time() - last_cleanup) / 3600

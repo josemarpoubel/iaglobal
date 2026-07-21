@@ -15,7 +15,7 @@ from types import MappingProxyType  # <-- Proxy de leitura imutável ultra-rápi
 
 
 @dataclass(frozen=True)
-class ExecutionContext:
+class EvolutionExecutionContext:
     """
     Contexto imutável de execução com proteção de profundidade para dicionários.
     Qualquer tentativa de mutação de chaves internas levanta um TypeError.
@@ -52,7 +52,7 @@ class ExecutionContext:
         seed_version: str = "v1",
         task: str = "",
         metadata: Optional[Dict[str, Any]] = None,
-    ) -> "ExecutionContext":
+    ) -> "EvolutionExecutionContext":
         """
         Factory method que cria um snapshot isolado do estado atual.
         Usa deepcopy defensivo apenas UMA vez no ponto de entrada do snapshot.
@@ -92,9 +92,9 @@ def make_context(
     seed_version: str = "v1",
     task: str = "",
     metadata: Optional[Dict[str, Any]] = None,
-) -> ExecutionContext:
-    """Função utilitária e atalho público para criar instâncias do ExecutionContext."""
-    return ExecutionContext.create(
+) -> EvolutionExecutionContext:
+    """Função utilitária e atalho público para criar instâncias do EvolutionExecutionContext."""
+    return EvolutionExecutionContext.create(
         execution_id=execution_id,
         graph=graph,
         memory=memory,

@@ -161,7 +161,6 @@ async def run_apoptosis_kill(
 
 async def _drain_executions(agent_name: str) -> None:
     """Aguarda conclusões de execuções em andamento antes de apoptose."""
-    # TODO: Implementar quando houver tracking de execuções ativas
     # Por enquanto, apenas log
     logger.debug("[APOPTOSE] Drain de %s (no-op por enquanto)", agent_name)
     await asyncio.sleep(0.1)  # Small delay para permitir conclusões pendentes
@@ -169,14 +168,12 @@ async def _drain_executions(agent_name: str) -> None:
 
 async def _serialize_state(agent_name: str) -> Optional[Dict[str, Any]]:
     """Serializa estado do agente para sucessor."""
-    # TODO: Implementar serialização de estado (skills, memória, configurações)
     logger.debug("[APOPTOSE] Serialização de %s (no-op por enquanto)", agent_name)
     return None
 
 
 async def _unregister_agent(agent_name: str) -> None:
     """Desregistra agente de pools e registries."""
-    # TODO: Implementar desregistro (SkillRegistry, AgentPool, etc.)
     logger.debug("[APOPTOSE] Desregistro de %s (no-op por enquanto)", agent_name)
 
 

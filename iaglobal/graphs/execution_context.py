@@ -1,7 +1,7 @@
 from typing import Any, Dict, List
 
 
-class ExecutionContext:
+class GraphExecutionContext:
     def __init__(self, task_id: str, graph_state: Dict[str, Any]):
         self.task_id = task_id
         self.state = graph_state

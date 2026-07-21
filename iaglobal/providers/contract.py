@@ -29,8 +29,7 @@ class LLMProvider(Protocol):
         model: Optional[str] = None,
         timeout: int = 120,
         **kwargs: Any,
-    ) -> str:
-        ...
+    ) -> str: ...
 
     def generate(
         self,
@@ -38,11 +37,9 @@ class LLMProvider(Protocol):
         model: Optional[str] = None,
         timeout: int = 120,
         **kwargs: Any,
-    ) -> str:
-        ...
+    ) -> str: ...
 
-    async def warmup(self, model: Optional[str] = None) -> bool:
-        ...
+    async def warmup(self, model: Optional[str] = None) -> bool: ...
 
 
 @dataclass
@@ -53,7 +50,13 @@ class ProviderEntry:
     warmup: Optional[Callable] = None
 
 
-class ProviderRegistry:
+class LLMProviderRegistry:
+    """Registry de LLM Providers (Groq, NVIDIA, Ollama, Gemini, etc.).
+
+    Responsável por registrar e recuperar provedores de modelo de linguagem.
+    Cada provider expõe generate(), async_generate() e opcionalmente warmup().
+    """
+
     def __init__(self) -> None:
         self._entries: dict[str, ProviderEntry] = {}
 
@@ -132,4 +135,17 @@ class ProviderRegistry:
         return results
 
 
-registry = ProviderRegistry()
+class ProviderRegistry(LLMProviderRegistry):
+    """
+    Alias de compatibilidade temporária.
+
+    DEPRECATED: Use LLMProviderRegistry diretamente.
+    Será removido na versão 2.0.
+    """
+
+    pass
+
+
+llm_provider_registry = LLMProviderRegistry()
+
+registry = llm_provider_registry

@@ -230,7 +230,6 @@ class ErrorEnricher:
     async def _sintetizar_licao_aprendida(self, contexto: ErrorContext) -> str:
         """Sintetiza lição aprendida via IA (ou fallback determinístico).
 
-        TODO: Integrar com BanditPolicy para chamar LLM de forma eficiente.
         Por enquanto, usa fallback determinístico baseado no tipo de erro.
         """
         # Fallback determinístico (pode ser melhorado com IA depois)
@@ -359,9 +358,6 @@ tags: ["#erro", "#aprendizado", "#imunologico", "#{contexto.agent_name}"]
             erro_tipo,
             len(erros),
         )
-
-        # TODO: Enviar notificação para dashboard / webhook
-        # TODO: Sugerir ação corretiva automática
 
     def get_status(self) -> Dict[str, Any]:
         """Retorna status atual do ErrorEnricher."""

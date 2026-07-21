@@ -86,9 +86,7 @@ class ProviderFitnessRecord:
 
         latency_score = min(1.0, 1000 / max(latencia_media_ms, 100))
         cost_score = min(1.0, 10 / max(custo_medio_creditos, 0.1))
-        fitness_score = (
-            ivm_media_movel * 0.6 + latency_score * 0.2 + cost_score * 0.2
-        )
+        fitness_score = ivm_media_movel * 0.6 + latency_score * 0.2 + cost_score * 0.2
 
         return ProviderFitnessRecord(
             provider_id=self.provider_id,
@@ -284,8 +282,7 @@ class BanditPolicyEvolutiva(BanditPolicy):
                 ).isoformat()
                 estado["weights"].pop(provider_id, None)
                 logger.warning(
-                    "[BANIMENTO] Provider %s banido por %sh "
-                    "(strikes=%d, fitness=%.3f)",
+                    "[BANIMENTO] Provider %s banido por %sh (strikes=%d, fitness=%.3f)",
                     provider_id,
                     self.ban_duration_hours,
                     novo.strikes_consecutivos,
@@ -308,9 +305,15 @@ class BanditPolicyEvolutiva(BanditPolicy):
         logger.debug(
             "[FITNESS] %s: fitness=%.3f, IVM_médio=%.3f, strikes=%d",
             provider_id,
-            self.fitness_records.get(provider_id, ProviderFitnessRecord(provider_id)).fitness_score,
-            self.fitness_records.get(provider_id, ProviderFitnessRecord(provider_id)).ivm_media_movel,
-            self.fitness_records.get(provider_id, ProviderFitnessRecord(provider_id)).strikes_consecutivos,
+            self.fitness_records.get(
+                provider_id, ProviderFitnessRecord(provider_id)
+            ).fitness_score,
+            self.fitness_records.get(
+                provider_id, ProviderFitnessRecord(provider_id)
+            ).ivm_media_movel,
+            self.fitness_records.get(
+                provider_id, ProviderFitnessRecord(provider_id)
+            ).strikes_consecutivos,
         )
 
     @staticmethod
@@ -352,7 +355,7 @@ class BanditPolicyEvolutiva(BanditPolicy):
             if record.fitness_score < self.min_fitness_for_selection:
                 continue
             score_base = record.fitness_score
-            bonus_task = 1.0  # TODO: Implementar por task_type
+            bonus_task = 1.0
             score_final = score_base * bonus_task
             rankings.append((provider_id, score_final))
 

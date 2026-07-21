@@ -300,7 +300,7 @@ class MetaLearner:
                 topics=paper_topics,
                 predicted_fitness=predicted_fitness,
                 reason=reason,
-                similar_to=[],  # TODO: implementar similaridade
+                similar_to=[],
             )
             recommendations.append(rec)
 
@@ -361,7 +361,6 @@ class MetaLearner:
             )
             return False
 
-        # TODO: Disparar nova rodada de experimentos com parâmetros ajustados
         # Por enquanto, apenas log
         logger.info(
             "[META] Replicação disparada para %s (fitness=%.0f%%, hipóteses mistas)",
