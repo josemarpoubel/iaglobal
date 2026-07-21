@@ -68,7 +68,9 @@ class SAMePool:
         with self._io_lock:
             if agent_name not in self.accounts:
                 self.accounts[agent_name] = SAMeAccount(agent_name=agent_name)
-                self._store.mutate_sync(lambda _: [a.to_dict() for a in self.accounts.values()])
+                self._store.mutate_sync(
+                    lambda _: [a.to_dict() for a in self.accounts.values()]
+                )
             return self.accounts[agent_name]
 
     def can_afford(self, agent_name: str, cost: int) -> bool:
@@ -84,7 +86,9 @@ class SAMePool:
                 return False
             acc.balance -= cost
             acc.total_spent += cost
-            self._store.mutate_sync(lambda _: [a.to_dict() for a in self.accounts.values()])
+            self._store.mutate_sync(
+                lambda _: [a.to_dict() for a in self.accounts.values()]
+            )
             return True
 
     def recharge(self, agent_name: str, amount: int = RECHARGE_RATE):
@@ -94,7 +98,9 @@ class SAMePool:
             acc = self.accounts[agent_name]
             acc.balance += amount
             acc.total_earned += amount
-            self._store.mutate_sync(lambda _: [a.to_dict() for a in self.accounts.values()])
+            self._store.mutate_sync(
+                lambda _: [a.to_dict() for a in self.accounts.values()]
+            )
 
     def balance(self, agent_name: str) -> int:
         return self.get_account(agent_name).balance

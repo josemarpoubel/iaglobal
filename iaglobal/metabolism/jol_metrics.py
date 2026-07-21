@@ -20,7 +20,9 @@ from pathlib import Path
 from typing import Optional, Dict, Any
 
 from iaglobal.graphs.comms.acetylcholine_bus import (
-    AcetylcholineBus, AgentMessage, bus as default_bus,
+    AcetylcholineBus,
+    AgentMessage,
+    bus as default_bus,
 )
 from iaglobal.utils.logger import get_logger
 
@@ -80,8 +82,14 @@ class JOLMetricsCollector:
             return
 
         timestamp = datetime.utcnow().isoformat() + "Z"
-        task_id = msg.content.get("task_id", "unknown") if isinstance(msg.content, dict) else "unknown"
-        violations = msg.content.get("violations", []) if isinstance(msg.content, dict) else []
+        task_id = (
+            msg.content.get("task_id", "unknown")
+            if isinstance(msg.content, dict)
+            else "unknown"
+        )
+        violations = (
+            msg.content.get("violations", []) if isinstance(msg.content, dict) else []
+        )
 
         record = {
             "timestamp": timestamp,
@@ -96,7 +104,9 @@ class JOLMetricsCollector:
                 }
                 for v in violations
             ],
-            "action": msg.content.get("action", "unknown") if isinstance(msg.content, dict) else "unknown",
+            "action": msg.content.get("action", "unknown")
+            if isinstance(msg.content, dict)
+            else "unknown",
             "sender": msg.sender,
         }
 
@@ -106,7 +116,8 @@ class JOLMetricsCollector:
 
         logger.debug(
             "[JOL] Sentinel intervention: task=%s violations=%d",
-            task_id, len(violations),
+            task_id,
+            len(violations),
         )
 
     def _on_critic_correction(self, msg: AgentMessage) -> None:
@@ -147,7 +158,9 @@ class JOLMetricsCollector:
 
         logger.debug(
             "[JOL] Critic correction: task=%s status=%s tokens=%d",
-            task_id, status, tokens_used,
+            task_id,
+            status,
+            tokens_used,
         )
 
     def _on_tier_congestion(self, msg: AgentMessage) -> None:
@@ -177,14 +190,18 @@ class JOLMetricsCollector:
         }
 
         _write_jsonl(CONGESTION_FILE, record)
-        self._stats["total_congestion_alerts"] = \
+        self._stats["total_congestion_alerts"] = (
             self._stats.get("total_congestion_alerts", 0) + 1
+        )
         self._update_timestamps(timestamp)
 
         logger.debug(
             "[JOL] Congestion alert: tier=%s usage=%.1f%% conc=%d/%d rej=%d",
-            tier, record["usage_pct"], record["current_concurrency"],
-            record["capacity"], record["rejections"],
+            tier,
+            record["usage_pct"],
+            record["current_concurrency"],
+            record["capacity"],
+            record["rejections"],
         )
 
     def _update_timestamps(self, timestamp: str) -> None:
@@ -210,7 +227,9 @@ class JOLMetricsCollector:
 
         logger.info(
             "[JOL] Coletor iniciado — interventions=%s corrections=%s congestion=%s",
-            INTERVENTIONS_FILE, CORRECTIONS_FILE, CONGESTION_FILE,
+            INTERVENTIONS_FILE,
+            CORRECTIONS_FILE,
+            CONGESTION_FILE,
         )
 
     def stop(self) -> None:
@@ -239,8 +258,7 @@ class JOLMetricsCollector:
 
         # intervention_rate = intervenções / correções (quanto >1, mais ruído)
         noise_ratio = (
-            self._stats["total_sentinel_interventions"] / total
-            if total > 0 else 0.0
+            self._stats["total_sentinel_interventions"] / total if total > 0 else 0.0
         )
 
         return {
@@ -271,6 +289,7 @@ class JOLMetricsCollector:
 
 # ── CLI Helper ──────────────────────────────────────────────────────
 
+
 def print_summary() -> None:
     """Imprime resumo formatado para CLI (iaglobal status)."""
     collector = JOLMetricsCollector()
@@ -285,10 +304,16 @@ def print_summary() -> None:
     print()
     print(f"Intervention Precision:          {summary['intervention_precision']}%")
     print(f"Noise Ratio (interv/corr):       {summary['noise_ratio']}")
-    print(f"Total Congestion Alerts:         {summary.get('total_congestion_alerts', 0)}")
+    print(
+        f"Total Congestion Alerts:         {summary.get('total_congestion_alerts', 0)}"
+    )
     print()
-    print(f"First Event:                     {summary['first_event_timestamp'] or 'N/A'}")
-    print(f"Last Event:                      {summary['last_event_timestamp'] or 'N/A'}")
+    print(
+        f"First Event:                     {summary['first_event_timestamp'] or 'N/A'}"
+    )
+    print(
+        f"Last Event:                      {summary['last_event_timestamp'] or 'N/A'}"
+    )
     print()
     print(f"Data Files:")
     print(f"  Interventions: {summary['data_files']['interventions']}")

@@ -35,12 +35,35 @@ class TaskRouter:
         return [
             (re.compile(r"^no_critic"), self.TIER_JUIZ),
             (re.compile(r"^critic"), self.TIER_JUIZ),
-            (re.compile(r"^no_.*(requirements|technology_selection|architecture_design|system_design)$"), self.TIER_JUIZ),
-            (re.compile(r"^no_.*(critic|arbitrar|correction|validation|judge)$"), self.TIER_JUIZ),
+            (
+                re.compile(
+                    r"^no_.*(requirements|technology_selection|architecture_design|system_design)$"
+                ),
+                self.TIER_JUIZ,
+            ),
+            (
+                re.compile(r"^no_.*(critic|arbitrar|correction|validation|judge)$"),
+                self.TIER_JUIZ,
+            ),
             (re.compile(r"^no_coder"), self.TIER_OPERARIO),
-            (re.compile(r"^no_.*(code|generate|execute|compile|write|artifact|api|backend|frontend|database|deploy|build|run|create|develop|implement|construct|design|architect|planner|task|breakdown)$"), self.TIER_OPERARIO),
-            (re.compile(r"^no_.*(sentinel|entropy|syntax|auditor|validator|defender|guardian)$"), self.TIER_SENTINELA),
-            (re.compile(r"^no_.*(audit|monitor|security|constraint|requirement|check|verify|test|debug|analyst|review|inspect|detect|analyze|detect|identify|assess|evaluate|profile|scan|guard|shield|watch|probe)$"), self.TIER_SENTINELA),
+            (
+                re.compile(
+                    r"^no_.*(code|generate|execute|compile|write|artifact|api|backend|frontend|database|deploy|build|run|create|develop|implement|construct|design|architect|planner|task|breakdown)$"
+                ),
+                self.TIER_OPERARIO,
+            ),
+            (
+                re.compile(
+                    r"^no_.*(sentinel|entropy|syntax|auditor|validator|defender|guardian)$"
+                ),
+                self.TIER_SENTINELA,
+            ),
+            (
+                re.compile(
+                    r"^no_.*(audit|monitor|security|constraint|requirement|check|verify|test|debug|analyst|review|inspect|detect|analyze|detect|identify|assess|evaluate|profile|scan|guard|shield|watch|probe)$"
+                ),
+                self.TIER_SENTINELA,
+            ),
             (re.compile(r"^no_dependency"), self.TIER_SENTINELA),
             (re.compile(r"^no_test"), self.TIER_SENTINELA),
             (re.compile(r"^tester"), self.TIER_SENTINELA),
@@ -77,9 +100,9 @@ class TaskRouter:
 
     def get_timeout_for_tier(self, tier: str) -> float:
         return {
-            self.TIER_JUIZ: 600.0,   # Juiz: 10 minutos para raciocínio profundo
+            self.TIER_JUIZ: 600.0,  # Juiz: 10 minutos para raciocínio profundo
             self.TIER_OPERARIO: 60.0,  # Operário: 1 minuto balanceado
-            self.TIER_SENTINELA: 10.0, # Sentinela: 10 segundos rápido
+            self.TIER_SENTINELA: 10.0,  # Sentinela: 10 segundos rápido
         }.get(tier, 60.0)
 
     def is_critical_node(self, node_id: str) -> bool:

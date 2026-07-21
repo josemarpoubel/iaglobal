@@ -51,33 +51,39 @@ class _SanitizerTransformer(ast.NodeTransformer):
 
     def visit_Import(self, node: ast.Import) -> Any:
         if node.lineno in self.violation_lines:
-            self.sanitized.append(
-                f"L{node.lineno}: Import removido por segurança"
-            )
+            self.sanitized.append(f"L{node.lineno}: Import removido por segurança")
             return ast.Pass()
         return node
 
     def visit_ImportFrom(self, node: ast.ImportFrom) -> Any:
         if node.lineno in self.violation_lines:
-            self.sanitized.append(
-                f"L{node.lineno}: ImportFrom removido por segurança"
-            )
+            self.sanitized.append(f"L{node.lineno}: ImportFrom removido por segurança")
             return ast.Pass()
         return node
 
     def visit_Call(self, node: ast.Call) -> Any:
         if node.lineno in self.violation_lines:
             if isinstance(node.func, ast.Name) and node.func.id in {
-                "eval", "exec", "compile", "__import__",
-                "getattr", "setattr", "delattr",
-                "globals", "vars", "dir",
+                "eval",
+                "exec",
+                "compile",
+                "__import__",
+                "getattr",
+                "setattr",
+                "delattr",
+                "globals",
+                "vars",
+                "dir",
             }:
                 self.sanitized.append(
                     f"L{node.lineno}: Chamada '{node.func.id}()' substituída por None"
                 )
                 return ast.Constant(value=None)
             if isinstance(node.func, ast.Attribute) and node.func.attr in {
-                "system", "popen", "spawn", "execute",
+                "system",
+                "popen",
+                "spawn",
+                "execute",
             }:
                 self.sanitized.append(
                     f"L{node.lineno}: Acesso a '.{node.func.attr}()' substituído por None"
@@ -173,15 +179,22 @@ class AutoCorrectionLoop:
             linguagem=linguagem,
         )
 
-    def _reportar_violacao_seguranca(self, agent_name: str, violacoes: List[str]) -> None:
+    def _reportar_violacao_seguranca(
+        self, agent_name: str, violacoes: List[str]
+    ) -> None:
         """Registra violação de segurança e dispara apoptose se reincidente."""
         # Contador de reincidência em memória
-        self._violation_counter[agent_name] = self._violation_counter.get(agent_name, 0) + 1
+        self._violation_counter[agent_name] = (
+            self._violation_counter.get(agent_name, 0) + 1
+        )
         reincidencia = self._violation_counter[agent_name]
 
         logger.warning(
             "[AUTO-CORRECAO] 🛡️ Violacao seguranca: %s | agente=%s | reincidencia=%d/%d",
-            violacoes[0][:80], agent_name, reincidencia, REINCIDENCIA_LIMIAR,
+            violacoes[0][:80],
+            agent_name,
+            reincidencia,
+            REINCIDENCIA_LIMIAR,
         )
 
         # Registro persistente via EpigeneticRegistry (assíncrono, fire-and-forget)
@@ -296,7 +309,9 @@ class AutoCorrectionLoop:
                         len(transformer.sanitized),
                     )
                 else:
-                    issues.append("SECURITY: Violações detectadas mas sanitização falhou")
+                    issues.append(
+                        "SECURITY: Violações detectadas mas sanitização falhou"
+                    )
             except Exception as e:
                 logger.warning("[AUTO-CORRECAO] Erro na sanitizacao AST: %s", e)
                 issues.append(f"SECURITY: Erro ao sanitizar ({e})")

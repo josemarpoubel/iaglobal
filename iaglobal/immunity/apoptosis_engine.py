@@ -1,8 +1,8 @@
 # iaglobal/immunity/apoptosis_engine.py
 """
-ApoptosisEngine — Morte celular programada para agentes corrompidos.
+ImmuneApoptosisEngine — Eliminação imunológica de agentes patológicos.
 
-Garante remoção limpa do registry sem deixar rastro.
+Drain → snapshot → registry cleanup → lições aprendidas no Obsidian.
 """
 
 import asyncio
@@ -16,19 +16,19 @@ from iaglobal.memory.async_memory import add_ltm
 logger = logging.getLogger(__name__)
 
 
-class ApoptosisEngine:
+class ImmuneApoptosisEngine:
     """
-    Motor de apoptose programada.
+    Motor de apoptose programada — eliminação imunológica.
 
     Operação:
-    1. Drain de conexões do agente
-    2. Serialização do estado (snapshot)
-    3. Remoção do registry
-    4. Limpeza de rastros
-    5. Notificação de dependentes
+    1. Extrai lições da falha
+    2. Serializa estado (snapshot)
+    3. Remove do registry
+    4. Limpa rastros
+    5. Grava aprendizado no Obsidian
     """
 
-    _instance: Optional["ApoptosisEngine"] = None
+    _instance: Optional["ImmuneApoptosisEngine"] = None
 
     def __new__(cls):
         if cls._instance is None:
@@ -198,4 +198,4 @@ class ApoptosisEngine:
 
 
 # Singleton
-apoptosis_engine = ApoptosisEngine()
+immune_apoptosis_engine = ImmuneApoptosisEngine()

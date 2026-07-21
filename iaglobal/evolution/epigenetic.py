@@ -76,6 +76,7 @@ class EpigeneticMemory:
     def _resolve_genome_path(self, agent_id: str) -> Optional[Path]:
         try:
             from iaglobal._paths import JSON_DIR
+
             return JSON_DIR / f"genome_{agent_id}.json"
         except Exception:
             return None
@@ -119,7 +120,9 @@ class EpigeneticMemory:
             return
 
         try:
-            store.mutate_sync(lambda data: self._apply_cicatriz(data, trauma, severidade))
+            store.mutate_sync(
+                lambda data: self._apply_cicatriz(data, trauma, severidade)
+            )
             logger.info(
                 "[EPIGENÉTICA] Cicatriz gravada para %s: %s (+%.2f)",
                 agent_id,

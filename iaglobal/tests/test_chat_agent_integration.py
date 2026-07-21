@@ -177,7 +177,9 @@ class TestInteragirComColonia:
     async def test_extracao_falha_retorna_erro(self, evo_agent):
         mock_falho = MagicMock()
         mock_falho.arbitrar_geracao = AsyncMock(side_effect=RuntimeError("LLM down"))
-        with patch("iaglobal.interface.chat_agent._get_critic", return_value=mock_falho):
+        with patch(
+            "iaglobal.interface.chat_agent._get_critic", return_value=mock_falho
+        ):
             colonia = EvoAgentColony()
             await colonia.registrar(evo_agent, "generalista")
 

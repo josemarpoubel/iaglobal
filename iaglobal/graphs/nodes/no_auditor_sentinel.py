@@ -10,27 +10,7 @@ import logging
 from typing import Dict, Any
 
 from iaglobal.immunity.entropy_sentinel import entropy_sentinel
-
-logger = logging.getLogger(__name__)
-
-
-async def run_auditor_sentinel(context: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Audita integridade do genesis e alerta se divergir.
-
-    Args:
-        context: {"force_check": bool, "expected_hash": str}
-
-    Returns:
-        {"integrity_ok": bool, "current_hash": str, "alert_triggered": bool}
-    """
-    from iaglobal.core.graceful_shutdown import graceful_shutdown
-
-    expected = context.get("expected_hash") or entropy_sentinel._genesis_hash
-    current = entropy_sentinel._genesis_hash
-
-
-logger = logging.getLogger(__name__)
+from iaglobal.core.graceful_shutdown import graceful_shutdown
 
 
 async def run_auditor_sentinel(context: Dict[str, Any]) -> Dict[str, Any]:

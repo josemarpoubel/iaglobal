@@ -24,6 +24,7 @@ import pytest
 # FIX-1: Thread-safe _salvar_estado()
 # ═══════════════════════════════════════════════════════════════════
 
+
 class TestThreadSafeStateSave:
     """_salvar_estado() deve ser atômico para evitar corrupção."""
 
@@ -38,9 +39,7 @@ class TestThreadSafeStateSave:
         OmniMind._instance = None
         OmniMind._initialized = False
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             tmp_path = Path(f.name)
             json.dump([], f)
 
@@ -101,9 +100,7 @@ class TestThreadSafeStateSave:
         OmniMind._instance = None
         OmniMind._initialized = False
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             tmp_path = Path(f.name)
             json.dump([], f)
 
@@ -133,9 +130,7 @@ class TestThreadSafeStateSave:
         """Se escrita falhar, temp file deve ser limpo."""
         from iaglobal.obsidian.omnimind import OmniMind
 
-        with tempfile.NamedTemporaryFile(
-            mode="w", suffix=".json", delete=False
-        ) as f:
+        with tempfile.NamedTemporaryFile(mode="w", suffix=".json", delete=False) as f:
             tmp_path = Path(f.name)
             json.dump([], f)
 
@@ -151,9 +146,7 @@ class TestThreadSafeStateSave:
                 omni._salvar_estado()
 
             # Verifica que não sobraram arquivos temp
-            temp_files = list(
-                tmp_path.parent.glob(tmp_path.stem + "_*.tmp")
-            )
+            temp_files = list(tmp_path.parent.glob(tmp_path.stem + "_*.tmp"))
             assert len(temp_files) == 0, "Temp file não foi limpo após erro"
 
         finally:
@@ -164,6 +157,7 @@ class TestThreadSafeStateSave:
 # ═══════════════════════════════════════════════════════════════════
 # FIX-2: drain_background_tasks() no shutdown
 # ═══════════════════════════════════════════════════════════════════
+
 
 class TestBackgroundTasksDrain:
     """Background tasks devem ser drenadas antes do shutdown."""
@@ -259,6 +253,7 @@ class TestBackgroundTasksDrain:
 # ═══════════════════════════════════════════════════════════════════
 # Integration: Pipeline drain
 # ═══════════════════════════════════════════════════════════════════
+
 
 class TestPipelineDrainIntegration:
     """Pipeline deve drenar tasks antes de retornar."""

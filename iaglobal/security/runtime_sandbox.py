@@ -189,7 +189,9 @@ class AuditLogger:
         log_file = self.log_path / f"runtime_{time.strftime('%Y%m%d')}.jsonl"
         try:
             with open(log_file, "a", encoding="utf-8") as f:
-                f.write(str(hashlib.sha256(str(log_entry).encode()).hexdigest()[:12]) + "\n")
+                f.write(
+                    str(hashlib.sha256(str(log_entry).encode()).hexdigest()[:12]) + "\n"
+                )
         except Exception as e:
             logger.error("[RUNTIME_SANDBOX] Falha ao escrever log: %s", e)
 
@@ -214,7 +216,9 @@ class RestrictedBuiltins:
     def __getattr__(self, name: str) -> Any:
         if name in BLOCKED_BUILTINS:
             self.audit_logger.log_violation(
-                self.agent_id, name, "builtin_blocked",
+                self.agent_id,
+                name,
+                "builtin_blocked",
                 {"reason": "builtin perigoso bloqueado"},
             )
             raise SecurityViolation(
@@ -232,7 +236,9 @@ class RestrictedBuiltins:
     def __getitem__(self, name: str) -> Any:
         if name in BLOCKED_BUILTINS:
             self.audit_logger.log_violation(
-                self.agent_id, name, "dict_access_blocked",
+                self.agent_id,
+                name,
+                "dict_access_blocked",
                 {"reason": "dict access para builtin perigoso"},
             )
             raise SecurityViolation(
@@ -244,7 +250,9 @@ class RestrictedBuiltins:
     def _restricted_import(self, name: str, *args: Any, **kwargs: Any) -> Any:
         if name in BLACKLISTED_MODULES or name not in self.allowed_modules:
             self.audit_logger.log_violation(
-                self.agent_id, "__import__", "import_blocked",
+                self.agent_id,
+                "__import__",
+                "import_blocked",
                 {"module": name},
             )
             raise SecurityViolation(
@@ -256,9 +264,14 @@ class RestrictedBuiltins:
     def _filtered_introspection(self, name: str) -> Any:
         if name == "globals":
             g = self._original.globals()
-            return {k: v for k, v in g.items() if not k.startswith("__") and k not in BLOCKED_BUILTINS}
+            return {
+                k: v
+                for k, v in g.items()
+                if not k.startswith("__") and k not in BLOCKED_BUILTINS
+            }
         if name == "vars":
             import inspect
+
             frame = inspect.currentframe().f_back
             return {k: v for k, v in frame.f_locals.items() if not k.startswith("__")}
         if name == "dir":
@@ -268,12 +281,14 @@ class RestrictedBuiltins:
 
 def _block(name: str, agent_id: str, audit_logger: AuditLogger) -> Any:
     """Cria função que sempre levanta SecurityViolation."""
+
     def blocker(*args: Any, **kwargs: Any) -> Any:
         audit_logger.log_violation(agent_id, name, "builtin_blocked", {"reason": name})
         raise SecurityViolation(
             f"[RUNTIME_SANDBOX] {name} bloqueado: builtin_blocked",
             agent_id=agent_id,
         )
+
     blocker.__name__ = name
     return blocker
 
@@ -318,8 +333,10 @@ def _safe_getattr(agent_id: str, audit_logger: AuditLogger) -> Any:
             obj_type = f"sensitive_module:{obj.__name__}"
         if blocked:
             audit_logger.log_violation(
-                agent_id, "getattr", "builtins_access",
-                {"object": obj_type, "attribute": name}
+                agent_id,
+                "getattr",
+                "builtins_access",
+                {"object": obj_type, "attribute": name},
             )
             raise SecurityViolation(
                 f"[RUNTIME_SANDBOX] getattr bloqueado: {obj_type}.{name}",
@@ -337,8 +354,10 @@ def _safe_setattr(agent_id: str, audit_logger: AuditLogger) -> Any:
     def safe_setattr(obj: Any, name: str, value: Any) -> None:
         if name.startswith("__") and name.endswith("__"):
             audit_logger.log_violation(
-                agent_id, "setattr", "dunder_modification",
-                {"object": type(obj).__name__, "attribute": name}
+                agent_id,
+                "setattr",
+                "dunder_modification",
+                {"object": type(obj).__name__, "attribute": name},
             )
             raise SecurityViolation(
                 f"[RUNTIME_SANDBOX] setattr bloqueado: dunder {name}",
@@ -356,8 +375,10 @@ def _safe_delattr(agent_id: str, audit_logger: AuditLogger) -> Any:
     def safe_delattr(obj: Any, name: str) -> None:
         if name.startswith("__") and name.endswith("__"):
             audit_logger.log_violation(
-                agent_id, "delattr", "dunder_deletion",
-                {"object": type(obj).__name__, "attribute": name}
+                agent_id,
+                "delattr",
+                "dunder_deletion",
+                {"object": type(obj).__name__, "attribute": name},
             )
             raise SecurityViolation(
                 f"[RUNTIME_SANDBOX] delattr bloqueado: dunder {name}",
@@ -386,7 +407,9 @@ def _make_restricted_builtins(
         restricted[name] = _block(name, agent_id, audit_logger)
 
     # 2. Restringe builtins contextuais
-    restricted["__import__"] = _restricted_import_func(agent_id, audit_logger, allowed_modules)
+    restricted["__import__"] = _restricted_import_func(
+        agent_id, audit_logger, allowed_modules
+    )
     restricted["getattr"] = _safe_getattr(agent_id, audit_logger)
     restricted["setattr"] = _safe_setattr(agent_id, audit_logger)
     restricted["delattr"] = _safe_delattr(agent_id, audit_logger)
@@ -401,15 +424,64 @@ def _make_restricted_builtins(
 
     # 3. Copia builtins seguros do módulo original
     safe_names = (
-        "abs", "all", "any", "ascii", "bin", "bool", "bytearray", "bytes",
-        "callable", "chr", "classmethod", "complex", "delattr", "dict",
-        "divmod", "enumerate", "filter", "float", "format", "frozenset",
-        "hasattr", "hash", "hex", "id", "int", "isinstance", "issubclass",
-        "iter", "len", "list", "map", "max", "memoryview", "min", "next",
-        "object", "oct", "ord", "pow", "print", "property", "range",
-        "repr", "reversed", "round", "set", "setattr", "slice",
-        "sorted", "staticmethod", "str", "sum", "super", "tuple",
-        "type", "zip", "__build_class__", "__name__",
+        "abs",
+        "all",
+        "any",
+        "ascii",
+        "bin",
+        "bool",
+        "bytearray",
+        "bytes",
+        "callable",
+        "chr",
+        "classmethod",
+        "complex",
+        "delattr",
+        "dict",
+        "divmod",
+        "enumerate",
+        "filter",
+        "float",
+        "format",
+        "frozenset",
+        "hasattr",
+        "hash",
+        "hex",
+        "id",
+        "int",
+        "isinstance",
+        "issubclass",
+        "iter",
+        "len",
+        "list",
+        "map",
+        "max",
+        "memoryview",
+        "min",
+        "next",
+        "object",
+        "oct",
+        "ord",
+        "pow",
+        "print",
+        "property",
+        "range",
+        "repr",
+        "reversed",
+        "round",
+        "set",
+        "setattr",
+        "slice",
+        "sorted",
+        "staticmethod",
+        "str",
+        "sum",
+        "super",
+        "tuple",
+        "type",
+        "zip",
+        "__build_class__",
+        "__name__",
     )
     for name in safe_names:
         if hasattr(_orig, name):
@@ -419,6 +491,7 @@ def _make_restricted_builtins(
     for mod_name in allowed_modules:
         try:
             import importlib
+
             restricted[mod_name] = importlib.import_module(mod_name)
         except ImportError:
             pass
@@ -428,10 +501,15 @@ def _make_restricted_builtins(
 
 def _blocked_introspection(name: str) -> Any:
     """globals/vars/dir que retornam dados filtrados."""
+
     def func(*args: Any, **kwargs: Any) -> Any:
         if name == "globals":
             g = sys._getframe(1).f_globals
-            return {k: v for k, v in g.items() if not k.startswith("__") and k not in BLOCKED_BUILTINS}
+            return {
+                k: v
+                for k, v in g.items()
+                if not k.startswith("__") and k not in BLOCKED_BUILTINS
+            }
         if name == "vars":
             obj = args[0] if args else sys._getframe(1)
             d = vars(obj) if hasattr(obj, "__dict__") else {}
@@ -439,8 +517,13 @@ def _blocked_introspection(name: str) -> Any:
         if name == "dir":
             obj = args[0] if args else sys._getframe(1)
             result = dir(obj) if hasattr(obj, "__dir__") else []
-            return [n for n in result if not n.startswith("__") and n not in BLOCKED_BUILTINS]
+            return [
+                n
+                for n in result
+                if not n.startswith("__") and n not in BLOCKED_BUILTINS
+            ]
         return []
+
     func.__name__ = name
     return func
 
@@ -479,9 +562,7 @@ class SafeGlobals(dict):
 
     def __setitem__(self, key: str, value: Any) -> None:
         if key in BLOCKED_BUILTINS:
-            raise SecurityViolation(
-                f"[RUNTIME_SANDBOX] Atribuição bloqueada: {key}"
-            )
+            raise SecurityViolation(f"[RUNTIME_SANDBOX] Atribuição bloqueada: {key}")
         super().__setitem__(key, value)
 
 

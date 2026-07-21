@@ -161,6 +161,7 @@ class TestAgentCooperationContract:
 
         assert inspect.iscoroutinefunction(agent.generate)
 
+
 class TestPipelineEngineSaveScript:
     def test_pipeline_engine_save_script_escreve_em_result(self):
         """PipelineEngine._save_script deve salvar via save_result_artifact e retornar o path do arquivo."""
@@ -182,4 +183,5 @@ class TestPipelineEngineSaveScript:
         assert "project" in str(result_path.parent.name)
         assert result_path.name == "output.py"
         import shutil
+
         shutil.rmtree(result_path.parent, ignore_errors=True)

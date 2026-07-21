@@ -15,7 +15,9 @@ def fresh_probe():
 async def test_probe_detects_hypoxia(fresh_probe):
     """Sonda detecta hipóxia quando lag > threshold."""
     # Simula hipóxia diretamente (sem mock complexo)
-    fresh_probe.current_lag = fresh_probe.HYPOXIA_THRESHOLD_SECONDS + 0.01  # 10ms acima do threshold
+    fresh_probe.current_lag = (
+        fresh_probe.HYPOXIA_THRESHOLD_SECONDS + 0.01
+    )  # 10ms acima do threshold
     fresh_probe.hypoxia_detected = False
 
     # Verifica que estado inicial é saudável
@@ -32,7 +34,9 @@ async def test_probe_recovers_from_hypoxia(fresh_probe):
     """Sonda detecta recuperação quando lag volta ao normal."""
     # Estado inicial: hipóxia
     fresh_probe.hypoxia_detected = True
-    fresh_probe.current_lag = fresh_probe.HYPOXIA_THRESHOLD_SECONDS + 0.02  # acima do threshold
+    fresh_probe.current_lag = (
+        fresh_probe.HYPOXIA_THRESHOLD_SECONDS + 0.02
+    )  # acima do threshold
 
     # Simula recuperação
     fresh_probe.current_lag = 0.005  # 5ms (normal)

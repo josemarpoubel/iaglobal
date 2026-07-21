@@ -14,6 +14,271 @@ You are a sharp tool for this work, provided we focus on solving one structural 
 
 "Non-Regression Guidelines":
 
+# Architectural Evolution Protocol (Mandatory)
+
+## Fundamental Principle
+
+Before creating any file, folder, module, class, or namespace, the agent must assume that **it likely already exists**.
+
+The agent's first responsibility is not to implement.
+
+The first responsibility is to **discover the existing architecture**.
+
+---
+
+## Rule 1 — Never create a namespace without an audit
+
+Creating a new package or directory without first verifying if an equivalent one already exists is prohibited.
+
+Mandatory workflow:
+
+1. Locate the existing namespace.
+2. Identify related modules.
+3. Check existing imports.
+4. Check references in the pipeline.
+5. Only then decide whether to reuse or create.
+
+Example commands:
+
+```bash
+find iaglobal -type d | sort
+
+tree -L 3 iaglobal
+
+grep -Rni "<subject>" iaglobal
+
+python -m iaglobal.auditoria_arquitetural
+```
+
+---
+
+## Rule 2 — Reuse is the rule
+
+If a module with an equivalent responsibility exists, it must be extended.
+
+Do not create another one.
+
+Incorrect:
+
+```
+iaglobal/metacognition/
+```
+
+Correct:
+
+```
+iaglobal/evolution/metacognition/
+```
+
+---
+
+## Rule 3 — Do not duplicate concepts
+
+Never create a:
+
+* new namespace
+* new class
+* new service
+* new provider
+* new resolver
+* new snapshot
+
+without verifying if something semantically equivalent already exists.
+
+Even if the name is different.
+
+Conceptual equivalence is more important than nominal equivalence.
+
+---
+
+## Rule 4 — Architecture before implementation
+
+Before writing code, the agent must answer:
+
+* Where does this concept belong?
+* Does a similar module already exist?
+* Is there a responsible subsystem?
+* Am I creating a duplication?
+* Am I breaking the project's taxonomy?
+
+If any answer is uncertain, stop implementation and investigate. ---
+
+## Rule 5 — Respect architectural boundaries
+
+Each subsystem has exclusive responsibility.
+
+Examples:
+
+```
+evolution/
+```
+
+Responsible for:
+
+* evolution
+* metacognition
+* learning
+* adaptation
+* evaluation
+
+```
+memory/
+```
+
+Responsible for:
+
+* memory
+* retrieval
+* storage
+* snapshots
+* cognitive context
+
+Do not move responsibilities between subsystems without architectural justification.
+
+---
+
+## Rule 6 — Every change begins with reading
+
+Before editing any file, perform an architectural discovery step.
+
+This step must produce a summary containing:
+
+* existing modules
+* related classes
+* dependencies
+* extension points
+* duplication risks
+
+Implementation may only begin after this analysis.
+
+---
+
+## Rule 7 — Evolve rather than create
+
+The correct order is always:
+
+```
+Discover
+↓
+Understand
+↓
+Integrate
+↓
+Extend
+↓
+Refactor
+```
+
+Never:
+
+```
+Imagine
+↓
+Create
+```
+
+---
+
+## Rule 8 — Architectural Awareness
+
+The agent must treat the existing architecture as the primary source of truth.
+
+No structural decision may be made based solely on model inference.
+
+Every decision must be validated against the actual state of the repository.
+
+# Rule 9 — Repository Integrity Check (Mandatory)
+
+Before completing any task, creating a commit, or preparing code for submission to GitHub, the agent must ensure that **no project file has been lost, omitted, or inadvertently removed**.
+
+The accidental absence of a single file can break the architecture, pipeline execution, or tests.
+
+---
+
+## Mandatory procedure
+
+Before finalizing the work, perform a complete audit of the project tree.
+
+Mandatory checks:
+
+* removed files;
+* renamed files;
+* moved files;
+* empty directories;
+* orphaned modules;
+* broken imports;
+* untracked files;
+* modified files not yet accounted for;
+* differences between the current tree and the expected project state.
+
+Example commands:
+
+```bash
+git status
+
+git diff --stat
+
+git diff --name-status
+
+git ls-files
+
+find iaglobal -type f | sort
+
+python -m iaglobal.auditoria_arquitetural
+```
+
+---
+
+## Prohibited actions
+
+* completing a task with missing files without justification;
+* removing files simply because they "aren't being used";
+* deleting modules without checking all references;
+* leaving newly created files out of version control;
+* preparing a commit without reviewing all modified files.
+
+---
+
+## Mandatory pre-commit checklist
+
+The agent must explicitly answer:
+
+* Are there any removed files? Which ones?
+* Was each removal intentional and documented?
+* Are there new files not added to Git?
+* Are there modified files outside the task scope?
+* Are there empty directories created by mistake?
+* Are there broken imports following the changes?
+* Does the project tree remain intact?
+* Are all necessary files included in the commit?
+
+If any answer is negative or uncertain, the work **cannot be considered complete**. ---
+
+## Mandatory report
+
+Every task must conclude with an integrity report containing:
+
+*   files created;
+*   files modified;
+*   files moved;
+*   files removed (with justification);
+*   new, untracked files (`git status`);
+*   project tree validation;
+*   confirmation that no expected files were lost;
+*   results of executed tests.
+
+---
+
+### Invariant
+
+**No change may compromise the repository's structural integrity.**
+
+A commit is considered valid only when the agent demonstrates that all necessary files remain present, correctly referenced, and included in the set of changes.
+
+**The repository's architecture takes precedence over the model's internal knowledge.**
+
+Whenever there is a conflict between what the model believes and what exists in the code, the agent must follow the existing code.
+
 # 🧬 Testing Standards — iaglobal
 
 ## 📁 Output Directory
@@ -1033,7 +1298,9 @@ All AI model calls must go through `BanditPolicy` for:
 | `iaglobal status` | Show system dashboard |
 | `iaglobal history --list` | List execution history |
 | `evolution-lab` | Run evolution lab |
-| `python iaglobal/auditoria_arquitetural.py` | Run architectural audit (orphan detection) |
+| `python -m iaglobal.auditoria_arquitetural` | Run architectural audit (nominal collision detection) |
+| `python -m iaglobal.auditoria_arquitetural --include-functions` | Include function-level collision detection |
+| `python -m iaglobal.auditoria_arquitetural --json` | Structured JSON output |
 | `python -m pytest iaglobal/tests/test_mitochondrial_probe.py -v` | Run mitochondrial probe tests |
 | `python -m pytest iaglobal/tests/test_psc_hierarchy.py -v` | Run PSC sovereignty tests |
 | `python -m pytest iaglobal/tests/test_instrument_decorator.py -v` | Run instrument decorator tests |

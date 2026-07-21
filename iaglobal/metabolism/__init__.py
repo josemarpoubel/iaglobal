@@ -23,7 +23,10 @@ from iaglobal.metabolism.metabolic_metrics import MetabolicMetrics
 from iaglobal.metabolism.metabolic_invariants import MetabolicInvariants
 from iaglobal.metabolism.metabolic_autocorrect import MetabolicAutocorrect
 from iaglobal.metabolism.clarity_directive import ClarityDirective
-from iaglobal.metabolism.joint_optimization import JointOptimizationLoop, joint_optimization_loop
+from iaglobal.metabolism.joint_optimization import (
+    JointOptimizationLoop,
+    joint_optimization_loop,
+)
 
 __all__ = [
     "MethylationEngine",

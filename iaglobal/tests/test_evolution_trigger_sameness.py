@@ -45,12 +45,12 @@ class TestEvolutionTriggerSAMeSpending:
     async def test_single_spend_on_trigger(self):
         """Gasto único de SAMe quando trigger dispara evolução."""
         balance_before = same_pool.balance("evolution_trigger")
-        
+
         with patch.object(EvolutionTrigger, "_record_outcome"):
             result = await EvolutionTrigger.trigger(self._make_ctx(score=30))
-        
+
         balance_after = same_pool.balance("evolution_trigger")
-        
+
         assert result["evolution_triggered"] is True
         assert balance_before - balance_after == COST_CREATE_SKILL
         assert result["same_used"] == COST_CREATE_SKILL
@@ -59,10 +59,10 @@ class TestEvolutionTriggerSAMeSpending:
     async def test_no_spend_when_score_high(self):
         """Sem gasto de SAMe quando score é alto (>= 70)."""
         balance_before = same_pool.balance("evolution_trigger")
-        
+
         result = await EvolutionTrigger.trigger(self._make_ctx(score=85))
         balance_after = same_pool.balance("evolution_trigger")
-        
+
         assert result["evolution_triggered"] is False
         # Deve ter recharge, não gasto
         assert balance_after > balance_before
@@ -72,16 +72,18 @@ class TestEvolutionTriggerSAMeSpending:
     async def test_spend_occurs_once_even_on_exception(self):
         """Exceção após spend() não causa gasto duplo."""
         balance_before = same_pool.balance("evolution_trigger")
-        
+
         with patch.object(EvolutionTrigger, "_record_outcome"):
-            with patch("iaglobal.evolution.metacognition.evolution_trigger.EvolutionEngine") as MockEngine:
+            with patch(
+                "iaglobal.evolution.metacognition.evolution_trigger.EvolutionEngine"
+            ) as MockEngine:
                 instance = AsyncMock()
                 instance.evolve = AsyncMock(side_effect=RuntimeError("Falha simulada"))
                 MockEngine.return_value = instance
                 result = await EvolutionTrigger.trigger(self._make_ctx(score=30))
-        
+
         balance_after = same_pool.balance("evolution_trigger")
-        
+
         assert result["evolution_triggered"] is False
         assert "Falha na evolução" in result["reason"]
         # spend() ocorreu (gasto pelo attempt), mas não houve segundo gasto
@@ -91,12 +93,12 @@ class TestEvolutionTriggerSAMeSpending:
     async def test_concurrent_triggers_no_overspend(self):
         """Múltiplos triggers concorrentes não causam gasto além do esperado."""
         balance_before = same_pool.balance("evolution_trigger")
-        
+
         async def trigger_once(score: int):
             ctx = self._make_ctx(score=score)
             with patch.object(EvolutionTrigger, "_record_outcome"):
                 return await EvolutionTrigger.trigger(ctx)
-        
+
         # Dispara 3 triggers concorrentes
         results = await asyncio.gather(
             trigger_once(30),
@@ -104,10 +106,10 @@ class TestEvolutionTriggerSAMeSpending:
             trigger_once(35),
             return_exceptions=True,
         )
-        
+
         balance_after = same_pool.balance("evolution_trigger")
         actual_spend = balance_before - balance_after
-        
+
         # 3 triggers × 10 = 30 (máximo esperado)
         assert actual_spend <= 3 * COST_CREATE_SKILL
         assert actual_spend > 0
@@ -118,9 +120,9 @@ class TestEvolutionTriggerSAMeSpending:
         # Força saldo baixo
         with same_pool._io_lock:
             same_pool.accounts["evolution_trigger"].balance = 5
-        
+
         result = await EvolutionTrigger.trigger(self._make_ctx(score=30))
-        
+
         assert result["evolution_triggered"] is False
         assert "SAMe insuficiente" in result["reason"]
         # Não gasta o pouco que tem
@@ -130,9 +132,9 @@ class TestEvolutionTriggerSAMeSpending:
     async def test_recharge_on_high_score(self):
         """Recarga de SAMe ocorre quando score é alto."""
         balance_before = same_pool.balance("evolution_trigger")
-        
+
         result = await EvolutionTrigger.trigger(self._make_ctx(score=85))
         balance_after = same_pool.balance("evolution_trigger")
-        
+
         assert result["evolution_triggered"] is False
         assert balance_after - balance_before == RECHARGE_RATE

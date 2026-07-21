@@ -118,7 +118,9 @@ async def test_immune_cycle_vaccine_hit():
     start = time.monotonic()
 
     output = execute_code(codigo, timeout=10)
-    assert output and "<Error:" in output, "Código com SyntaxError deve produzir output de erro"
+    assert output and "<Error:" in output, (
+        "Código com SyntaxError deve produzir output de erro"
+    )
 
     d = parse_error(output, codigo)
     vacina = await check_vaccine(d, TEST_LINEAGE)

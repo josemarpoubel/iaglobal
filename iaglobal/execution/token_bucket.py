@@ -74,14 +74,15 @@ class LocalModelGate:
 
     # Capacidades por tier do ROADMAP_2
     BUCKET_CAPACITY: ClassVar[dict[str, int]] = {
-        "glm4": 2,   # Juiz: processamento crítico, 1 por vez
-        "qwen": 6,   # Operário: fluxo principal, throughput moderado
-        "lfm": 8,    # Sentinela: monitor+validation rápido, paralelismo máximo
+        "glm4": 2,  # Juiz: processamento crítico, 1 por vez
+        "qwen": 6,  # Operário: fluxo principal, throughput moderado
+        "lfm": 8,  # Sentinela: monitor+validation rápido, paralelismo máximo
     }
 
     def __init__(self) -> None:
         # Importar TaskRouter para classificação de node_id → tier
         from iaglobal.providers.task_router import TaskRouter
+
         self.router = TaskRouter()
 
         # Buckets independentes por tier
@@ -119,7 +120,8 @@ class LocalModelGate:
     def get_priority(cls, node_id: str) -> float:
         """Mapeia node_id para prioridade 0.0-1.0 para o tier correspondente."""
         nid = (
-            (node_id or "").lower()
+            (node_id or "")
+            .lower()
             .replace("_agent", "")
             .replace("agent_", "")
             .replace("no_", "")
@@ -202,8 +204,11 @@ class LocalModelGate:
             logger.info(
                 "[LOCAL_GATE] Congestion alert -> tier=%s usage=%.1f%% "
                 "conc=%d/%d rejections=%d",
-                tier, payload["usage_pct"], payload["current_concurrency"],
-                payload["capacity"], payload["rejections"]
+                tier,
+                payload["usage_pct"],
+                payload["current_concurrency"],
+                payload["capacity"],
+                payload["rejections"],
             )
         except Exception as e:
             logger.debug("[LOCAL_GATE] Falha ao publicar congestão: %s", e)
@@ -255,7 +260,10 @@ class LocalModelGate:
                 self._consecutive_reductions[tier] = cons + 1
                 logger.warning(
                     "[LOCAL_GATE] Tier %s fill_rate reduzido para %.1f tok/s (latency=%.0fms, reduction=%d/3)",
-                    tier, bucket.fill_rate, latency_ms, cons + 1
+                    tier,
+                    bucket.fill_rate,
+                    latency_ms,
+                    cons + 1,
                 )
             elif latency_ms < 300:
                 # Recupera fill_rate em baixa carga
@@ -273,7 +281,9 @@ class LocalModelGate:
                 return True
         return False
 
-    async def waiter_deferred_reduction(self, tier: str, reduction: float = 0.3) -> None:
+    async def waiter_deferred_reduction(
+        self, tier: str, reduction: float = 0.3
+    ) -> None:
         """Reduz fill_rate de um tier em resposta a um alerta (único por tier).
 
         Chamado pelo PipelineEngine quando recebe um alert de tier_congestion_alert.
@@ -287,5 +297,8 @@ class LocalModelGate:
         if old != bucket.fill_rate:
             logger.info(
                 "[LOCAL_GATE] Tier %s fill_rate reduzido %.1f→%.1f tok/s (redução de %.0f%%)",
-                tier, old, bucket.fill_rate, reduction * 100
+                tier,
+                old,
+                bucket.fill_rate,
+                reduction * 100,
             )

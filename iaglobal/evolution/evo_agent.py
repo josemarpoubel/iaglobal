@@ -922,9 +922,7 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
     # A flag é setada externamente (epigenetic.set_flag("immune_cycle", True))
     # ou por mutação após X falhas consecutivas de código.
 
-    async def _immune_correction_cycle(
-        self, code: str, prompt: str = ""
-    ) -> dict:
+    async def _immune_correction_cycle(self, code: str, prompt: str = "") -> dict:
         """
         Ciclo completo de correção imunológica.
 
@@ -981,7 +979,9 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
                 recovery.delta_segundos = round(time.monotonic() - start, 3)
                 logger.info(
                     "[%s] Vacina aplicada para %s | tentativa=%d",
-                    self.name, d.tipo_erro, tentativas,
+                    self.name,
+                    d.tipo_erro,
+                    tentativas,
                 )
                 break
 
@@ -994,7 +994,9 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
                 current_code = fix
                 logger.info(
                     "[%s] Correção determinística: %s → tentativa %d",
-                    self.name, d.tipo_erro, tentativas,
+                    self.name,
+                    d.tipo_erro,
+                    tentativas,
                 )
                 continue
 
@@ -1017,7 +1019,9 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
                 current_code = fixed
                 logger.info(
                     "[%s] Correção via crítico: %s → tentativa %d",
-                    self.name, d.tipo_erro, tentativas,
+                    self.name,
+                    d.tipo_erro,
+                    tentativas,
                 )
             except Exception as e:
                 logger.debug("[%s] Crítico indisponível: %s", self.name, e)
@@ -1303,9 +1307,9 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
 
         # --- Integração com ApoptosisEngine ---
         try:
-            from iaglobal.immunity.apoptosis_engine import apoptosis_engine
+            from iaglobal.immunity.apoptosis_engine import immune_apoptosis_engine
 
-            await apoptosis_engine.execute(
+            await immune_apoptosis_engine.execute(
                 agent_name=self.name, agent_state=state, reason=reason
             )
         except Exception as e:

@@ -8,7 +8,8 @@ from typing import Optional
 
 from iaglobal.agents.failure_analysis_agent import FailureAnalysisAgent
 from iaglobal.graphs.comms.acetylcholine_bus import (
-    AcetylcholineBus, AgentMessage,
+    AcetylcholineBus,
+    AgentMessage,
 )
 from iaglobal.providers.provider_router import cognitive_dispatch
 from iaglobal.utils.logger import get_logger
@@ -94,12 +95,11 @@ class SentinelOrchestrator:
         )
         logger.info(
             "[SENTINEL] Task %s: %d violação(ões) publicada(s) no barramento",
-            task_id, len(violations),
+            task_id,
+            len(violations),
         )
 
-    async def _analyze_requirements(
-        self, prompt: str, code: str
-    ) -> list[dict]:
+    async def _analyze_requirements(self, prompt: str, code: str) -> list[dict]:
         """Híbrido: keyword scan → LFM confirmation.
 
         Fase 1 — check_requirements() (zero custo de inferência):
@@ -116,9 +116,7 @@ class SentinelOrchestrator:
 
         # Fase 2: Confirmação semântica via LFM-230M
         confirmed = []
-        lfm_prompt = LFM_CONFIRM_PROMPT.format(
-            request=prompt[:2000], code=code[:3000]
-        )
+        lfm_prompt = LFM_CONFIRM_PROMPT.format(request=prompt[:2000], code=code[:3000])
 
         try:
             lfm_result = await asyncio.wait_for(
@@ -132,7 +130,8 @@ class SentinelOrchestrator:
         except (asyncio.TimeoutError, Exception) as exc:
             logger.warning(
                 "[SENTINEL] LFM timeout/erro (%s) — mantendo %d violações keyword",
-                exc, len(violations),
+                exc,
+                len(violations),
             )
             return violations
 
@@ -143,7 +142,10 @@ class SentinelOrchestrator:
             cat = v.get("category", "")
             req = v.get("requirement", "")
             chk = v.get("check", "")
-            if any(term in lfm_result.lower() for term in [req.lower(), chk.lower(), cat.lower()]):
+            if any(
+                term in lfm_result.lower()
+                for term in [req.lower(), chk.lower(), cat.lower()]
+            ):
                 confirmed.append(v)
 
         return confirmed or violations

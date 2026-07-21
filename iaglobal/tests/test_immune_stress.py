@@ -70,7 +70,9 @@ class ImmuneStressSimulator:
         fix = ""
 
         # Simula vacina existente: registra primeiro, depois "encontra"
-        await register_vaccine(d, "x = (1 + 2)", lineage_marker=self.lineage_marker + "_innate")
+        await register_vaccine(
+            d, "x = (1 + 2)", lineage_marker=self.lineage_marker + "_innate"
+        )
 
         vacina = await check_vaccine(d, lineage_marker=self.lineage_marker + "_innate")
         if vacina is not None:
@@ -184,13 +186,19 @@ def print_results(results: list[StressResult]) -> None:
 
     if innate:
         avg_innate = sum(r.latency_ms for r in innate) / len(innate)
-        print(f"\n📊 Resposta Inata (vacina): {len(innate)} ocorrências | latência média {avg_innate:.2f}ms")
+        print(
+            f"\n📊 Resposta Inata (vacina): {len(innate)} ocorrências | latência média {avg_innate:.2f}ms"
+        )
     if adaptive:
         avg_adaptive = sum(r.latency_ms for r in adaptive) / len(adaptive)
-        print(f"📊 Resposta Adaptativa (nova vacina): {len(adaptive)} ocorrências | latência média {avg_adaptive:.2f}ms")
+        print(
+            f"📊 Resposta Adaptativa (nova vacina): {len(adaptive)} ocorrências | latência média {avg_adaptive:.2f}ms"
+        )
     if complex_resp:
         avg_complex = sum(r.latency_ms for r in complex_resp) / len(complex_resp)
-        print(f"📊 Resposta Complexa (crítico): {len(complex_resp)} ocorrências | latência média {avg_complex:.2f}ms")
+        print(
+            f"📊 Resposta Complexa (crítico): {len(complex_resp)} ocorrências | latência média {avg_complex:.2f}ms"
+        )
 
 
 @pytest.mark.asyncio
@@ -235,7 +243,9 @@ async def test_immune_stress_complex():
     """Cenário 3: erro sem padrão → delega ao crítico."""
     sim = ImmuneStressSimulator()
     result = await sim.simulate_complex()
-    assert not result.deterministic_fix, "Erro complexo NÃO deve ter correção determinística"
+    assert not result.deterministic_fix, (
+        "Erro complexo NÃO deve ter correção determinística"
+    )
 
 
 @pytest.mark.asyncio
@@ -273,10 +283,13 @@ async def test_immune_stress_full_pipeline():
     # Verifica o report do JOL
     report = await joint_optimization_loop.get_colony_report()
     assert report["total_executions"] >= len(results)
-    print(f"\n📈 JOL Colony Report: {report['total_executions']} execuções | IVM global={report['global_ivm']}")
+    print(
+        f"\n📈 JOL Colony Report: {report['total_executions']} execuções | IVM global={report['global_ivm']}"
+    )
 
 
 if __name__ == "__main__":
+
     async def main():
         sim = ImmuneStressSimulator()
         results = await sim.run_all()

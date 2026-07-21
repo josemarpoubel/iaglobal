@@ -34,20 +34,33 @@ except ImportError:
 from iaglobal.providers.ollama_provider import async_generate as ollama_async_generate
 from iaglobal.providers.contract import registry
 
+
 # Bootstrap: importa cada módulo provider para disparar registry.register()
 def _bootstrap_providers() -> None:
     import importlib
+
     _provider_modules = [
-        "groq", "openrouter", "nvidia", "opencode", "gemini",
-        "openai", "perplexity", "huggingchat", "poe",
-        "hf_router", "hf_video",
+        "groq",
+        "openrouter",
+        "nvidia",
+        "opencode",
+        "gemini",
+        "openai",
+        "perplexity",
+        "huggingchat",
+        "poe",
+        "hf_router",
+        "hf_video",
     ]
     for _name in _provider_modules:
         try:
             importlib.import_module(f"iaglobal.providers.{_name}_provider")
         except ImportError:
             logger.debug("[ROUTER] Provider %s_nao_provider nao encontrado", _name)
-    logger.debug("[ROUTER] Bootstrap de providers concluido (ollama registrado via import direto)")
+    logger.debug(
+        "[ROUTER] Bootstrap de providers concluido (ollama registrado via import direto)"
+    )
+
 
 _bootstrap_providers()
 
@@ -55,7 +68,10 @@ _bootstrap_providers()
 # Mapeia tipo de tarefa → rota metabólica, extraindo capacidade do
 # ProviderConfig.  Desacoplado do gerenciamento de buckets (Passo 3).
 from iaglobal.providers.provider_config import (
-    ProviderConfig, CognitiveRole, get_model_config, get_role_by_model_id,
+    ProviderConfig,
+    CognitiveRole,
+    get_model_config,
+    get_role_by_model_id,
 )
 
 from iaglobal.metabolism.bucket_manager import BucketManager
@@ -223,7 +239,8 @@ async def cognitive_dispatch(
         # bypass completo, retorna fallback vazio.
         logger.warning(
             "[COGNITIVE] %s (%s): todos os tiers exaustos — bypass",
-            node_id, route,
+            node_id,
+            route,
         )
         return ""
 
@@ -232,11 +249,16 @@ async def cognitive_dispatch(
         model = f"ollama/{raw_model}"
         logger.info(
             "[COGNITIVE] dispatch node=%s route=%s granted=%s model=%s",
-            node_id, route, granted_route, model,
+            node_id,
+            route,
+            granted_route,
+            model,
         )
         result = await async_route_generate(
-            model=model, prompt=prompt,
-            task_type=task_type, node_id=node_id,
+            model=model,
+            prompt=prompt,
+            task_type=task_type,
+            node_id=node_id,
         )
         return result or ""
     finally:
@@ -292,14 +314,33 @@ PROVIDER_TIMEOUT = {
 # Constrói PROVIDERS e ASYNC_PROVIDERS dinamicamente a partir do Registry
 # Aliases não-padrão (ollama_glm4, ollama_lfm, hf_router_*) são adicionados explicitamente.
 _HF_ROUTER_ALIASES = [
-    "hf_router_qwen", "hf_router_qwenext", "hf_router_30b", "hf_router_32b",
-    "hf_router_opus", "hf_router_llama", "hf_router_groq", "hf_router_groq8",
-    "hf_router_hermes", "hf_router_nemotron", "hf_router_nemo2",
-    "hf_router_ultra", "hf_router_oss", "hf_router_oss2",
-    "hf_router_glm", "hf_router_glm4", "hf_router_glm5", "hf_router_glm45",
-    "hf_router_glm5f", "hf_router_phi4", "hf_router_qwen36",
-    "hf_router_v4pro", "hf_router_r1", "hf_router_35",
-    "hf_router_amelia", "hf_router_kimi", "hf_router_minimax",
+    "hf_router_qwen",
+    "hf_router_qwenext",
+    "hf_router_30b",
+    "hf_router_32b",
+    "hf_router_opus",
+    "hf_router_llama",
+    "hf_router_groq",
+    "hf_router_groq8",
+    "hf_router_hermes",
+    "hf_router_nemotron",
+    "hf_router_nemo2",
+    "hf_router_ultra",
+    "hf_router_oss",
+    "hf_router_oss2",
+    "hf_router_glm",
+    "hf_router_glm4",
+    "hf_router_glm5",
+    "hf_router_glm45",
+    "hf_router_glm5f",
+    "hf_router_phi4",
+    "hf_router_qwen36",
+    "hf_router_v4pro",
+    "hf_router_r1",
+    "hf_router_35",
+    "hf_router_amelia",
+    "hf_router_kimi",
+    "hf_router_minimax",
 ]
 
 PROVIDERS: dict[str, Callable] = dict(registry.sync)
@@ -308,8 +349,12 @@ ASYNC_PROVIDERS: dict[str, Callable] = dict(registry.async_)
 # Aliases sync — ollama_glm4/lfm + hf_router_*
 if "ollama" in PROVIDERS:
     _o_sync = PROVIDERS["ollama"]
-    PROVIDERS.setdefault("ollama_glm4", lambda p, **k: _o_sync(p, model=GLM4_MODEL_ID, **k))
-    PROVIDERS.setdefault("ollama_lfm", lambda p, **k: _o_sync(p, model=LFM_MODEL_ID, **k))
+    PROVIDERS.setdefault(
+        "ollama_glm4", lambda p, **k: _o_sync(p, model=GLM4_MODEL_ID, **k)
+    )
+    PROVIDERS.setdefault(
+        "ollama_lfm", lambda p, **k: _o_sync(p, model=LFM_MODEL_ID, **k)
+    )
 if "hf_router" in PROVIDERS:
     _hfr_sync = PROVIDERS["hf_router"]
     for _a in _HF_ROUTER_ALIASES:
@@ -430,6 +475,7 @@ def _provider_has_key(provider: str) -> bool:
         return True
     try:
         from iaglobal.providers.provider_config import ProviderConfig
+
         key_map = {
             "groq": ProviderConfig.GROQ_API_KEY,
             "nvidia": ProviderConfig.NVIDIA_API_KEY,

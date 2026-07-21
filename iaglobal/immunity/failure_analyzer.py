@@ -64,13 +64,13 @@ _ERROR_PATTERNS = [
     (r"Exception", "RuntimeError"),
 ]
 
-_LINE_PATTERN = re.compile(r'line\s+(\d+)', re.IGNORECASE)
+_LINE_PATTERN = re.compile(r"line\s+(\d+)", re.IGNORECASE)
 _FILE_PATTERN = re.compile(r'File\s+"([^"]+)"', re.IGNORECASE)
 _ERROR_LINE_PATTERN = re.compile(
-    r'(?:Traceback.*\n)?.*?(?:Error|Exception|Timeout|Warning):\s*(.*)',
+    r"(?:Traceback.*\n)?.*?(?:Error|Exception|Timeout|Warning):\s*(.*)",
     re.DOTALL,
 )
-_TRACEBACK_CLEAN_PATTERN = re.compile(r'/home/[^/]+/[^\s:]+')
+_TRACEBACK_CLEAN_PATTERN = re.compile(r"/home/[^/]+/[^\s:]+")
 
 
 def _sanitize_paths(text: str) -> str:
@@ -91,7 +91,14 @@ def _extract_error_type(output: str) -> str:
 def _extract_error_message(output: str) -> str:
     """Extrai a mensagem principal do erro."""
     lines = output.strip().splitlines()
-    significant = [l for l in lines if l.strip() and not l.startswith("[") and "exit code" not in l and "stderr" not in l]
+    significant = [
+        l
+        for l in lines
+        if l.strip()
+        and not l.startswith("[")
+        and "exit code" not in l
+        and "stderr" not in l
+    ]
     if not significant:
         return output[:200]
     for line in reversed(significant):
@@ -167,8 +174,8 @@ def fingerprint_error(traceback_str: str) -> str:
     fingerprint → vacina universal.
     """
     cleaned = _sanitize_paths(traceback_str)
-    cleaned = re.sub(r'line \d+', 'line N', cleaned, flags=re.IGNORECASE)
-    cleaned = re.sub(r'\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}', '<TIMESTAMP>', cleaned)
+    cleaned = re.sub(r"line \d+", "line N", cleaned, flags=re.IGNORECASE)
+    cleaned = re.sub(r"\d{4}-\d{2}-\d{2}[ T]\d{2}:\d{2}:\d{2}", "<TIMESTAMP>", cleaned)
     return hashlib.sha256(cleaned.encode()).hexdigest()
 
 
@@ -232,7 +239,9 @@ async def register_vaccine(
 
         marker = getattr(evo, "lineage_marker", None) or lineage_marker
         if not marker:
-            logger.debug("[FAILURE_ANALYZER] Sem lineage_marker — vacina não registrada")
+            logger.debug(
+                "[FAILURE_ANALYZER] Sem lineage_marker — vacina não registrada"
+            )
             return
 
         pattern = f"{diagnostico.fingerprint}::type={diagnostico.tipo_erro}"
@@ -242,7 +251,9 @@ async def register_vaccine(
             "correction_preview": correction[:200],
         }
         await vaccine_ledger.registrar_falha(
-            type("_EvoProxy", (), {"lineage_marker": marker, "name": "failure_analyzer"})(),
+            type(
+                "_EvoProxy", (), {"lineage_marker": marker, "name": "failure_analyzer"}
+            )(),
             pattern,
             context,
         )
@@ -326,7 +337,7 @@ def _fix_indentation(code: str) -> str:
     for line in lines:
         if line.strip():
             stripped = line.lstrip()
-            leading = line[:len(line) - len(stripped)]
+            leading = line[: len(line) - len(stripped)]
             fixed_spaces = leading.replace("\t", "    ")
             fixed.append(fixed_spaces + stripped)
         else:
@@ -358,9 +369,9 @@ def _fix_import_error(code: str, message: str) -> str:
             f"{indent}try:",
             f"{indent}    {lines[import_line].strip()}",
             f"{indent}except ImportError:",
-            f'{indent}    pass  # {module} not available — graceful degradation',
+            f"{indent}    pass  # {module} not available — graceful degradation",
         ]
-        lines[import_line:import_line + 1] = try_block
+        lines[import_line : import_line + 1] = try_block
     return "\n".join(lines)
 
 
@@ -374,7 +385,9 @@ def _fix_name_error(code: str, message: str) -> str:
         for i, line in enumerate(lines):
             if var_name in line and "=" not in line.split(var_name)[0]:
                 indent = " " * (len(line) - len(line.lstrip()))
-                lines.insert(i, f"{indent}{var_name} = None  # auto-declared by FailureAnalyzer")
+                lines.insert(
+                    i, f"{indent}{var_name} = None  # auto-declared by FailureAnalyzer"
+                )
                 break
         return "\n".join(lines)
     return code
@@ -386,8 +399,13 @@ def _fix_empty_output(code: str) -> str:
     if not lines:
         return 'print("No output produced")'
     last = lines[-1].strip()
-    if last and not last.startswith(("print", "return", "assert", "#", "def ", "class ", "import ", "from ")):
-        if not any(kw in last for kw in ("=", "for ", "while ", "if ", "try:", "except", "with ")):
+    if last and not last.startswith(
+        ("print", "return", "assert", "#", "def ", "class ", "import ", "from ")
+    ):
+        if not any(
+            kw in last
+            for kw in ("=", "for ", "while ", "if ", "try:", "except", "with ")
+        ):
             indent = " " * (len(lines[-1]) - len(lines[-1].lstrip()))
             lines.append(f"{indent}print({last})")
     return "\n".join(lines)

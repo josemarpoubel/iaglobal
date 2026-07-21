@@ -39,6 +39,7 @@ logging.basicConfig(level=logging.CRITICAL)
 
 # ── Helpers ──────────────────────────────────────────────────────────────────
 
+
 def _reset_omnimind_singleton():
     OmniMind._instance = None
 
@@ -226,9 +227,7 @@ class TestSelecaoDeLei:
         assert depois == antes + 1
 
     def test_consultar_agente_nao_registrado_nao_quebra(self):
-        orientacao = self.om.consultar(
-            "nao-existe", "teste sem registro"
-        )
+        orientacao = self.om.consultar("nao-existe", "teste sem registro")
         assert "agente-desconhecido" in orientacao.guidance
 
 
@@ -275,9 +274,7 @@ class TestGatilhosMetabolicos:
 
     def test_registrar_aprendizado_acumula(self):
         for i in range(5):
-            self.om.registrar_aprendizado(
-                f"agent-{i}", "test", f"aprendizado {i}"
-            )
+            self.om.registrar_aprendizado(f"agent-{i}", "test", f"aprendizado {i}")
         assert len(self.om._aprendizados) >= 5
 
 
@@ -308,21 +305,15 @@ class TestCooperacaoEIvm:
 
     @pytest.mark.asyncio
     async def test_update_ivm_excelente(self):
-        await self.om.update_ivm_metric(
-            "coder-1", 0.95, {"task_hash": "task-alta"}
-        )
+        await self.om.update_ivm_metric("coder-1", 0.95, {"task_hash": "task-alta"})
 
     @pytest.mark.asyncio
     async def test_update_ivm_critico(self):
-        await self.om.update_ivm_metric(
-            "coder-1", 0.30, {"task_hash": "task-baixa"}
-        )
+        await self.om.update_ivm_metric("coder-1", 0.30, {"task_hash": "task-baixa"})
 
     @pytest.mark.asyncio
     async def test_update_ivm_medio(self):
-        await self.om.update_ivm_metric(
-            "coder-1", 0.75, {"task_hash": "task-media"}
-        )
+        await self.om.update_ivm_metric("coder-1", 0.75, {"task_hash": "task-media"})
 
     @pytest.mark.asyncio
     async def test_update_ivm_sem_metadata(self):
@@ -462,6 +453,7 @@ class TestApoptoseContratual:
 
         # 4. Unrevoke readmite
         from iaglobal.genesis.lineage_gate import unrevoke_node
+
         unrevoke_node("coder", "reabilitado apos revisao")
         raw = json.loads(crl.read_text(encoding="utf-8"))
         assert "coder" not in raw.get("revoked", {})
@@ -515,10 +507,8 @@ class TestConcorrencia:
         _reset_omnimind_singleton()
         om = OmniMind()
         import asyncio
-        tasks = [
-            om.update_ivm_metric(f"agent-{i}", 0.5 + i * 0.05)
-            for i in range(20)
-        ]
+
+        tasks = [om.update_ivm_metric(f"agent-{i}", 0.5 + i * 0.05) for i in range(20)]
         results = await asyncio.gather(*tasks, return_exceptions=True)
         erros = [r for r in results if isinstance(r, Exception)]
         assert not erros, f"Erros async: {erros}"

@@ -681,7 +681,87 @@
       "duration_hours": null,
       "expires_at": 0,
       "action": "revoke"
+    },
+    {
+      "node": "agent_0",
+      "reason": "Apoptose contratual: Thread 0 violou contrato",
+      "timestamp": 1784509355.1808527,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_1",
+      "reason": "Apoptose contratual: Thread 1 violou contrato",
+      "timestamp": 1784509355.181937,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_2",
+      "reason": "Apoptose contratual: Thread 2 violou contrato",
+      "timestamp": 1784509355.1832542,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_3",
+      "reason": "Apoptose contratual: Thread 3 violou contrato",
+      "timestamp": 1784509355.1846786,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_4",
+      "reason": "Apoptose contratual: Thread 4 violou contrato",
+      "timestamp": 1784509355.1862006,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_5",
+      "reason": "Apoptose contratual: Thread 5 violou contrato",
+      "timestamp": 1784509355.187264,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_6",
+      "reason": "Apoptose contratual: Thread 6 violou contrato",
+      "timestamp": 1784509355.188475,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_7",
+      "reason": "Apoptose contratual: Thread 7 violou contrato",
+      "timestamp": 1784509355.190344,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_9",
+      "reason": "Apoptose contratual: Thread 9 violou contrato",
+      "timestamp": 1784509355.1921942,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
+    },
+    {
+      "node": "agent_8",
+      "reason": "Apoptose contratual: Thread 8 violou contrato",
+      "timestamp": 1784509355.1937685,
+      "duration_hours": null,
+      "expires_at": 0,
+      "action": "revoke"
     }
   ],
-  "last_updated": 1784385133.580456
+  "last_updated": 1784509355.1937718
 }

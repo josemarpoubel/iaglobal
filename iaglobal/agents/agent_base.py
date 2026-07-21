@@ -244,6 +244,7 @@ class AgentBase(ABC):
 
         candidates = candidates or self.DEFAULT_CANDIDATES
         from iaglobal.providers.provider_router import _provider_has_key
+
         candidates = [c for c in candidates if _provider_has_key(c.split("/")[0])]
 
         if context is None:

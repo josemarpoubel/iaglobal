@@ -13,6 +13,7 @@ logger = logging.getLogger("iaglobal.providers")
 
 class CognitiveRole(Enum):
     """Papéis cognitivos dos modelos locais — diferenciação celular aplicada à IA."""
+
     JUIZ = "juiz"
     OPERARIO = "operario"
     SENTINELA = "sentinela"

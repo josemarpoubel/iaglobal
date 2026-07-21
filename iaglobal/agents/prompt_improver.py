@@ -1022,14 +1022,19 @@ class DecompositionEngine:
 
 
 # ---------------------------------------------------------------------------
-# Reflection Engine
+# Prompt Reflection Engine
 # ---------------------------------------------------------------------------
 
 
-class ReflectionEngine:
+class PromptReflectionEngine:
     """
     Gera checklist de auto-crítica dinâmica baseada em domínio,
     histórico de erros (error_context) e exemplos negativos do MTA.
+
+    DIFERENTE de iaglobal.evolution.metacognition.reflection.ReflectionEngine
+    que produz reflexões sobre execuções de agentes (metacognição).
+
+    Esta classe é específica para reflexão sobre QUALIDADE DE PROMPTS.
     """
 
     _UNIVERSAL_CHECKS = [
@@ -1058,7 +1063,7 @@ class ReflectionEngine:
         else:
             lines.append("\n[AUTO-REVISÃO OBRIGATÓRIA]")
             lines.append("Antes de finalizar, confirme cada item:")
-            for check in ReflectionEngine._UNIVERSAL_CHECKS:
+            for check in PromptReflectionEngine._UNIVERSAL_CHECKS:
                 lines.append(f"☐ {check}")
 
         # ── Checks específicos por domínio ───────────────────────────────────
@@ -1140,7 +1145,7 @@ class PromptImprover:
         self._complexity = ComplexityEngine()
         self._persona = PersonaComposer()
         self._decomposer = DecompositionEngine()
-        self._reflection = ReflectionEngine()
+        self._reflection = PromptReflectionEngine()
 
     def improve(
         self,

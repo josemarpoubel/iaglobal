@@ -441,18 +441,23 @@ def test_effective_agent_in_bandit_generate(monkeypatch, bandit_module):
             pass
 
     from iaglobal.execution.token_bucket import LocalModelGate
+
     orig_get_instance = LocalModelGate.get_instance
+
     async def _fake_gate(*args, **kwargs):
         gate = await orig_get_instance(*args, **kwargs)
         gate._rejected_counts = {"glm4": 0, "qwen": 0, "lfm": 0}
         for tier, bucket in gate.buckets.items():
             bucket.tokens = bucket.capacity
         return gate
+
     monkeypatch.setattr(LocalModelGate, "get_instance", _fake_gate)
 
     orig_acquire = bandit_module.BanditPolicy.acquire_model
+
     async def _fake_acquire(self, model_name, node_id=""):
         return True
+
     monkeypatch.setattr(bandit_module.BanditPolicy, "acquire_model", _fake_acquire)
 
     out = asyncio.run(

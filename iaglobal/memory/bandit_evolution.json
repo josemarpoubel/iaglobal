@@ -50,12 +50,32 @@
       "latencia_media_ms": 0.44524645805358887,
       "custo_medio_creditos": 2.71,
       "fitness_score": 0.4
+    },
+    "ollama/qwen2.5:0.5b": {
+      "provider_id": "ollama/qwen2.5:0.5b",
+      "total_uses": 4,
+      "successful_uses": 0,
+      "failed_uses": 4,
+      "ivm_history": [
+        0.1,
+        0.1,
+        0.1,
+        0.1
+      ],
+      "ivm_media_movel": 0.1,
+      "strikes_consecutivos": 4,
+      "ultimo_banimento": null,
+      "latencia_media_ms": 5.587364721298218,
+      "custo_medio_creditos": 0.034390000000000004,
+      "fitness_score": 0.46
     }
   },
   "banned_providers": {
-    "groq/llama-3.3-70b-versatile": "2026-07-19T14:31:48.530578+00:00",
-    "unknown": "2026-07-18T18:11:10.589192+00:00"
+    "ollama/qwen2.5:0.5b": "2026-07-21T01:02:11.173965+00:00"
   },
-  "weights": {},
-  "updated_at": "2026-07-18T14:31:48.530578+00:00"
+  "weights": {
+    "groq/llama-3.3-70b-versatile": 1.012302602138178,
+    "unknown": 0.9813364350520096
+  },
+  "updated_at": "2026-07-20T01:02:11.173965+00:00"
 }

@@ -348,8 +348,7 @@ def _safe_relative_path(base_dir: Path, user_path: str) -> Path:
         full.relative_to(base)
     except ValueError:
         raise PermissionError(
-            f"Path traversal bloqueado: '{user_path}' -> {full} "
-            f"(fora de {base})"
+            f"Path traversal bloqueado: '{user_path}' -> {full} (fora de {base})"
         )
     return full
 

@@ -43,7 +43,14 @@ class ASTGateway:
         """
 
         if not code or not code.strip():
-            return ASTResult(False, None, ["Empty code"], [], error_type="EmptyCode", fix_hint="Forneça código Python válido para análise")
+            return ASTResult(
+                False,
+                None,
+                ["Empty code"],
+                [],
+                error_type="EmptyCode",
+                fix_hint="Forneça código Python válido para análise",
+            )
 
         try:
             tree = ast.parse(code, mode=mode)
@@ -107,7 +114,11 @@ class ASTGateway:
             return "Remova zeros à esquerda de literais inteiros"
         if "invalid syntax" in msg:
             return "Verifique parênteses, colchetes e dois-pontos na linha indicada"
-        if "unindent" in msg.lower() or "indent" in msg.lower() or "IndentationError" in type(e).__name__:
+        if (
+            "unindent" in msg.lower()
+            or "indent" in msg.lower()
+            or "IndentationError" in type(e).__name__
+        ):
             return "Verifique indentação — tabs e espaços podem estar misturados. Use indentação uniforme (4 espaços)"
         if "expected an indented block" in msg:
             return "Adicione um bloco indentado após a definição da função/classe"
@@ -198,14 +209,35 @@ class ASTGateway:
                         )
 
                     dangerous_dunders = {
-                        "__subclasses__", "__mro__", "__bases__",
-                        "__globals__", "__closure__", "__code__",
-                        "__func__", "__self__", "__class__", "__dict__",
-                        "__getattribute__", "__getattr__", "__setattr__",
-                        "__delattr__", "__new__", "__reduce__", "__reduce_ex__",
-                        "__getstate__", "__setstate__", "__getitem__", "__setitem__",
-                        "__delitem__", "__iter__", "__next__", "__enter__", "__exit__",
-                        "__call__", "__instancecheck__", "__subclasscheck__",
+                        "__subclasses__",
+                        "__mro__",
+                        "__bases__",
+                        "__globals__",
+                        "__closure__",
+                        "__code__",
+                        "__func__",
+                        "__self__",
+                        "__class__",
+                        "__dict__",
+                        "__getattribute__",
+                        "__getattr__",
+                        "__setattr__",
+                        "__delattr__",
+                        "__new__",
+                        "__reduce__",
+                        "__reduce_ex__",
+                        "__getstate__",
+                        "__setstate__",
+                        "__getitem__",
+                        "__setitem__",
+                        "__delitem__",
+                        "__iter__",
+                        "__next__",
+                        "__enter__",
+                        "__exit__",
+                        "__call__",
+                        "__instancecheck__",
+                        "__subclasscheck__",
                     }
                     if node.func.attr in dangerous_dunders:
                         violations.append(

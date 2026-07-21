@@ -53,7 +53,11 @@ class FeedbackEngine:
         # Se começa com <!DOCTYPE, <html, ou tag HTML, não é Python
         first_lines = code.strip().split("\n")[:3]
         first_stripped = "\n".join(first_lines).strip()
-        if re.match(r"^\s*<(!DOCTYPE|html|head|body|div|script|style)", first_stripped, re.IGNORECASE):
+        if re.match(
+            r"^\s*<(!DOCTYPE|html|head|body|div|script|style)",
+            first_stripped,
+            re.IGNORECASE,
+        ):
             return False
         # Se começa com # === comentário de seção === (markdown-style, não Python)
         if re.match(r"^# === .+ ===$", first_lines[0].strip()):
@@ -110,17 +114,19 @@ class FeedbackEngine:
                 )
 
             # Auto-fix para "invalid decimal literal" antes da validação
-            fixed = re.sub(r'(?<!\w)0+(\d+)(?!\w)', lambda m: m.group(1), code)
-            fixed = re.sub(r'(\d[\d_]*?)_(?=\W|$)', r'\1', fixed)
-            fixed = re.sub(r'(\d)__+(\d)', r'\1_\2', fixed)
+            fixed = re.sub(r"(?<!\w)0+(\d+)(?!\w)", lambda m: m.group(1), code)
+            fixed = re.sub(r"(\d[\d_]*?)_(?=\W|$)", r"\1", fixed)
+            fixed = re.sub(r"(\d)__+(\d)", r"\1_\2", fixed)
             if fixed != code:
                 logger.info("[FEEDBACK] Auto-fix decimal literal applied")
                 code = fixed
 
             # Strip seções HTML/JS que o LLM injetou no meio do Python
             if "</" in code or "<!DOCTYPE" in code:
-                cleaned = re.sub(r'(?s)<!DOCTYPE.*?>', '', code)
-                cleaned = re.sub(r'(?s)<(html|head|body|div|script|style)[^>]*>.*?</\1>', '', cleaned)
+                cleaned = re.sub(r"(?s)<!DOCTYPE.*?>", "", code)
+                cleaned = re.sub(
+                    r"(?s)<(html|head|body|div|script|style)[^>]*>.*?</\1>", "", cleaned
+                )
                 if cleaned != code:
                     logger.info("[FEEDBACK] HTML/JS sections stripped from mixed code")
                     code = cleaned

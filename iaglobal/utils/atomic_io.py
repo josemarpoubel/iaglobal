@@ -36,6 +36,7 @@ logger = logging.getLogger(__name__)
 # Camada 1 — torn write
 # ---------------------------------------------------------------------------
 
+
 def atomic_write_json(path: Path, data: Any, indent: int = 2) -> None:
     """Escreve *data* como JSON em *path* com garantia atômica.
 
@@ -69,6 +70,7 @@ async def async_atomic_write_json(path: Path, data: Any, indent: int = 2) -> Non
 # ---------------------------------------------------------------------------
 # Camada 2 — lost update (read-modify-write seguro)
 # ---------------------------------------------------------------------------
+
 
 class AtomicJSONStore:
     """
@@ -143,6 +145,7 @@ class AtomicJSONStore:
         try:
             return json.loads(self.path.read_text(encoding="utf-8"))
         except (json.JSONDecodeError, OSError) as e:
-            logger.warning("[AtomicJSONStore] falha lendo %s, usando default: %s",
-                           self.path, e)
+            logger.warning(
+                "[AtomicJSONStore] falha lendo %s, usando default: %s", self.path, e
+            )
             return self._default

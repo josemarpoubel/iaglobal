@@ -61,6 +61,7 @@ class ExecutionGraph:
         self._bus_handlers_registered = False
         try:
             from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
+
             self._epigenetic = EpigeneticRegistry()
         except Exception:
             self._epigenetic = None
@@ -189,7 +190,31 @@ class ExecutionGraph:
         exec_id = str(input_data.get("metadata", {}).get("execution_id", raw_task))
         workdir = make_workdir(node.name, exec_id, raw_task)
 
-        ctx = {"input": input_data, "memory": self.results, "workdir": workdir}
+        # Bridge: expõe ExecutionContext + auto-resolve provider
+        exec_ctx = input_data.get("__exec_ctx")
+        ctx: Dict[str, Any] = {
+            "input": input_data,
+            "memory": self.results,
+            "workdir": workdir,
+        }
+        if exec_ctx is not None:
+            ctx["execution_context"] = exec_ctx
+            from iaglobal.pipeline.context.contextproviderregistry import (
+                provider_registry,
+            )
+            from iaglobal.pipeline.context.serializers import ContextSerializer
+
+            provider = provider_registry.get(node.name)
+            if provider is not None:
+                try:
+                    node_ctx = provider.build(exec_ctx, node_name=node.name)
+                    prompt_context = ContextSerializer().serialize(node_ctx)
+                    raw_task = f"{prompt_context}\n\n{raw_task}"
+                except Exception:
+                    logger.exception(
+                        "[GRAPH] Provider '%s' falhou — seguindo sem contexto",
+                        node.name,
+                    )
         if raw_task:
             ctx["task"] = raw_task
         trace = trace_node_execution(node.name, ctx)
@@ -529,9 +554,10 @@ class ExecutionGraph:
         elif self._epigenetic is not None:
             try:
                 import hashlib
-                task_hash = hashlib.sha256(
-                    f"{node_id}:{missing}".encode()
-                ).hexdigest()[:16]
+
+                task_hash = hashlib.sha256(f"{node_id}:{missing}".encode()).hexdigest()[
+                    :16
+                ]
                 loop = asyncio.get_running_loop()
                 # Guarda referência + done_callback para evitar que a task
                 # seja coletada pelo GC antes de completar (FIX-2).

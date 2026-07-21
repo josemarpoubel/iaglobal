@@ -102,7 +102,9 @@ async def run_validator_retry(ctx: Dict[str, Any]) -> Dict[str, Any]:
         )
 
         if correction_result and len(str(correction_result).strip()) > 20:
-            new_code = _extrair_fenced_code(str(correction_result)) or str(correction_result)
+            new_code = _extrair_fenced_code(str(correction_result)) or str(
+                correction_result
+            )
             past_attempts.append(new_code)
             corrected_code = new_code
         else:
@@ -164,6 +166,7 @@ def _extrair_codigo(memory: Dict[str, Any], ctx: Dict[str, Any]) -> str:
 
 def _extrair_fenced_code(text: str) -> Optional[str]:
     import re
+
     m = re.search(r"```(?:\w+)?\n(.*?)```", text, re.DOTALL)
     if m:
         return m.group(1).strip()

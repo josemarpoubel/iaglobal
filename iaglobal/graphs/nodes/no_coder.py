@@ -25,6 +25,7 @@ def _get_coder_contract():
     global _CODER_CONTRACT
     if _CODER_CONTRACT is None:
         from iaglobal.graphs.contracts.node_contract import NodeContract
+
         _CODER_CONTRACT = NodeContract(
             required_inputs=["prompt_builder"],
             optional_inputs=["agentmailbox"],

@@ -351,7 +351,7 @@ class CriticAgent(AgentBase):
     def _extrair_imports(self, codigo: str) -> List[str]:
         """Extrai lista de imports do código para compliance check via ASTGateway."""
         imports = []
-        
+
         # Usar ASTGateway em vez de ast.parse direto
         result = _ast_gateway.parse(codigo)
         if result.valid and result.tree:
@@ -363,7 +363,7 @@ class CriticAgent(AgentBase):
                 elif isinstance(node, ast.ImportFrom):
                     if node.module:
                         imports.append(node.module)
-        
+
         return imports
         return imports
 
@@ -518,18 +518,26 @@ class CriticAgent(AgentBase):
             logger.info(
                 "[ARBITER mode=%s] %s delegado horizontalmente para %s — "
                 "fast-path local, sem Bandit",
-                mode, node_id, _social_peer,
+                mode,
+                node_id,
+                _social_peer,
             )
-            await self._creditar_cooperacao(node_id, resolved_locally=True, via=f"social:{_social_peer}")
+            await self._creditar_cooperacao(
+                node_id, resolved_locally=True, via=f"social:{_social_peer}"
+            )
             try:
-                from iaglobal.providers.ollama_provider import async_generate as _ollama_fast
+                from iaglobal.providers.ollama_provider import (
+                    async_generate as _ollama_fast,
+                )
+
                 _social_result = await _ollama_fast(prompt, timeout=30)
                 if _social_result:
                     return _social_result
             except Exception as _social_err:
                 logger.warning(
                     "[ARBITER] fallback social %s -> Ollama falhou: %s",
-                    node_id, _social_err,
+                    node_id,
+                    _social_err,
                 )
             # Fallback: se o fast-path social falhou, escala via Bandit
 
@@ -552,6 +560,7 @@ class CriticAgent(AgentBase):
 
         candidates = getattr(self, "DEFAULT_CANDIDATES", ["ollama/qwen2.5:0.5b"])
         from iaglobal.providers.provider_router import _provider_has_key
+
         candidates = [c for c in candidates if _provider_has_key(c.split("/")[0])]
         try:
             resultado = await self.bandit.generate(
@@ -652,12 +661,18 @@ class CriticAgent(AgentBase):
             if best.load_factor >= 0.8:
                 logger.debug(
                     "[SOCIAL] %s: peer %s tem prof=%.2f mas load=%.2f — saturado, ignorando",
-                    node_id, best.agent_id, cap.proficiency, best.load_factor,
+                    node_id,
+                    best.agent_id,
+                    cap.proficiency,
+                    best.load_factor,
                 )
                 return None
             logger.info(
                 "[SOCIAL] %s: peer %s disponivel (prof=%.2f load=%.2f) — cooperacao horizontal",
-                node_id, best.agent_id, cap.proficiency, best.load_factor,
+                node_id,
+                best.agent_id,
+                cap.proficiency,
+                best.load_factor,
             )
             return best.agent_id
         except Exception as e:
@@ -879,3 +894,32 @@ Critérios:
             + scores.get("security", 0) * 0.25
             + scores.get("spec_match", 0) * 0.15
         )
+
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Ponte de compatibilidade (módulo-level)
+#
+# `arbitrar_geracao` é o portão único de geração definido como MÉTODO de
+# instância de CriticAgent (PSC/Lei da Obediência). Chamadores legados que
+# importavam a função diretamente do módulo (ex: interface/chat_agent.py)
+# continuam funcionando sem alterar a organização da API pública.
+#
+# NÃO remova esta ponte sem migrar todos os importadores para
+# `_get_critic().arbitrar_geracao(...)`.
+# ─────────────────────────────────────────────────────────────────────────────
+
+
+async def arbitrar_geracao(
+    node_id: str,
+    prompt: str,
+    task_type: str = "general",
+    context: Optional[dict] = None,
+) -> str:
+    """Ponte de compatibilidade — delega ao singleton do CriticAgent.
+
+    Mantém o contrato de ``CriticAgent.arbitrar_geracao`` intacto e preserva
+    o ponto único de passagem (chokepoint) exigido pela BanditPolicy/PSC.
+    """
+    return await _get_critic().arbitrar_geracao(
+        node_id=node_id, prompt=prompt, task_type=task_type, context=context
+    )

@@ -1,7 +1,0 @@
-[console_scripts]
-evolution-lab = iaglobal.cli.evolution_lab:run_evolution_lab
-gravar-instintos = scripts.gravar_instintos:main
-iaglobal = iaglobal.cli.main:main
-life-signals = iaglobal.cli.life_signals:main
-organism = iaglobal.core.organism_main:main
-testar = pytest:main

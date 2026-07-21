@@ -291,7 +291,9 @@ def clamp(value: float, min_val: float = 0.0, max_val: float = 1.0) -> float:
     return max(min_val, min(max_val, value))
 
 
-def compute_confidence(context: AwarenessExecutionContext) -> tuple[float, ConfidenceTrace]:
+def compute_confidence(
+    context: AwarenessExecutionContext,
+) -> tuple[float, ConfidenceTrace]:
     """
     Calcula confiança de forma determinística e composicional.
 

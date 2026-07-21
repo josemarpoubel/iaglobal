@@ -52,9 +52,7 @@ class TokenBucket:
         self.tokens = min(self.capacity, self.tokens + elapsed * self.fill_rate)
         self._last_refill = now
 
-    async def acquire(
-        self, estimated_tokens: int = 100, timeout: float = 0.0
-    ) -> bool:
+    async def acquire(self, estimated_tokens: int = 100, timeout: float = 0.0) -> bool:
         """Tenta consumir *estimated_tokens* do bucket.
 
         timeout=0 → non-blocking (retorna False imediatamente se insuficiente).
@@ -72,8 +70,7 @@ class TokenBucket:
                     self.current_concurrent += 1
                     self.tokens -= estimated_tokens
                     logger.debug(
-                        "[BUCKET] acquired tokens=%d concurrent=%d/%d "
-                        "remaining=%.0f",
+                        "[BUCKET] acquired tokens=%d concurrent=%d/%d remaining=%.0f",
                         estimated_tokens,
                         self.current_concurrent,
                         self.max_concurrent,
@@ -87,7 +84,9 @@ class TokenBucket:
 
             logger.debug(
                 "[BUCKET] acquire rejected (concurrent=%d/%d tokens=%.0f)",
-                self.current_concurrent, self.max_concurrent, self.tokens,
+                self.current_concurrent,
+                self.max_concurrent,
+                self.tokens,
             )
             self._rejections += 1  # Contabilizar rejeição para métricas JOL
             return False
@@ -135,8 +134,10 @@ class BucketManager:
             )
         logger.info(
             "[ENDÓCRINO] Buckets inicializados: %s",
-            {r: {"max_conc": b.max_concurrent, "cap": b.capacity}
-             for r, b in self.buckets.items()},
+            {
+                r: {"max_conc": b.max_concurrent, "cap": b.capacity}
+                for r, b in self.buckets.items()
+            },
         )
 
     @classmethod
@@ -157,8 +158,9 @@ class BucketManager:
     def role_for_route(cls, route: str) -> CognitiveRole | None:
         return _ROUTE_TO_ROLE.get(route)
 
-    async def acquire(self, route_name: str, estimated_tokens: int = 100,
-                      timeout: float = 0.0) -> bool:
+    async def acquire(
+        self, route_name: str, estimated_tokens: int = 100, timeout: float = 0.0
+    ) -> bool:
         """Tenta adquirir recursos do bucket da rota.
 
         Se timeout=0 (default), retorna False imediatamente se o bucket
@@ -168,9 +170,7 @@ class BucketManager:
         if not bucket:
             logger.warning("[ENDÓCRINO] Rota '%s' sem bucket registrado", route_name)
             return False
-        return await bucket.acquire(
-            estimated_tokens=estimated_tokens, timeout=timeout
-        )
+        return await bucket.acquire(estimated_tokens=estimated_tokens, timeout=timeout)
 
     async def release(self, route_name: str) -> None:
         """Libera slot de concorrência após inferência."""
@@ -179,7 +179,8 @@ class BucketManager:
             await bucket.release()
 
     async def acquire_with_fallback(
-        self, route_name: str,
+        self,
+        route_name: str,
         estimated_tokens: int = 100,
         timeout: float = 0.5,
     ) -> str | None:
@@ -200,7 +201,9 @@ class BucketManager:
                 if await self.acquire(fb_route, estimated_tokens, 0.0):
                     logger.info(
                         "[ENDÓCRINO] Fallback %s → %s (tokens=%d)",
-                        route_name, fb_route, estimated_tokens,
+                        route_name,
+                        fb_route,
+                        estimated_tokens,
                     )
                     return fb_route
 

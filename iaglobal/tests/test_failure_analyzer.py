@@ -52,7 +52,9 @@ def test_recovery_metrics_defaults():
 
 
 def test_recovery_metrics_full():
-    r = RecoveryMetrics(tentativas=3, delta_segundos=12.5, vacina_aplicada=True, fingerprint_erro="xyz")
+    r = RecoveryMetrics(
+        tentativas=3, delta_segundos=12.5, vacina_aplicada=True, fingerprint_erro="xyz"
+    )
     assert r.tentativas == 3
     assert r.delta_segundos == 12.5
     assert r.vacina_aplicada is True
@@ -105,7 +107,7 @@ def test_extract_zero_division():
 
 
 def test_extract_message_with_error():
-    msg = _extract_error_message('Traceback...\nValueError: invalid literal for int()')
+    msg = _extract_error_message("Traceback...\nValueError: invalid literal for int()")
     assert "invalid literal" in msg
 
 
@@ -263,6 +265,7 @@ def test_generate_correction_plan_timeout():
 
 def test_import_diagnostico_modulo():
     from iaglobal.interface import chat_agent
+
     fields = chat_agent.IntencaoBiologica.model_fields
     assert "diagnostico" in fields
     assert "plano_correcao" in fields

@@ -1,7 +1,7 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # iaglobal/agents/multi_agent.py
 """
-Multi-Agent Orchestrator - Geração 9: Delegação via Grafo.
+Multi-Agent Orchestrator - Delegação via Grafo.
 
 Este módulo agora é apenas uma interface de compatibilidade.
 A orquestração real ocorre no nível do grafo (graph builder + topology),

@@ -89,10 +89,15 @@ class TestSocialRegistry:
         assert [a.agent_id for a in results] == ["agent-b", "agent-c", "agent-a"]
 
     def test_query_filters_by_domain(self, reg: SocialRegistry):
-        reg.publish(Advertisement(
-            agent_id="agent-a",
-            skills={"code": Capability("code", 0.8), "test": Capability("test", 0.6)},
-        ))
+        reg.publish(
+            Advertisement(
+                agent_id="agent-a",
+                skills={
+                    "code": Capability("code", 0.8),
+                    "test": Capability("test", 0.6),
+                },
+            )
+        )
         reg.publish(_make_adv("agent-b", domain="test", proficiency=0.9))
         results_code = reg.query("code")
         results_test = reg.query("test")

@@ -40,7 +40,11 @@ class GlutathionePool:
 
     def add_guardrail(self, name: str, description: str, detector: str):
         with self._io_lock:
-            new_guardrail = {"name": name, "description": description, "detector": detector}
+            new_guardrail = {
+                "name": name,
+                "description": description,
+                "detector": detector,
+            }
             self.guardrails = self.guardrails + [new_guardrail]
             self._store.mutate_sync(lambda _: self.guardrails)
 

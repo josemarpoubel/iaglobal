@@ -10,8 +10,8 @@ from typing import Dict, Any, Optional
 logger = logging.getLogger("iaglobal")
 
 
-class ApoptosisEngine:
-    """Mecanismo de morte programada com herança epigenética."""
+class EvolutionRecoveryEngine:
+    """Substituição de agente que falhou — gera clone com herança epigenética."""
 
     def __init__(self, epigenetic_path: Path | None = None):
         from iaglobal._paths import PACKAGE_DIR

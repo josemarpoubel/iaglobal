@@ -72,7 +72,9 @@ def _stream_jsonl(path: Path):
             try:
                 yield json.loads(line)
             except json.JSONDecodeError:
-                logger.debug("[THRESHOLD] Linha JSONL ignorada (corrompida): %s", line[:80])
+                logger.debug(
+                    "[THRESHOLD] Linha JSONL ignorada (corrompida): %s", line[:80]
+                )
                 continue
 
 
@@ -143,10 +145,14 @@ def analyze(
     # ── Coeficiente de Precisão do Sentinela ──
     # Precisão = correções aprovadas / total de intervenções.
     # > 80% = imunologista eficaz; < 50% = falso positivo crônico.
-    precision = (corrections_approved / total_interventions * 100.0) \
-        if total_interventions > 0 else 0.0
-    noise_ratio = (total_interventions / total_corrections) \
-        if total_corrections > 0 else 0.0
+    precision = (
+        (corrections_approved / total_interventions * 100.0)
+        if total_interventions > 0
+        else 0.0
+    )
+    noise_ratio = (
+        (total_interventions / total_corrections) if total_corrections > 0 else 0.0
+    )
 
     # ── Custo de Oportunidade por Tier ──
     # Janela temporal observada → divide em slots de 1min.
@@ -179,7 +185,9 @@ def analyze(
         idle_pct = round((1.0 - util_proxy) * 100.0, 1)
         # rejection_pct REAL: rejeições observadas / (rejeições + capacidade*janela)
         denom = tier_rejections[tier] + max_throughput
-        rej_pct = round((tier_rejections[tier] / denom) * 100.0, 1) if denom > 0 else 0.0
+        rej_pct = (
+            round((tier_rejections[tier] / denom) * 100.0, 1) if denom > 0 else 0.0
+        )
         has_real = tier_congestion_samples[tier] > 0
         tier_opportunity[tier] = {
             "idle_pct": idle_pct,
@@ -187,7 +195,8 @@ def analyze(
             "rejections_observed": tier_rejections[tier],
             "congestion_samples": tier_congestion_samples[tier],
             "max_throughput_estimate": round(max_throughput, 1),
-            "note": "dados reais do LocalModelGate" if has_real
+            "note": "dados reais do LocalModelGate"
+            if has_real
             else "sem congestão observada na janela",
         }
 
@@ -248,26 +257,34 @@ def print_report(report: Optional[Dict[str, Any]] = None) -> None:
 
     print("\n=== JOL Threshold Analyzer Report ===")
     win = report["observation_window"]
-    print(f"Janela observada: {win['first_event']} → {win['last_event']} "
-          f"({win['window_minutes']} min)")
+    print(
+        f"Janela observada: {win['first_event']} → {win['last_event']} "
+        f"({win['window_minutes']} min)"
+    )
 
     print("\n-- Coeficiente de Precisão do Sentinela --")
-    print(f"  Precisão: {report['sentinel_precision_pct']}% "
-          f"(saudável ≥ {report['suggested_thresholds']['sentinel_precision']['healthy_min_pct']}%)")
+    print(
+        f"  Precisão: {report['sentinel_precision_pct']}% "
+        f"(saudável ≥ {report['suggested_thresholds']['sentinel_precision']['healthy_min_pct']}%)"
+    )
     print(f"  Noise Ratio (interv/corr): {report['noise_ratio']}")
 
     print("\n-- Custo de Oportunidade por Tier --")
     for tier, data in report["tier_opportunity_cost"].items():
-        print(f"  {tier}: idle={data['idle_pct']}% "
-              f"max_throughput≈{data['max_throughput_estimate']}/janela")
+        print(
+            f"  {tier}: idle={data['idle_pct']}% "
+            f"max_throughput≈{data['max_throughput_estimate']}/janela"
+        )
 
     print("\n-- Thresholds Sugeridos (Collection.yaml) --")
     st = report["suggested_thresholds"]
     for tier in TIERS:
         t = st[tier]
-        print(f"  {tier}: warn_usage={t['warning_usage_pct']}% "
-              f"fill_floor={t['fill_rate_floor']} "
-              f"rej_mult={t['rejection_limit_multiplier']}")
+        print(
+            f"  {tier}: warn_usage={t['warning_usage_pct']}% "
+            f"fill_floor={t['fill_rate_floor']} "
+            f"rej_mult={t['rejection_limit_multiplier']}"
+        )
 
     print("\n-- Totals --")
     for k, v in report["totals"].items():

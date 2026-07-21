@@ -37,3 +37,10 @@ tests/temp/
 *.log
 *.pkl
 *.lock
+
+# Epigenetic state (regenerable)
+iaglobal/obsidian/epigenetic/*.cbor
+
+# Build artifacts
+iaglobal.egg-info/
+*.egg-info/

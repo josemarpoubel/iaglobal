@@ -1,839 +1,411 @@
-2026-07-13 23:40:37,253 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:40:39,025 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-13 23:40:39,045 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:40:41,385 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:40:41,385 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:40:41,867 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:40:52,406 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:40:53,186 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-13 23:40:53,203 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:40:55,223 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-13 23:40:55,225 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:40:55,226 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:40:55,666 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:41:04,225 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:41:05,005 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-13 23:41:05,010 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:41:07,071 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-13 23:41:07,083 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:41:07,083 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:41:07,492 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:41:15,443 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:41:24,608 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:41:24,631 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-13 23:41:25,325 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-13 23:41:25,330 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:41:27,324 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-13 23:41:27,325 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:41:27,326 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:41:27,768 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:41:28,084 [INFO] [iaglobal.ancestry_tree] [AncestryTree] Árvore de Ancestralidade initialized | lineages_dir=/workspace/iaglobal/memory/data/work/obsidian/05_Lineages
-2026-07-13 23:41:55,048 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:41:55,064 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-13 23:41:57,370 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-13 23:41:57,383 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:41:57,384 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:41:57,931 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:41:58,043 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:41:58,169 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-13 23:41:58,170 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:41:59,827 [INFO] [iaglobal.ancestry_tree] [AncestryTree] Árvore de Ancestralidade initialized | lineages_dir=/workspace/iaglobal/memory/data/work/obsidian/05_Lineages
-2026-07-13 23:42:05,729 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:42:05,745 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-13 23:42:07,832 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-13 23:42:07,844 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:42:07,844 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:42:08,429 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:42:08,530 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:42:08,667 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-13 23:42:08,668 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:42:10,327 [INFO] [iaglobal.ancestry_tree] [AncestryTree] Árvore de Ancestralidade initialized | lineages_dir=/workspace/iaglobal/memory/data/work/obsidian/05_Lineages
-2026-07-13 23:42:11,208 [INFO] [iaglobal.policy.bandit_evolutivo] [PERSISTÊNCIA] Nenhum estado persistido encontrado
-2026-07-13 23:42:11,208 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
-2026-07-13 23:42:11,209 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
-2026-07-13 23:42:11,209 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
-2026-07-13 23:42:11,233 [INFO] [iaglobal] 💾 Script salvo em: /workspace/iaglobal/memory/data/script/teste_test-001.py
-2026-07-13 23:42:11,243 [INFO] [iaglobal] 📦 Resultado salvo em: /workspace/iaglobal/memory/data/result/teste_test-001.py
-2026-07-13 23:42:11,470 [ERROR] [iaglobal] Syntax error: invalid syntax (<unknown>, line 1)
-2026-07-13 23:42:11,708 [ERROR] [iaglobal] Syntax error: invalid syntax (<unknown>, line 1)
-2026-07-13 23:42:12,064 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:12,066 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:12,072 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=cache_poison | detail=l1 toxic key=015f7e6bc5ae | agent=None
-2026-07-13 23:42:12,083 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=stale_cache | detail=l1 key=2f5052c9fd15 | agent=None
-2026-07-13 23:42:12,085 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=cache_poison | detail=l2 toxic key=94091dd64a21 | agent=None
-2026-07-13 23:42:12,147 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus task-1 em 3 subtarefas
-2026-07-13 23:42:12,149 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus task-2 em 4 subtarefas
-2026-07-13 23:42:12,150 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus task-3 em 1 subtarefas
-2026-07-13 23:42:12,151 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus t em 3 subtarefas
-2026-07-13 23:42:12,152 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer e67b8c6ee3ef → w1
-2026-07-13 23:42:12,152 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer 7cb51026aa72 → w2
-2026-07-13 23:42:12,152 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer 6e67835cbdc6 → w1
-2026-07-13 23:42:12,166 [INFO] [iaglobal.communication.worker] [WORKER worker-code] Iniciado com skills: ['coder']
-2026-07-13 23:42:12,166 [INFO] [iaglobal.communication.worker] [WORKER worker-code] Executando t1 (coder)
-2026-07-13 23:42:12,168 [INFO] [iaglobal.communication.integrator] [INTEGRATOR] Integrado big-task: 3 workers, all_ok=True, latency=350ms
-2026-07-13 23:42:12,170 [INFO] [iaglobal.communication.integrator] [INTEGRATOR] Integrado partial-task: 2 workers, all_ok=False, latency=600ms
-2026-07-13 23:42:12,189 [WARNING] [iaglobal.communication.integrator] [INTEGRATOR] Falha ao alimentar evolução: 'MetaEvolver' object has no attribute 'record_outcome'
-2026-07-13 23:42:12,191 [INFO] [iaglobal.communication.integrator] [INTEGRATOR] Resultado escrito no Obsidian: /workspace/iaglobal/obsidian/03_Long_Term/colony_test-org_obs-test.md
-2026-07-13 23:42:12,204 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:42:12,205 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:42:12,206 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: beta
-2026-07-13 23:42:12,207 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:42:12,207 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: beta
-2026-07-13 23:42:12,209 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:42:12,209 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: beta
-2026-07-13 23:42:12,209 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha-coder-132
-2026-07-13 23:42:12,209 [INFO] [iaglobal.communication.fitness] [FITNESS] Mitose: alpha → alpha-coder-132 (IVM pai=0.7840)
-2026-07-13 23:42:12,210 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:42:12,210 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: beta
-2026-07-13 23:42:12,210 [WARNING] [iaglobal.communication.fitness] [FITNESS] Apoptose: beta IVM=0.0000 < 0.30
-2026-07-13 23:42:12,212 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: a
-2026-07-13 23:42:12,212 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: b
-2026-07-13 23:42:12,223 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:42:12,225 [INFO] [iaglobal.communication.worker] [WORKER worker-a] Iniciado com skills: ['search', 'code_review']
-2026-07-13 23:42:12,226 [INFO] [iaglobal.communication.worker] [WORKER worker-b] Iniciado com skills: ['coder']
-2026-07-13 23:42:12,226 [INFO] [iaglobal.communication.worker] [WORKER worker-c] Iniciado com skills: ['report']
-2026-07-13 23:42:12,226 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: queen-1
-2026-07-13 23:42:12,226 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: worker-a
-2026-07-13 23:42:12,226 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: worker-b
-2026-07-13 23:42:12,226 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: worker-c
-2026-07-13 23:42:12,226 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus e2e-task em 3 subtarefas
-2026-07-13 23:42:12,227 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer ad04b22f0784 → worker-a
-2026-07-13 23:42:12,227 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer a2787a230096 → worker-b
-2026-07-13 23:42:12,227 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer f0ccc7c6c5e6 → worker-c
-2026-07-13 23:42:12,227 [INFO] [iaglobal.communication.worker] [WORKER worker-a] Executando ad04b22f0784 (search)
-2026-07-13 23:42:12,228 [WARNING] [iaglobal.mcp.search_web] DuckDuckGo falhou: No module named 'duckduckgo_search'
-2026-07-13 23:42:13,278 [INFO] [iaglobal.communication.worker] [WORKER worker-c] Executando f0ccc7c6c5e6 (report)
-2026-07-13 23:42:13,278 [INFO] [iaglobal.communication.integrator] [INTEGRATOR] Integrado e2e-task: 2 workers, all_ok=True, latency=48ms
-2026-07-13 23:42:13,283 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,285 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.50, search_helped=None
-2026-07-13 23:42:13,285 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,287 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.90, search_helped=None
-2026-07-13 23:42:13,287 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,288 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:42:13,289 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,290 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.85, search_helped=True
-2026-07-13 23:42:13,290 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,292 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:42:13,292 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: busca ajudou → confidence=0.80
-2026-07-13 23:42:13,292 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,294 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:42:13,294 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: busca atrapalhou → confidence=0.55
-2026-07-13 23:42:13,303 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,305 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:42:13,305 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.60, search_helped=None
-2026-07-13 23:42:13,305 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: threshold ajustado para 0.90 (delta=0.10)
-2026-07-13 23:42:13,305 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: threshold ajustado para 0.90 (delta=0.10)
-2026-07-13 23:42:13,305 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,307 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.80, search_helped=True
-2026-07-13 23:42:13,307 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.60, search_helped=False
-2026-07-13 23:42:13,307 [INFO] [iaglobal.search.confidence_tracker] [CONF] debugger: confidence=0.90, search_helped=True
-2026-07-13 23:42:13,307 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,309 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.85, search_helped=True
-2026-07-13 23:42:13,309 [INFO] [iaglobal.search.confidence_tracker] [CONF] 1 confianças carregadas
-2026-07-13 23:42:13,310 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.80, search_helped=None
-2026-07-13 23:42:13,311 [INFO] [iaglobal.search.confidence_tracker] [CONF] debugger: confidence=0.90, search_helped=None
-2026-07-13 23:42:13,311 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: cache limpo
-2026-07-13 23:42:13,311 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,324 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.80, search_helped=None
-2026-07-13 23:42:13,324 [INFO] [iaglobal.search.confidence_tracker] [CONF] debugger: confidence=0.90, search_helped=None
-2026-07-13 23:42:13,324 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,325 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:42:13,328 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.75, search_helped=True
-2026-07-13 23:42:13,330 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:42:13,330 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: busca ajudou → confidence=0.80
-2026-07-13 23:42:13,343 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.80, search_helped=None
-2026-07-13 23:42:13,345 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.95, search_helped=None
-2026-07-13 23:42:13,371 [WARNING] [iaglobal.reflection.contamination_report] 🚨 [CONTAMINATION] Report created | type=architectural_hallucination | severity=MEDIUM | file=/tmp/pytest-of-root/pytest-0/test_create_report0/contamination_20260713_234213.json
-2026-07-13 23:42:13,372 [WARNING] [iaglobal.reflection.contamination_report] 🚨 [CONTAMINATION] Report created | type=architectural_hallucination | severity=MEDIUM | file=/tmp/pytest-of-root/pytest-0/test_report_architectural_hall0/contamination_20260713_234213.json
-2026-07-13 23:42:13,411 [WARNING] [iaglobal.reflection.claim_detection] 🚨 [QUARANTINE] Memória em quarentena | arquivo=test.md | claims=2 | path=/tmp/pytest-of-root/pytest-0/test_full_contamination_workfl0/vault/00_Quarentena/CONTAMINATED_test.md
-2026-07-13 23:42:13,423 [WARNING] [iaglobal.reflection.contamination_report] 🚨 [CONTAMINATION] Report created | type=architectural_hallucination | severity=MEDIUM | file=/tmp/pytest-of-root/pytest-0/test_full_contamination_workfl0/reports/contamination_20260713_234213.json
-2026-07-13 23:42:15,831 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] 1 imports envolvidos em try/except
-2026-07-13 23:42:15,833 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] requirements.txt: 63 pacotes carregados
-2026-07-13 23:42:15,844 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] Instalando pacote: test_package (auto-install)
-2026-07-13 23:42:15,844 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] ✅ test_package instalado com sucesso
-2026-07-13 23:42:15,846 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] Instalando pacote: nonexistent_package_xyz (auto-install)
-2026-07-13 23:42:15,846 [WARNING] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] ❌ Falha ao instalar nonexistent_package_xyz: Erro: pacote não existe
-2026-07-13 23:42:15,847 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] Instalando pacote: slow_package (auto-install)
-2026-07-13 23:42:15,847 [WARNING] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] ❌ Timeout ao instalar slow_package (60s)
-2026-07-13 23:42:15,950 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,950 [INFO] [iaglobal] [MEMBRANA] node_id='debugger_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,950 [INFO] [iaglobal] [MEMBRANA] node_id='planner' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,950 [INFO] [iaglobal] [MEMBRANA] node_id='pm' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,950 [INFO] [iaglobal] [MEMBRANA] node_id='tester' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,951 [INFO] [iaglobal] [MEMBRANA] node_id='architect' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,965 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='debugger_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='planner' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='pm' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='tester' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='architect' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='debugger_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='planner' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='pm' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='tester' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,967 [INFO] [iaglobal] [MEMBRANA] node_id='architect' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:15,970 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
-2026-07-13 23:42:15,972 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['groq', 'nvidia', 'ollama']
-2026-07-13 23:42:15,973 [WARNING] [iaglobal] [ROUTER] Falha: groq (0.00s). Erro: 401 Unauthorized — API key ausente/inválida (simulado)
-2026-07-13 23:42:15,973 [WARNING] [iaglobal] [ROUTER] Falha: nvidia (0.00s). Erro: 401 Unauthorized — API key ausente/inválida (simulado)
-2026-07-13 23:42:15,985 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.01s). Erro: Ollama não acessível em http://localhost:11434.
-2026-07-13 23:42:15,985 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
-2026-07-13 23:42:16,005 [INFO] [iaglobal] [ROUTER] Sucesso: ollama (0.00s, 8 chars)
-2026-07-13 23:42:16,005 [INFO] [iaglobal] [METRICS] record provider=ollama model=ollama/qwen2.5:0.5b success=True latency_ms=0 tokens=0 cost=0.000000 task=general
-2026-07-13 23:42:16,005 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:16,007 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
-2026-07-13 23:42:16,007 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:42:16,007 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
-2026-07-13 23:42:16,008 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama indisponível (porta morta simulada)
-2026-07-13 23:42:16,008 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
-2026-07-13 23:42:16,009 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama indisponível (porta morta simulada)
-2026-07-13 23:42:16,009 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=coder | IVM=0.050 | classificacao=falha
-2026-07-13 23:42:16,009 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=coder | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:16,029 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:42:16,065 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_chaotic resetado
-2026-07-13 23:42:16,074 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:42:16,076 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Carregados 2 perfis entrópicos de disco (CBOR)
-2026-07-13 23:42:16,083 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:42:16,087 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:42:16,089 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:42:16,090 [INFO] [iaglobal.evo_agent] [evo-t-sc] Instanciado | gen=0 | marker=fb6c18d08b9adf37 | nadph=0.50
-2026-07-13 23:42:16,090 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-sc (gen=0, phonetic=feu-ba-se-pao-nau-jea-fei-hu-fo-jeu-mai-keu-beo-rao-le-do)
-2026-07-13 23:42:16,103 [INFO] [iaglobal.evo_agent] [evo-t-sc] GENESIS | lineage_id=c6bd5f444ade7c9f… | phonetic=jau-na-ku-pa-ceu-jai-mou-gou-be-gau-geu-co-dou-peu-keu-tu
-2026-07-13 23:42:16,104 [INFO] [iaglobal] [OmniMind] Agente desregistrado: c6bd5f444ade7c9f11a8f25c8b7189ae19dd194831eda03ccfd3df594fd37b78bf70eb4a2a049f3ebe61d728f53040736397c8eb7779fc643d8570077a56b598
-2026-07-13 23:42:16,104 [INFO] [iaglobal.evo_agent] [evo-t-sc] Apoptose | reason=t
-2026-07-13 23:42:16,111 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-sc
-2026-07-13 23:42:16,124 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-sc
-2026-07-13 23:42:16,125 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-sc eliminado com sucesso
-2026-07-13 23:42:16,126 [INFO] [iaglobal.evo_agent] [evo-t-sc] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-sc_genome.json | SAMe final=105
-2026-07-13 23:42:16,128 [INFO] [iaglobal.evo_agent] [evo-t-af] Instanciado | gen=0 | marker=8012ecd510ed4e13 | nadph=0.50
-2026-07-13 23:42:16,128 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-af (gen=0, phonetic=po-be-mi-fai-pe-hu-bae-peo-mea-cao-peu-dw-jae-hou-hi-bi)
-2026-07-13 23:42:16,129 [INFO] [iaglobal.evo_agent] [evo-t-af] GENESIS | lineage_id=7df91bdc629d119a… | phonetic=hou-gu-pea-ty-ko-tai-leu-to-cea-by-ju-fi-tai-du-to-gao
-2026-07-13 23:42:16,130 [INFO] [iaglobal.immunity.immune_memory_exchange] [IMMUNE-EXCHANGE] Broadcasted 1 vacina(s) p/ linhagem 8012ecd510ed4e13
-2026-07-13 23:42:16,130 [INFO] [iaglobal] [OmniMind] Agente desregistrado: 7df91bdc629d119ac029fd5e069cd66dded28b67cd120f6eabd39ca035848e462f61285bc5b491e36a22945a055b5eec6abcc216823641e08cba7fecc2b64148
-2026-07-13 23:42:16,130 [INFO] [iaglobal.evo_agent] [evo-t-af] Apoptose | reason=t
-2026-07-13 23:42:16,131 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-af
-2026-07-13 23:42:16,145 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-af
-2026-07-13 23:42:16,145 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-af eliminado com sucesso
-2026-07-13 23:42:16,146 [INFO] [iaglobal.evo_agent] [evo-t-af] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-af_genome.json | SAMe final=105
-2026-07-13 23:42:16,149 [INFO] [iaglobal.evo_agent] [evo-t-li] Instanciado | gen=0 | marker=6500204b3a1da939 | nadph=0.50
-2026-07-13 23:42:16,149 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-li (gen=0, phonetic=tw-vea-tae-ny-fou-ba-bei-sa-vw-heu-meo-kw-sy-pe-deu-kai)
-2026-07-13 23:42:16,150 [INFO] [iaglobal.evo_agent] [evo-t-li] GENESIS | lineage_id=dd49268d6dc59129… | phonetic=jeu-li-go-ko-vy-do-jy-da-ti-pw-meo-teu-lae-co-bw-mai
-2026-07-13 23:42:16,150 [INFO] [iaglobal] [OmniMind] Agente desregistrado: dd49268d6dc591299c34438f878ee9478b93cf0f422a7117f2ba59b31df43eb49a66d8ef43c6f45ac50f3fd90207baf39f2a1bd09275a5644b1623bff9c24bd3
-2026-07-13 23:42:16,150 [INFO] [iaglobal.evo_agent] [evo-t-li] Apoptose | reason=t
-2026-07-13 23:42:16,163 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-li
-2026-07-13 23:42:16,164 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-li
-2026-07-13 23:42:16,165 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-li eliminado com sucesso
-2026-07-13 23:42:16,165 [INFO] [iaglobal.evo_agent] [evo-t-li] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-li_genome.json | SAMe final=105
-2026-07-13 23:42:16,168 [INFO] [iaglobal.evo_agent] [evo-t-rf] Instanciado | gen=0 | marker=c673e5ada9e961ae | nadph=0.50
-2026-07-13 23:42:16,168 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-rf (gen=0, phonetic=kea-vo-fei-fai-ha-pae-pai-ke-gy-nea-na-jau-si-sou-he-lw)
-2026-07-13 23:42:16,171 [INFO] [iaglobal.evo_agent] [evo-t-rf] GENESIS | lineage_id=4afe6e92a272d5db… | phonetic=by-kai-by-pai-teu-ka-hea-leu-fy-dao-bai-bo-sw-je-no-beo
-2026-07-13 23:42:16,209 [INFO] [iaglobal] 🔧 ReflexionEngine initialized with max_iterations=5
-2026-07-13 23:42:16,227 [INFO] [iaglobal] [KNOWLEDGE] 0 entradas carregadas de /workspace/iaglobal/memory/data/json/knowledge.json
-2026-07-13 23:42:16,228 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:42:16,243 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:42:16,245 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=499 | tags=[]
-2026-07-13 23:42:16,245 [INFO] [iaglobal] [ARBITER mode=enforce] evo_agent memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:42:16,245 [INFO] [iaglobal] [ARBITER mode=enforce] evo_agent nao resolvido em casa — escalando via critic
-2026-07-13 23:42:16,246 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=evo_agent | IVM=0.100 | classificacao=falha
-2026-07-13 23:42:16,246 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=evo_agent | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:16,246 [INFO] [iaglobal] [ROUTER] async_route_generate model=groq/llama-3.3-70b-versatile provider=groq task_type=reflection
-2026-07-13 23:42:16,327 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:42:16,327 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #1/2
-2026-07-13 23:42:17,395 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:42:17,395 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #2/2
-2026-07-13 23:42:19,462 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:42:19,462 [WARNING] [iaglobal] [ROUTER] Falha: groq (0.06s). Erro: Resposta vazia do provedor.
-2026-07-13 23:42:19,462 [INFO] [iaglobal] [ROUTER] async_route_generate primary=groq failed -> fallback
-2026-07-13 23:42:19,463 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=groq RACE_SIZE=3 pool=2
-2026-07-13 23:42:19,463 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['nvidia', 'ollama']
-2026-07-13 23:42:19,466 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
-2026-07-13 23:42:19,657 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:42:19,658 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #1/2
-2026-07-13 23:42:20,726 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:42:20,726 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #2/2
-2026-07-13 23:42:22,794 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:42:22,794 [WARNING] [iaglobal] [ROUTER] Falha: nvidia (0.07s). Erro: Resposta vazia do provedor.
-2026-07-13 23:42:22,795 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.750 | P=0.750 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:22,797 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=evo_agent | IVM=0.050 | classificacao=falha
-2026-07-13 23:42:22,797 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=evo_agent | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:22,797 [INFO] [iaglobal] 🔄 Attempt 1/5 - Executing in Sandbox...
-2026-07-13 23:42:22,799 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-13 23:42:22,799 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-13 23:42:22,799 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-13 23:42:22,825 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-13 23:42:22,826 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-13 23:42:22,826 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-13 23:42:22,910 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-13 23:42:22,910 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-13 23:42:22,910 [INFO] [iaglobal] ✅ Code executed successfully in sandbox!
-2026-07-13 23:42:22,911 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-13 23:42:22,911 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-13 23:42:22,912 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-13 23:42:22,928 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-13 23:42:22,928 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-13 23:42:22,929 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-13 23:42:22,973 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-13 23:42:22,983 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-13 23:42:22,983 [INFO] [iaglobal] ✨ Reflexion completed successfully in 6.77s
-2026-07-13 23:42:22,983 [INFO] [iaglobal] [OmniMind] Agente desregistrado: 4afe6e92a272d5db2fedcd37c793321098f34e7143f165823bc177ad20d7fad0ff6342151e52af9662c4ad34369bcced133e69f22fff6f45d4163d112741a99a
-2026-07-13 23:42:22,983 [INFO] [iaglobal.evo_agent] [evo-t-rf] Apoptose | reason=t
-2026-07-13 23:42:22,984 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-rf
-2026-07-13 23:42:22,986 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-rf
-2026-07-13 23:42:22,988 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-rf eliminado com sucesso
-2026-07-13 23:42:22,988 [INFO] [iaglobal.evo_agent] [evo-t-rf] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-rf_genome.json | SAMe final=105
-2026-07-13 23:42:22,992 [INFO] [iaglobal.evo_agent] [evo-t-h] Instanciado | gen=0 | marker=bc0a4fabaf626636 | nadph=0.50
-2026-07-13 23:42:22,992 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-h (gen=0, phonetic=ro-ky-pea-sa-hu-sao-jy-fei-rou-pei-sao-vi-dau-bw-lao-gw)
-2026-07-13 23:42:23,003 [INFO] [iaglobal.evo_agent] [evo-t-h] GENESIS | lineage_id=bfb4568bf1292bf1… | phonetic=kau-pau-fe-hau-vae-fu-la-ba-hi-gu-teu-cei-lau-gy-vo-vw
-2026-07-13 23:42:23,004 [INFO] [iaglobal.evo_agent] 🧬 [evo-t-h] [Metabolismo] Buscando nutrientes externos: tarefa normal de análise
-2026-07-13 23:42:23,004 [INFO] [iaglobal.evo_agent] [evo-t-h] Nutricao externa completa | source=memory_cache | impact=False
-2026-07-13 23:42:23,006 [INFO] [iaglobal.metabolism.homocysteine_pool] [HOMOCYSTEINE] Candidate 'skill_8997ff26' adicionada (score=0.50)
-2026-07-13 23:42:23,006 [INFO] [iaglobal.evo_agent] [evo-t-h] Expressão | urgency=normal | elapsed=2.5ms | SAMe=80 | nadph=0.50
-2026-07-13 23:42:23,006 [INFO] [iaglobal] [OmniMind] Agente desregistrado: bfb4568bf1292bf1a82772f4aa4553a497893886c99bde4e74e3f7e39f7f4b05b0fa22c6f423d5a392ae8b734841258c378f28d56898851f80cf73488b546126
-2026-07-13 23:42:23,006 [INFO] [iaglobal.evo_agent] [evo-t-h] Apoptose | reason=t
-2026-07-13 23:42:23,007 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-h
-2026-07-13 23:42:23,008 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-h
-2026-07-13 23:42:23,009 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-h eliminado com sucesso
-2026-07-13 23:42:23,009 [INFO] [iaglobal.evo_agent] [evo-t-h] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-h_genome.json | SAMe final=85
-2026-07-13 23:42:23,023 [INFO] [iaglobal.evo_agent] [evo-dummy_evo_test] Instanciado | gen=0 | marker=2f11100269a3ed53 | nadph=0.50
-2026-07-13 23:42:23,023 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-dummy_evo_test (gen=0, phonetic=vy-lau-rw-po-meu-ro-li-la-ra-fi-vao-dou-pao-ko-jeo-dai)
-2026-07-13 23:42:23,024 [INFO] [iaglobal.evo_agent] [evo-dummy_evo_test] GENESIS | lineage_id=fb207a091b18f273… | phonetic=ty-jae-nw-hae-sa-nau-sae-jeu-go-nw-seo-pe-leu-dea-reo-dou
-2026-07-13 23:42:23,024 [INFO] [iaglobal.agents.agent_base] [DUMMY_EVO_TEST] EvoAgent de linhagem inicializado (marker=2f11100269a3ed53)
-2026-07-13 23:42:23,024 [INFO] [iaglobal] [OmniMind] Agente desregistrado: fb207a091b18f273b6fd0ad687d2a36c91413773477a930ade3512b03e438be892be164dcae5a462539f19a561e39ac2cc2406fd99f65e8b204054092217f290
-2026-07-13 23:42:23,024 [INFO] [iaglobal.evo_agent] [evo-dummy_evo_test] Apoptose | reason=t
-2026-07-13 23:42:23,025 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-dummy_evo_test
-2026-07-13 23:42:23,026 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-dummy_evo_test
-2026-07-13 23:42:23,026 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-dummy_evo_test eliminado com sucesso
-2026-07-13 23:42:23,027 [INFO] [iaglobal.evo_agent] [evo-dummy_evo_test] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-dummy_evo_test_genome.json | SAMe final=105
-2026-07-13 23:42:23,030 [INFO] [iaglobal.immunity.immune_memory_exchange] [IMMUNE-EXCHANGE] Broadcasted 1 vacina(s) p/ linhagem 2f11100269a3ed53
-2026-07-13 23:42:23,032 [INFO] [iaglobal] 🔧 ReflexionEngine initialized with max_iterations=5
-2026-07-13 23:42:23,046 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:42:23,047 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:42:23,048 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=499 | tags=[]
-2026-07-13 23:42:23,048 [INFO] [iaglobal.agents.agent_base] [DUMMY_EVO_TEST] Memory rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:42:23,050 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:42:23,050 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:42:23,051 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=499 | tags=[]
-2026-07-13 23:42:23,051 [INFO] [iaglobal] [ARBITER mode=enforce] dummy_evo_test memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:42:23,051 [INFO] [iaglobal] [ARBITER mode=enforce] dummy_evo_test nao resolvido em casa — escalando via critic
-2026-07-13 23:42:23,051 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=dummy_evo_test | IVM=0.100 | classificacao=falha
-2026-07-13 23:42:23,051 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=dummy_evo_test | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:23,063 [INFO] [iaglobal] [ROUTER] async_route_generate model=groq/llama-3.3-70b-versatile provider=groq task_type=reflection
-2026-07-13 23:42:23,145 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:42:23,145 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #1/2
-2026-07-13 23:42:24,211 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:42:24,212 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #2/2
-2026-07-13 23:42:26,280 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:42:26,281 [WARNING] [iaglobal] [ROUTER] Falha: groq (0.07s). Erro: Resposta vazia do provedor.
-2026-07-13 23:42:26,281 [INFO] [iaglobal] [ROUTER] async_route_generate primary=groq failed -> fallback
-2026-07-13 23:42:26,281 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=groq RACE_SIZE=3 pool=2
-2026-07-13 23:42:26,281 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['nvidia', 'ollama']
-2026-07-13 23:42:26,285 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
-2026-07-13 23:42:26,485 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:42:26,485 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #1/2
-2026-07-13 23:42:27,557 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:42:27,558 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #2/2
-2026-07-13 23:42:29,628 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:42:29,628 [WARNING] [iaglobal] [ROUTER] Falha: nvidia (0.07s). Erro: Resposta vazia do provedor.
-2026-07-13 23:42:29,629 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.690 | P=0.600 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:29,630 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=dummy_evo_test | IVM=0.050 | classificacao=falha
-2026-07-13 23:42:29,630 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=dummy_evo_test | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:42:29,630 [INFO] [iaglobal.agents.agent_base] [DUMMY_EVO_TEST] FAIL (tools=0 llm=1)
-2026-07-13 23:42:29,631 [INFO] [iaglobal] 🔄 Attempt 1/5 - Executing in Sandbox...
-2026-07-13 23:42:29,632 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-13 23:42:29,632 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-13 23:42:29,632 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-13 23:42:29,645 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-13 23:42:29,645 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-13 23:42:29,646 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-13 23:42:29,672 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-13 23:42:29,683 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-13 23:42:29,683 [INFO] [iaglobal] ✅ Code executed successfully in sandbox!
-2026-07-13 23:42:29,684 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-13 23:42:29,684 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-13 23:42:29,684 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-13 23:42:29,705 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-13 23:42:29,706 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-13 23:42:29,706 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-13 23:42:29,731 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-13 23:42:29,732 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-13 23:42:29,732 [INFO] [iaglobal] ✨ Reflexion completed successfully in 6.69s
-2026-07-13 23:42:29,751 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:42:29,763 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:42:29,764 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=264 | tags=[]
-2026-07-13 23:42:29,764 [INFO] [iaglobal.agents.agent_base] [DUMMY_EVO_TEST] Memory rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:42:29,765 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:42:29,765 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:42:29,766 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=264 | tags=[]
-2026-07-13 23:42:29,766 [INFO] [iaglobal] [ARBITER mode=enforce] dummy_evo_test memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:42:29,766 [INFO] [iaglobal] [ARBITER mode=enforce] dummy_evo_test nao resolvido em casa — escalando via critic
-2026-07-13 23:42:29,766 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=dummy_evo_test | IVM=0.100 | classificacao=falha
-2026-07-13 23:42:29,766 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=dummy_evo_test | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:43:44,088 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:43:44,088 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Carregados 2 perfis entrópicos de disco (CBOR)
-2026-07-13 23:43:44,104 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 1 registros | path=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-13 23:43:44,104 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-13 23:43:46,289 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-13 23:43:46,290 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:43:46,290 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:43:46,949 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:43:47,084 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:43:47,229 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-13 23:43:47,230 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:43:49,028 [INFO] [iaglobal.ancestry_tree] [AncestryTree] Árvore de Ancestralidade initialized | lineages_dir=/workspace/iaglobal/memory/data/work/obsidian/05_Lineages
-2026-07-13 23:43:49,789 [INFO] [iaglobal.policy.bandit_evolutivo] [PERSISTÊNCIA] Nenhum estado persistido encontrado
-2026-07-13 23:43:49,789 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
-2026-07-13 23:43:49,789 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
-2026-07-13 23:43:49,789 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
-2026-07-13 23:43:49,807 [INFO] [iaglobal] 💾 Script salvo em: /workspace/iaglobal/memory/data/script/teste_test-001.py
-2026-07-13 23:43:49,808 [INFO] [iaglobal] 📦 Resultado salvo em: /workspace/iaglobal/memory/data/result/teste_test-001.py
-2026-07-13 23:43:50,084 [ERROR] [iaglobal] Syntax error: invalid syntax (<unknown>, line 1)
-2026-07-13 23:43:50,326 [ERROR] [iaglobal] Syntax error: invalid syntax (<unknown>, line 1)
-2026-07-13 23:43:50,724 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:43:50,727 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:43:50,744 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=cache_poison | detail=l1 toxic key=015f7e6bc5ae | agent=None
-2026-07-13 23:43:50,746 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=stale_cache | detail=l1 key=2f5052c9fd15 | agent=None
-2026-07-13 23:43:50,747 [WARNING] [iaglobal.immunity.metabolic_barrier] [BARRIER] evento imunológico=cache_poison | detail=l2 toxic key=94091dd64a21 | agent=None
-2026-07-13 23:43:50,804 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus task-1 em 3 subtarefas
-2026-07-13 23:43:50,805 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus task-2 em 4 subtarefas
-2026-07-13 23:43:50,806 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus task-3 em 1 subtarefas
-2026-07-13 23:43:50,808 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus t em 3 subtarefas
-2026-07-13 23:43:50,808 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer 2dd7fc7642e5 → w1
-2026-07-13 23:43:50,808 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer 7245ab2d0326 → w2
-2026-07-13 23:43:50,808 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer cc1d685107b0 → w1
-2026-07-13 23:43:50,812 [INFO] [iaglobal.communication.worker] [WORKER worker-code] Iniciado com skills: ['coder']
-2026-07-13 23:43:50,824 [INFO] [iaglobal.communication.worker] [WORKER worker-code] Executando t1 (coder)
-2026-07-13 23:43:50,825 [INFO] [iaglobal.communication.integrator] [INTEGRATOR] Integrado big-task: 3 workers, all_ok=True, latency=350ms
-2026-07-13 23:43:50,828 [INFO] [iaglobal.communication.integrator] [INTEGRATOR] Integrado partial-task: 2 workers, all_ok=False, latency=600ms
-2026-07-13 23:43:50,831 [WARNING] [iaglobal.communication.integrator] [INTEGRATOR] Falha ao alimentar evolução: 'MetaEvolver' object has no attribute 'record_outcome'
-2026-07-13 23:43:50,845 [INFO] [iaglobal.communication.integrator] [INTEGRATOR] Resultado escrito no Obsidian: /workspace/iaglobal/obsidian/03_Long_Term/colony_test-org_obs-test.md
-2026-07-13 23:43:50,848 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:43:50,849 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:43:50,850 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: beta
-2026-07-13 23:43:50,851 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:43:50,851 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: beta
-2026-07-13 23:43:50,864 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:43:50,864 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: beta
-2026-07-13 23:43:50,864 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha-coder-230
-2026-07-13 23:43:50,864 [INFO] [iaglobal.communication.fitness] [FITNESS] Mitose: alpha → alpha-coder-230 (IVM pai=0.7840)
-2026-07-13 23:43:50,866 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:43:50,866 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: beta
-2026-07-13 23:43:50,866 [WARNING] [iaglobal.communication.fitness] [FITNESS] Apoptose: beta IVM=0.0000 < 0.30
-2026-07-13 23:43:50,867 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: a
-2026-07-13 23:43:50,867 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: b
-2026-07-13 23:43:50,868 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: alpha
-2026-07-13 23:43:50,870 [INFO] [iaglobal.communication.worker] [WORKER worker-a] Iniciado com skills: ['search', 'code_review']
-2026-07-13 23:43:50,870 [INFO] [iaglobal.communication.worker] [WORKER worker-b] Iniciado com skills: ['coder']
-2026-07-13 23:43:50,871 [INFO] [iaglobal.communication.worker] [WORKER worker-c] Iniciado com skills: ['report']
-2026-07-13 23:43:50,871 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: queen-1
-2026-07-13 23:43:50,871 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: worker-a
-2026-07-13 23:43:50,871 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: worker-b
-2026-07-13 23:43:50,871 [INFO] [iaglobal.communication.fitness] [FITNESS] Organismo registrado: worker-c
-2026-07-13 23:43:50,871 [INFO] [iaglobal.communication.queen] [QUEEN] Decompus e2e-task em 3 subtarefas
-2026-07-13 23:43:50,883 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer 3035635d6026 → worker-a
-2026-07-13 23:43:50,883 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer cd7c14ba71a6 → worker-b
-2026-07-13 23:43:50,884 [INFO] [iaglobal.communication.queen] [QUEEN] task_offer 5f039b403456 → worker-c
-2026-07-13 23:43:50,884 [INFO] [iaglobal.communication.worker] [WORKER worker-a] Executando 3035635d6026 (search)
-2026-07-13 23:43:50,884 [WARNING] [iaglobal.mcp.search_web] DuckDuckGo falhou: No module named 'duckduckgo_search'
-2026-07-13 23:43:51,929 [INFO] [iaglobal.communication.worker] [WORKER worker-c] Executando 5f039b403456 (report)
-2026-07-13 23:43:51,930 [INFO] [iaglobal.communication.integrator] [INTEGRATOR] Integrado e2e-task: 2 workers, all_ok=True, latency=43ms
-2026-07-13 23:43:51,934 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,936 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.50, search_helped=None
-2026-07-13 23:43:51,936 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,938 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.90, search_helped=None
-2026-07-13 23:43:51,938 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,940 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:43:51,940 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,945 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.85, search_helped=True
-2026-07-13 23:43:51,945 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,946 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:43:51,947 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: busca ajudou → confidence=0.80
-2026-07-13 23:43:51,947 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,949 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:43:51,949 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: busca atrapalhou → confidence=0.55
-2026-07-13 23:43:51,949 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,951 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:43:51,951 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.60, search_helped=None
-2026-07-13 23:43:51,951 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: threshold ajustado para 0.90 (delta=0.10)
-2026-07-13 23:43:51,951 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: threshold ajustado para 0.90 (delta=0.10)
-2026-07-13 23:43:51,951 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,963 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.80, search_helped=True
-2026-07-13 23:43:51,964 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.60, search_helped=False
-2026-07-13 23:43:51,964 [INFO] [iaglobal.search.confidence_tracker] [CONF] debugger: confidence=0.90, search_helped=True
-2026-07-13 23:43:51,964 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,966 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.85, search_helped=True
-2026-07-13 23:43:51,966 [INFO] [iaglobal.search.confidence_tracker] [CONF] 1 confianças carregadas
-2026-07-13 23:43:51,968 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.80, search_helped=None
-2026-07-13 23:43:51,968 [INFO] [iaglobal.search.confidence_tracker] [CONF] debugger: confidence=0.90, search_helped=None
-2026-07-13 23:43:51,968 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: cache limpo
-2026-07-13 23:43:51,968 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,970 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.80, search_helped=None
-2026-07-13 23:43:51,970 [INFO] [iaglobal.search.confidence_tracker] [CONF] debugger: confidence=0.90, search_helped=None
-2026-07-13 23:43:51,970 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,970 [INFO] [iaglobal.search.confidence_tracker] [CONF] cache global limpo
-2026-07-13 23:43:51,984 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.75, search_helped=True
-2026-07-13 23:43:51,985 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.70, search_helped=None
-2026-07-13 23:43:51,985 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: busca ajudou → confidence=0.80
-2026-07-13 23:43:51,987 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.80, search_helped=None
-2026-07-13 23:43:51,989 [INFO] [iaglobal.search.confidence_tracker] [CONF] coder: confidence=0.95, search_helped=None
-2026-07-13 23:43:52,030 [WARNING] [iaglobal.reflection.contamination_report] 🚨 [CONTAMINATION] Report created | type=architectural_hallucination | severity=MEDIUM | file=/tmp/pytest-of-root/pytest-1/test_create_report0/contamination_20260713_234352.json
-2026-07-13 23:43:52,031 [WARNING] [iaglobal.reflection.contamination_report] 🚨 [CONTAMINATION] Report created | type=architectural_hallucination | severity=MEDIUM | file=/tmp/pytest-of-root/pytest-1/test_report_architectural_hall0/contamination_20260713_234352.json
-2026-07-13 23:43:52,083 [WARNING] [iaglobal.reflection.claim_detection] 🚨 [QUARANTINE] Memória em quarentena | arquivo=test.md | claims=2 | path=/tmp/pytest-of-root/pytest-1/test_full_contamination_workfl0/vault/00_Quarentena/CONTAMINATED_test.md
-2026-07-13 23:43:52,083 [WARNING] [iaglobal.reflection.contamination_report] 🚨 [CONTAMINATION] Report created | type=architectural_hallucination | severity=MEDIUM | file=/tmp/pytest-of-root/pytest-1/test_full_contamination_workfl0/reports/contamination_20260713_234352.json
-2026-07-13 23:43:54,231 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] 1 imports envolvidos em try/except
-2026-07-13 23:43:54,232 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] requirements.txt: 63 pacotes carregados
-2026-07-13 23:43:54,234 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] Instalando pacote: test_package (auto-install)
-2026-07-13 23:43:54,234 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] ✅ test_package instalado com sucesso
-2026-07-13 23:43:54,244 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] Instalando pacote: nonexistent_package_xyz (auto-install)
-2026-07-13 23:43:54,244 [WARNING] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] ❌ Falha ao instalar nonexistent_package_xyz: Erro: pacote não existe
-2026-07-13 23:43:54,245 [INFO] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] Instalando pacote: slow_package (auto-install)
-2026-07-13 23:43:54,246 [WARNING] [iaglobal.core.dependency_enforcer] [DEPENDENCY-ENFORCER] ❌ Timeout ao instalar slow_package (60s)
-2026-07-13 23:43:54,345 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,346 [INFO] [iaglobal] [MEMBRANA] node_id='debugger_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,346 [INFO] [iaglobal] [MEMBRANA] node_id='planner' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,346 [INFO] [iaglobal] [MEMBRANA] node_id='pm' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,346 [INFO] [iaglobal] [MEMBRANA] node_id='tester' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,346 [INFO] [iaglobal] [MEMBRANA] node_id='architect' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,348 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,349 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='debugger_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='planner' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='pm' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='tester' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='architect' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='debugger_agent' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='planner' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='pm' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='tester' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,350 [INFO] [iaglobal] [MEMBRANA] node_id='architect' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,363 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
-2026-07-13 23:43:54,363 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['groq', 'nvidia', 'ollama']
-2026-07-13 23:43:54,364 [WARNING] [iaglobal] [ROUTER] Falha: groq (0.00s). Erro: 401 Unauthorized — API key ausente/inválida (simulado)
-2026-07-13 23:43:54,364 [WARNING] [iaglobal] [ROUTER] Falha: nvidia (0.00s). Erro: 401 Unauthorized — API key ausente/inválida (simulado)
-2026-07-13 23:43:54,366 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
-2026-07-13 23:43:54,366 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
-2026-07-13 23:43:54,370 [INFO] [iaglobal] [ROUTER] Sucesso: ollama (0.00s, 8 chars)
-2026-07-13 23:43:54,370 [INFO] [iaglobal] [METRICS] record provider=ollama model=ollama/qwen2.5:0.5b success=True latency_ms=0 tokens=0 cost=0.000000 task=general
-2026-07-13 23:43:54,370 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:43:54,372 [INFO] [iaglobal] [ROUTER] 🏁 Iniciando Roteamento Paralelo (Task: general)
-2026-07-13 23:43:54,372 [INFO] [iaglobal] [MEMBRANA] node_id='coder' sem direito a modelo externo — restrito a Ollama local (pressão evolutiva)
-2026-07-13 23:43:54,372 [INFO] [iaglobal] [ROUTER] 🏎️  Disparando Batch 1 com: ['ollama']
-2026-07-13 23:43:54,372 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama indisponível (porta morta simulada)
-2026-07-13 23:43:54,383 [WARNING] [iaglobal] [ROUTER] Todos os provedores cloud falharam. Tentando Ollama como último recurso...
-2026-07-13 23:43:54,385 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama indisponível (porta morta simulada)
-2026-07-13 23:43:54,385 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=coder | IVM=0.050 | classificacao=falha
-2026-07-13 23:43:54,385 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=coder | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:43:54,387 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:43:54,404 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:43:54,405 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_apoptose_direct resetado
-2026-07-13 23:43:54,446 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_chaotic resetado
-2026-07-13 23:43:54,467 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:43:54,469 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Carregados 2 perfis entrópicos de disco (CBOR)
-2026-07-13 23:43:54,470 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:43:54,474 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:43:54,485 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] ✅ Perfil de test_agent resetado
-2026-07-13 23:43:54,486 [INFO] [iaglobal.evo_agent] [evo-t-sc] Instanciado | gen=0 | marker=fb6c18d08b9adf37 | nadph=0.50
-2026-07-13 23:43:54,487 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-sc (gen=0, phonetic=feu-ba-se-pao-nau-jea-fei-hu-fo-jeu-mai-keu-beo-rao-le-do)
-2026-07-13 23:43:54,487 [INFO] [iaglobal.evo_agent] [evo-t-sc] GENESIS | lineage_id=c6bd5f444ade7c9f… | phonetic=jau-na-ku-pa-ceu-jai-mou-gou-be-gau-geu-co-dou-peu-keu-tu
-2026-07-13 23:43:54,487 [INFO] [iaglobal] [OmniMind] Agente desregistrado: c6bd5f444ade7c9f11a8f25c8b7189ae19dd194831eda03ccfd3df594fd37b78bf70eb4a2a049f3ebe61d728f53040736397c8eb7779fc643d8570077a56b598
-2026-07-13 23:43:54,488 [INFO] [iaglobal.evo_agent] [evo-t-sc] Apoptose | reason=t
-2026-07-13 23:43:54,489 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-sc
-2026-07-13 23:43:54,504 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-sc
-2026-07-13 23:43:54,505 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-sc eliminado com sucesso
-2026-07-13 23:43:54,506 [INFO] [iaglobal.evo_agent] [evo-t-sc] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-sc_genome.json | SAMe final=110
-2026-07-13 23:43:54,508 [INFO] [iaglobal.evo_agent] [evo-t-af] Instanciado | gen=0 | marker=8012ecd510ed4e13 | nadph=0.50
-2026-07-13 23:43:54,509 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-af (gen=0, phonetic=po-be-mi-fai-pe-hu-bae-peo-mea-cao-peu-dw-jae-hou-hi-bi)
-2026-07-13 23:43:54,509 [INFO] [iaglobal.immunity.vaccine_ledger] [VACCINE-LEDGER] 1 vacina(s) aplicada(s) à linhagem 8012ecd510ed4e13
-2026-07-13 23:43:54,509 [INFO] [iaglobal.evo_agent] [evo-t-af] GENESIS | lineage_id=7df91bdc629d119a… | phonetic=hou-gu-pea-ty-ko-tai-leu-to-cea-by-ju-fi-tai-du-to-gao
-2026-07-13 23:43:54,510 [INFO] [iaglobal] [OmniMind] Agente desregistrado: 7df91bdc629d119ac029fd5e069cd66dded28b67cd120f6eabd39ca035848e462f61285bc5b491e36a22945a055b5eec6abcc216823641e08cba7fecc2b64148
-2026-07-13 23:43:54,510 [INFO] [iaglobal.evo_agent] [evo-t-af] Apoptose | reason=t
-2026-07-13 23:43:54,511 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-af
-2026-07-13 23:43:54,523 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-af
-2026-07-13 23:43:54,524 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-af eliminado com sucesso
-2026-07-13 23:43:54,524 [INFO] [iaglobal.evo_agent] [evo-t-af] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-af_genome.json | SAMe final=110
-2026-07-13 23:43:54,526 [INFO] [iaglobal.evo_agent] [evo-t-li] Instanciado | gen=0 | marker=6500204b3a1da939 | nadph=0.50
-2026-07-13 23:43:54,526 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-li (gen=0, phonetic=tw-vea-tae-ny-fou-ba-bei-sa-vw-heu-meo-kw-sy-pe-deu-kai)
-2026-07-13 23:43:54,527 [INFO] [iaglobal.evo_agent] [evo-t-li] GENESIS | lineage_id=dd49268d6dc59129… | phonetic=jeu-li-go-ko-vy-do-jy-da-ti-pw-meo-teu-lae-co-bw-mai
-2026-07-13 23:43:54,527 [INFO] [iaglobal] [OmniMind] Agente desregistrado: dd49268d6dc591299c34438f878ee9478b93cf0f422a7117f2ba59b31df43eb49a66d8ef43c6f45ac50f3fd90207baf39f2a1bd09275a5644b1623bff9c24bd3
-2026-07-13 23:43:54,527 [INFO] [iaglobal.evo_agent] [evo-t-li] Apoptose | reason=t
-2026-07-13 23:43:54,528 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-li
-2026-07-13 23:43:54,529 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-li
-2026-07-13 23:43:54,529 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-li eliminado com sucesso
-2026-07-13 23:43:54,530 [INFO] [iaglobal.evo_agent] [evo-t-li] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-li_genome.json | SAMe final=110
-2026-07-13 23:43:54,531 [INFO] [iaglobal.evo_agent] [evo-t-rf] Instanciado | gen=0 | marker=c673e5ada9e961ae | nadph=0.50
-2026-07-13 23:43:54,532 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-rf (gen=0, phonetic=kea-vo-fei-fai-ha-pae-pai-ke-gy-nea-na-jau-si-sou-he-lw)
-2026-07-13 23:43:54,532 [INFO] [iaglobal.evo_agent] [evo-t-rf] GENESIS | lineage_id=4afe6e92a272d5db… | phonetic=by-kai-by-pai-teu-ka-hea-leu-fy-dao-bai-bo-sw-je-no-beo
-2026-07-13 23:43:54,566 [INFO] [iaglobal] 🔧 ReflexionEngine initialized with max_iterations=5
-2026-07-13 23:43:54,570 [INFO] [iaglobal] [KNOWLEDGE] 0 entradas carregadas de /workspace/iaglobal/memory/data/json/knowledge.json
-2026-07-13 23:43:54,583 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:43:54,584 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:43:54,584 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=499 | tags=[]
-2026-07-13 23:43:54,585 [INFO] [iaglobal] [ARBITER mode=enforce] evo_agent memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:43:54,585 [INFO] [iaglobal] [ARBITER mode=enforce] evo_agent nao resolvido em casa — escalando via critic
-2026-07-13 23:43:54,585 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=evo_agent | IVM=0.100 | classificacao=falha
-2026-07-13 23:43:54,585 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=evo_agent | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:43:54,585 [INFO] [iaglobal] [ROUTER] async_route_generate model=groq/llama-3.3-70b-versatile provider=groq task_type=reflection
-2026-07-13 23:43:54,678 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:43:54,678 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #1/2
-2026-07-13 23:43:55,744 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:43:55,744 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #2/2
-2026-07-13 23:43:57,811 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:43:57,811 [WARNING] [iaglobal] [ROUTER] Falha: groq (0.06s). Erro: Resposta vazia do provedor.
-2026-07-13 23:43:57,811 [INFO] [iaglobal] [ROUTER] async_route_generate primary=groq failed -> fallback
-2026-07-13 23:43:57,811 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=groq RACE_SIZE=3 pool=2
-2026-07-13 23:43:57,811 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['nvidia', 'ollama']
-2026-07-13 23:43:57,815 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
-2026-07-13 23:43:58,048 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:43:58,049 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #1/2
-2026-07-13 23:43:59,118 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:43:59,118 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #2/2
-2026-07-13 23:44:01,189 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:44:01,189 [WARNING] [iaglobal] [ROUTER] Falha: nvidia (0.07s). Erro: Resposta vazia do provedor.
-2026-07-13 23:44:01,190 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.750 | P=0.750 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:44:01,192 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=evo_agent | IVM=0.050 | classificacao=falha
-2026-07-13 23:44:01,192 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=evo_agent | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:44:01,192 [INFO] [iaglobal] 🔄 Attempt 1/5 - Executing in Sandbox...
-2026-07-13 23:44:01,194 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-13 23:44:01,194 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-13 23:44:01,195 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-13 23:44:01,205 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-13 23:44:01,206 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-13 23:44:01,206 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-13 23:44:01,248 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-13 23:44:01,248 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-13 23:44:01,248 [INFO] [iaglobal] ✅ Code executed successfully in sandbox!
-2026-07-13 23:44:01,249 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-13 23:44:01,249 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-13 23:44:01,250 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-13 23:44:01,266 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-13 23:44:01,266 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-13 23:44:01,266 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-13 23:44:01,305 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-13 23:44:01,306 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-13 23:44:01,306 [INFO] [iaglobal] ✨ Reflexion completed successfully in 6.74s
-2026-07-13 23:44:01,306 [INFO] [iaglobal] [OmniMind] Agente desregistrado: 4afe6e92a272d5db2fedcd37c793321098f34e7143f165823bc177ad20d7fad0ff6342151e52af9662c4ad34369bcced133e69f22fff6f45d4163d112741a99a
-2026-07-13 23:44:01,307 [INFO] [iaglobal.evo_agent] [evo-t-rf] Apoptose | reason=t
-2026-07-13 23:44:01,307 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-rf
-2026-07-13 23:44:01,309 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-rf
-2026-07-13 23:44:01,309 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-rf eliminado com sucesso
-2026-07-13 23:44:01,310 [INFO] [iaglobal.evo_agent] [evo-t-rf] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-rf_genome.json | SAMe final=110
-2026-07-13 23:44:01,313 [INFO] [iaglobal.evo_agent] [evo-t-h] Instanciado | gen=0 | marker=bc0a4fabaf626636 | nadph=0.50
-2026-07-13 23:44:01,313 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-h (gen=0, phonetic=ro-ky-pea-sa-hu-sao-jy-fei-rou-pei-sao-vi-dau-bw-lao-gw)
-2026-07-13 23:44:01,323 [INFO] [iaglobal.evo_agent] [evo-t-h] GENESIS | lineage_id=bfb4568bf1292bf1… | phonetic=kau-pau-fe-hau-vae-fu-la-ba-hi-gu-teu-cei-lau-gy-vo-vw
-2026-07-13 23:44:01,324 [INFO] [iaglobal.evo_agent] 🧬 [evo-t-h] [Metabolismo] Buscando nutrientes externos: tarefa normal de análise
-2026-07-13 23:44:01,324 [INFO] [iaglobal.evo_agent] [evo-t-h] Nutricao externa completa | source=memory_cache | impact=False
-2026-07-13 23:44:01,325 [INFO] [iaglobal.metabolism.homocysteine_pool] [HOMOCYSTEINE] Candidate 'skill_76e568f7' adicionada (score=0.50)
-2026-07-13 23:44:01,326 [INFO] [iaglobal.evo_agent] [evo-t-h] Expressão | urgency=normal | elapsed=2.5ms | SAMe=65 | nadph=0.50
-2026-07-13 23:44:01,326 [INFO] [iaglobal] [OmniMind] Agente desregistrado: bfb4568bf1292bf1a82772f4aa4553a497893886c99bde4e74e3f7e39f7f4b05b0fa22c6f423d5a392ae8b734841258c378f28d56898851f80cf73488b546126
-2026-07-13 23:44:01,326 [INFO] [iaglobal.evo_agent] [evo-t-h] Apoptose | reason=t
-2026-07-13 23:44:01,327 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-h
-2026-07-13 23:44:01,328 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-h
-2026-07-13 23:44:01,328 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-h eliminado com sucesso
-2026-07-13 23:44:01,329 [INFO] [iaglobal.evo_agent] [evo-t-h] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-h_genome.json | SAMe final=70
-2026-07-13 23:44:01,346 [INFO] [iaglobal.evo_agent] [evo-dummy_evo_test] Instanciado | gen=0 | marker=2f11100269a3ed53 | nadph=0.50
-2026-07-13 23:44:01,346 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-dummy_evo_test (gen=0, phonetic=vy-lau-rw-po-meu-ro-li-la-ra-fi-vao-dou-pao-ko-jeo-dai)
-2026-07-13 23:44:01,346 [INFO] [iaglobal.immunity.vaccine_ledger] [VACCINE-LEDGER] 1 vacina(s) aplicada(s) à linhagem 2f11100269a3ed53
-2026-07-13 23:44:01,346 [INFO] [iaglobal.evo_agent] [evo-dummy_evo_test] GENESIS | lineage_id=fb207a091b18f273… | phonetic=ty-jae-nw-hae-sa-nau-sae-jeu-go-nw-seo-pe-leu-dea-reo-dou
-2026-07-13 23:44:01,346 [INFO] [iaglobal.agents.agent_base] [DUMMY_EVO_TEST] EvoAgent de linhagem inicializado (marker=2f11100269a3ed53)
-2026-07-13 23:44:01,347 [INFO] [iaglobal] [OmniMind] Agente desregistrado: fb207a091b18f273b6fd0ad687d2a36c91413773477a930ade3512b03e438be892be164dcae5a462539f19a561e39ac2cc2406fd99f65e8b204054092217f290
-2026-07-13 23:44:01,347 [INFO] [iaglobal.evo_agent] [evo-dummy_evo_test] Apoptose | reason=t
-2026-07-13 23:44:01,347 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-dummy_evo_test
-2026-07-13 23:44:01,349 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-dummy_evo_test
-2026-07-13 23:44:01,349 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-dummy_evo_test eliminado com sucesso
-2026-07-13 23:44:01,349 [INFO] [iaglobal.evo_agent] [evo-dummy_evo_test] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-dummy_evo_test_genome.json | SAMe final=110
-2026-07-13 23:44:01,366 [INFO] [iaglobal] 🔧 ReflexionEngine initialized with max_iterations=5
-2026-07-13 23:44:01,369 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:44:01,370 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:44:01,370 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=499 | tags=[]
-2026-07-13 23:44:01,370 [INFO] [iaglobal.agents.agent_base] [DUMMY_EVO_TEST] Memory rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:44:01,383 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:44:01,384 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:44:01,384 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=499 | tags=[]
-2026-07-13 23:44:01,384 [INFO] [iaglobal] [ARBITER mode=enforce] dummy_evo_test memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:44:01,385 [INFO] [iaglobal] [ARBITER mode=enforce] dummy_evo_test nao resolvido em casa — escalando via critic
-2026-07-13 23:44:01,385 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=dummy_evo_test | IVM=0.100 | classificacao=falha
-2026-07-13 23:44:01,385 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=dummy_evo_test | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:44:01,386 [INFO] [iaglobal] [ROUTER] async_route_generate model=groq/llama-3.3-70b-versatile provider=groq task_type=reflection
-2026-07-13 23:44:01,470 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:44:01,471 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #1/2
-2026-07-13 23:44:02,540 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:44:02,540 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #2/2
-2026-07-13 23:44:04,611 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-13 23:44:04,611 [WARNING] [iaglobal] [ROUTER] Falha: groq (0.07s). Erro: Resposta vazia do provedor.
-2026-07-13 23:44:04,611 [INFO] [iaglobal] [ROUTER] async_route_generate primary=groq failed -> fallback
-2026-07-13 23:44:04,611 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=groq RACE_SIZE=3 pool=2
-2026-07-13 23:44:04,612 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['nvidia', 'ollama']
-2026-07-13 23:44:04,615 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
-2026-07-13 23:44:04,807 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:44:04,807 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #1/2
-2026-07-13 23:44:05,876 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:44:05,876 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #2/2
-2026-07-13 23:44:07,949 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-13 23:44:07,949 [WARNING] [iaglobal] [ROUTER] Falha: nvidia (0.07s). Erro: Resposta vazia do provedor.
-2026-07-13 23:44:07,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.690 | P=0.600 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:44:07,951 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=dummy_evo_test | IVM=0.050 | classificacao=falha
-2026-07-13 23:44:07,951 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=dummy_evo_test | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:44:07,951 [INFO] [iaglobal.agents.agent_base] [DUMMY_EVO_TEST] FAIL (tools=0 llm=1)
-2026-07-13 23:44:07,952 [INFO] [iaglobal] 🔄 Attempt 1/5 - Executing in Sandbox...
-2026-07-13 23:44:07,952 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-13 23:44:07,952 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-13 23:44:07,953 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-13 23:44:07,964 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-13 23:44:07,965 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-13 23:44:07,965 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-13 23:44:07,990 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-13 23:44:07,990 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-13 23:44:07,990 [INFO] [iaglobal] ✅ Code executed successfully in sandbox!
-2026-07-13 23:44:07,991 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-13 23:44:07,991 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-13 23:44:07,991 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-13 23:44:08,006 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-13 23:44:08,007 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-13 23:44:08,007 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-13 23:44:08,033 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-13 23:44:08,033 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-13 23:44:08,033 [INFO] [iaglobal] ✨ Reflexion completed successfully in 6.67s
-2026-07-13 23:44:08,050 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:44:08,051 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:44:08,051 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=264 | tags=[]
-2026-07-13 23:44:08,051 [INFO] [iaglobal.agents.agent_base] [DUMMY_EVO_TEST] Memory rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:44:08,052 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-13 23:44:08,063 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-13 23:44:08,064 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=264 | tags=[]
-2026-07-13 23:44:08,064 [INFO] [iaglobal] [ARBITER mode=enforce] dummy_evo_test memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-13 23:44:08,064 [INFO] [iaglobal] [ARBITER mode=enforce] dummy_evo_test nao resolvido em casa — escalando via critic
-2026-07-13 23:44:08,064 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=dummy_evo_test | IVM=0.100 | classificacao=falha
-2026-07-13 23:44:08,064 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=dummy_evo_test | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-13 23:45:32,772 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-13 23:45:32,787 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:45:32,788 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:45:33,350 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:45:56,068 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-13 23:45:56,069 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Carregados 2 perfis entrópicos de disco (CBOR)
-2026-07-13 23:45:56,084 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 2 registros | path=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-13 23:45:56,084 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-13 23:45:58,328 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-13 23:45:58,344 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-13 23:45:58,344 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-13 23:45:58,827 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-13 23:45:58,949 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:45:59,084 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-13 23:45:59,086 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-13 23:46:00,867 [INFO] [iaglobal.ancestry_tree] [AncestryTree] Árvore de Ancestralidade initialized | lineages_dir=/workspace/iaglobal/memory/data/work/obsidian/05_Lineages
-2026-07-14 11:16:39,318 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
-2026-07-14 11:16:39,319 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Carregados 2 perfis entrópicos de disco (CBOR)
-2026-07-14 11:16:39,324 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 2 registros | path=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 11:16:39,324 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 11:16:41,703 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-14 11:16:41,704 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-14 11:16:41,705 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-14 11:16:42,263 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-14 11:16:42,397 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-14 11:16:42,644 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-14 11:16:42,645 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-14 11:16:44,899 [INFO] [iaglobal.ancestry_tree] [AncestryTree] Árvore de Ancestralidade initialized | lineages_dir=/workspace/iaglobal/memory/data/work/obsidian/05_Lineages
-2026-07-14 17:01:49,404 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-14 17:01:49,407 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-14 17:01:49,421 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-14 17:01:49,827 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-14 17:01:49,844 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 2 registros | path=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 17:01:49,844 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 17:01:54,627 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-14 17:01:54,628 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-14 17:01:54,629 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-14 17:01:54,984 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-14 17:01:54,989 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 2 registros | path=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 17:01:54,989 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 17:02:01,968 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-14 17:02:01,969 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-14 17:02:01,981 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-14 17:02:02,350 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-14 17:02:02,366 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 2 registros | path=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 17:02:02,366 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 17:02:06,690 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 2 tools do disco
-2026-07-14 17:02:06,701 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=nao
-2026-07-14 17:02:06,701 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=nao
-2026-07-14 17:02:07,105 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-14 17:02:07,122 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 2 registros | path=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 17:02:07,122 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-14 17:02:07,303 [INFO] [iaglobal.evo_agent] [evo-t-rf] Instanciado | gen=0 | marker=c673e5ada9e961ae | nadph=0.50
-2026-07-14 17:02:07,303 [INFO] [iaglobal] [OmniMind] Agente registrado: evo-t-rf (gen=0, phonetic=kea-vo-fei-fai-ha-pae-pai-ke-gy-nea-na-jau-si-sou-he-lw)
-2026-07-14 17:02:07,306 [INFO] [iaglobal.evo_agent] [evo-t-rf] GENESIS | lineage_id=4afe6e92a272d5db… | phonetic=by-kai-by-pai-teu-ka-hea-leu-fy-dao-bai-bo-sw-je-no-beo
-2026-07-14 17:02:07,361 [INFO] [iaglobal] 🔧 ReflexionEngine initialized with max_iterations=5
-2026-07-14 17:02:07,367 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
-2026-07-14 17:02:07,382 [WARNING] [iaglobal] .env não encontrado em /workspace/.env, usando fallback find_dotenv()
-2026-07-14 17:02:08,946 [INFO] [iaglobal.policy.bandit_evolutivo] [PERSISTÊNCIA] Nenhum estado persistido encontrado
-2026-07-14 17:02:08,947 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
-2026-07-14 17:02:08,947 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
-2026-07-14 17:02:08,947 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
-2026-07-14 17:02:08,962 [INFO] [iaglobal] [KNOWLEDGE] 0 entradas carregadas de /workspace/iaglobal/memory/data/json/knowledge.json
-2026-07-14 17:02:08,964 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...
-2026-07-14 17:02:08,965 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.
-2026-07-14 17:02:08,966 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=499 | tags=[]
-2026-07-14 17:02:08,966 [INFO] [iaglobal] [ARBITER mode=enforce] evo_agent memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM
-2026-07-14 17:02:08,966 [INFO] [iaglobal] [ARBITER mode=enforce] evo_agent nao resolvido em casa — escalando via critic
-2026-07-14 17:02:08,966 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=evo_agent | IVM=0.100 | classificacao=falha
-2026-07-14 17:02:08,966 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=evo_agent | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-14 17:02:08,967 [INFO] [iaglobal] [ROUTER] async_route_generate model=groq/llama-3.3-70b-versatile provider=groq task_type=reflection
-2026-07-14 17:02:09,330 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-14 17:02:09,330 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #1/2
-2026-07-14 17:02:10,401 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-14 17:02:10,401 [WARNING] [iaglobal] [ROUTER] Resposta vazia de groq. Tentando retry #2/2
-2026-07-14 17:02:12,470 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://api.groq.com/openai/v1/chat/completions -> 401: {"error":{"message":"Invalid API Key","type":"invalid_request_error","code":"invalid_api_key"}}
-
-2026-07-14 17:02:12,471 [WARNING] [iaglobal] [ROUTER] Falha: groq (0.07s). Erro: Resposta vazia do provedor.
-2026-07-14 17:02:12,471 [INFO] [iaglobal] [ROUTER] async_route_generate primary=groq failed -> fallback
-2026-07-14 17:02:12,471 [INFO] [iaglobal] [ROUTER] _async_parallel_fallback exclude=groq RACE_SIZE=3 pool=2
-2026-07-14 17:02:12,471 [INFO] [iaglobal] [ROUTER] Race batch 1/1: ['nvidia', 'ollama']
-2026-07-14 17:02:12,475 [WARNING] [iaglobal] [ROUTER] Falha: ollama (0.00s). Erro: Ollama não acessível em http://localhost:11434.
-2026-07-14 17:02:12,703 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-14 17:02:12,703 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #1/2
-2026-07-14 17:02:13,771 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-14 17:02:13,772 [WARNING] [iaglobal] [ROUTER] Resposta vazia de nvidia. Tentando retry #2/2
-2026-07-14 17:02:15,841 [WARNING] [iaglobal.providers.async_http] [ASYNC-HTTP] https://integrate.api.nvidia.com/v1/chat/completions -> 500: Missing request extension: Extension of type `headers::common::authorization::Authorization<headers::common::authorization::Bearer>` was not found. Perhaps you forgot to add it? See `axum::Extension`.
-2026-07-14 17:02:15,841 [WARNING] [iaglobal] [ROUTER] Falha: nvidia (0.07s). Erro: Resposta vazia do provedor.
-2026-07-14 17:02:15,842 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.050 | classificacao=falha
-2026-07-14 17:02:15,842 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-14 17:02:15,844 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=evo_agent | IVM=0.050 | classificacao=falha
-2026-07-14 17:02:15,844 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=evo_agent | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
-2026-07-14 17:02:15,847 [INFO] [iaglobal] 🔄 Attempt 1/5 - Executing in Sandbox...
-2026-07-14 17:02:15,848 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-14 17:02:15,848 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-14 17:02:15,848 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-14 17:02:15,862 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-14 17:02:15,862 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-14 17:02:15,863 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-14 17:02:15,945 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-14 17:02:15,945 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-14 17:02:15,945 [INFO] [iaglobal] ✅ Code executed successfully in sandbox!
-2026-07-14 17:02:15,946 [INFO] [iaglobal] [FEEDBACK] Código não-Python detectado — pulando validação AST
-2026-07-14 17:02:15,946 [INFO] [iaglobal] 📝 [SANDBOX] Criando script...
-2026-07-14 17:02:15,946 [INFO] [iaglobal] 🚀 [SANDBOX] Executando código isoladamente...
-2026-07-14 17:02:15,962 [INFO] [iaglobal] 🔐 [SANDBOX]: Iniciando blindagem de ambiente...
-2026-07-14 17:02:15,962 [INFO] [iaglobal] 🛡️ [SANDBOX]: Firewall virtual ativado.
-2026-07-14 17:02:15,962 [INFO] [iaglobal] ✅ [SANDBOX]: Ambiente blindado e isolado com sucesso.
-2026-07-14 17:02:15,984 [INFO] [iaglobal] ✅ [SANDBOX] Execução concluída.
-2026-07-14 17:02:15,984 [INFO] [iaglobal] 🧹 [SANDBOX] Arquivo temporário removido.
-2026-07-14 17:02:15,984 [INFO] [iaglobal] ✨ Reflexion completed successfully in 8.62s
-2026-07-14 17:02:15,985 [INFO] [iaglobal] [OmniMind] Agente desregistrado: 4afe6e92a272d5db2fedcd37c793321098f34e7143f165823bc177ad20d7fad0ff6342151e52af9662c4ad34369bcced133e69f22fff6f45d4163d112741a99a
-2026-07-14 17:02:15,985 [INFO] [iaglobal.evo_agent] [evo-t-rf] Apoptose | reason=t
-2026-07-14 17:02:15,987 [WARNING] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] Iniciando eliminação de evo-t-rf
-2026-07-14 17:02:16,002 [INFO] [iaglobal.memory.async_memory] [ASYNC_MEMORY] LTM salvo: apoptosis_evo-t-rf
-2026-07-14 17:02:16,003 [INFO] [iaglobal.immunity.apoptosis_engine] [APOPTOSIS] evo-t-rf eliminado com sucesso
-2026-07-14 17:02:16,004 [INFO] [iaglobal.evo_agent] [evo-t-rf] Apoptose completa | genome→/workspace/iaglobal/memory/data/json/evo-t-rf_genome.json | SAMe final=115
+2026-07-20 21:30:49,013 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 21:30:54,302 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-20 21:30:54,317 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-20 21:30:54,343 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-20 21:30:54,516 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 21:30:54,881 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-20 21:30:54,881 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-20 21:30:54,881 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-20 21:30:55,057 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-20 21:30:55,106 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-07-20 21:30:55,166 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 21:30:55,167 [INFO] [iaglobal.mcp.unified] 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+2026-07-20 21:30:55,167 [INFO] [iaglobal.mcp.unified] 🔮 MCP Unified Server inicializando...
+2026-07-20 21:30:55,167 [INFO] [iaglobal.mcp.unified] 🔮 Iniciando MCP Unified Server em 127.0.0.1:8100
+2026-07-20 21:30:55,167 [INFO] [iaglobal.mcp.unified] ✅ MCP Unified integrado ao AcetylcholineBus
+2026-07-20 21:42:48,669 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 21:42:50,026 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-20 21:42:50,623 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-20 21:42:50,640 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-20 21:42:50,667 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-20 21:42:50,831 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 21:42:51,013 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-20 21:42:51,014 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-20 21:42:51,014 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-20 21:42:51,153 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-20 21:42:51,169 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-07-20 21:42:51,232 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 21:42:51,232 [INFO] [iaglobal.mcp.unified] 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+2026-07-20 21:42:51,232 [INFO] [iaglobal.mcp.unified] 🔮 MCP Unified Server inicializando...
+2026-07-20 21:42:51,233 [INFO] [iaglobal.mcp.unified] 🔮 Iniciando MCP Unified Server em 127.0.0.1:8100
+2026-07-20 21:42:51,233 [INFO] [iaglobal.mcp.unified] ✅ MCP Unified integrado ao AcetylcholineBus
+2026-07-20 21:50:13,799 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-20 21:50:14,472 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-20 21:50:14,488 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-20 21:50:14,516 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-20 21:50:14,679 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 21:50:14,842 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-20 21:50:14,843 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-20 21:50:14,843 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-20 21:50:14,846 [INFO] [iaglobal] [PM_AGENT] func=5 | non_func=1 | priority=high | prompt_len=147
+2026-07-20 21:55:30,102 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 21:55:34,259 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-20 21:55:35,417 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-20 21:55:35,431 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-20 21:55:35,455 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-20 21:55:35,636 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 21:55:35,799 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-20 21:55:35,799 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-20 21:55:35,799 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-20 21:55:35,931 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-20 21:55:35,978 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-07-20 21:55:36,043 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 21:55:36,044 [INFO] [iaglobal.mcp.unified] 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+2026-07-20 21:55:36,044 [INFO] [iaglobal.mcp.unified] 🔮 MCP Unified Server inicializando...
+2026-07-20 21:55:36,044 [INFO] [iaglobal.mcp.unified] 🔮 Iniciando MCP Unified Server em 127.0.0.1:8100
+2026-07-20 21:55:36,044 [INFO] [iaglobal.mcp.unified] ✅ MCP Unified integrado ao AcetylcholineBus
+2026-07-20 22:21:11,547 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 22:21:11,563 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:11,563 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:11,572 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:11,572 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:11,580 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:11,580 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:11,589 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:11,589 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:11,597 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:11,597 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:11,639 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-20 22:21:11,678 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 22:21:17,933 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-20 22:21:18,485 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-20 22:21:18,503 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-20 22:21:18,532 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-20 22:21:18,868 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-20 22:21:18,869 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-20 22:21:18,869 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-20 22:21:19,011 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-20 22:21:19,047 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:19,048 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:19,058 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:19,058 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:19,068 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:19,068 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:19,077 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:21:19,077 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:21:19,639 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-20 22:21:19,642 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-20 22:21:19,644 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-20 22:21:19,653 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-20 22:21:19,653 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-20 22:21:19,654 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-20 22:35:53,545 [INFO] [iaglobal.evolution] 🚀 EvolutionRuntime inicializado.
+2026-07-20 22:37:17,288 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 9 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 22:37:17,288 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 22:37:17,300 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:17,300 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:17,309 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:17,309 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:17,318 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:17,318 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:17,326 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:17,326 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:17,335 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:17,335 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:17,353 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-20 22:37:17,367 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 22:37:19,853 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-20 22:37:20,268 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-20 22:37:20,286 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-20 22:37:20,308 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-20 22:37:20,595 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-20 22:37:20,596 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-20 22:37:20,596 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-20 22:37:20,740 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-20 22:37:20,762 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:20,762 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:20,773 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:20,773 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:20,783 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:20,784 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:20,794 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:37:20,794 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:37:21,347 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-20 22:37:21,349 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-20 22:37:21,351 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-20 22:37:21,358 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-20 22:37:21,358 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-20 22:37:21,359 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-20 22:55:51,840 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 18 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 22:55:51,840 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-20 22:55:51,850 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:51,851 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:51,859 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:51,859 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:51,868 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:51,868 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:51,880 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:51,880 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:51,888 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:51,889 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:51,909 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-20 22:55:51,931 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-20 22:55:54,610 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-20 22:55:55,057 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-20 22:55:55,074 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-20 22:55:55,103 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-20 22:55:55,425 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-20 22:55:55,426 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-20 22:55:55,426 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-20 22:55:55,577 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-20 22:55:55,597 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:55,597 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:55,609 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:55,609 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:55,619 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:55,619 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:55,630 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-20 22:55:55,630 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-20 22:55:56,276 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-20 22:55:56,279 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-20 22:55:56,282 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-20 22:55:56,287 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-20 22:55:56,287 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-20 22:55:56,287 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 03:43:10,636 [ERROR] [iaglobal] ❌ Falha ao limpar toxinas: 'SubconsciousAPI' object has no attribute 'buscar_tarefas'
+2026-07-21 03:43:10,636 [ERROR] [iaglobal.mcp.unified] ❌ Falha ao publicar métricas: 'OmniMind' object has no attribute 'registrar_violação_lei'
+2026-07-21 03:55:54,856 [ERROR] [iaglobal] ❌ Falha ao limpar toxinas: 'SubconsciousAPI' object has no attribute 'buscar_tarefas'
+2026-07-21 03:55:54,857 [ERROR] [iaglobal.mcp.unified] ❌ Falha ao publicar métricas: 'OmniMind' object has no attribute 'registrar_violação_lei'
+2026-07-21 07:11:41,639 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 27 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 07:11:41,639 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 07:11:41,653 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:41,653 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:41,661 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:41,661 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:41,670 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:41,670 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:41,679 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:41,679 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:41,687 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:41,687 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:41,705 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-21 07:11:41,719 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-21 07:11:44,166 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 07:11:44,587 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 07:11:44,603 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 07:11:44,629 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 07:11:44,947 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 07:11:44,948 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 07:11:44,948 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 07:11:45,088 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-21 07:11:45,107 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:45,107 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:45,117 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:45,117 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:45,127 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:45,127 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:45,136 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:11:45,136 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:11:45,753 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-21 07:11:45,755 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-21 07:11:45,757 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-21 07:11:45,762 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-21 07:11:45,762 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-21 07:11:45,763 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 07:14:15,391 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 36 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 07:14:15,391 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 07:14:15,402 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:15,402 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:15,410 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:15,410 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:15,419 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:15,419 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:15,428 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:15,428 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:15,436 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:15,437 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:15,449 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-21 07:14:15,463 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-21 07:14:17,861 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 07:14:18,272 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 07:14:18,288 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 07:14:18,314 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 07:14:18,614 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 07:14:18,614 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 07:14:18,614 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 07:14:18,744 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-21 07:14:18,763 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:18,763 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:18,775 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:18,775 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:18,785 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:18,785 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:18,794 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:14:18,794 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:14:19,342 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-21 07:14:19,344 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-21 07:14:19,347 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-21 07:14:19,354 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-21 07:14:19,354 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-21 07:14:19,355 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 07:14:19,360 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:19,433 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:19,437 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:19,438 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:19,443 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:19,530 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:19,534 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:19,537 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmplxtoswi5/awareness.db (intervalo=0.1s)
+2026-07-21 07:14:19,537 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence iniciado
+2026-07-21 07:14:19,861 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence parado
+2026-07-21 07:14:19,861 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:19,866 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:19,869 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmp8th5u45s/awareness.db (intervalo=0.1s)
+2026-07-21 07:14:19,869 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence iniciado
+2026-07-21 07:14:20,193 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence parado
+2026-07-21 07:14:20,193 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:20,194 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:20,195 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmp8th5u45s/awareness.db (intervalo=2.0s)
+2026-07-21 07:14:20,195 [INFO] [iaglobal.cognition.awareness.persistence] Awareness restaurado de /tmp/tmp8th5u45s/awareness.db
+2026-07-21 07:14:20,196 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:20,201 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:20,201 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:20,204 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:20,205 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:20,208 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:20,208 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:20,210 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:20,211 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:20,214 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:20,214 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:20,215 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:14:20,219 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:14:20,219 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:02,418 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 45 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 07:24:02,418 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 07:24:02,429 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:02,429 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:02,438 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:02,438 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:02,446 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:02,447 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:02,455 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:02,456 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:02,464 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:02,464 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:02,479 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-21 07:24:02,494 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-21 07:24:05,067 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 07:24:05,471 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 07:24:05,486 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 07:24:05,506 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 07:24:05,802 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 07:24:05,803 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 07:24:05,803 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 07:24:05,952 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-21 07:24:05,972 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:05,972 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:05,983 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:05,984 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:05,995 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:05,995 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:06,004 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:24:06,005 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:24:06,545 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-21 07:24:06,548 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-21 07:24:06,551 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-21 07:24:06,557 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-21 07:24:06,558 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-21 07:24:06,558 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 07:24:06,564 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:06,640 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:06,643 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:06,644 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:06,648 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:06,722 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:06,726 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:06,729 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmpk08_d8dp/awareness.db (intervalo=0.1s)
+2026-07-21 07:24:06,729 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence iniciado
+2026-07-21 07:24:07,056 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence parado
+2026-07-21 07:24:07,056 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,061 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:07,063 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmp2c5hro9c/awareness.db (intervalo=0.1s)
+2026-07-21 07:24:07,063 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence iniciado
+2026-07-21 07:24:07,387 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence parado
+2026-07-21 07:24:07,388 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,389 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:07,389 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmp2c5hro9c/awareness.db (intervalo=2.0s)
+2026-07-21 07:24:07,390 [INFO] [iaglobal.cognition.awareness.persistence] Awareness restaurado de /tmp/tmp2c5hro9c/awareness.db
+2026-07-21 07:24:07,391 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,395 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:07,396 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,400 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:07,400 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,403 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:07,403 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,406 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:07,407 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,410 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:07,410 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,410 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:24:07,413 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:24:07,414 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:45,603 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 54 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 07:32:45,603 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 07:32:45,613 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:45,613 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:45,623 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:45,623 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:45,636 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:45,636 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:45,644 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:45,645 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:45,654 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:45,654 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:45,667 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-21 07:32:45,682 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-21 07:32:48,186 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 07:32:48,619 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 07:32:48,638 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 07:32:48,691 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 07:32:49,040 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 07:32:49,041 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 07:32:49,041 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 07:32:49,195 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-21 07:32:49,214 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:49,214 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:49,226 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:49,226 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:49,236 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:49,237 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:49,248 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 07:32:49,248 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 07:32:49,839 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-21 07:32:49,841 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-21 07:32:49,844 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-21 07:32:49,850 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-21 07:32:49,851 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-21 07:32:49,851 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 07:32:49,857 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:49,931 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:49,934 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:49,935 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:49,940 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,013 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,017 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,021 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmp10blqsp6/awareness.db (intervalo=0.1s)
+2026-07-21 07:32:50,021 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence iniciado
+2026-07-21 07:32:50,347 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence parado
+2026-07-21 07:32:50,348 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,353 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,356 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmp2b1m_4sl/awareness.db (intervalo=0.1s)
+2026-07-21 07:32:50,357 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence iniciado
+2026-07-21 07:32:50,683 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence parado
+2026-07-21 07:32:50,683 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,684 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,685 [INFO] [iaglobal.cognition.awareness.persistence] AwarenessPersistence inicializado: /tmp/tmp2b1m_4sl/awareness.db (intervalo=2.0s)
+2026-07-21 07:32:50,686 [INFO] [iaglobal.cognition.awareness.persistence] Awareness restaurado de /tmp/tmp2b1m_4sl/awareness.db
+2026-07-21 07:32:50,687 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,691 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,692 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,695 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,696 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,700 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,701 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,705 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,707 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,711 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,712 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,712 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 07:32:50,715 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
+2026-07-21 07:32:50,715 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado

@@ -156,7 +156,9 @@ class PythonStructureRule(ValidationRule):
             has_func_or_class = False
             if result.valid and result.tree:
                 has_func_or_class = any(
-                    isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                    isinstance(
+                        node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef)
+                    )
                     for node in ast.walk(result.tree)
                 )
 

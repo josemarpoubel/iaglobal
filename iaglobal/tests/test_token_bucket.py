@@ -21,7 +21,7 @@ class TestTokenBucket:
         tb = TokenBucket(capacity=5, fill_rate=10.0, max_concurrent=5)
         for i in range(5):
             assert await tb.acquire(1), f"Token {i} should pass"
-        
+
         # 6º deve falhar (capacity esgotado)
         assert not await tb.acquire(1), "Exceeding capacity should fail"
 
@@ -38,7 +38,7 @@ class TestTokenBucket:
         tb = TokenBucket(capacity=3, fill_rate=20.0, max_concurrent=3)  # 20 tokens/s
         await tb.acquire(3)  # esgota
         assert not await tb.acquire(1), "Should be empty"
-        
+
         await asyncio.sleep(0.1)  # 0.1s * 20 = 2 tokens
         assert await tb.acquire(1), "Should have refilled 1 token"
 
@@ -107,13 +107,15 @@ class TestLocalModelGate:
         gate = LocalModelGate()
         # Captura fill_rate inicial
         initial_rates = {tier: b.fill_rate for tier, b in gate.buckets.items()}
-        
+
         # Alta latência → reduz fill_rate
         gate.report_latency(1200.0)
-        
+
         # fill_rate deve ter diminuído
         for tier, bucket in gate.buckets.items():
-            assert bucket.fill_rate <= initial_rates[tier], f"Tier {tier} fill_rate should decrease"
+            assert bucket.fill_rate <= initial_rates[tier], (
+                f"Tier {tier} fill_rate should decrease"
+            )
 
     @pytest.mark.asyncio
     async def test_buckets_created_per_tier(self):
@@ -122,7 +124,7 @@ class TestLocalModelGate:
         assert "glm4" in gate.buckets
         assert "qwen" in gate.buckets
         assert "lfm" in gate.buckets
-        
+
         # Capacidades corretas
         assert gate.buckets["glm4"].capacity == 2
         assert gate.buckets["qwen"].capacity == 6
@@ -133,11 +135,11 @@ class TestLocalModelGate:
         """get_metrics deve retornar dicionário com métricas por tier."""
         gate = LocalModelGate()
         metrics = gate.get_metrics()
-        
+
         assert "glm4" in metrics
         assert "qwen" in metrics
         assert "lfm" in metrics
-        
+
         for tier in metrics:
             assert "tokens" in metrics[tier]
             assert "capacity" in metrics[tier]

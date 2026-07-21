@@ -1,2 +1,0 @@
-{"timestamp": 1783986136.0054817, "provider": "ollama", "model": "ollama/qwen2.5:0.5b", "prompt_size": 19, "success": true, "latency_ms": 0.12564659118652344, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "cost": 0.0, "task_key": "general", "task_type": "general"}
-{"timestamp": 1783986234.3703754, "provider": "ollama", "model": "ollama/qwen2.5:0.5b", "prompt_size": 19, "success": true, "latency_ms": 0.0782012939453125, "prompt_tokens": 0, "completion_tokens": 0, "total_tokens": 0, "cost": 0.0, "task_key": "general", "task_type": "general"}

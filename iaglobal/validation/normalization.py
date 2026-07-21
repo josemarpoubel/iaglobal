@@ -2,26 +2,6 @@
 
 import re
 
-import re
-
-
-def normalizar_codigo(texto: str) -> str:
-    """
-    Remove markdown e lixo de LLM.
-    """
-
-    if not texto:
-        return ""
-
-    # Remove fences
-    texto = re.sub(r"```python", "", texto, flags=re.IGNORECASE)
-    texto = re.sub(r"```", "", texto)
-
-    # Remove espaços extremos
-    texto = texto.strip()
-
-    return texto
-
 
 class DataNormalizer:
     """Normalizes code and data structures."""

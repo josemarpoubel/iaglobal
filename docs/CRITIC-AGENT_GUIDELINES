@@ -1,0 +1,611 @@
+Do ponto de vista de custo e eficiência, ela faz bastante sentido.
+
+Uma política como esta é bastante racional...
+
+Nesse fluxo abaixo:
+
+* **99% do processamento ocorre localmente (Ollama)**.
+* Apenas o **Critic** consome créditos da nuvem.
+* O Critic funciona como um "juiz" ou "gatekeeper", não como um executor.
+
+Isso reduz drasticamente o consumo de tokens.
+
+### evolução provider
+
+Em vez de enviar tudo para a nuvem sempre, o Critic pode ser acionado apenas em determinados momentos:
+
+* após todos os testes passarem;
+* quando a cobertura atingir um limite;
+* quando o código estabilizar (sem alterações por N ciclos);
+* antes da entrega final.
+
+Assim, um ciclo poderia ser:
+
+
+```
+Coder (local)
+      │
+Tester (local)
+      │
+Debugger (local)
+      │
+passou?
+      │
+   não ───────────────┐
+      │               │
+      ▼               │
+corrige localmente ◄──┘
+
+      │
+      ▼
+Critic (cloud)
+      │
+      ├── aprovou → fim
+      │
+      └── reprovou
+             │
+             ▼
+     gera instruções
+             │
+             ▼
+ Tester/Debugger/Coder (local)
+```
+
+Nesse modelo, o Critic **não corrige código**. Ele apenas produz um diagnóstico de alto nível, por exemplo:
+
+* "há risco de race condition";
+* "a arquitetura viola SOLID";
+* "há duplicação";
+* "os testes não cobrem o caso X".
+
+Quem faz a implementação das mudanças continua sendo os agentes locais.
+
+### Eu faria uma pequena alteração na membrana
+
+Em vez de pensar em "quem pode usar cloud", pensaria em **papéis**.
+
+Por exemplo:
+
+```
+ROLE_LOCAL
+    planner
+    pm
+    architect
+    coder
+    tester
+    debugger
+    reviewer
+    search
+
+ROLE_CLOUD
+    critic
+```
+
+Então a decisão seria baseada no papel:
+
+```python
+if agent.role == CLOUD_REVIEWER:
+    providers = CLOUD + LOCAL_FALLBACK
+else:
+    providers = LOCAL_ONLY
+```
+
+Isso torna a política mais robusta do que depender de nomes como `"critic"` ou `"critic_agent"`.
+
+### O único ponto que eu mudaria
+
+Hoje você comentou:
+
+> "somente o crítico usar os modelos online"
+
+Eu acrescentaria um **fallback** para o próprio Critic:
+
+```
+Critic
+    tenta Groq
+        ↓
+    tenta NVIDIA
+        ↓
+    tenta OpenRouter
+        ↓
+    se tudo falhar
+        ↓
+    Ollama
+```
+
+Assim o sistema nunca para por indisponibilidade de um provedor externo, mas continua priorizando a nuvem apenas para o papel mais importante. Isso mantém o consumo de créditos sob controle e preserva a robustez da pipeline.
+
+Na arquitetura do **iaglobal**, eu faria isso como uma **mudança de responsabilidade**, e não apenas como uma mudança no `provider_router`.
+
+Hoje, pelo que vimos nas conversas anteriores, seu projeto já possui praticamente todos os componentes:
+
+* Execution Graph
+* Bandit Evolution
+* Provider Router
+* Skill Router
+* Critic
+* Tester
+* Debugger
+* Métricas
+* Membrana
+
+O problema é que eles ainda estão muito acoplados à escolha de provider.
+
+Eu inverteria essa responsabilidade.
+
+---
+
+# Arquitetura proposta
+
+```
+                   +----------------------+
+                   |  Execution Graph     |
+                   +----------+-----------+
+                              |
+                    executa próximo nó
+                              |
+                              ▼
+                    +------------------+
+                    | SkillNode        |
+                    +------------------+
+                              |
+                     identifica ROLE
+                              |
+                              ▼
+                 +--------------------------+
+                 | Model Selection Layer    |
+                 +--------------------------+
+                  │                    │
+          ROLE_LOCAL             ROLE_CRITIC
+                  │                    │
+                  ▼                    ▼
+          Ollama Router        Bandit Evolution
+                                      │
+                         escolhe Groq/NVIDIA/OpenRouter
+                                      │
+                                      ▼
+                             Provider Router
+```
+
+Observe que o **Bandit deixa de ser global**.
+
+Ele passa a existir **somente para ROLE_CRITIC**.
+
+---
+
+# Papéis (Roles)
+
+Em vez de testar nomes:
+
+```
+if "critic" in node_id:
+```
+
+eu criaria algo semelhante a:
+
+```python
+class AgentRole(Enum):
+    LOCAL = auto()
+    CRITIC = auto()
+```
+
+e cada skill declararia seu papel.
+
+Exemplo:
+
+```python
+Skill(
+    id="tester",
+    role=AgentRole.LOCAL,
+)
+```
+
+```python
+Skill(
+    id="critic",
+    role=AgentRole.CRITIC,
+)
+```
+
+Então o router nunca mais procura `"critic"` dentro de strings.
+
+---
+
+# Pipeline
+
+Seu pipeline passa a ser:
+
+```
+Planner
+
+↓
+
+Architect
+
+↓
+
+Coder
+
+↓
+
+Tester
+
+↓
+
+Debugger
+
+↓
+
+Tester
+
+↓
+
+Debugger
+
+↓
+
+...
+
+↓
+
+Critic
+```
+
+O Critic nunca modifica código.
+
+Ele apenas devolve um relatório estruturado.
+
+Exemplo:
+
+```json
+{
+  "approved": false,
+  "issues":[
+    {
+      "severity":"high",
+      "node":"database",
+      "instruction":"Adicionar índice composto"
+    },
+    {
+      "severity":"medium",
+      "instruction":"Reduzir acoplamento"
+    }
+  ]
+}
+```
+
+---
+
+# Quem corrige?
+
+Não é o Critic.
+
+O Critic apenas produz:
+
+```
+InstructionSet
+```
+
+Algo como
+
+```python
+InstructionSet(
+    issues=[...],
+    confidence=0.96,
+    score=91,
+)
+```
+
+Esse objeto volta para:
+
+```
+Debugger
+```
+
+Depois
+
+```
+Tester
+```
+
+Depois
+
+```
+Coder
+```
+
+---
+
+# O Bandit muda de função
+
+Hoje ele escolhe provider.
+
+Eu faria ele escolher:
+
+```
+modelo
+```
+
+e não
+
+```
+provider
+```
+
+Por exemplo.
+
+Entrada:
+
+```
+Prompt
+
++
+Tipo da tarefa
+
++
+Histórico
+
++
+Budget
+
++
+Latência
+
++
+Score histórico
+```
+
+Saída:
+
+```
+deepseek-r1
+
+ou
+
+llama-70b
+
+ou
+
+glm-4.5
+
+ou
+
+gpt-4.1
+
+...
+```
+
+Depois disso o Provider Router apenas responde:
+
+```
+Quem fornece esse modelo?
+```
+
+Isso desacopla completamente provider de modelo.
+
+---
+
+# Separaria duas decisões
+
+Hoje elas parecem misturadas.
+
+Eu faria:
+
+## Decision 1
+
+```
+Posso usar cloud?
+```
+
+Resposta:
+
+```
+SIM
+
+ou
+
+NÃO
+```
+
+Essa é a membrana.
+
+---
+
+## Decision 2
+
+```
+Qual modelo é o melhor?
+```
+
+Essa é o Bandit.
+
+---
+
+## Decision 3
+
+```
+Onde esse modelo existe?
+```
+
+Essa é o Provider Router.
+
+---
+
+# O Bandit deveria aprender por modelo
+
+Hoje imagino algo assim:
+
+```
+Groq
+
+score
+
+NVIDIA
+
+score
+```
+
+Eu inverteria.
+
+Seria
+
+```
+Qwen3
+
+score
+
+Llama 4
+
+score
+
+DeepSeek
+
+score
+
+GLM
+
+score
+```
+
+Depois um catálogo informa:
+
+```
+GLM
+
+↓
+
+OpenRouter
+
+↓
+
+Groq
+
+↓
+
+NVIDIA
+```
+
+---
+
+# Métricas que alimentam o Bandit
+
+Cada execução gera algo semelhante a:
+
+```
+ModelExecution
+```
+
+```python
+class ModelExecution:
+
+    model
+
+    prompt_type
+
+    latency
+
+    tokens
+
+    cost
+
+    passed_tests
+
+    critic_score
+
+    hallucination_score
+
+    retries
+
+    final_success
+```
+
+Isso vale ouro.
+
+Depois de algumas centenas de execuções o sistema começa a aprender coisas como:
+
+```
+Para Debug
+
+↓
+
+DeepSeek ganha.
+```
+
+```
+Para Arquitetura
+
+↓
+
+Claude ganha.
+```
+
+```
+Para Refatoração
+
+↓
+
+Qwen3 ganha.
+```
+
+Sem regras fixas.
+
+---
+
+# O Critic deveria consultar o Bandit
+
+Fluxo:
+
+```
+Critic
+
+↓
+
+PromptClassifier
+
+↓
+
+prompt_type = code_review
+```
+
+↓
+
+Bandit pergunta
+
+```
+Qual modelo tem maior reward
+para code_review?
+```
+
+↓
+
+Resposta
+
+```
+GLM-4.5
+```
+
+↓
+
+Provider Router
+
+↓
+
+OpenRouter
+
+↓
+
+Executa.
+
+---
+
+# Resultado
+
+No fim, sua arquitetura fica organizada em quatro camadas bem definidas:
+
+1. **Execution Layer**: controla o fluxo do grafo (`Coder → Tester → Debugger → Critic`).
+2. **Membrane Layer**: decide **se** um agente pode acessar a nuvem (papéis `LOCAL` vs. `CRITIC`).
+3. **Bandit Layer**: escolhe o **modelo** mais adequado para a tarefa com base em métricas, tipo de prompt, custo, latência e histórico de sucesso.
+4. **Provider Layer**: resolve **onde** executar o modelo escolhido (Groq, NVIDIA, OpenRouter, Ollama etc.), com fallback automático.
+
+Essa separação elimina o acoplamento entre papéis, modelos e provedores. O resultado é uma arquitetura mais evolutiva: você pode adicionar novos modelos, novos provedores ou alterar a política da membrana sem modificar os demais componentes. Isso também permite que o Bandit evolua continuamente suas escolhas com dados reais de execução, enquanto o consumo de créditos permanece controlado porque apenas o papel de **Critic** tem autorização para acessar modelos externos.
+

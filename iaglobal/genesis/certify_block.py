@@ -33,12 +33,10 @@ def get_genesis_hash_from_file(genesis_file_path: str) -> str:
     return hashlib.sha3_512(serialized_genesis).hexdigest()
 
 
-def verify_genesis_integrity():
+def verify_genesis_blueprint_consistency() -> bool:
     """
-    Compara a realidade atual (Evolutivo) com o DNA original (Blueprint).
-    Faz duas checagens:
-    1. Hash lógico (conteúdo CBOR canônico).
-    2. Hash físico (byte-a-byte do arquivo).
+    Compara consistência entre genesis evolutiva e blueprint (2 arquivos CBOR).
+    Retorna True se ambos os hashes (CBOR e byte-a-byte) coincidirem.
     """
     # Caminhos alinhados com a estrutura real do projeto
     base_dir = os.path.join(
@@ -100,6 +98,6 @@ def verify_genesis_integrity():
 
 if __name__ == "__main__":
     # Se rodar este script diretamente, ele faz o diagnóstico
-    success = verify_genesis_integrity()
+    success = verify_genesis_blueprint_consistency()
     if not success:
         exit(1)  # Código de erro para impedir o bootstrap do Multiverso

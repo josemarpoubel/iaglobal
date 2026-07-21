@@ -80,10 +80,7 @@ class HomocysteinePool:
                 self.candidates = [CandidateSkill.from_dict(d) for d in data]
                 dirty = False
                 for c in self.candidates:
-                    if (
-                        c.route == "production"
-                        and not self._is_production_worthy(c)[0]
-                    ):
+                    if c.route == "production" and not self._is_production_worthy(c)[0]:
                         c.route = "guardrail"
                         dirty = True
                 if dirty:
@@ -96,9 +93,7 @@ class HomocysteinePool:
     def add(self, candidate: CandidateSkill):
         with self._io_lock:
             self.candidates.append(candidate)
-            self._store.mutate_sync(
-                lambda _: [c.to_dict() for c in self.candidates]
-            )
+            self._store.mutate_sync(lambda _: [c.to_dict() for c in self.candidates])
         logger.info(
             "[HOMOCYSTEINE] Candidate '%s' adicionada (score=%.2f)",
             candidate.skill.name,

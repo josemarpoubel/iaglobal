@@ -21,7 +21,6 @@ class RequirementsOutput:
 
 
 class PMAgent(AgentBase):
-    # Padrões limpos (sem espaços no final)
     _FUNC_REQ_PATTERNS = [
         "cadastrar",
         "listar",
@@ -51,6 +50,24 @@ class PMAgent(AgentBase):
         "registrar",
         "monitorar",
         "simular",
+        "criar",
+        "gerenciar",
+        "controlar",
+        "vender",
+        "comprar",
+        "administrar",
+        "adicionar",
+        "remover",
+        "editar",
+        "configurar",
+        "instalar",
+        "manter",
+        "visualizar",
+        "imprimir",
+        "agendar",
+        "cancelar",
+        "confirmar",
+        "habilitar",
     ]
 
     _NON_FUNC_REQ_PATTERNS = [
@@ -70,26 +87,74 @@ class PMAgent(AgentBase):
         "acessibilidade",
         "usabilidade",
         "manutenibilidade",
+        "monitoramento",
+        "recuperacao",
+        "resiliencia",
+        "tolerancia",
     ]
+
+    # Mapeia conjugações comuns → infinitivo para normalizar a saída
+    _VERB_NORMALIZE = {
+        "crie": "criar",
+        "cria": "criar",
+        "crio": "criar",
+        "criamos": "criar",
+        "criam": "criar",
+        "criou": "criar",
+        "controle": "controlar",
+        "controla": "controlar",
+        "controlo": "controlar",
+        "controlamos": "controlar",
+        "vende": "vender",
+        "vendo": "vender",
+        "vendemos": "vender",
+        "vendem": "vender",
+        "vendeu": "vender",
+        "gerencia": "gerenciar",
+        "gerencio": "gerenciar",
+        "gerenciou": "gerenciar",
+        "faca": "fazer",
+        "faz": "fazer",
+        "faco": "fazer",
+        "desenvolva": "desenvolver",
+        "desenvolve": "desenvolver",
+        "construa": "construir",
+        "constroi": "construir",
+    }
+
+    _STOPWORDS = {
+        "o",
+        "a",
+        "os",
+        "as",
+        "um",
+        "uma",
+        "de",
+        "da",
+        "do",
+        "no",
+        "na",
+        "em",
+        "para",
+        "por",
+        "com",
+        "sem",
+        "sob",
+        "sobre",
+        "entre",
+        "ate",
+    }
 
     def __init__(self):
         super().__init__(agent_name="pm")
-        # --- 2. Performance: Pré-compilação de Regex ---
-        # \b garante word boundary (não pega "cadastrou" quando busca "cadastrar", por exemplo)
-        func_pattern = (
-            r"\b(" + "|".join(re.escape(p) for p in self._FUNC_REQ_PATTERNS) + r")\b"
-        )
+
         non_func_pattern = (
             r"\b("
             + "|".join(re.escape(p) for p in self._NON_FUNC_REQ_PATTERNS)
             + r")\b"
         )
-
-        self._func_regex = re.compile(func_pattern, re.IGNORECASE)
         self._non_func_regex = re.compile(non_func_pattern, re.IGNORECASE)
-
-        # Regex para capturar o "alvo" da ação (ex: cadastrar [usuário])
-        self._context_regex = re.compile(r"\b({actions})\s+([a-zA-ZÀ-ú_]+)")
+        self._INFINITIVE_CACHE = self._infinitive_stems()
 
     @staticmethod
     def _normalize_text(text: str) -> str:
@@ -97,56 +162,84 @@ class PMAgent(AgentBase):
         nfkd = unicodedata.normalize("NFD", text)
         return nfkd.encode("ascii", "ignore").decode("utf-8").lower()
 
+    @staticmethod
+    def _infinitive_stems():
+        """Retorna pares (stem_escapado, infinitivo) para cada verbo."""
+        result = []
+        for v in PMAgent._FUNC_REQ_PATTERNS:
+            stem = re.escape(v)
+            for suffix in ["ar", "er", "ir"]:
+                if v.endswith(suffix):
+                    stem = re.escape(v[: -len(suffix)])
+                    break
+            result.append((stem, v))
+        return result
+
+    def _normalize_action(self, raw_verb: str) -> str:
+        lower = raw_verb.lower()
+        if lower in self._VERB_NORMALIZE:
+            return self._VERB_NORMALIZE[lower]
+        for stem, infinitive in self._INFINITIVE_CACHE:
+            if lower.startswith(stem.replace("\\", "")):
+                return infinitive
+        return lower
+
     def extract_requirements(
         self, prompt: str, enhancement: Optional[Dict[str, Any]] = None
     ) -> Dict[str, Any]:
         if not prompt or not isinstance(prompt, str):
             return RequirementsOutput().to_dict()
 
-        # Normaliza o prompt (tira acentos e lower)
         clean_prompt = self._normalize_text(prompt)
 
         functional = set()
         non_functional = set()
 
-        # --- 3. Extração com Contexto (NLP Básico) ---
-        # Em vez de só "Implementar cadastrar", tenta achar "cadastrar usuário"
-        actions_pattern = "|".join(re.escape(p) for p in self._FUNC_REQ_PATTERNS)
+        stems = self._infinitive_stems()
+        stem_alt = "|".join(s + r"\w*" for s, _ in stems)
+
+        # --- 3. Extração com Contexto (verbo + alvo) ---
+        # Casamento pela raiz: "cri" → crie, cria, criou...
+        # Preposição "de" opcional: "controle de estoque"
         context_search = re.compile(
-            rf"\b({actions_pattern})\s+([a-z0-9_]+)", re.IGNORECASE
+            rf"\b({stem_alt})\s+(?:de\s+)?([a-z0-9_]+)", re.IGNORECASE
         )
 
-        for match in context_search.finditer(prompt):
-            action = match.group(1).lower()
+        for match in context_search.finditer(clean_prompt):
+            action = self._normalize_action(match.group(1))
             target = match.group(2).lower()
-            # Ignora palavras de ligação comuns
-            if target not in ["o", "a", "os", "as", "um", "uma", "de", "da", "do"]:
+            if target not in self._STOPWORDS:
                 functional.add(f"Implementar funcionalidade de {action} {target}")
             else:
                 functional.add(f"Implementar funcionalidade de {action}")
 
-        # Fallback para ações sem alvo claro
+        # --- 4. Fallback: verbos isolados ---
         if not functional:
-            for match in self._func_regex.finditer(clean_prompt):
-                functional.add(f"Implementar funcionalidade de {match.group(1)}")
+            func_regex = re.compile(rf"\b(?:{stem_alt})\b", re.IGNORECASE)
+            for match in func_regex.finditer(clean_prompt):
+                action = self._normalize_action(match.group(0))
+                functional.add(f"Implementar funcionalidade de {action}")
 
-        if not functional and any(
-            w in clean_prompt for w in ["criar", "fazer", "desenvolver", "construir"]
-        ):
-            functional.add("Implementar funcionalidade principal conforme requisitos")
+        if not functional:
+            imp = "|".join(
+                re.escape(v[: -3 if v.endswith(("ar", "er", "ir")) else 0]) + r"\w*"
+                for v in ["criar", "fazer", "desenvolver", "construir"]
+            )
+            if re.search(rf"\b(?:{imp})\b", clean_prompt, re.IGNORECASE):
+                functional.add(
+                    "Implementar funcionalidade principal conforme requisitos"
+                )
 
-        # --- 4. Requisitos Não-Funcionais ---
+        # --- 5. Requisitos Não-Funcionais ---
         for match in self._non_func_regex.finditer(clean_prompt):
-            # Mapeia de volta para a palavra com acento se necessário, ou mantém padrão
             non_functional.add(f"Garantir {match.group(1)}")
 
-        # --- 5. Extração de Drivers (Resiliente a erros de chave) ---
+        # --- 6. Extração de Drivers ---
         drivers = []
         if isinstance(enhancement, dict):
-            # Usa .get() para evitar KeyError se a chave vier com espaço ou não existir
             drivers = enhancement.get("intents_detected", []) or []
 
-        # --- 6. Lógica de Prioridade ---
+        # --- 7. Lógica de Prioridade ---
         func_count = len(functional)
         non_func_count = len(non_functional)
 
@@ -165,7 +258,6 @@ class PMAgent(AgentBase):
             len(prompt),
         )
 
-        # Retorna usando a Dataclass para garantir o schema correto
         return RequirementsOutput(
             functional=sorted(list(functional)),
             non_functional=sorted(list(non_functional)),

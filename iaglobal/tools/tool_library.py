@@ -259,7 +259,38 @@ class ToolLibrary:
                 if task_format not in all_entry_text.lower():
                     format_penalty = 0.25
 
-            combo = max(tag_score, sem_score) - format_penalty
+            # Penalidade de domínio: task dev (criar app/sistema) vs tool não-dev
+            _DEV_KEYWORDS = [
+                "criar",
+                "app",
+                "sistema",
+                "código",
+                "codigo",
+                "api",
+                "desenvolver",
+                "construir",
+                "aplicativo",
+                "programa",
+                "site",
+                "página",
+                "pagina",
+                "função",
+                "funcao",
+                "aplicação",
+                "aplicacao",
+                "implementar",
+                "código-fonte",
+                "codigo-fonte",
+            ]
+            domain_penalty = 0.0
+            task_has_dev_intent = any(k in task_lower for k in _DEV_KEYWORDS)
+            if task_has_dev_intent:
+                entry_text = " ".join(entry.tags) + " " + entry.description
+                entry_has_dev_tags = any(k in entry_text.lower() for k in _DEV_KEYWORDS)
+                if not entry_has_dev_tags:
+                    domain_penalty = 0.35
+
+            combo = max(tag_score, sem_score) - format_penalty - domain_penalty
 
             if combo > best_score:
                 best_score = combo

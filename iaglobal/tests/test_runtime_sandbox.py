@@ -279,7 +279,7 @@ result = math.sqrt(25) + math.pow(2, 3)
 
     def test_codigo_malicioso_eval_bloqueado(self, sandbox):
         safe, _ = sandbox
-        code = "eval('__import__(\"os\").system(\"ls\")')"
+        code = 'eval(\'__import__("os").system("ls")\')'
         with pytest.raises(SecurityViolation):
             exec_sandboxed(code, safe)
 

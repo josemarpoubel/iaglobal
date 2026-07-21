@@ -27,34 +27,85 @@ PATTERNS = {
 # alvo (ex: html) estiver presente no código gerado.
 REQUIREMENT_CHECKS: dict[str, list[dict]] = {
     "autenticação": [
-        {"name": "password_input", "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate', "hint": "Implemente campo de senha ou rota de login", "mandatory": True},
+        {
+            "name": "password_input",
+            "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate',
+            "hint": "Implemente campo de senha ou rota de login",
+            "mandatory": True,
+        },
     ],
     "autenticacao": [  # sem acento
-        {"name": "password_input", "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate', "hint": "Implemente campo de senha ou rota de login", "mandatory": True},
+        {
+            "name": "password_input",
+            "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate',
+            "hint": "Implemente campo de senha ou rota de login",
+            "mandatory": True,
+        },
     ],
     "login": [
-        {"name": "password_input", "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate', "hint": "Implemente campo de senha ou rota de login", "mandatory": True},
+        {
+            "name": "password_input",
+            "pattern": r'type=["\']password["\']|password|senha|pwd|login|/auth|/signin|authenticate',
+            "hint": "Implemente campo de senha ou rota de login",
+            "mandatory": True,
+        },
     ],
     "tema escuro": [
-        {"name": "dark_background", "pattern": r'background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)', "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)", "mandatory": False},
+        {
+            "name": "dark_background",
+            "pattern": r"background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)",
+            "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)",
+            "mandatory": False,
+        },
     ],
     "dark theme": [
-        {"name": "dark_background", "pattern": r'background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)', "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)", "mandatory": False},
+        {
+            "name": "dark_background",
+            "pattern": r"background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)",
+            "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)",
+            "mandatory": False,
+        },
     ],
     "dark mode": [
-        {"name": "dark_background", "pattern": r'background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)', "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)", "mandatory": False},
+        {
+            "name": "dark_background",
+            "pattern": r"background[^:]*:[^;]*(#1[0-9a-f]|#0[df]|#2[0-9a-f]|#3[0-9a-f]|rgb\s*\(\s*(0|[12]?\d)\s*,)",
+            "hint": "Adicione background escuro no CSS/estilo (ex: #1a1a2e)",
+            "mandatory": False,
+        },
     ],
-        "python": [
-        {"name": "python_code", "pattern": r'^(import |from |def |class |@|#)', "hint": "A tecnologia principal solicitada foi Python, mas o código gerado está em outra linguagem", "mandatory": False, "check_language": "py"},
+    "python": [
+        {
+            "name": "python_code",
+            "pattern": r"^(import |from |def |class |@|#)",
+            "hint": "A tecnologia principal solicitada foi Python, mas o código gerado está em outra linguagem",
+            "mandatory": False,
+            "check_language": "py",
+        },
     ],
     "flask": [
-        {"name": "flask_import", "pattern": r'from flask import|import flask|Flask\(', "hint": "Implemente a aplicação usando Flask (from flask import Flask)", "mandatory": True},
+        {
+            "name": "flask_import",
+            "pattern": r"from flask import|import flask|Flask\(",
+            "hint": "Implemente a aplicação usando Flask (from flask import Flask)",
+            "mandatory": True,
+        },
     ],
     "django": [
-        {"name": "django_import", "pattern": r'django|from django|import django', "hint": "Implemente a aplicação usando Django", "mandatory": True},
+        {
+            "name": "django_import",
+            "pattern": r"django|from django|import django",
+            "hint": "Implemente a aplicação usando Django",
+            "mandatory": True,
+        },
     ],
     "fastapi": [
-        {"name": "fastapi_import", "pattern": r'from fastapi|import fastapi|FastAPI\(', "hint": "Implemente a API usando FastAPI", "mandatory": True},
+        {
+            "name": "fastapi_import",
+            "pattern": r"from fastapi|import fastapi|FastAPI\(",
+            "hint": "Implemente a API usando FastAPI",
+            "mandatory": True,
+        },
     ],
 }
 
@@ -272,9 +323,13 @@ class FailureAnalysisAgent(AgentBase):
         guardrails: list[dict] = []
 
         detected_langs = set()
-        if re.search(r'\.py["\']|^import |^from |def |class |if __name__', code, re.MULTILINE):
+        if re.search(
+            r'\.py["\']|^import |^from |def |class |if __name__', code, re.MULTILINE
+        ):
             detected_langs.add("py")
-        if re.search(r'<html|<head|<body|<!DOCTYPE|<style|<script', code, re.IGNORECASE):
+        if re.search(
+            r"<html|<head|<body|<!DOCTYPE|<style|<script", code, re.IGNORECASE
+        ):
             detected_langs.add("html")
         if re.search(r'\.js["\']|function |const |let |var |=>|document\.', code):
             detected_langs.add("js")
@@ -292,18 +347,22 @@ class FailureAnalysisAgent(AgentBase):
 
                 if check_lang:
                     if check_lang not in detected_langs:
-                        violations.append({
-                            "category": "functional_gap",
-                            "requirement": keyword,
-                            "check": name,
-                            "detail": f"Requisito '{keyword}' espera código {check_lang}, mas o gerado é {'/'.join(sorted(detected_langs)) or 'desconhecido'}",
-                            "hint": hint,
-                        })
-                        guardrails.append({
-                            "type": "language_enforcer",
-                            "rule": f"force_{check_lang}_for_{keyword}",
-                            "description": hint,
-                        })
+                        violations.append(
+                            {
+                                "category": "functional_gap",
+                                "requirement": keyword,
+                                "check": name,
+                                "detail": f"Requisito '{keyword}' espera código {check_lang}, mas o gerado é {'/'.join(sorted(detected_langs)) or 'desconhecido'}",
+                                "hint": hint,
+                            }
+                        )
+                        guardrails.append(
+                            {
+                                "type": "language_enforcer",
+                                "rule": f"force_{check_lang}_for_{keyword}",
+                                "description": hint,
+                            }
+                        )
                         continue
                     # Linguagem correta — pula verificação de regex (já satisfeita)
                     continue
@@ -313,19 +372,23 @@ class FailureAnalysisAgent(AgentBase):
 
                 # Violação: padrão não encontrado
                 severity = "crítica" if mandatory else "leve"
-                violations.append({
-                    "category": "functional_gap",
-                    "requirement": keyword,
-                    "check": name,
-                    "detail": f"Requisito '{keyword}' não satisfeito: esperava '{name}' (severidade {severity})",
-                    "hint": hint,
-                    "mandatory": mandatory,
-                })
-                guardrails.append({
-                    "type": "requirement_enforcer",
-                    "rule": f"enforce_{name}_for_{keyword}",
-                    "description": hint,
-                })
+                violations.append(
+                    {
+                        "category": "functional_gap",
+                        "requirement": keyword,
+                        "check": name,
+                        "detail": f"Requisito '{keyword}' não satisfeito: esperava '{name}' (severidade {severity})",
+                        "hint": hint,
+                        "mandatory": mandatory,
+                    }
+                )
+                guardrails.append(
+                    {
+                        "type": "requirement_enforcer",
+                        "rule": f"enforce_{name}_for_{keyword}",
+                        "description": hint,
+                    }
+                )
 
         return violations, guardrails
 
@@ -385,8 +448,10 @@ class FailureAnalysisAgent(AgentBase):
         findings.extend(req_violations)
         guardrail_suggestions.extend(req_guardrails)
 
-        error_type = "functional_gap" if req_violations else (
-            findings[0]["category"] if findings else "clean"
+        error_type = (
+            "functional_gap"
+            if req_violations
+            else (findings[0]["category"] if findings else "clean")
         )
 
         return {

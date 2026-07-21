@@ -65,8 +65,10 @@ async def warmup_cognitive_cortex() -> dict[str, bool]:
     print(f"🧠 Iniciando warmup do córtex cognitivo: {models_to_wake}")
 
     results: dict[str, bool] = {}
+
     async def _wake(m: str):
         results[m] = await warmup(m)
+
     await asyncio.gather(*[_wake(m) for m in models_to_wake], return_exceptions=True)
 
     ok = sum(1 for v in results.values() if v)

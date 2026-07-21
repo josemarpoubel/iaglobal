@@ -16,7 +16,9 @@ from iaglobal.agents.failure_analysis_agent import FailureAnalysisAgent
 logger = logging.getLogger(__name__)
 
 
-def _execute_sync_analysis(error_log: str, task_str: str, generated_code: str = "") -> Tuple[dict, dict, dict]:
+def _execute_sync_analysis(
+    error_log: str, task_str: str, generated_code: str = ""
+) -> Tuple[dict, dict, dict]:
     """Encapsula toda a computação síncrona e escrita em disco para rodar em thread pool."""
     # 1. Coleta e geração de relatórios estáticos de sistema
     system_data = FailureAnalysisAgent.collect_system_data() or {}
@@ -39,7 +41,8 @@ def _execute_sync_analysis(error_log: str, task_str: str, generated_code: str = 
     result = (
         FailureAnalysisAgent.analyze(
             error_log=error_log, prompt=task_str, code=generated_code
-        ) or result
+        )
+        or result
     )
     result["guardrail"] = FailureAnalysisAgent.generate_guardrail(result)
 

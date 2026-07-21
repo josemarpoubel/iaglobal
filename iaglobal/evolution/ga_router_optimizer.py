@@ -16,8 +16,8 @@ logger = logging.getLogger(__name__)
 
 
 @dataclass
-class Individual:
-    """Indivíduo do GA (vetor de pesos)."""
+class RouterIndividual:
+    """Indivíduo do GA para otimização de router (vetor de pesos IVM nomeados)."""
 
     weights: Dict[str, float]
     fitness: float = 0.0

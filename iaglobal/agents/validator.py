@@ -17,17 +17,13 @@ from iaglobal.agents.semantic_validator import (
     RuleRegistry,
     ScoreAggregator,
     LanguageDetector,
+    RuleResult,
+    ValidationResult as SemanticValidationResult,
 )
 
 
 # --- 1. Contratos de Dados Rígidos (Essencial para Pipelines) ---
-@dataclass
-class RuleResult:
-    rule_name: str
-    passed: bool
-    score: float
-    message: str = ""
-    category: str = "general"
+# RuleResult importado de semantic_validator.py (canônico)
 
 
 @dataclass
@@ -175,11 +171,12 @@ class SemanticValidatorAgent(AgentBase):
         except SyntaxError as e:
             # ⚠️ O "Pulo do Gato": Erro de sintaxe no código do LLM é um RESULTADO da regra, não um crash do sistema!
             return RuleResult(
-                rule_name=rule_name,
+                name=rule_name,
+                description=f"Erro de sintaxe no código: {e.msg} (linha {e.lineno})",
                 passed=False,
-                score=0.0,
-                message=f"Erro de sintaxe no código: {e.msg} (linha {e.lineno})",
+                weight=0.0,
                 category="syntax",
+                suggestion=None,
             )
         except Exception as e:
             logger.warning(

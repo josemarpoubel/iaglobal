@@ -195,12 +195,15 @@ class Bootstrap:
                 elif _ok == _total:
                     logger.info(
                         "[WARMUP] %d/%d providers aquecidos com sucesso",
-                        _ok, _total,
+                        _ok,
+                        _total,
                     )
                 else:
                     logger.warning(
                         "[WARMUP] %d/%d providers aquecidos (%d falharam — continuando)",
-                        _ok, _total, _total - _ok,
+                        _ok,
+                        _total,
+                        _total - _ok,
                     )
             except Exception as e:
                 logger.warning("[WARMUP] Bootstrap ignorado: %s", e)

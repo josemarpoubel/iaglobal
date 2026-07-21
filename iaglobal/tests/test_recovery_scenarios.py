@@ -27,9 +27,11 @@ from iaglobal.graphs.recovery import RecoveryPolicy, RecoveryDecision
 # Helpers
 # ═══════════════════════════════════════════════════════════════════
 
+
 def _make_node(name: str, depends_on: list[str] | None = None) -> Node:
     async def _noop(input_data: dict) -> dict:
         return {"output": ""}
+
     return Node(
         name=name,
         run=_noop,
@@ -39,6 +41,7 @@ def _make_node(name: str, depends_on: list[str] | None = None) -> Node:
 
 def _make_graph(nodes: dict[str, Node]) -> "ExecutionGraph":
     from iaglobal.graphs.execution_graph import ExecutionGraph
+
     g = ExecutionGraph()
     g.nodes.clear()
     for nid, node in nodes.items():
@@ -49,6 +52,7 @@ def _make_graph(nodes: dict[str, Node]) -> "ExecutionGraph":
 # ═══════════════════════════════════════════════════════════════════
 # FIX-1 + FIX-4: Invalidação transitiva
 # ═══════════════════════════════════════════════════════════════════
+
 
 class TestTransitiveInvalidation:
     """Reset de A deve invalidar C mesmo que C dependa de B, não de A."""
@@ -73,9 +77,7 @@ class TestTransitiveInvalidation:
         b.acquire()
         c.acquire()
 
-        await g._invalidate_sibling_consumers(
-            "A", execution_id, executed, skip_node=""
-        )
+        await g._invalidate_sibling_consumers("A", execution_id, executed, skip_node="")
 
         # B e C invalidados (transitivamente)
         assert "B" not in g.results
@@ -105,7 +107,7 @@ class TestTransitiveInvalidation:
             "A", execution_id, executed, skip_node="B"
         )
 
-        assert "B" in g.results      # skip_node preservado
+        assert "B" in g.results  # skip_node preservado
         assert "C" not in g.results  # C invalidado (transitivo)
 
     @pytest.mark.asyncio
@@ -124,9 +126,7 @@ class TestTransitiveInvalidation:
         for n in (b, c, d):
             n.acquire()
 
-        await g._invalidate_sibling_consumers(
-            "A", execution_id, executed, skip_node=""
-        )
+        await g._invalidate_sibling_consumers("A", execution_id, executed, skip_node="")
 
         assert "B" not in g.results
         assert "C" not in g.results
@@ -154,9 +154,7 @@ class TestTransitiveInvalidation:
         b.acquire()
 
         # Não deve travar (visited set previne re-processamento)
-        await g._invalidate_sibling_consumers(
-            "A", execution_id, executed, skip_node=""
-        )
+        await g._invalidate_sibling_consumers("A", execution_id, executed, skip_node="")
         # Ainda assim B foi invalidado
         assert "B" not in g.results
 
@@ -164,6 +162,7 @@ class TestTransitiveInvalidation:
 # ═══════════════════════════════════════════════════════════════════
 # FIX-2: Corrida real com duas corotinas concorrentes
 # ═══════════════════════════════════════════════════════════════════
+
 
 class TestConcurrentResetRace:
     """Duas corotinas resetando o mesmo upstream simultaneamente não
@@ -261,9 +260,7 @@ class TestConcurrentResetRace:
                 g._recovery_in_flight.discard(uid_flight)
 
         # Lança ambas "simultaneamente"
-        r1, r2 = await asyncio.gather(
-            _reset_coroutine("A"), _reset_coroutine("B")
-        )
+        r1, r2 = await asyncio.gather(_reset_coroutine("A"), _reset_coroutine("B"))
         # Pelo menos uma deve ter resetado; a outra deve ter pulado
         assert r1 != r2, "Uma corotina deve pular (guard funcionou)"
 
@@ -271,6 +268,7 @@ class TestConcurrentResetRace:
 # ═══════════════════════════════════════════════════════════════════
 # FIX-3: Memória imunológica (recording)
 # ═══════════════════════════════════════════════════════════════════
+
 
 class TestImmunologicalMemory:
     """Decisões do RecoveryPolicy devem ser registradas."""
@@ -285,9 +283,7 @@ class TestImmunologicalMemory:
         mock_omni.emitir_gatilho_apoptose = MagicMock()
 
         with patch.object(g, "_epigenetic", None):
-            with patch(
-                "iaglobal.graphs.execution_graph.omni_mind", mock_omni
-            ):
+            with patch("iaglobal.graphs.execution_graph.omni_mind", mock_omni):
                 await g._record_recovery_decision(
                     node_id="test_node",
                     missing=["dep"],
@@ -361,9 +357,7 @@ class TestImmunologicalMemory:
         g._epigenetic = mock_epigenetic
         g._background_tasks = set()
 
-        with patch(
-            "iaglobal.graphs.execution_graph.logger"
-        ) as mock_logger:
+        with patch("iaglobal.graphs.execution_graph.logger") as mock_logger:
             await g._record_recovery_decision(
                 node_id="test_node",
                 missing=["dep"],
@@ -406,9 +400,7 @@ class TestImmunologicalMemory:
             side_effect=RuntimeError("OmniMind offline")
         )
 
-        with patch(
-            "iaglobal.graphs.execution_graph.omni_mind", mock_omni
-        ):
+        with patch("iaglobal.graphs.execution_graph.omni_mind", mock_omni):
             await g._record_recovery_decision(
                 node_id="test_node",
                 missing=["dep"],
@@ -425,11 +417,12 @@ class TestImmunologicalMemory:
         g = _make_graph({})
         g._epigenetic = None
 
-        with patch(
-            "iaglobal.graphs.execution_graph.omni_mind"
-        ) as mock_omni, patch(
-            "iaglobal.graphs.execution_graph.asyncio.to_thread"
-        ) as mock_to_thread:
+        with (
+            patch("iaglobal.graphs.execution_graph.omni_mind") as mock_omni,
+            patch(
+                "iaglobal.graphs.execution_graph.asyncio.to_thread"
+            ) as mock_to_thread,
+        ):
             mock_omni.emitir_gatilho_apoptose = MagicMock()
             mock_to_thread.return_value = asyncio.ensure_future(asyncio.sleep(0))
 
@@ -450,6 +443,7 @@ class TestImmunologicalMemory:
 # ═══════════════════════════════════════════════════════════════════
 # FIX-5: reset_node atomicidade
 # ═══════════════════════════════════════════════════════════════════
+
 
 class TestResetNodeAtomicity:
     """reset_node deve ser atômico (todas as estruturas sob o lock)."""
@@ -492,6 +486,7 @@ class TestResetNodeAtomicity:
 # ═══════════════════════════════════════════════════════════════════
 # Integration: RecoveryPolicy circuit breaker + backoff
 # ═══════════════════════════════════════════════════════════════════
+
 
 class TestRecoveryPolicyBehavior:
     """RecoveryPolicy internals."""

@@ -44,7 +44,11 @@ class Advertisement:
         return {
             "agent_id": self.agent_id,
             "skills": {
-                d: {"domain": d, "proficiency": c.proficiency, "latency_p50_ms": c.latency_p50_ms}
+                d: {
+                    "domain": d,
+                    "proficiency": c.proficiency,
+                    "latency_p50_ms": c.latency_p50_ms,
+                }
                 for d, c in self.skills.items()
             },
             "load_factor": self.load_factor,
@@ -165,6 +169,7 @@ class SocialRegistry:
             return
         if bus is None:
             from iaglobal.graphs.comms.acetylcholine_bus import bus as _bus
+
             bus = _bus
         self._bus = bus
 

@@ -19,9 +19,16 @@ from iaglobal.utils.logger import get_logger
 logger = get_logger("iaglobal.tools.code_executor")
 
 BLOCKED_IMPORTS = {
-    "os.system", "os.popen", "subprocess", "shutil.rmtree",
-    "shutil.copytree", "pathlib.Path.unlink",
-    "__import__", "eval", "exec", "compile",
+    "os.system",
+    "os.popen",
+    "subprocess",
+    "shutil.rmtree",
+    "shutil.copytree",
+    "pathlib.Path.unlink",
+    "__import__",
+    "eval",
+    "exec",
+    "compile",
 }
 BLOCKED_KEYWORDS = {"__import__", "eval(", "exec(", "compile("}
 
@@ -94,7 +101,9 @@ except Exception as e:
             output = "\n".join(output_parts) if output_parts else ""
             logger.info(
                 "[CodeExecutor] Python OK (%d chars, %.2fs, rc=%d)",
-                len(code), elapsed, rc,
+                len(code),
+                elapsed,
+                rc,
             )
             return output
         except subprocess.TimeoutExpired:
@@ -142,7 +151,9 @@ except Exception as e:
             output = "\n".join(output_parts) if output_parts else ""
             logger.info(
                 "[CodeExecutor] Bash OK (%d chars, %.2fs, rc=%d)",
-                len(code), elapsed, rc,
+                len(code),
+                elapsed,
+                rc,
             )
             return output
         except subprocess.TimeoutExpired:

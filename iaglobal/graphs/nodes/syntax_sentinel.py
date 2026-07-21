@@ -103,11 +103,11 @@ def _fix_decimal_literal(code: str) -> str:
     for line in lines:
         original = line
         # Remove leading zeros de números decimais (mas preserva 0x, 0o, 0b, 0., 0)
-        line = re.sub(r'(?<!\w)0+(\d+)(?!\w)', lambda m: m.group(1), line)
+        line = re.sub(r"(?<!\w)0+(\d+)(?!\w)", lambda m: m.group(1), line)
         # Remove trailing underscores em números (ex: 1_234_ → 1_234)
-        line = re.sub(r'(\d[\d_]*?)_(?=\W|$)', r'\1', line)
+        line = re.sub(r"(\d[\d_]*?)_(?=\W|$)", r"\1", line)
         # Remove underscores duplicados consecutivos (ex: 1__000)
-        line = re.sub(r'(\d)__+(\d)', r'\1_\2', line)
+        line = re.sub(r"(\d)__+(\d)", r"\1_\2", line)
         if line != original:
             changed = True
         fixed_lines.append(line)
@@ -140,8 +140,7 @@ _AUTO_FIXERS = [
         "id": "decimal_literal",
         "priority": 4,
         "detect": lambda code: bool(
-            re.search(r"(?<!\w)0+\d+", code)
-            or re.search(r"\d_\b", code)
+            re.search(r"(?<!\w)0+\d+", code) or re.search(r"\d_\b", code)
         ),
         "fix": _fix_decimal_literal,
     },
@@ -301,9 +300,7 @@ async def run_syntax_sentinel(ctx: Dict[str, Any]) -> Dict[str, Any]:
         try:
             # Tenta o fixer se o detect match no código OU se o erro contém palavra-chave
             code_match = fixer["detect"](fixed_code)
-            error_match = (
-                "decimal" in error_msg and fixer["id"] == "decimal_literal"
-            )
+            error_match = "decimal" in error_msg and fixer["id"] == "decimal_literal"
             if code_match or error_match:
                 new_code = fixer["fix"](fixed_code)
                 if new_code != fixed_code:

@@ -1,7 +1,8 @@
+from __future__ import annotations
+
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
-
 
 
 class TaskIntent(str, Enum):
@@ -16,10 +17,6 @@ class TaskIntent(str, Enum):
 
 @dataclass
 class PipelineState:
-    """
-    Estado central do pipeline.
-    """
-
     task_id: str
 
     prompt: str
@@ -47,3 +44,5 @@ class PipelineState:
     context: Dict[str, Any] = field(default_factory=dict)
 
     intent: TaskIntent = TaskIntent.GENERAL
+
+    execution_context: Any = None

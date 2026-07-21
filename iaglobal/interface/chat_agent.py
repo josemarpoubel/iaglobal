@@ -31,27 +31,37 @@ from iaglobal.utils.logger import get_logger
 
 # --- ajustar para os módulos reais do projeto ---
 from iaglobal.evolution.evo_agent import EvoAgent
-from iaglobal.agents.critic_agent import arbitrar_geracao
+from iaglobal.agents.critic_agent import _get_critic
 from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
 
 logger = get_logger("iaglobal")
 
-LINEAGE_MARKER = (
-    "cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136"
-)
+LINEAGE_MARKER = "cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136"
+
+
+def _is_valid_lineage(lineage: object) -> bool:
+    """Valida se um marcador de linhagem é um DNA próprio válido.
+
+    Um agente válido carrega seu próprio lineage_marker de 16 chars hex,
+    derivado do seu DNA (não o marcador global do sistema).
+    """
+    return (
+        isinstance(lineage, str)
+        and len(lineage) == 16
+        and all(c in "0123456789abcdef" for c in lineage.lower())
+    )
 
 
 # ---------------------------------------------------------------------------
 # SAMe Activation — modelo de intenção estruturada (doador de metila cognitivo)
 # ---------------------------------------------------------------------------
 
+
 class IntencaoBiologica(BaseModel):
     """Sinal externo já traduzido e validado antes de tocar qualquer EvoAgent."""
 
     comando: str = Field(..., description="A ação ou tarefa solicitada")
-    urgencia: str = Field(
-        "normal", description="baixa | normal | alta | critica"
-    )
+    urgencia: str = Field("normal", description="baixa | normal | alta | critica")
     familia_alvo: Optional[str] = Field(
         None,
         description="Especialização/lineage do EvoAgent alvo, se o usuário indicou uma",
@@ -66,6 +76,7 @@ class IntencaoBiologica(BaseModel):
 # BanditPolicy) e o portão crítico intactos mesmo com uma lib de terceiros.
 # ---------------------------------------------------------------------------
 
+
 async def _modelo_roteado_por_bandit(
     messages: list[ModelMessage], info: AgentInfo
 ) -> ModelResponse:
@@ -77,7 +88,7 @@ async def _modelo_roteado_por_bandit(
     )
 
     try:
-        resultado = await arbitrar_geracao(
+        resultado = await _get_critic().arbitrar_geracao(
             node_id="interface.chat_agent",
             prompt=prompt,
             context={"origem": "pydantic_ai_bridge"},
@@ -86,7 +97,9 @@ async def _modelo_roteado_por_bandit(
         logger.exception("Falha ao rotear geração via arbitrar_geracao()")
         raise
 
-    texto = resultado.get("texto", "") if isinstance(resultado, dict) else str(resultado)
+    texto = (
+        resultado.get("texto", "") if isinstance(resultado, dict) else str(resultado)
+    )
     return ModelResponse(parts=[TextPart(texto)])
 
 
@@ -110,6 +123,7 @@ _extrator = _criar_agente_extrator()
 # Mitose / Diferenciação — colônia de múltiplas instâncias EvoAgent
 # ---------------------------------------------------------------------------
 
+
 @dataclass
 class RegistroEvoAgent:
     instancia: EvoAgent
@@ -118,6 +132,7 @@ class RegistroEvoAgent:
     execucoes: int = 0
     falhas: int = 0
     latencia_media: float = 0.0
+
 
 class EvoAgentColony:
     """
@@ -130,11 +145,16 @@ class EvoAgentColony:
         self._agentes: dict[str, RegistroEvoAgent] = {}
         self._lock = asyncio.Lock()
 
-    async def registrar(self, agente: EvoAgent, especializacao: str = "generalista") -> str:
-        lineage = getattr(agente, "lineage_marker", None) or LINEAGE_MARKER
-        if lineage != LINEAGE_MARKER:
+    async def registrar(
+        self, agente: EvoAgent, especializacao: str = "generalista"
+    ) -> str:
+        lineage = getattr(agente, "lineage_marker", None)
+        # DNA válido = marcador de linhagem próprio (16 chars hex), não vazio.
+        # O marcador global do sistema (LINEAGE_MARKER) NÃO é aceito como
+        # identidade de agente — cada célula deve carregar seu próprio DNA.
+        if not _is_valid_lineage(lineage):
             logger.warning(
-                "DNA divergente no registro de '%s' — rejeitado pelo tribunal Genesis.",
+                "DNA divergente/ausente no registro de '%s' — rejeitado pelo tribunal Genesis.",
                 especializacao,
             )
             raise ValueError("Falha na verificação de DNA (Genesis tribunal).")
@@ -148,7 +168,9 @@ class EvoAgentColony:
         logger.info("EvoAgent '%s' registrado na colônia.", especializacao)
         return especializacao
 
-    async def selecionar(self, especializacao: Optional[str] = None) -> RegistroEvoAgent:
+    async def selecionar(
+        self, especializacao: Optional[str] = None
+    ) -> RegistroEvoAgent:
         async with self._lock:
             if not self._agentes:
                 raise RuntimeError("Colônia vazia — nenhum EvoAgent disponível.")
@@ -162,7 +184,9 @@ class EvoAgentColony:
                 key=lambda r: (r.falhas / r.execucoes) if r.execucoes else 0.0,
             )
 
-    async def registrar_resultado(self, especializacao: str, sucesso: bool, latencia: float) -> None:
+    async def registrar_resultado(
+        self, especializacao: str, sucesso: bool, latencia: float
+    ) -> None:
         async with self._lock:
             registro = self._agentes.get(especializacao)
             if not registro:
@@ -173,9 +197,11 @@ class EvoAgentColony:
             n = registro.execucoes
             registro.latencia_media += (latencia - registro.latencia_media) / n
 
+
 # ---------------------------------------------------------------------------
 # Ponto de entrada único da membrana de chat
 # ---------------------------------------------------------------------------
+
 
 async def interagir_com_colonia(colonia: EvoAgentColony, user_input: str) -> dict:
     """
@@ -184,7 +210,12 @@ async def interagir_com_colonia(colonia: EvoAgentColony, user_input: str) -> dic
     3) Dispara agente.handle() — que já deve chamar arbitrar_geracao() internamente
     4) Retorna payload com "execution_metrics" para o JointOptimizationLoop
     """
-    execution_metrics: dict = {"success": False, "latency": None, "cost": 0.0, "model": None}
+    execution_metrics: dict = {
+        "success": False,
+        "latency": None,
+        "cost": 0.0,
+        "model": None,
+    }
     inicio = time.monotonic()
 
     try:
@@ -208,15 +239,20 @@ async def interagir_com_colonia(colonia: EvoAgentColony, user_input: str) -> dic
         expressao = await registro.instancia.handle(intencao.comando)
         sucesso = True
     except Exception:
-        logger.exception("EvoAgent '%s' falhou ao processar comando", registro.especializacao)
+        logger.exception(
+            "EvoAgent '%s' falhou ao processar comando", registro.especializacao
+        )
 
     latencia = time.monotonic() - inicio
     await colonia.registrar_resultado(registro.especializacao, sucesso, latencia)
 
-    execution_metrics.update(success=sucesso, latency=latencia, model=registro.especializacao)
+    execution_metrics.update(
+        success=sucesso, latency=latencia, model=registro.especializacao
+    )
 
     return {
         "resposta": expressao,
+        "synthesis": expressao.synthesis if expressao else None,
         "intencao": intencao.model_dump(),
         "agente_utilizado": registro.especializacao,
         "execution_metrics": execution_metrics,
@@ -227,10 +263,22 @@ async def interagir_com_colonia(colonia: EvoAgentColony, user_input: str) -> dic
 # Fábrica de conveniência
 # ---------------------------------------------------------------------------
 
-async def criar_colonia_evoagents(especializacoes: list[str]) -> EvoAgentColony:
-    """Instancia e registra um EvoAgent por especialização informada."""
+
+async def criar_colonia_evoagents(
+    especializacoes: list[str],
+    nadph_reserve: float = 0.5,
+) -> EvoAgentColony:
+    """Instancia e registra um EvoAgent por especialização informada.
+
+    Ponte de compatibilidade: repassa nadph_reserve para EvoAgent.genesis()
+    preservando a reserva de auto-reparo por agente (não por colônia).
+    """
     colonia = EvoAgentColony()
     for especializacao in especializacoes:
-        agente = EvoAgent.genesis()  # ajustar assinatura conforme genesis() real
+        agente = await EvoAgent.genesis(
+            task_hint=especializacao,
+            name=f"evo-{especializacao}",
+            nadph_reserve=nadph_reserve,
+        )
         await colonia.registrar(agente, especializacao)
     return colonia

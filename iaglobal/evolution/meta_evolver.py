@@ -103,13 +103,10 @@ class MetaEvolver:
                     )
                     raw_trials = data.get("trials", [])
                     self.trials = [
-                        MetaTrial.from_dict(t)
-                        for t in raw_trials[-MAX_TRIALS_WINDOW:]
+                        MetaTrial.from_dict(t) for t in raw_trials[-MAX_TRIALS_WINDOW:]
                     ]
                     if self.trials:
-                        self._best_improvement = max(
-                            t.improvement for t in self.trials
-                        )
+                        self._best_improvement = max(t.improvement for t in self.trials)
             except json.JSONDecodeError:
                 logger.error(
                     "[META] Arquivo meta_evolution.json corrompido. Inicializando novos parâmetros."
@@ -120,13 +117,16 @@ class MetaEvolver:
     def _save(self):
         # NOTA DE DESIGN: Sempre invocado sob o contexto seguro do self._lock externo
         try:
-            self._store.mutate_sync(lambda _: {
-                "current_params": self.current_params.to_dict(),
-                "trials": [t.to_dict() for t in self.trials],
-            })
+            self._store.mutate_sync(
+                lambda _: {
+                    "current_params": self.current_params.to_dict(),
+                    "trials": [t.to_dict() for t in self.trials],
+                }
+            )
         except Exception as e:
             logger.error(
-                "[META-CRITICAL] Falha ao persistir metadados evolutivos: %s", e,
+                "[META-CRITICAL] Falha ao persistir metadados evolutivos: %s",
+                e,
             )
 
     def record_trial(

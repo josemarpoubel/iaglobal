@@ -62,7 +62,14 @@ class JointOptimizationLoop:
     def bind_colony(self, colony) -> None:
         self._colony = colony
 
-    async def ingest(self, node: str, success: bool, latency: float, cost: float = 0.0, model: str = "unknown") -> None:
+    async def ingest(
+        self,
+        node: str,
+        success: bool,
+        latency: float,
+        cost: float = 0.0,
+        model: str = "unknown",
+    ) -> None:
         snapshot = ExecutionSnapshot(
             node=node,
             model=model,
@@ -98,7 +105,9 @@ class JointOptimizationLoop:
         if total == 0:
             return 0.5
         productivity = stats["success"] / total
-        avg_latency = stats["latency_sum"] / stats["count"] if stats["count"] > 0 else 500.0
+        avg_latency = (
+            stats["latency_sum"] / stats["count"] if stats["count"] > 0 else 500.0
+        )
         efficiency = max(0.0, 1.0 - min(avg_latency / 10.0, 1.0))
         return round(productivity * 0.4 + efficiency * 0.4 + 0.2, 4)
 
@@ -139,7 +148,11 @@ class JointOptimizationLoop:
             reward_count = 0
 
             for (node, mdl, strategy), stats in bandit.credit_engine.stats.items():
-                if mdl == model or model.endswith(mdl.split("/")[-1]) if "/" in mdl else mdl == model:
+                if (
+                    mdl == model or model.endswith(mdl.split("/")[-1])
+                    if "/" in mdl
+                    else mdl == model
+                ):
                     total_success += stats["success"]
                     total_fail += stats["fail"]
                     if stats["reward_count"] > 0:
@@ -159,7 +172,11 @@ class JointOptimizationLoop:
                 if abs(smoothed - old_weight) > 0.01:
                     logger.info(
                         "[JOL] Peso %s: %.4f → %.4f (success=%.2f, reward=%.2f)",
-                        model, old_weight, smoothed, success_rate, avg_reward,
+                        model,
+                        old_weight,
+                        smoothed,
+                        success_rate,
+                        avg_reward,
                     )
 
     async def apply_decay(self, credit_engine) -> None:
@@ -182,7 +199,10 @@ class JointOptimizationLoop:
             stats["reward_total"] *= DECAY_FACTOR
             stats["reward_count"] = max(1, int(stats["reward_count"] * DECAY_FACTOR))
 
-        logger.debug("[JOL] Decay aplicado a %d entradas do credit_engine", len(credit_engine.stats))
+        logger.debug(
+            "[JOL] Decay aplicado a %d entradas do credit_engine",
+            len(credit_engine.stats),
+        )
 
     async def evaluate_colony(self) -> list[dict]:
         decisions = []
@@ -195,24 +215,32 @@ class JointOptimizationLoop:
                 if total < 3:
                     continue
                 success_rate = 1.0 - (registro.falhas / total) if total > 0 else 0.0
-                ivm = success_rate * 0.4 + max(0.0, 1.0 - min(registro.latencia_media / 10.0, 1.0)) * 0.4 + 0.2
+                ivm = (
+                    success_rate * 0.4
+                    + max(0.0, 1.0 - min(registro.latencia_media / 10.0, 1.0)) * 0.4
+                    + 0.2
+                )
 
                 if ivm < IVM_APOPTOSE_THRESHOLD:
-                    decisions.append({
-                        "action": "apoptose",
-                        "especializacao": especializacao,
-                        "ivm": round(ivm, 4),
-                        "success_rate": round(success_rate, 4),
-                        "execucoes": total,
-                    })
+                    decisions.append(
+                        {
+                            "action": "apoptose",
+                            "especializacao": especializacao,
+                            "ivm": round(ivm, 4),
+                            "success_rate": round(success_rate, 4),
+                            "execucoes": total,
+                        }
+                    )
                 elif ivm >= IVM_MITOSE_THRESHOLD and total >= 5:
-                    decisions.append({
-                        "action": "mitose",
-                        "especializacao": especializacao,
-                        "ivm": round(ivm, 4),
-                        "success_rate": round(success_rate, 4),
-                        "execucoes": total,
-                    })
+                    decisions.append(
+                        {
+                            "action": "mitose",
+                            "especializacao": especializacao,
+                            "ivm": round(ivm, 4),
+                            "success_rate": round(success_rate, 4),
+                            "execucoes": total,
+                        }
+                    )
 
         return decisions
 
@@ -229,8 +257,12 @@ class JointOptimizationLoop:
                     "total": stats["count"],
                     "success": stats["success"],
                     "fail": stats["fail"],
-                    "avg_latency": round(stats["latency_sum"] / stats["count"], 2) if stats["count"] else 0,
-                    "avg_cost": round(stats["cost_sum"] / stats["count"], 4) if stats["count"] else 0,
+                    "avg_latency": round(stats["latency_sum"] / stats["count"], 2)
+                    if stats["count"]
+                    else 0,
+                    "avg_cost": round(stats["cost_sum"] / stats["count"], 4)
+                    if stats["count"]
+                    else 0,
                 }
                 for node, stats in stats_snapshot.items()
             ],
@@ -247,11 +279,15 @@ class JointOptimizationLoop:
             "total_executions": total_snapshots,
             "total_success": total_success,
             "total_fail": total_fail,
-            "success_rate": round(total_success / total_snapshots, 4) if total_snapshots else 0.0,
+            "success_rate": round(total_success / total_snapshots, 4)
+            if total_snapshots
+            else 0.0,
             "nodes": ranked,
             "avg_latency": round(
                 sum(s.latency for s in snapshots_copy) / total_snapshots, 2
-            ) if total_snapshots else 0.0,
+            )
+            if total_snapshots
+            else 0.0,
         }
 
 

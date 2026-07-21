@@ -28,7 +28,9 @@ class CorrectionContext:
 
     @property
     def correction_prompt(self) -> str:
-        lines = [f"O código abaixo FALHOU na validação AST (tentativa {self.attempt}/{self.max_attempts}):"]
+        lines = [
+            f"O código abaixo FALHOU na validação AST (tentativa {self.attempt}/{self.max_attempts}):"
+        ]
         lines.append("")
         lines.append("Erro detectado:")
         if self.error_type:
@@ -42,11 +44,15 @@ class CorrectionContext:
         if self.fix_hint:
             lines.append(f"  Correção sugerida: {self.fix_hint}")
         if self.past_attempts:
-            lines.append(f"\nTentativas anteriores de correção ({len(self.past_attempts)}):")
+            lines.append(
+                f"\nTentativas anteriores de correção ({len(self.past_attempts)}):"
+            )
             for i, prev in enumerate(self.past_attempts, 1):
                 preview = prev[:200].replace("\n", "\\n")
                 lines.append(f"  [{i}] {preview}...")
-        lines.append(f"\nCódigo atual (com erro):\n```python\n{self.original_code}\n```")
+        lines.append(
+            f"\nCódigo atual (com erro):\n```python\n{self.original_code}\n```"
+        )
         lines.append(f"\nReescreva o código corrigindo APENAS o erro apontado acima.")
         lines.append(f"Responda APENAS com o código corrigido em bloco ```python.")
         return "\n".join(lines)

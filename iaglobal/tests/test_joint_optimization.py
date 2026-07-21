@@ -114,7 +114,13 @@ async def test_sync_bandit_weights_smoothing(jol):
     bandit.credit_engine = MagicMock()
     key = ("critic", "ollama/qwen2.5:0.5b", "epsilon_greedy")
     bandit.credit_engine.stats = {
-        key: {"success": 10, "fail": 1, "reward_total": 8.0, "reward_count": 11, "latency": 5.0},
+        key: {
+            "success": 10,
+            "fail": 1,
+            "reward_total": 8.0,
+            "reward_count": 11,
+            "latency": 5.0,
+        },
     }
     bandit.weights = {"ollama/qwen2.5:0.5b": 0.5}
 
@@ -131,7 +137,13 @@ async def test_sync_bandit_weights_substring_match(jol):
     bandit.credit_engine = MagicMock()
     key = ("critic", "ollama/qwen2.5:0.5b", "epsilon_greedy")
     bandit.credit_engine.stats = {
-        key: {"success": 5, "fail": 0, "reward_total": 5.0, "reward_count": 5, "latency": 2.0},
+        key: {
+            "success": 5,
+            "fail": 0,
+            "reward_total": 5.0,
+            "reward_count": 5,
+            "latency": 2.0,
+        },
     }
     bandit.weights = {"ollama/qwen2.5:0.5b": 0.0}
 
@@ -145,8 +157,11 @@ async def test_apply_decay(jol):
     credit = MagicMock()
     credit.stats = {
         ("critic", "ollama/model", "default"): {
-            "success": 100, "fail": 10, "latency": 50.0,
-            "reward_total": 80.0, "reward_count": 110,
+            "success": 100,
+            "fail": 10,
+            "latency": 50.0,
+            "reward_total": 80.0,
+            "reward_count": 110,
         },
     }
     await jol.apply_decay(credit)
@@ -167,9 +182,7 @@ async def test_evaluate_colony_apoptose_trigger():
     jol = JointOptimizationLoop()
     colony = MagicMock()
     colony._agentes = {
-        "bad_agent": MagicMock(
-            execucoes=10, falhas=8, latencia_media=15.0
-        ),
+        "bad_agent": MagicMock(execucoes=10, falhas=8, latencia_media=15.0),
     }
     jol._colony = colony
     decisions = await jol.evaluate_colony()
@@ -183,9 +196,7 @@ async def test_evaluate_colony_mitose_trigger():
     jol = JointOptimizationLoop()
     colony = MagicMock()
     colony._agentes = {
-        "good_agent": MagicMock(
-            execucoes=10, falhas=0, latencia_media=0.1
-        ),
+        "good_agent": MagicMock(execucoes=10, falhas=0, latencia_media=0.1),
     }
     jol._colony = colony
     decisions = await jol.evaluate_colony()

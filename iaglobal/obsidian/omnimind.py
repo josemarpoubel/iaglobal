@@ -331,9 +331,7 @@ class OmniMind:
             )
             try:
                 with os.fdopen(fd, "w", encoding="utf-8") as f:
-                    json.dump(
-                        self._memoria_coletiva, f, indent=2, ensure_ascii=False
-                    )
+                    json.dump(self._memoria_coletiva, f, indent=2, ensure_ascii=False)
                     f.flush()
                     os.fsync(f.fileno())
                 # Rename atômico (mesmo filesystem)
@@ -352,7 +350,9 @@ class OmniMind:
         except Exception as e:
             logger.warning("[OmniMind] Falha ao salvar estado em disco: %s", e)
 
-    def _cleanup_old_temp_files(self, temp_dir: Path, max_age_seconds: int = 3600) -> None:
+    def _cleanup_old_temp_files(
+        self, temp_dir: Path, max_age_seconds: int = 3600
+    ) -> None:
         """Remove arquivos temporários mais antigos que max_age_seconds."""
         import os
         import time
@@ -1041,7 +1041,9 @@ class OmniMind:
             self._salvar_estado()
 
         # Aplica revogacao no CRL (bloqueia execucao futura do agente)
-        duration_str = "permanentemente" if duration_hours is None else f"por {duration_hours}h"
+        duration_str = (
+            "permanentemente" if duration_hours is None else f"por {duration_hours}h"
+        )
         revogou = revoke_node(
             node_name=agent_id,
             reason=f"Apoptose contratual: {motivo}",

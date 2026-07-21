@@ -79,12 +79,14 @@ def _load_revocation_list() -> Dict[str, float]:
                 if expired:
                     history = data.get("revocation_history", [])
                     for name in expired:
-                        history.append({
-                            "node": name,
-                            "reason": "expiracao_automatica",
-                            "timestamp": now,
-                            "action": "unrevoke",
-                        })
+                        history.append(
+                            {
+                                "node": name,
+                                "reason": "expiracao_automatica",
+                                "timestamp": now,
+                                "action": "unrevoke",
+                            }
+                        )
                     data["revoked"] = {k: v for k, v in active.items()}
                     data["revocation_history"] = history
                     data["last_updated"] = now
@@ -167,7 +169,9 @@ def revoke_node(
             json.dumps(data, indent=2, ensure_ascii=False), encoding="utf-8"
         )
 
-        duration_str = "permanentemente" if expires_at == 0 else f"por {duration_hours}h"
+        duration_str = (
+            "permanentemente" if expires_at == 0 else f"por {duration_hours}h"
+        )
         logger.warning(
             "[LINEAGE_GATE] 🔒 Nó revogado %s: %s | %s", duration_str, node_name, reason
         )

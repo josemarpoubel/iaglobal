@@ -64,6 +64,67 @@ class CodeArtifact:
     model_used: str = ""
     score: float = 0.0
 
+    @staticmethod
+    def from_raw(raw: Any) -> "CodeArtifact":
+        """Normaliza qualquer saída de nó em CodeArtifact.
+
+        Contrato (congelado por tests/test_code_artifact.py):
+        - None / {} vazios → code="", files={}
+        - str → code=str
+        - dict com "code" → usa code
+        - dict com "output" (str) → usa output como code
+        - dict com "output" (dict) → usa output["code"] se existir
+        - dict com "files" mas sem code → NÃO promove arquivo a code
+        - dict arbitrário (sem code/output/files) → code="", nunca str(dict)
+        - CodeArtifact → retorna o próprio objeto (passthrough, ``is``)
+        - objeto com .code/.files (ex: SolutionArtifact) → copia
+        - objeto sem .code → code=""
+        """
+        if raw is None:
+            return CodeArtifact()
+
+        if isinstance(raw, CodeArtifact):
+            return raw
+
+        # objetos com atributos .code/.files (SolutionArtifact, etc.)
+        if hasattr(raw, "code") or hasattr(raw, "files"):
+            code = getattr(raw, "code", "") or ""
+            files = getattr(raw, "files", None) or {}
+            score = getattr(raw, "score", 0.0) or 0.0
+            if not isinstance(code, str):
+                code = ""
+            if not isinstance(files, dict):
+                files = {}
+            return CodeArtifact(code=code, files=dict(files), score=float(score))
+
+        if isinstance(raw, str):
+            return CodeArtifact(code=raw)
+
+        if isinstance(raw, dict):
+            code = raw.get("code")
+            if code is None:
+                output = raw.get("output")
+                if isinstance(output, str):
+                    code = output
+                elif isinstance(output, dict):
+                    code = output.get("code")
+            if not isinstance(code, str):
+                code = ""
+            # Contrato (tests/test_code_artifact.py):
+            # - code/output presentes -> normaliza code e PRESERVA files
+            # - apenas files (sem code/output) -> code="", files={}
+            files = raw.get("files") or {}
+            if not isinstance(files, dict):
+                files = {}
+            return CodeArtifact(
+                code=code,
+                files=dict(files) if code else {},
+                score=float(raw.get("score", 0.0) or 0.0),
+            )
+
+        # fallback seguro: nunca stringifica estruturas arbitrárias
+        return CodeArtifact()
+
 
 class CoderAgent(AgentBase):
     def __init__(self, temperatura: float = 0.5, estilo: str = "direto, minimalista"):

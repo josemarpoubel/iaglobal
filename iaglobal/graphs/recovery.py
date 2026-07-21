@@ -65,9 +65,7 @@ class RecoveryPolicy:
         execution_state: Optional[Dict[str, object]] = None,
     ) -> RecoveryResult:
         start = time.monotonic()
-        upstream_ids = [
-            self._config.key_to_node_map.get(k, k) for k in missing
-        ]
+        upstream_ids = [self._config.key_to_node_map.get(k, k) for k in missing]
         attempt_number = self._attempt_counts.get(node_id, 0) + 1
 
         if attempt_number <= self._config.max_attempts_per_node:
@@ -77,7 +75,7 @@ class RecoveryPolicy:
         else:
             reason = (
                 f"orçamento de recuperação excedido "
-                f"({attempt_number-1}/{self._config.max_attempts_per_node})"
+                f"({attempt_number - 1}/{self._config.max_attempts_per_node})"
             )
             result = await self._abort(node_id, reason, start)
 
@@ -113,12 +111,8 @@ class RecoveryPolicy:
             elapsed_ms=(time.monotonic() - start) * 1000,
         )
 
-    async def _abort(
-        self, node_id: str, reason: str, start: float
-    ) -> RecoveryResult:
-        logger.error(
-            "[RecoveryPolicy] %s: abortando ramo — %s", node_id, reason
-        )
+    async def _abort(self, node_id: str, reason: str, start: float) -> RecoveryResult:
+        logger.error("[RecoveryPolicy] %s: abortando ramo — %s", node_id, reason)
         return RecoveryResult(
             decision=RecoveryDecision.ABORT,
             node_id=node_id,

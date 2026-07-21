@@ -19,6 +19,7 @@ from iaglobal.mcp.mcp_agent import MCPAgent
 from iaglobal.mcp.search_web import WebSearchTool
 from iaglobal.mcp.file_system import FileSystemTool
 from iaglobal.mcp.code_executor import CodeExecutorTool
+from iaglobal.mcp.placeholder import MCPPlaceholder
 from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.mcp.server")
@@ -121,22 +122,7 @@ Tools disponíveis:
         return await _get_code_exec().execute(code, language=language)
 
 else:
-
-    class MCPPlaceholder:
-        """Placeholder quando FastMCP não está instalado."""
-
-        def __init__(self, *args, **kwargs):
-            pass
-
-        def tool(self, *args, **kwargs):
-            def decorator(f):
-                return f
-
-            return decorator
-
-        async def run(self, *args, **kwargs):
-            logger.error("FastMCP não instalado. Execute: pip install mcp")
-            return
+    from iaglobal.mcp.placeholder import MCPPlaceholder
 
     mcp = MCPPlaceholder()
 

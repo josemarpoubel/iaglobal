@@ -266,7 +266,9 @@ class TestCallLlmAutoEvolution:
             a = _DummyAgent()
             original = a.bandit.generate
             try:
-                a.bandit.generate = lambda **kw: (_ for _ in ()).throw(RuntimeError("down"))
+                a.bandit.generate = lambda **kw: (_ for _ in ()).throw(
+                    RuntimeError("down")
+                )
                 try:
                     await a._call_llm(prompt="x", task_type="code")
                 except RuntimeError:

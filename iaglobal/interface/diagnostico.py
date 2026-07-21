@@ -37,9 +37,7 @@ class DiagnosticoFalha(BaseModel):
         "",
         description="SHA256 do traceback sanitizado (sem paths absolutos) — chave da vacina",
     )
-    codigo_original: str = Field(
-        "", description="Código que falhou, para referência"
-    )
+    codigo_original: str = Field("", description="Código que falhou, para referência")
     output_bruto: str = Field(
         "", description="Output completo do code_executor (stdout + stderr)"
     )

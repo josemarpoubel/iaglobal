@@ -63,7 +63,7 @@ class TesterAgent(AgentBase):
     def _extrair_funcoes_classes(self, codigo: str) -> Dict[str, List[str]]:
         funcoes = []
         classes = []
-        
+
         # Usar ASTGateway em vez de ast.parse direto
         result = _ast_gateway.parse(codigo)
         if result.valid and result.tree:

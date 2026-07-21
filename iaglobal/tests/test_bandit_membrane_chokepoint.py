@@ -118,9 +118,11 @@ def test_bandit_generate_enforce_confines(monkeypatch, bandit_module):
                 bp.credit_engine.stats.clear()
             except Exception:
                 pass
+
         # Mock acquire_model (classe/método) para evitar dependência de semáforo real
         async def _fake_acquire(self, model_name, node_id=""):
             return True
+
         monkeypatch.setattr(bandit_module.BanditPolicy, "acquire_model", _fake_acquire)
         # PSC: critic é o único node_id que passa. A membrana em modo enforce
         # não filtra critic (tem acesso cloud). O teste verifica que o modelo
@@ -165,9 +167,11 @@ def test_bandit_generate_shadow_logs_only(monkeypatch, bandit_module, caplog):
                 bp.credit_engine.stats.clear()
             except Exception:
                 pass
+
         # Mock acquire_model (classe/método) para evitar dependência de semáforo real
         async def _fake_acquire(self, model_name, node_id=""):
             return True
+
         monkeypatch.setattr(bandit_module.BanditPolicy, "acquire_model", _fake_acquire)
         # PSC: critic é o único node_id que passa. Em shadow mode, a membrana
         # não confina critic (tem acesso cloud). O teste verifica fluxo normal.

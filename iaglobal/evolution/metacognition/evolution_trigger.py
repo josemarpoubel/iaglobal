@@ -53,7 +53,9 @@ class EvolutionTrigger:
                 reason = f"SAMe insuficiente — evolução bloqueada (saldo: {same_pool.balance('evolution_trigger')})"
             else:
                 # Executa em thread para não bloquear o event loop com fcntl.flock
-                await asyncio.to_thread(same_pool.spend, "evolution_trigger", COST_CREATE_SKILL)
+                await asyncio.to_thread(
+                    same_pool.spend, "evolution_trigger", COST_CREATE_SKILL
+                )
                 same_used = COST_CREATE_SKILL
                 try:
                     graph = ctx.get("graph")

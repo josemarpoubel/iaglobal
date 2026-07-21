@@ -6,6 +6,7 @@ Metáfora biológica:
   - CodeAssembler = ribossomo (sintetiza proteína/código funcional a partir dos aa)
   - Validação AST = dobramento proteico (verifica estrutura 3D antes de liberar)
 """
+
 import ast
 import re
 import logging
@@ -54,7 +55,9 @@ class AssemblyResult:
 class CodeAssembler:
     """Monta código válido a partir de CodeBlocks extraídos da web."""
 
-    def assemble(self, blocks: List[CodeBlock], language: str = "html") -> AssemblyResult:
+    def assemble(
+        self, blocks: List[CodeBlock], language: str = "html"
+    ) -> AssemblyResult:
         """Monta o melhor arquivo possível dos blocos disponíveis."""
         if not blocks:
             return AssemblyResult(errors=["Nenhum bloco de código disponível"])
@@ -77,7 +80,9 @@ class CodeAssembler:
             result.valid = len(best.code) > 10
             return result
 
-    def _assemble_html(self, blocks: List[CodeBlock], result: AssemblyResult) -> AssemblyResult:
+    def _assemble_html(
+        self, blocks: List[CodeBlock], result: AssemblyResult
+    ) -> AssemblyResult:
         """Monta HTML válido a partir de blocos mistos."""
         from iaglobal.search.search_code_extractor import SearchCodeExtractor
 
@@ -96,15 +101,21 @@ class CodeAssembler:
             elif block.language in ("javascript", "js"):
                 script_parts.append(block.code)
 
-        body_content = "\n    ".join(body_parts) if body_parts else "<div id='app'>Conteudo</div>"
-        styles = "\n    ".join(style_parts) if style_parts else "body { font-family: sans-serif; margin: 20px; }"
+        body_content = (
+            "\n    ".join(body_parts) if body_parts else "<div id='app'>Conteudo</div>"
+        )
+        styles = (
+            "\n    ".join(style_parts)
+            if style_parts
+            else "body { font-family: sans-serif; margin: 20px; }"
+        )
         scripts = "\n    ".join(script_parts) if script_parts else "// app logic"
         if head_parts:
             best_head = max(head_parts, key=len)
             deduped_head = []
             seen_head_tags: set = set()
             for tag in re.findall(r"<[^>]+>", best_head):
-                tag_normalized = re.sub(r'\s+', ' ', tag.lower()).strip()
+                tag_normalized = re.sub(r"\s+", " ", tag.lower()).strip()
                 if tag_normalized not in seen_head_tags:
                     seen_head_tags.add(tag_normalized)
                     deduped_head.append(tag)
@@ -120,20 +131,24 @@ class CodeAssembler:
         )
 
         result.code = code
-        result.blocks_used = len(body_parts) + len(style_parts) + len(script_parts) + len(head_parts)
+        result.blocks_used = (
+            len(body_parts) + len(style_parts) + len(script_parts) + len(head_parts)
+        )
         result.valid = bool(re.search(r"<!DOCTYPE html>", code, re.IGNORECASE))
         if not result.valid:
             result.errors.append("HTML sem DOCTYPE — estrutura inválida")
         return result
 
-    def _assemble_python(self, blocks: List[CodeBlock], result: AssemblyResult) -> AssemblyResult:
+    def _assemble_python(
+        self, blocks: List[CodeBlock], result: AssemblyResult
+    ) -> AssemblyResult:
         """Monta Python válido a partir de blocos — valida cada um via ASTGateway."""
         valid_parts: List[str] = []
         for block in blocks:
             code = block.code.strip()
             if not code:
                 continue
-            
+
             # Usar ASTGateway em vez de ast.parse direto
             parse_result = _ast_gateway.parse(code)
             if parse_result.valid and parse_result.tree:
@@ -145,7 +160,7 @@ class CodeAssembler:
             return result
 
         merged = self._dedupe_and_merge(valid_parts)
-        
+
         # Validar merged com ASTGateway
         merged_result = _ast_gateway.parse(merged)
         if merged_result.valid:
@@ -161,18 +176,20 @@ class CodeAssembler:
                 result.blocks_used = 1
             else:
                 if merged_result.errors:
-                    result.errors.append(f"AST inválido mesmo após merge: {merged_result.errors[0]}")
+                    result.errors.append(
+                        f"AST inválido mesmo após merge: {merged_result.errors[0]}"
+                    )
 
         return result
 
-    def _assemble_css(self, blocks: List[CodeBlock], result: AssemblyResult) -> AssemblyResult:
+    def _assemble_css(
+        self, blocks: List[CodeBlock], result: AssemblyResult
+    ) -> AssemblyResult:
         """Monta CSS a partir de blocos — deduplica seletores."""
         seen_rules: set = set()
         rules: List[str] = []
         for block in blocks:
-            for rule_match in re.finditer(
-                r"([^{]+)\{([^}]+)\}", block.code
-            ):
+            for rule_match in re.finditer(r"([^{]+)\{([^}]+)\}", block.code):
                 selector = rule_match.group(1).strip()
                 body = rule_match.group(2).strip()
                 key = f"{selector}{{{body}}}"
@@ -193,7 +210,9 @@ class CodeAssembler:
         result.blocks_used = len(rules)
         return result
 
-    def _assemble_javascript(self, blocks: List[CodeBlock], result: AssemblyResult) -> AssemblyResult:
+    def _assemble_javascript(
+        self, blocks: List[CodeBlock], result: AssemblyResult
+    ) -> AssemblyResult:
         """Monta JavaScript — concatenacão com validação básica."""
         valid_parts: List[str] = []
         for block in blocks:
@@ -202,6 +221,7 @@ class CodeAssembler:
                 continue
             try:
                 from iaglobal.search.search_code_extractor import _check_js_syntax
+
                 _check_js_syntax(code)
                 valid_parts.append(code)
             except SyntaxError:
@@ -214,6 +234,7 @@ class CodeAssembler:
         merged = "\n\n".join(valid_parts)
         try:
             from iaglobal.search.search_code_extractor import _check_js_syntax
+
             _check_js_syntax(merged)
             result.code = merged
             result.valid = True
@@ -241,7 +262,7 @@ class CodeAssembler:
             if not parse_result.valid or not parse_result.tree:
                 other.append(part)
                 continue
-            
+
             tree = parse_result.tree
             for node in ast.walk(tree):
                 if isinstance(node, ast.Import):

@@ -41,6 +41,7 @@ from iaglobal.mcp.mcp_agent import MCPAgent
 from iaglobal.mcp.search_web import WebSearchTool
 from iaglobal.mcp.file_system import FileSystemTool
 from iaglobal.mcp.code_executor import CodeExecutorTool
+from iaglobal.mcp.placeholder import MCPPlaceholder
 from iaglobal.api import IAGlobalAPI
 from iaglobal.metabolism.metabolic_invariants import MetabolicInvariants
 from iaglobal.metabolism.metabolic_autocorrect import MetabolicAutocorrect
@@ -539,20 +540,7 @@ Forneça APENAS o código corrigido, sem explicações."""
             return []
 
 else:
-    # Placeholder quando FastMCP não disponível
-    class MCPPlaceholder:
-        def __init__(self, *args, **kwargs):
-            pass
-
-        def tool(self, *args, **kwargs):
-            def decorator(f):
-                return f
-
-            return decorator
-
-        async def run(self, *args, **kwargs):
-            logger.error("FastMCP não instalado. Execute: pip install mcp")
-            return
+    from iaglobal.mcp.placeholder import MCPPlaceholder
 
     mcp = MCPPlaceholder()
 

@@ -22,6 +22,7 @@ def _get_pb_contract():
     global _PROMPT_BUILDER_CONTRACT
     if _PROMPT_BUILDER_CONTRACT is None:
         from iaglobal.graphs.contracts.node_contract import NodeContract
+
         _PROMPT_BUILDER_CONTRACT = NodeContract(
             required_inputs=["dependency", "knowledge"],
         )

@@ -87,10 +87,13 @@ def render(s: Dict[str, Any]) -> str:
     lines.append("=" * 58)
     lines.append("  🧬 iaglobal — DASHBOARD DE HOMEOSTASE (Tribunal Cognitivo)")
     lines.append("=" * 58)
-    lines.append(f"  Sentinela: intervenções={s['interventions']}  "
-                 f"correções={s['corrections']}  precisão={s['precision_pct']}%")
-    lines.append(f"  Falso-positivos (rejeições): {s['rejected']}  "
-                 f"aprovadas: {s['approved']}")
+    lines.append(
+        f"  Sentinela: intervenções={s['interventions']}  "
+        f"correções={s['corrections']}  precisão={s['precision_pct']}%"
+    )
+    lines.append(
+        f"  Falso-positivos (rejeições): {s['rejected']}  aprovadas: {s['approved']}"
+    )
     lines.append(f"  Alertas de congestão (total): {s['congestion_alerts']}")
     lines.append("-" * 58)
     lines.append("  TIER        REJEC.   AMOSTRAS   ÚLTIMO USO%   STATUS")
@@ -107,8 +110,12 @@ def render(s: Dict[str, Any]) -> str:
 
 def main() -> int:
     ap = argparse.ArgumentParser(description="Dashboard de congestão do iaglobal")
-    ap.add_argument("--watch", type=int, default=0,
-                    help="Segundos entre refreshes (0 = snapshot único)")
+    ap.add_argument(
+        "--watch",
+        type=int,
+        default=0,
+        help="Segundos entre refreshes (0 = snapshot único)",
+    )
     args = ap.parse_args()
 
     try:

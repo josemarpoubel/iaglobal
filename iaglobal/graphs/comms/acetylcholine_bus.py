@@ -67,10 +67,14 @@ class AcetylcholineBus:
 
     # ── Pub/Sub (broadcast) ──────────────────────────────────────────────
 
-    def subscribe(self, channel_or_recipient: str, callback: Callable[[AgentMessage], Any]):
+    def subscribe(
+        self, channel_or_recipient: str, callback: Callable[[AgentMessage], Any]
+    ):
         self._subscribers[channel_or_recipient].add(callback)
 
-    def unsubscribe(self, channel_or_recipient: str, callback: Callable[[AgentMessage], Any]):
+    def unsubscribe(
+        self, channel_or_recipient: str, callback: Callable[[AgentMessage], Any]
+    ):
         if channel_or_recipient in self._subscribers:
             self._subscribers[channel_or_recipient].discard(callback)
 
@@ -121,7 +125,9 @@ class AcetylcholineBus:
         if task_id and task_id in self._queues:
             await self._queues[task_id].put(message)
 
-    def consume_event(self, task_id: str, event_type: str = "") -> Optional[AgentMessage]:
+    def consume_event(
+        self, task_id: str, event_type: str = ""
+    ) -> Optional[AgentMessage]:
         """Lê o evento mais recente da fila da task, sem bloqueio.
 
         Retorna o AgentMessage ou None se a fila estiver vazia.
@@ -138,7 +144,9 @@ class AcetylcholineBus:
             return None
         return msg
 
-    def consume_event_payload(self, task_id: str, event_type: str = "") -> Optional[dict]:
+    def consume_event_payload(
+        self, task_id: str, event_type: str = ""
+    ) -> Optional[dict]:
         """Conveniência: retorna apenas o payload dict do evento."""
         msg = self.consume_event(task_id, event_type)
         if msg is None:

@@ -198,8 +198,12 @@ class BanditPolicy:
         Para modelos locais, consulta primeiro o LocalModelGate (token bucket
         com priorização por IVM). Se o gate negar, retorna False imediatamente
         sem bloquear — o chamador deve usar synthetic_success.
+
+        Em caso de timeout no semáforo, libera automaticamente o token do
+        LocalModelGate (se consumido) para evitar vazamento.
         """
         semaphore = await self._get_model_semaphore(model_name)
+        _gate_token_consumed = False
         try:
             is_cloud = any(
                 provider in model_name
@@ -217,6 +221,7 @@ class BanditPolicy:
                         model_name,
                     )
                     return False
+                _gate_token_consumed = True
 
             # Timeout curto: 3s para cloud, 1s para local
             timeout = 3.0 if is_cloud else 1.0
@@ -226,6 +231,15 @@ class BanditPolicy:
             self.logger.debug(f"🔒 {model_name} adquirido (timeout={timeout}s)")
             return True
         except asyncio.TimeoutError:
+            # Libera token do gate local se foi consumido antes do semáforo
+            if _gate_token_consumed:
+                try:
+                    from iaglobal.execution.token_bucket import LocalModelGate
+
+                    gate = await LocalModelGate.get_instance()
+                    await gate.release(node_id)
+                except Exception:
+                    pass
             self.logger.debug(f"⏰ Timeout ({timeout}s) aguardando {model_name}")
             return False
 
@@ -747,6 +761,7 @@ class BanditPolicy:
         model_selected = None
         latency = 0.0
         success = False
+        _sem_acquired = False  # guard para finally: só libera se adquiriu
 
         try:
             # ── Membrana seletiva (shadow/enforce) no chokepoint ──
@@ -805,19 +820,27 @@ class BanditPolicy:
             # ── Tribunal Cognitivo: TaskRouter resolve tier para node_id ──
             try:
                 from iaglobal.providers.task_router import get_task_router
+
                 router = get_task_router()
                 tier = router.get_role_for_node(node_id)
                 route = router.route_for_tier(tier)
                 # Prioriza a rota do tier correto
-                if route in candidates or any(route.split("_")[0] in c for c in candidates):
-                    prioritized = [route if r in candidates else r for r in [route] + candidates]
+                if route in candidates or any(
+                    route.split("_")[0] in c for c in candidates
+                ):
+                    prioritized = [
+                        route if r in candidates else r for r in [route] + candidates
+                    ]
                     candidates = prioritized
                 # Timeout baseado no tier cognitivo
                 tier_timeout = router.get_timeout_for_tier(tier)
                 timeout = min(timeout, tier_timeout) if timeout else tier_timeout
                 self.logger.debug(
                     "[TRIBUNAL] node_id=%s tier=%s route=%s timeout=%.1fs",
-                    node_id, tier, route, timeout
+                    node_id,
+                    tier,
+                    route,
+                    timeout,
                 )
             except Exception:
                 pass
@@ -831,28 +854,37 @@ class BanditPolicy:
             )
 
             # 2. Adquire semáforo (controla concorrência por modelo)
-            acquired = await self.acquire_model(model_selected, node_id)
-            if not acquired:
-                self.logger.warning(
-                    f"⏰ Timeout aguardando semáforo para {model_selected}"
-                )
-                # Libera recursos do modelo original (token bucket pode ter consumido)
-                self.release_model(model_selected)
-                try:
-                    from iaglobal.execution.token_bucket import LocalModelGate
-                    gate = await LocalModelGate.get_instance()
-                    await gate.release(effective_agent)
-                except Exception:
-                    pass
-                # Tenta fallback
-                fallback_candidates = [c for c in candidates if c != model_selected]
-                if fallback_candidates:
-                    model_selected = fallback_candidates[0]
-                    acquired = await self.acquire_model(model_selected, node_id)
+            #    Tenta todos os candidatos em ordem de ranking, com retry
+            #    e backoff exponencial se todos estiverem ocupados.
+            #    acquire_model faz autocleanup do token bucket em caso de
+            #    timeout — não chamar release_model() sem acquire.
+            acquired = False
+            for retry_round in range(3):
+                for _candidate in candidates:
+                    acquired = await self.acquire_model(_candidate, node_id)
+                    if acquired:
+                        model_selected = _candidate
+                        _sem_acquired = True
+                        break
+                    self.logger.warning(
+                        f"⏰ Tentativa {retry_round + 1}/3: timeout "
+                        f"aguardando semáforo para {_candidate}"
+                    )
+                if acquired:
+                    break
+                if retry_round < 2:
+                    backoff = 0.1 * (2**retry_round)
+                    self.logger.info(
+                        f"⏳ {node_id}: todos os {len(candidates)} candidato(s) "
+                        f"ocupados — backoff {backoff:.1f}s "
+                        f"(rodada {retry_round + 1}/3)"
+                    )
+                    await asyncio.sleep(backoff)
 
             if not acquired:
                 self.logger.error(
-                    f"❌ {node_id}: Não conseguiu adquirir semáforo para nenhum modelo"
+                    f"❌ {node_id}: Não conseguiu adquirir semáforo "
+                    f"para nenhum modelo após 3 tentativas"
                 )
                 return ""
 
@@ -913,7 +945,9 @@ class BanditPolicy:
 
             # JOL: Sincroniza pesos com aprendizado contínuo
             try:
-                from iaglobal.metabolism.joint_optimization import joint_optimization_loop
+                from iaglobal.metabolism.joint_optimization import (
+                    joint_optimization_loop,
+                )
 
                 await joint_optimization_loop.sync_bandit_weights(self, candidates)
                 await joint_optimization_loop.apply_decay(self.credit_engine)
@@ -986,16 +1020,16 @@ class BanditPolicy:
             return ""
 
         finally:
-            # 7. SEMPRE libera o semáforo
-            if model_selected:
+            # 7. Libera semáforo + token bucket APENAS se foi adquirido
+            if _sem_acquired and model_selected:
                 self.release_model(model_selected)
-                # Libera também o token bucket do LocalModelGate (via effective_agent)
                 if not any(
                     p in model_selected
                     for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
                 ):
                     try:
                         from iaglobal.execution.token_bucket import LocalModelGate
+
                         gate = await LocalModelGate.get_instance()
                         await gate.release(effective_agent)
                     except Exception:
@@ -1012,9 +1046,15 @@ class BanditPolicy:
             )
             # 9. Reporta latência ao LocalModelGate para ajuste dinâmico do
             # token bucket e circuit breaker (apenas modelos locais).
-            if model_selected and not any(
-                p in model_selected
-                for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
+            # Só reporta se o semáforo foi realmente adquirido — latência 0.0
+            # numa falha de aquisição inflaria artificialmente o fill_rate.
+            if (
+                _sem_acquired
+                and model_selected
+                and not any(
+                    p in model_selected
+                    for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
+                )
             ):
                 try:
                     from iaglobal.execution.token_bucket import LocalModelGate

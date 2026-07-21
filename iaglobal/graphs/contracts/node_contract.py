@@ -31,7 +31,12 @@ class NodeContract:
         for key in self.required_inputs:
             entry = memory.get(key, {})
             if isinstance(entry, dict):
-                output = entry.get("output") or entry.get("code") or entry.get("built_prompt") or ""
+                output = (
+                    entry.get("output")
+                    or entry.get("code")
+                    or entry.get("built_prompt")
+                    or ""
+                )
                 if not output or (isinstance(output, str) and len(output.strip()) < 5):
                     missing.append(key)
             elif not entry:
