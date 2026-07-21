@@ -1,7 +1,7 @@
 ==============================================================
 RELATÓRIO DE ARQUITETURA - IAGLOBAL
 ==============================================================
-Data: Mon Jul 20 09:58:50 PM -03 2026
+Data: Tue Jul 21 08:51:09 AM -03 2026
 Diretório: /home/kitohamachi/iaglobal-main
 
 ==============================================================
@@ -303,8 +303,8 @@ Diretório: /home/kitohamachi/iaglobal-main
 │   ├── [1.5K]  credit.py
 │   ├── [ 291]  edge.py
 │   ├── [2.8K]  edges.py
-│   ├── [ 341]  execution_context.py
-│   ├── [ 45K]  execution_graph.py
+│   ├── [ 346]  execution_context.py
+│   ├── [ 46K]  execution_graph.py
 │   ├── [1.9K]  graph_builder_v2.py
 │   ├── [   0]  __init__.py
 │   ├── [2.0K]  instrumentation.py
@@ -321,7 +321,7 @@ Diretório: /home/kitohamachi/iaglobal-main
 │   │   ├── [2.1K]  no_ai_audit_compliance.py
 │   │   ├── [4.3K]  no_api_builder.py
 │   │   ├── [4.0K]  no_api_design.py
-│   │   ├── [9.3K]  no_apoptosis_kill.py
+│   │   ├── [9.0K]  no_apoptosis_kill.py
 │   │   ├── [5.3K]  no_applied_ai_engineer.py
 │   │   ├── [4.4K]  no_architect.py
 │   │   ├── [3.4K]  no_architecture_validator.py
@@ -515,6 +515,7 @@ Diretório: /home/kitohamachi/iaglobal-main
 │   ├── [4.6K]  consolidation.py
 │   ├── [1.6K]  core.py
 │   ├── [4.0K]  data
+│   │   ├── [ 19K]  ancestry_tree.jsonl
 │   │   ├── [4.0K]  cache
 │   │   │   ├── [4.0K]  memory_swap
 │   │   │   └── [4.0K]  search_swap
@@ -532,6 +533,8 @@ Diretório: /home/kitohamachi/iaglobal-main
 │   │   │   ├── [   2]  same_pool.json
 │   │   │   └── [4.0K]  synthesis
 │   │   ├── [4.0K]  memory_backups
+│   │   ├── [ 17K]  omnimind_state.json
+│   │   ├── [4.0K]  omnimind_temp
 │   │   ├── [4.0K]  provider_metrics
 │   │   ├── [4.0K]  result
 │   │   ├── [4.0K]  script
@@ -539,6 +542,7 @@ Diretório: /home/kitohamachi/iaglobal-main
 │   │   ├── [4.0K]  storage
 │   │   ├── [4.0K]  temp
 │   │   │   ├── [4.0K]  documentation
+│   │   │   ├── [4.0K]  generated_videos
 │   │   │   └── [4.0K]  sandbox_exec
 │   │   ├── [ 915]  tools_registry.pkl
 │   │   └── [4.0K]  work
@@ -572,7 +576,7 @@ Diretório: /home/kitohamachi/iaglobal-main
 │   ├── [ 12K]  jol_metrics.py
 │   ├── [5.8K]  metabolic_autocorrect.py
 │   ├── [5.5K]  metabolic_invariants.py
-│   ├── [8.5K]  metabolic_metrics.py
+│   ├── [8.4K]  metabolic_metrics.py
 │   ├── [1.2K]  methylation_cycle.py
 │   ├── [ 16K]  methylation_engine.py
 │   ├── [6.4K]  opportunity_cost_detector.py
@@ -608,6 +612,34 @@ Diretório: /home/kitohamachi/iaglobal-main
 │   ├── [ 16K]  consolidation.py
 │   ├── [6.0K]  delta_sleep.py
 │   ├── [ 36K]  epigenetic
+│   │   ├── [ 232]  08f13b339b6a8798.cbor
+│   │   ├── [ 216]  091e538e9a904dee.cbor
+│   │   ├── [ 234]  17649f4e9c4a4cbf.cbor
+│   │   ├── [ 232]  22f478d44a2d877f.cbor
+│   │   ├── [ 234]  42646c6467c24d14.cbor
+│   │   ├── [ 234]  4b77ab2b59947e6c.cbor
+│   │   ├── [ 216]  4d0ce0dec5bec748.cbor
+│   │   ├── [ 234]  51b2179f23f97236.cbor
+│   │   ├── [ 216]  5ba0d1054634f3e2.cbor
+│   │   ├── [ 216]  6d41d74789e171c0.cbor
+│   │   ├── [ 232]  7c0fbebfe0802929.cbor
+│   │   ├── [ 216]  835109efd7ec646c.cbor
+│   │   ├── [ 234]  83b9e163f90c57fc.cbor
+│   │   ├── [ 234]  8964a1b4bdf4fb41.cbor
+│   │   ├── [ 234]  8b3ef3d3d111dbde.cbor
+│   │   ├── [ 234]  8dc2b80dae59707d.cbor
+│   │   ├── [ 232]  923f3ad1d0a846d4.cbor
+│   │   ├── [ 234]  966d202ead085698.cbor
+│   │   ├── [ 232]  a7ae5ff49325b09d.cbor
+│   │   ├── [ 234]  b9c4e0de6e34b6cb.cbor
+│   │   ├── [ 234]  bb3772fed7546db9.cbor
+│   │   ├── [ 216]  bea025a8b3dd223f.cbor
+│   │   ├── [ 234]  c57219bf0dcf932b.cbor
+│   │   ├── [ 232]  c9d2bb638becb6f6.cbor
+│   │   ├── [ 216]  da3281dee686e9b5.cbor
+│   │   ├── [ 234]  e50327d49c781079.cbor
+│   │   ├── [ 234]  e80f21db10984c32.cbor
+│   │   └── [ 232]  ed637139479bd772.cbor
 │   ├── [ 11K]  epigenetic_registry.py
 │   ├── [4.2K]  error_capture.py
 │   ├── [3.8K]  fugue_compartment.py
@@ -627,13 +659,13 @@ Diretório: /home/kitohamachi/iaglobal-main
 │   │   ├── [2.6K]  performance_snapshot.py
 │   │   ├── [6.3K]  protocol.py
 │   │   ├── [4.0K]  providers
-│   │   │   ├── [6.3K]  base.py
+│   │   │   ├── [6.4K]  base.py
 │   │   │   ├── [ 780]  coder.py
 │   │   │   ├── [ 774]  critic.py
 │   │   │   ├── [ 694]  dependency.py
 │   │   │   ├── [   0]  __init__.py
 │   │   │   ├── [1.1K]  knowledge.py
-│   │   │   ├── [2.3K]  memory.py
+│   │   │   ├── [2.4K]  memory.py
 │   │   │   ├── [2.5K]  performance.py
 │   │   │   ├── [ 722]  planner.py
 │   │   │   ├── [2.2K]  security.py
@@ -875,28 +907,29 @@ Diretório: /home/kitohamachi/iaglobal-main
     ├── [3.0K]  scoring.py
     └── [4.0K]  syntax.py
 
-93 directories, 774 files
+95 directories, 804 files
 
 ==============================================================
 2. ESTATÍSTICAS GERAIS
 ==============================================================
 Arquivos Python : 725
-Pastas          : 127
-Arquivos Totais : 909
+Pastas          : 131
+Arquivos Totais : 984
 
 ==============================================================
 3. EXTENSÕES
 ==============================================================
     725 py
-    133 pyc
+    178 pyc
+     31 cbor
      28 txt
-      9 json
+     10 json
       3 md
-      3 cbor
       2 html
       1 pkl
       1 log
       1 lock
+      1 jsonl
       1 deprecated
       1 db
       1 bak
@@ -904,7 +937,7 @@ Arquivos Totais : 909
 ==============================================================
 4. MAIORES ARQUIVOS PYTHON
 ==============================================================
- 149503 total
+ 149493 total
    1724 iaglobal/agents/performance_design_agent.py
    1569 iaglobal/tests/test_context_providers.py
    1547 iaglobal/evolution/skills/native/skill.py
@@ -912,7 +945,7 @@ Arquivos Totais : 909
    1391 iaglobal/providers/provider_router.py
    1352 iaglobal/agents/prompt_improver.py
    1170 iaglobal/obsidian/omnimind.py
-   1133 iaglobal/graphs/execution_graph.py
+   1135 iaglobal/graphs/execution_graph.py
    1077 iaglobal/evolution/evolutionengine.py
    1065 iaglobal/graphs/bandit.py
     998 iaglobal/chappie/ivm_axiom.py
@@ -949,14 +982,14 @@ Arquivos Totais : 909
     564 iaglobal/tests/test_mcp_protocol_expansion.py
     561 iaglobal/reflection/reflexion_engine.py
     560 iaglobal/tests/test_consolidation.py
-    551 iaglobal/agents/ingestion/experiment_runner.py
+    548 iaglobal/agents/ingestion/experiment_runner.py
     546 iaglobal/evolution/handler_evolution.py
     538 iaglobal/cli/main.py
     529 iaglobal/agents/agent_base.py
     518 iaglobal/immunity/entropy_sentinel.py
     514 iaglobal/tests/test_omnimind_integration.py
     512 iaglobal/immunity/symbiosis_score.py
-    512 iaglobal/agents/ingestion/meta_learner.py
+    511 iaglobal/agents/ingestion/meta_learner.py
     509 iaglobal/tests/test_recovery_scenarios.py
     501 iaglobal/evolution/memory_apoptosis.py
     500 iaglobal/obsidian/subconsciousapi.py
@@ -986,8 +1019,8 @@ Arquivos Totais : 909
     437 iaglobal/agents/ingestion/consolidation.py
     435 iaglobal/obsidian/consolidation.py
     431 iaglobal/memory/synthesis_sweeper.py
+    430 iaglobal/cognition/awareness/models.py
     428 iaglobal/tests/test_integration_phospholipid_registry_pipeline.py
-    428 iaglobal/cognition/awareness/models.py
     427 iaglobal/agents/semantic_validator.py
     425 iaglobal/security/sandbox_rules.py
     425 iaglobal/immunity/failure_analyzer.py
@@ -1013,10 +1046,10 @@ Arquivos Totais : 909
     393 iaglobal/tests/test_bandit_concurrency.py
     393 iaglobal/chappie/lineage_guardian.py
     389 iaglobal/graphs/nodes/no_debug_unificado.py
-    386 iaglobal/chappie/error_enricher.py
     385 iaglobal/tests/integration/test_stress_fase31.py
     384 iaglobal/graphs/nodes/no_lineage_proof.py
     382 iaglobal/tests/test_snippet_synthesizer.py
+    382 iaglobal/chappie/error_enricher.py
     381 iaglobal/storage/converter.py
     380 iaglobal/tests/test_e2e_membrane_validation.py
     380 iaglobal/meta/meta_learner.py
@@ -1489,6 +1522,7 @@ iaglobal/memory/cognitive/__init__.py
 iaglobal/memory/consolidation.py
 iaglobal/memory/core.py
 iaglobal/memory/data
+iaglobal/memory/data/ancestry_tree.jsonl
 iaglobal/memory/data/cache
 iaglobal/memory/data/cache/memory_swap
 iaglobal/memory/data/cache/search_swap
@@ -1509,6 +1543,8 @@ iaglobal/memory/data/json/synthesis
 iaglobal/memory/data/logs
 iaglobal/memory/data/logs/app.log
 iaglobal/memory/data/memory_backups
+iaglobal/memory/data/omnimind_state.json
+iaglobal/memory/data/omnimind_temp
 iaglobal/memory/data/provider_metrics
 iaglobal/memory/data/result
 iaglobal/memory/data/script
@@ -1516,6 +1552,7 @@ iaglobal/memory/data/snapshots
 iaglobal/memory/data/storage
 iaglobal/memory/data/temp
 iaglobal/memory/data/temp/documentation
+iaglobal/memory/data/temp/generated_videos
 iaglobal/memory/data/temp/sandbox_exec
 iaglobal/memory/data/tools_registry.pkl
 iaglobal/memory/data/work
@@ -1529,9 +1566,11 @@ iaglobal/memory/memory_storage.py
 iaglobal/memory/memory_vector.py
 iaglobal/memory/persistence.py
 iaglobal/memory/__pycache__
+iaglobal/memory/__pycache__/cache.cpython-313.pyc
 iaglobal/memory/__pycache__/db_manager.cpython-313.pyc
 iaglobal/memory/__pycache__/__init__.cpython-313.pyc
 iaglobal/memory/__pycache__/memory_error.cpython-313.pyc
+iaglobal/memory/__pycache__/memory_storage.cpython-313.pyc
 iaglobal/memory/__pycache__/term_short.cpython-313.pyc
 iaglobal/memory/ranking.py
 iaglobal/memory/raw_pool.py
@@ -1687,7 +1726,7 @@ iaglobal/memory/vault_unifier.py
       3 from typing import Any, Dict, List, Optional, Set, Tuple
       3 from threading import Lock
       3 from reactpy import component, html
-      3 from ..protocol import ExecutionContext
+      3 from ..protocol import PipelineExecutionContext
       3 from iaglobal.validation.js_validator import detect_lang
       3 from iaglobal.utils.hash_utils import LineageID
       3 from iaglobal.tools.web_brain import WebBrain
@@ -1849,7 +1888,7 @@ iaglobal/evolution/watchdog.py:class EvolutionaryWatchdog:
 iaglobal/evolution/meta_evolver.py:class EvolutionParams:
 iaglobal/evolution/meta_evolver.py:class MetaTrial:
 iaglobal/evolution/meta_evolver.py:class MetaEvolver:
-iaglobal/evolution/execution_context.py:class ExecutionContext:
+iaglobal/evolution/execution_context.py:class EvolutionExecutionContext:
 iaglobal/evolution/genomic_reflection.py:class MutationType(Enum):
 iaglobal/evolution/genomic_reflection.py:class MutationImpact(Enum):
 iaglobal/evolution/genomic_reflection.py:class ExecutionMetrics:
@@ -1967,7 +2006,7 @@ iaglobal/pipeline/context/protocol.py:class RuntimeContext:
 iaglobal/pipeline/context/protocol.py:class HistoryContext:
 iaglobal/pipeline/context/protocol.py:class MemoryContext:
 iaglobal/pipeline/context/protocol.py:class MetricsContext:
-iaglobal/pipeline/context/protocol.py:class ExecutionContext:
+iaglobal/pipeline/context/protocol.py:class PipelineExecutionContext:
 iaglobal/pipeline/context/protocol.py:class NodeSection:
 iaglobal/pipeline/context/protocol.py:class NodeContext:
 iaglobal/pipeline/context/protocol.py:class TokenBudget:
@@ -2630,7 +2669,7 @@ iaglobal/cognition/awareness/models.py:class EpisodicMemory:
 iaglobal/cognition/awareness/models.py:class ConfidenceTrace:
 iaglobal/cognition/awareness/models.py:class ArtifactConfidence:
 iaglobal/cognition/awareness/models.py:class ConfidenceSnapshot:
-iaglobal/cognition/awareness/models.py:class ExecutionContext:
+iaglobal/cognition/awareness/models.py:class AwarenessExecutionContext:
 iaglobal/cognition/awareness/episodic_engine.py:class EpisodicEngine:
 iaglobal/cognition/awareness/confidence_engine.py:class ConfidenceEngine:
 iaglobal/cognition/correction_context.py:class CorrectionContext:
@@ -2664,7 +2703,7 @@ iaglobal/graphs/membrane.py:class Organelle(Enum):
 iaglobal/graphs/membrane.py:class MembraneMessage:
 iaglobal/graphs/membrane.py:class Membrane:
 iaglobal/graphs/node_lineage_registry.py:class NodeLineageRegistry:
-iaglobal/graphs/execution_context.py:class ExecutionContext:
+iaglobal/graphs/execution_context.py:class GraphExecutionContext:
 iaglobal/graphs/node.py:class LineageEntry:
 iaglobal/graphs/node.py:class Node:
 iaglobal/graphs/credit.py:class CreditAssignmentEngine:
@@ -3379,10 +3418,7 @@ iaglobal/agents/agent_base.py:134:# Todos os agentes que herdam de AgentBase com
 iaglobal/agents/agent_base.py:402:        # BanditPolicy.generate (todo acesso a modelo de IA passa por lá), evitando
 iaglobal/agents/performance_audit_agent.py:431:                f"limite recomendado é 15 por função. Extraia métodos."
 iaglobal/agents/intent_classifier_agent.py:172:# Pré-compila todos os padrões uma única vez no carregamento do módulo
-iaglobal/agents/ingestion/experiment_runner.py:71:    # TODO: Implementar experimento
-iaglobal/agents/ingestion/experiment_runner.py:103:    # TODO: Carregar e analisar dataset
-iaglobal/agents/ingestion/experiment_runner.py:132:    # TODO: Implementar modelo de simulação
-iaglobal/agents/ingestion/experiment_runner.py:259:**Método**: {hypothesis.method}
+iaglobal/agents/ingestion/experiment_runner.py:256:**Método**: {hypothesis.method}
 iaglobal/agents/ingestion/hypothesis_generator.py:105:3. Métodos devem ser **executáveis computacionalmente** (sem equipamentos físicos)
 iaglobal/agents/ingestion/hypothesis_generator.py:258:        # Fallback: tentar parsear todo o texto como JSON
 iaglobal/agents/ingestion/hypothesis_generator.py:280:                description=f"O método proposto supera baselines em {topics[0]}",
@@ -3390,13 +3426,9 @@ iaglobal/agents/ingestion/hypothesis_generator.py:296:                descriptio
 iaglobal/agents/ingestion/consolidation.py:290:        """Formata métricas agregadas de todos os experimentos."""
 iaglobal/agents/ingestion/consolidation.py:331:                f"Recomenda-se: (1) revisão crítica do paper, (2) verificação de erros metodológicos, (3) tentativa de replicação independente."
 iaglobal/agents/ingestion/meta_learner.py:77:        """Carrega todos os papers consolidados (async I/O)."""
-iaglobal/agents/ingestion/meta_learner.py:303:                similar_to=[],  # TODO: implementar similaridade
-iaglobal/agents/ingestion/meta_learner.py:364:        # TODO: Disparar nova rodada de experimentos com parâmetros ajustados
 iaglobal/agents/mitosis_engine.py:107:        Este método aprende quais agents performam melhor em cada task_type.
 iaglobal/metabolism/bucket_manager.py:214:        """Relatório de status de todos os buckets."""
 iaglobal/metabolism/opportunity_cost_detector.py:187:        """Retorna cópia de todos os perfis metabólicos."""
-iaglobal/metabolism/metabolic_metrics.py:102:        """Retorna uso do vault em percentual (simulado). TODO: Implementar get_vault_stats em DeltaSleepSync."""
-iaglobal/metabolism/metabolic_metrics.py:124:        TODO: Implementar get_toxin_percent em DeltaSleepSync.
 iaglobal/metabolism/transsulfuration_cycle.py:37:      `functools.partial` sobre um método async).
 iaglobal/metabolism/joint_optimization.py:39:    Coleta execution_metrics de todos os nós, recalibra o BanditPolicy
 iaglobal/search/snippet_synthesizer.py:214:        # Contradicoes: comparar todos contra todos (Jaccard + negacao)
@@ -3443,9 +3475,6 @@ iaglobal/obsidian/subconsciousapi.py:238:        todos_links = re.findall(r"\[\[
 iaglobal/obsidian/subconsciousapi.py:240:        for link in todos_links:
 iaglobal/obsidian/ancestry_tree.py:22:Padrão Singleton — existe um único AncestryTree para todo o ecossistema.
 iaglobal/obsidian/ancestry_tree.py:114:    Padrão Singleton — existe um único AncestryTree para todo o ecossistema.
-iaglobal/chappie/error_enricher.py:233:        TODO: Integrar com BanditPolicy para chamar LLM de forma eficiente.
-iaglobal/chappie/error_enricher.py:363:        # TODO: Enviar notificação para dashboard / webhook
-iaglobal/chappie/error_enricher.py:364:        # TODO: Sugerir ação corretiva automática
 iaglobal/chappie/lineage_guardian.py:350:    async def validar_todos_agents(self) -> Dict[str, ValidationResult]:
 iaglobal/chappie/lineage_guardian.py:351:        """Valida todos os agents no diretório de nodes.
 iaglobal/chappie/lineage_guardian.py:357:        # Lista todos os arquivos no diretório de nodes
@@ -3467,7 +3496,6 @@ iaglobal/api/mcp_server.py:203:    """Lista todos os scripts Python gerados e pe
 iaglobal/dashboard/phospholipid_dashboard.py:67:        """Tabela detalhada de todos os serviços."""
 iaglobal/reflection/claim_detection.py:114:          - verified: True se todos os claims foram verificados como verdadeiros
 iaglobal/_paths.py:382:    """Garante que todos os diretórios críticos existam e coleta falhas em background."""
-iaglobal/policy/bandit_evolutivo.py:358:            bonus_task = 1.0  # TODO: Implementar por task_type
 iaglobal/policy/bandit_evolutivo.py:387:            logger.warning("Todos providers banidos! Fallback para ollama")
 iaglobal/immunity/emergent_behavior_detector.py:51:            "hack",
 iaglobal/immunity/error_persistence.py:12:  - instala um `logging.Handler` no logger 'iaglobal' que persiste todo registro
@@ -3501,9 +3529,6 @@ iaglobal/graphs/nodes/no_search_web_brain.py:97:        # DESVIA TODO O LAÇO DE
 iaglobal/graphs/nodes/no_web_classifier.py:40:        # desviamos para Thread Pool se o método for síncrono para proteger o AcetylcholineBus
 iaglobal/graphs/nodes/no_knowledge_analyzer.py:109:    # Carrega todo o cache bruto que o nó de busca salvou para esta tarefa específica
 iaglobal/graphs/nodes/no_debug_coder.py:50:        # desviamos para Thread Pool se o método for síncrono para proteger o laço de eventos
-iaglobal/graphs/nodes/no_apoptosis_kill.py:164:    # TODO: Implementar quando houver tracking de execuções ativas
-iaglobal/graphs/nodes/no_apoptosis_kill.py:172:    # TODO: Implementar serialização de estado (skills, memória, configurações)
-iaglobal/graphs/nodes/no_apoptosis_kill.py:179:    # TODO: Implementar desregistro (SkillRegistry, AgentPool, etc.)
 iaglobal/graphs/nodes/no_performance_design.py:50:        # desviamos para Thread Pool se o método for síncrono para proteger o AcetylcholineBus
 iaglobal/graphs/nodes/no_documentation.py:148:        f"Inclua titulo, secoes, listas e todo o conteudo necessario."
 iaglobal/graphs/nodes/no_code_executor.py:179:    violacoes = []  # Inicializado para todos os caminhos
@@ -3560,11 +3585,11 @@ iaglobal/graphs/migrar_nodes.py.deprecated:66:    - Auto-registro via decorator 
 iaglobal/graphs/migrar_nodes.py.deprecated:69:    # registry global de nós (nome -> método run_xxx)
 iaglobal/graphs/migrar_nodes.py.deprecated:120:        Lista todos os nós registrados.
 iaglobal/graphs/migrar_nodes.py.deprecated:137:        Auto-registra métodos run_* herdados dos Mixins como nós executáveis.
-iaglobal/graphs/execution_graph.py:440:        """Encontra recursivamente todos os dependentes (transitivos) de um nó."""
-iaglobal/graphs/execution_graph.py:496:        """Invalida TODOS os consumidores (transitivo) de `upstream_id`
-iaglobal/graphs/execution_graph.py:692:                # Lógica de ABORT (usando métodos assíncronos)
-iaglobal/graphs/execution_graph.py:762:                                    # só descarta reset_uids, nao todo o
-iaglobal/graphs/execution_graph.py:779:                                    # Invalida TODOS os consumidores
+iaglobal/graphs/execution_graph.py:442:        """Encontra recursivamente todos os dependentes (transitivos) de um nó."""
+iaglobal/graphs/execution_graph.py:498:        """Invalida TODOS os consumidores (transitivo) de `upstream_id`
+iaglobal/graphs/execution_graph.py:694:                # Lógica de ABORT (usando métodos assíncronos)
+iaglobal/graphs/execution_graph.py:764:                                    # só descarta reset_uids, nao todo o
+iaglobal/graphs/execution_graph.py:781:                                    # Invalida TODOS os consumidores
 iaglobal/graphs/policy.py:11:    Garante que todos os domínios utilizem a MESMA inteligência do BanditPolicy.
 iaglobal/graphs/policy.py:33:        Retorna todos os domínios mapeados no histórico global.
 iaglobal/security/sandbox_rules.py:212:        """Configura regras padrão e expõe todos os controles no fluxo de execução."""

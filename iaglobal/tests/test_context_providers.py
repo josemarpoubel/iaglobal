@@ -4,7 +4,7 @@ import pytest
 
 from iaglobal.pipeline.mission import MissionAnalyzer
 from iaglobal.pipeline.context import (
-    ExecutionContext,
+    PipelineExecutionContext as ExecutionContext,
     MissionContext,
     RuntimeContext,
     HistoryContext,
@@ -41,7 +41,7 @@ _PROMPT = (
 @pytest.fixture
 def exec_ctx() -> ExecutionContext:
     mission = MissionAnalyzer().analyze(_PROMPT)
-    return ExecutionContext(mission=mission)
+    return ExecutionContext(mission=mission)  # from alias PipelineExecutionContext
 
 
 # ============================================================
@@ -1446,7 +1446,7 @@ def test_todos_providers_registrados_tem_requisitos_validos():
 def test_todos_providers_sao_imutaveis_quando_constroem_node_context():
     """Valida que nenhum provider muta o ExecutionContext."""
     from iaglobal.pipeline.context import (
-        ExecutionContext,
+        PipelineExecutionContext as ExecutionContext,
         MissionContext,
         MemorySnapshot,
         SecuritySnapshot,
@@ -1489,7 +1489,7 @@ def test_todos_providers_sao_imutaveis_quando_constroem_node_context():
 def test_todos_providers_produzem_node_context_valido():
     """Valida que todo provider produz NodeContext com estrutura válida."""
     from iaglobal.pipeline.context import (
-        ExecutionContext,
+        PipelineExecutionContext as ExecutionContext,
         MissionContext,
         MemorySnapshot,
         SecuritySnapshot,
@@ -1532,7 +1532,7 @@ def test_todos_providers_produzem_node_context_valido():
 def test_todos_providers_suportam_serializacao():
     """Valida que todo provider produz contexto serializável."""
     from iaglobal.pipeline.context import (
-        ExecutionContext,
+        PipelineExecutionContext as ExecutionContext,
         MissionContext,
         MemorySnapshot,
         SecuritySnapshot,

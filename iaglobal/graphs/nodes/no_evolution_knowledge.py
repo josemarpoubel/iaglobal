@@ -11,7 +11,7 @@ import logging
 import asyncio
 from typing import Dict, Any
 
-from iaglobal.evolution.agents.knowledge_agent import KnowledgeAgent
+from iaglobal.evolution.evolution_agents.knowledge_agent import KnowledgeAgent
 
 logger = logging.getLogger(__name__)
 

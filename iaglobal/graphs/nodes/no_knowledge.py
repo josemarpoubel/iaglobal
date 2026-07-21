@@ -12,7 +12,7 @@ import asyncio
 from typing import Dict, Any, List
 
 from iaglobal.graphs.artifact import SolutionArtifact
-from iaglobal.evolution.agents.knowledge_agent import knowledge
+from iaglobal.evolution.evolution_agents.knowledge_agent import knowledge
 from iaglobal.memory.fusion_engine import KnowledgeGraph
 
 logger = logging.getLogger(__name__)

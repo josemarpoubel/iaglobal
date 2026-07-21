@@ -11,7 +11,7 @@ import logging
 import asyncio
 from typing import Dict, Any, List
 
-from iaglobal.evolution.agents.knowledge_agent import knowledge
+from iaglobal.evolution.evolution_agents.knowledge_agent import knowledge
 from iaglobal.memory.term_long import LongTermMemory
 from iaglobal.memory.term_short import ShortTermMemory
 from iaglobal._paths import CORE_DB

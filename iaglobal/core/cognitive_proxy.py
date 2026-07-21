@@ -32,7 +32,7 @@ from iaglobal.memory.semantic_cache import SemanticCache
 from iaglobal.core.retry_handler import RetryHandler
 from iaglobal.core.governance import governance as _gov
 from iaglobal.cognition.task_fingerprint import TaskFingerprint
-from iaglobal.cognition.agents.task_classifier_agent import TaskClassifierAgent
+from iaglobal.cognition.cognition_agents.task_classifier_agent import TaskClassifierAgent
 from iaglobal.storage.batch_writer import batch_writer, Event as BatchEvent
 from iaglobal.cognition.outcome_tracker import outcome_tracker, ExecutionOutcome
 from iaglobal.graphs.state_store import SystemStateBuffer, SUCCESS, FAILED

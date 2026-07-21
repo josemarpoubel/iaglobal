@@ -27,12 +27,12 @@ class ContextProviderRegistry:
 
     Singleton que gerencia providers de contexto para cada nó do grafo.
     Suporta lazy import: ao chamar get("coder"), tenta importar
-    iaglobal.pipeline.context.providers.coder automaticamente.
+    iaglobal.pipeline.context.context_providers.coder automaticamente.
     """
 
     _instance: Optional[ContextProviderRegistry] = None
     _providers: Dict[str, ContextProvider] = {}
-    _PROVIDER_MODULE = "iaglobal.pipeline.context.providers.{name}"
+    _PROVIDER_MODULE = "iaglobal.pipeline.context.context_providers.{name}"
 
     def __new__(cls) -> ContextProviderRegistry:
         if cls._instance is None:

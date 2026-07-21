@@ -409,3 +409,365 @@
 2026-07-21 07:32:50,712 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
 2026-07-21 07:32:50,715 [INFO] [iaglobal.cognition.awareness] AwarenessCache v3.2 inicializado (6 engines)
 2026-07-21 07:32:50,715 [INFO] [iaglobal.cognition.awareness] AwarenessCache fechado
+2026-07-21 09:09:58,824 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 09:09:59,476 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 09:09:59,491 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 09:09:59,518 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 09:09:59,670 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 63 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:09:59,670 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:09:59,837 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 09:09:59,837 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 09:09:59,837 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 09:09:59,839 [INFO] [iaglobal] [PM_AGENT] func=5 | non_func=1 | priority=high | prompt_len=147
+2026-07-21 09:10:24,676 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 09:10:25,311 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 09:10:25,327 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 09:10:25,353 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 09:10:25,506 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 63 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:10:25,506 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:10:25,673 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 09:10:25,673 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 09:10:25,673 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 09:10:25,674 [INFO] [iaglobal] [PM_AGENT] func=5 | non_func=1 | priority=high | prompt_len=147
+2026-07-21 09:10:41,126 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 09:10:41,788 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 09:10:41,803 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 09:10:41,830 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 09:10:41,980 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 63 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:10:41,980 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:10:42,130 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 09:10:42,131 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 09:10:42,131 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 09:10:42,133 [INFO] [iaglobal] [PM_AGENT] func=5 | non_func=1 | priority=high | prompt_len=147
+2026-07-21 09:10:55,842 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 09:10:56,498 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 09:10:56,517 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 09:10:56,566 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 09:10:56,736 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 63 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:10:56,736 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:10:56,879 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 09:10:56,879 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 09:10:56,879 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 09:10:56,881 [INFO] [iaglobal] [PM_AGENT] func=5 | non_func=1 | priority=high | prompt_len=147
+2026-07-21 09:11:02,564 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 63 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:11:02,565 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 09:11:02,576 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:02,576 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:02,585 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:02,585 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:02,594 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:02,594 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:02,604 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:02,604 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:02,613 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:02,613 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:02,635 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-21 09:11:02,659 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-21 09:11:05,050 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 09:11:05,446 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 09:11:05,462 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 09:11:05,492 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 09:11:05,806 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 09:11:05,807 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 09:11:05,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 09:11:05,948 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-21 09:11:05,965 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:05,965 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:05,977 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:05,977 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:05,988 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:05,988 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:05,998 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 09:11:05,998 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 09:11:06,551 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-21 09:11:06,554 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-21 09:11:06,556 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-21 09:11:06,563 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-21 09:11:06,563 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-21 09:11:06,564 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:06,581 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:06,582 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:07,085 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-07-21 09:11:07,086 [INFO] [iaglobal.token_bucket] [LOCAL_GATE] Congestion alert -> tier=glm4 usage=0.8% conc=0/2 rejections=2
+2026-07-21 09:11:09,910 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.717 | P=0.667 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,929 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.650 | P=0.500 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,929 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.610 | P=0.400 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,930 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.583 | P=0.333 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,930 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=5 | consecutivas=5 | taxa_falha=1.00
+2026-07-21 09:11:09,931 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=6 | consecutivas=6 | taxa_falha=1.00
+2026-07-21 09:11:09,932 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,933 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.550 | P=0.250 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,933 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=7 | consecutivas=7 | taxa_falha=1.00
+2026-07-21 09:11:09,934 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=8 | consecutivas=8 | taxa_falha=1.00
+2026-07-21 09:11:09,934 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=9 | consecutivas=9 | taxa_falha=1.00
+2026-07-21 09:11:09,935 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=10 | consecutivas=10 | taxa_falha=1.00
+2026-07-21 09:11:09,936 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=11 | consecutivas=11 | taxa_falha=1.00
+2026-07-21 09:11:09,942 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=12 | consecutivas=12 | taxa_falha=1.00
+2026-07-21 09:11:09,943 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=13 | consecutivas=13 | taxa_falha=1.00
+2026-07-21 09:11:09,944 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=14 | consecutivas=14 | taxa_falha=1.00
+2026-07-21 09:11:09,944 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=15 | consecutivas=15 | taxa_falha=1.00
+2026-07-21 09:11:09,945 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.497 | classificacao=crítico
+2026-07-21 09:11:09,945 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=16 | consecutivas=16 | taxa_falha=1.00
+2026-07-21 09:11:09,946 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.494 | classificacao=crítico
+2026-07-21 09:11:09,946 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=17 | consecutivas=17 | taxa_falha=1.00
+2026-07-21 09:11:09,946 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.492 | classificacao=crítico
+2026-07-21 09:11:09,947 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=18 | consecutivas=18 | taxa_falha=1.00
+2026-07-21 09:11:09,947 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.490 | classificacao=crítico
+2026-07-21 09:11:09,948 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,948 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,948 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,948 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,948 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,948 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,948 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,949 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,950 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,950 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,950 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,950 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,950 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,950 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,950 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,951 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,951 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:09,951 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:09,951 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.490 | P=0.100 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,797 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=19 | consecutivas=19 | taxa_falha=1.00
+2026-07-21 09:11:14,797 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.488 | classificacao=crítico
+2026-07-21 09:11:14,798 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=20 | consecutivas=20 | taxa_falha=1.00
+2026-07-21 09:11:14,798 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.486 | classificacao=crítico
+2026-07-21 09:11:14,799 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=21 | consecutivas=21 | taxa_falha=1.00
+2026-07-21 09:11:14,799 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.485 | classificacao=crítico
+2026-07-21 09:11:14,799 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,799 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.485 | P=0.087 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,800 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,800 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.485 | P=0.087 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,800 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=22 | consecutivas=22 | taxa_falha=1.00
+2026-07-21 09:11:14,800 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.483 | classificacao=crítico
+2026-07-21 09:11:14,801 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=23 | consecutivas=23 | taxa_falha=1.00
+2026-07-21 09:11:14,801 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.482 | classificacao=crítico
+2026-07-21 09:11:14,802 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=24 | consecutivas=24 | taxa_falha=1.00
+2026-07-21 09:11:14,802 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.481 | classificacao=crítico
+2026-07-21 09:11:14,803 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=25 | consecutivas=25 | taxa_falha=1.00
+2026-07-21 09:11:14,803 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.480 | classificacao=crítico
+2026-07-21 09:11:14,803 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=26 | consecutivas=26 | taxa_falha=1.00
+2026-07-21 09:11:14,804 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.479 | classificacao=crítico
+2026-07-21 09:11:14,804 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=27 | consecutivas=27 | taxa_falha=1.00
+2026-07-21 09:11:14,804 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.478 | classificacao=crítico
+2026-07-21 09:11:14,805 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=28 | consecutivas=28 | taxa_falha=1.00
+2026-07-21 09:11:14,805 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.477 | classificacao=crítico
+2026-07-21 09:11:14,806 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,806 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.477 | P=0.067 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,806 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,806 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.477 | P=0.067 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.477 | P=0.067 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.477 | P=0.067 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.477 | P=0.067 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.477 | P=0.067 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.477 | P=0.067 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:14,807 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.477 | P=0.067 E=1.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:15,011 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.529 | P=0.097 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:15,212 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.540 | P=0.125 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:15,413 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.551 | P=0.152 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:15,614 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.561 | P=0.176 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:15,815 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.570 | P=0.200 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:16,016 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.579 | P=0.222 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:16,217 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.587 | P=0.243 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:16,420 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.595 | P=0.263 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:16,621 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.603 | P=0.282 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:16,822 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.610 | P=0.300 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 09:11:17,127 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.557 | P=0.293 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:17,128 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.554 | P=0.286 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:17,128 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.551 | P=0.279 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:17,128 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.548 | P=0.273 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:17,129 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=5 | consecutivas=5 | taxa_falha=1.00
+2026-07-21 09:11:17,129 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:17,130 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.545 | P=0.267 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,479 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=6 | consecutivas=6 | taxa_falha=1.00
+2026-07-21 09:11:20,480 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=7 | consecutivas=7 | taxa_falha=1.00
+2026-07-21 09:11:20,481 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=8 | consecutivas=8 | taxa_falha=1.00
+2026-07-21 09:11:20,482 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=9 | consecutivas=9 | taxa_falha=1.00
+2026-07-21 09:11:20,483 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=10 | consecutivas=10 | taxa_falha=1.00
+2026-07-21 09:11:20,484 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,484 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.533 | P=0.240 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,484 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,484 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.533 | P=0.240 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,485 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,485 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.533 | P=0.240 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,485 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=11 | consecutivas=11 | taxa_falha=1.00
+2026-07-21 09:11:20,485 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=12 | consecutivas=12 | taxa_falha=1.00
+2026-07-21 09:11:20,486 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=13 | consecutivas=13 | taxa_falha=1.00
+2026-07-21 09:11:20,486 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=14 | consecutivas=14 | taxa_falha=1.00
+2026-07-21 09:11:20,487 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=15 | consecutivas=15 | taxa_falha=1.00
+2026-07-21 09:11:20,487 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=16 | consecutivas=16 | taxa_falha=1.00
+2026-07-21 09:11:20,488 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=17 | consecutivas=17 | taxa_falha=1.00
+2026-07-21 09:11:20,488 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=18 | consecutivas=18 | taxa_falha=1.00
+2026-07-21 09:11:20,489 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=19 | consecutivas=19 | taxa_falha=1.00
+2026-07-21 09:11:20,489 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=20 | consecutivas=20 | taxa_falha=1.00
+2026-07-21 09:11:20,490 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=21 | consecutivas=21 | taxa_falha=1.00
+2026-07-21 09:11:20,490 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=22 | consecutivas=22 | taxa_falha=1.00
+2026-07-21 09:11:20,491 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=23 | consecutivas=23 | taxa_falha=1.00
+2026-07-21 09:11:20,491 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=24 | consecutivas=24 | taxa_falha=1.00
+2026-07-21 09:11:20,492 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=25 | consecutivas=25 | taxa_falha=1.00
+2026-07-21 09:11:20,493 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=26 | consecutivas=26 | taxa_falha=1.00
+2026-07-21 09:11:20,493 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=27 | consecutivas=27 | taxa_falha=1.00
+2026-07-21 09:11:20,494 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=28 | consecutivas=28 | taxa_falha=1.00
+2026-07-21 09:11:20,494 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=29 | consecutivas=29 | taxa_falha=1.00
+2026-07-21 09:11:20,495 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=30 | consecutivas=30 | taxa_falha=1.00
+2026-07-21 09:11:20,496 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=31 | consecutivas=31 | taxa_falha=1.00
+2026-07-21 09:11:20,496 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=32 | consecutivas=32 | taxa_falha=1.00
+2026-07-21 09:11:20,497 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=33 | consecutivas=33 | taxa_falha=1.00
+2026-07-21 09:11:20,497 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.499 | classificacao=crítico
+2026-07-21 09:11:20,497 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=34 | consecutivas=34 | taxa_falha=1.00
+2026-07-21 09:11:20,498 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.498 | classificacao=crítico
+2026-07-21 09:11:20,498 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=35 | consecutivas=35 | taxa_falha=1.00
+2026-07-21 09:11:20,498 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.497 | classificacao=crítico
+2026-07-21 09:11:20,499 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=36 | consecutivas=36 | taxa_falha=1.00
+2026-07-21 09:11:20,499 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.496 | classificacao=crítico
+2026-07-21 09:11:20,500 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=37 | consecutivas=37 | taxa_falha=1.00
+2026-07-21 09:11:20,500 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.495 | classificacao=crítico
+2026-07-21 09:11:20,500 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=38 | consecutivas=38 | taxa_falha=1.00
+2026-07-21 09:11:20,500 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.494 | classificacao=crítico
+2026-07-21 09:11:20,501 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=39 | consecutivas=39 | taxa_falha=1.00
+2026-07-21 09:11:20,501 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.493 | classificacao=crítico
+2026-07-21 09:11:20,502 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=40 | consecutivas=40 | taxa_falha=1.00
+2026-07-21 09:11:20,502 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.493 | classificacao=crítico
+2026-07-21 09:11:20,503 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=41 | consecutivas=41 | taxa_falha=1.00
+2026-07-21 09:11:20,503 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.492 | classificacao=crítico
+2026-07-21 09:11:20,503 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=42 | consecutivas=42 | taxa_falha=1.00
+2026-07-21 09:11:20,503 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.491 | classificacao=crítico
+2026-07-21 09:11:20,504 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=43 | consecutivas=43 | taxa_falha=1.00
+2026-07-21 09:11:20,504 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.490 | classificacao=crítico
+2026-07-21 09:11:20,505 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=44 | consecutivas=44 | taxa_falha=1.00
+2026-07-21 09:11:20,505 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.489 | classificacao=crítico
+2026-07-21 09:11:20,505 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=45 | consecutivas=45 | taxa_falha=1.00
+2026-07-21 09:11:20,505 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.489 | classificacao=crítico
+2026-07-21 09:11:20,506 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=46 | consecutivas=46 | taxa_falha=1.00
+2026-07-21 09:11:20,506 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.488 | classificacao=crítico
+2026-07-21 09:11:20,506 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,507 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,508 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,509 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,510 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,511 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,512 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,513 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,513 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,513 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,513 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,513 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,513 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,513 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,513 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,514 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,515 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.488 | P=0.140 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,515 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=47 | consecutivas=47 | taxa_falha=1.00
+2026-07-21 09:11:20,515 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.487 | classificacao=crítico
+2026-07-21 09:11:20,516 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=48 | consecutivas=48 | taxa_falha=1.00
+2026-07-21 09:11:20,516 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.486 | classificacao=crítico
+2026-07-21 09:11:20,517 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=49 | consecutivas=49 | taxa_falha=1.00
+2026-07-21 09:11:20,517 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.486 | classificacao=crítico
+2026-07-21 09:11:20,518 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=50 | consecutivas=50 | taxa_falha=1.00
+2026-07-21 09:11:20,518 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.485 | classificacao=crítico
+2026-07-21 09:11:20,519 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=51 | consecutivas=51 | taxa_falha=1.00
+2026-07-21 09:11:20,519 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.484 | classificacao=crítico
+2026-07-21 09:11:20,520 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=52 | consecutivas=52 | taxa_falha=1.00
+2026-07-21 09:11:20,520 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.484 | classificacao=crítico
+2026-07-21 09:11:20,520 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=53 | consecutivas=53 | taxa_falha=1.00
+2026-07-21 09:11:20,521 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.483 | classificacao=crítico
+2026-07-21 09:11:20,521 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=54 | consecutivas=54 | taxa_falha=1.00
+2026-07-21 09:11:20,521 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.482 | classificacao=crítico
+2026-07-21 09:11:20,522 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] HOMOCISTEINA ELEVADA | agent=critic | falhas_sem_reciclagem=55 | consecutivas=55 | taxa_falha=1.00
+2026-07-21 09:11:20,522 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.482 | classificacao=crítico
+2026-07-21 09:11:20,523 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,523 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,523 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,523 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,524 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,525 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,525 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,525 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,525 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,525 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,525 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Alerta de homocisteína registrado no Obsidian | agent=critic
+2026-07-21 09:11:20,525 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.482 | P=0.126 E=1.000 C=0.250 | pesos=[P=0.45 E=0.40 C=0.10]
+2026-07-21 09:11:20,536 [WARNING] [iaglobal.providers.contract] [WARMUP] unstable falhou: no network
+2026-07-21 09:11:20,548 [WARNING] [iaglobal.providers.contract] [WARMUP] glacial timeout (0s)

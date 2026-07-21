@@ -25,20 +25,20 @@ from .contextproviderregistry import (
     provider_registry,  # Alias de compatibilidade
     register_provider,
 )
-from .providers.base import (
+from .context_providers.base import (
     ProjectionProvider,
     SectionSpec,
     register_projection_provider,
 )
-from .providers.planner import PlannerContextProvider
-from .providers.coder import CoderContextProvider
-from .providers.tester import TesterContextProvider
-from .providers.critic import CriticContextProvider
-from .providers.knowledge import KnowledgeContextProvider
-from .providers.memory import MemoryContextProvider
-from .providers.security import SecurityContextProvider
-from .providers.performance import PerformanceContextProvider
-from .providers.dependency import DependencyContextProvider
+from .context_providers.planner import PlannerContextProvider
+from .context_providers.coder import CoderContextProvider
+from .context_providers.tester import TesterContextProvider
+from .context_providers.critic import CriticContextProvider
+from .context_providers.knowledge import KnowledgeContextProvider
+from .context_providers.memory import MemoryContextProvider
+from .context_providers.security import SecurityContextProvider
+from .context_providers.performance import PerformanceContextProvider
+from .context_providers.dependency import DependencyContextProvider
 from .serializers import ContextSerializer, JSONSerializer
 
 __all__ = [
