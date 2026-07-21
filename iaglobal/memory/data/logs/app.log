@@ -1112,3 +1112,67 @@
 2026-07-21 09:18:29,643 [INFO] [iaglobal] [PM_AGENT] func=5 | non_func=1 | priority=high | prompt_len=147
 2026-07-21 09:18:29,807 [WARNING] [iaglobal.providers.contract] [WARMUP] unstable falhou: no network
 2026-07-21 09:18:29,818 [WARNING] [iaglobal.providers.contract] [WARMUP] glacial timeout (0s)
+2026-07-21 10:08:21,387 [INFO] [iaglobal] [OmniMind] Estado carregado do disco: 81 registros | path=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 10:08:21,388 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-07-21 10:08:21,446 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-07-21 10:08:25,972 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 3 tools do disco
+2026-07-21 10:08:27,424 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-07-21 10:08:27,439 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-07-21 10:08:27,466 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-07-21 10:08:27,838 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-07-21 10:08:27,838 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-07-21 10:08:27,838 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-07-21 10:08:27,991 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-07-21 10:08:28,021 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-07-21 10:08:28,022 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Carregados 0 perfis entrópicos de disco (CBOR)
+2026-07-21 10:08:29,196 [INFO] [iaglobal] [KNOWLEDGE] 0 entradas carregadas de /home/kitohamachi/iaglobal-main/iaglobal/memory/data/json/knowledge.json
+2026-07-21 10:08:29,645 [INFO] [iaglobal] ✅ Banco de vetores inicializado em: /home/kitohamachi/iaglobal-main/iaglobal/memory/data/db/core.db
+2026-07-21 10:08:30,245 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-07-21 10:08:31,917 [INFO] [iaglobal.fusion_engine] [FusionEngine] Motor de Fusão initialized | resonance_threshold=0.60 | max_parents=4
+2026-07-21 10:08:31,922 [INFO] [iaglobal] [KNOWLEDGE] 0 entradas carregadas de /home/kitohamachi/iaglobal-main/iaglobal/memory/data/json/knowledge.json
+2026-07-21 10:08:31,937 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:31,937 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:31,947 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:31,947 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente coder violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:31,956 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:31,956 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:31,964 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:31,965 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:31,975 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:31,975 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:31,990 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:31,990 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente reflexion violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:32,001 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:32,001 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente executor violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:32,012 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:32,012 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente evo_agent violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:32,023 [WARNING] [iaglobal.genesis.lineage_gate] [LINEAGE_GATE] CRL não configurada — defina set_revocation_file() primeiro
+2026-07-21 10:08:32,023 [WARNING] [iaglobal] [OmniMind] ⚖️ LEI DA OBEDIENCIA: Agente  violou contrato — Apoptose acionada. Revogacao permanentemente. Motivo: PSC: acesso cloud sem autorizacao do CriticAgent | CRL: FALHA
+2026-07-21 10:08:32,031 [INFO] [iaglobal] [ARBITER mode=enforce] reflexion nao resolvido em casa — escalando via critic
+2026-07-21 10:08:32,034 [INFO] [iaglobal] [ARBITER mode=enforce] tester nao resolvido em casa — escalando via critic
+2026-07-21 10:08:32,036 [INFO] [iaglobal] [ARBITER mode=enforce] tester resolvido em casa (tools)
+2026-07-21 10:08:32,046 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.0000 → 0.3000 (success=1.00, reward=1.00)
+2026-07-21 10:08:32,047 [INFO] [iaglobal.metabolism.joint_optimization] [JOL] Peso ollama_glm4: 0.3000 → 0.5100 (success=1.00, reward=1.00)
+2026-07-21 10:08:32,047 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reflexion | IVM=0.890 | P=1.000 E=1.000 C=0.450 | pesos=[P=0.40 E=0.40 C=0.20]
+2026-07-21 10:08:32,077 [INFO] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Inibidor alostérico registrado | total=1
+2026-07-21 10:08:32,077 [WARNING] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Disparando 1 inibidores alostéricos (lag=60ms)
+2026-07-21 10:08:32,080 [INFO] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Inibidor alostérico registrado | total=1
+2026-07-21 10:08:32,080 [WARNING] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Disparando 1 inibidores alostéricos (lag=60ms)
+2026-07-21 10:08:32,080 [ERROR] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Falha em inibidor alostérico 1: Callback failed!
+Traceback (most recent call last):
+  File "/home/kitohamachi/iaglobal-main/iaglobal/core/mitochondrial_probe.py", line 158, in _trigger_alosteric_inhibitors
+    await callback(lag)
+  File "/home/kitohamachi/iaglobal-main/iaglobal/tests/test_mitochondrial_probe.py", line 100, in failing_callback
+    raise ValueError("Callback failed!")
+ValueError: Callback failed!
+2026-07-21 10:08:32,108 [WARNING] [iaglobal.providers.contract] [WARMUP] unstable falhou: no network
+2026-07-21 10:08:32,121 [WARNING] [iaglobal.providers.contract] [WARMUP] glacial timeout (0s)
+2026-07-21 10:08:35,165 [INFO] [iaglobal.token_bucket] [LOCAL_GATE] Congestion alert -> tier=glm4 usage=2.2% conc=2/2 rejections=2
+2026-07-21 10:08:37,677 [INFO] [iaglobal.token_bucket] [LOCAL_GATE] Congestion alert -> tier=glm4 usage=2.2% conc=2/2 rejections=2
+2026-07-21 10:08:39,890 [INFO] [iaglobal.token_bucket] [LOCAL_GATE] Congestion alert -> tier=glm4 usage=0.8% conc=2/2 rejections=2
+2026-07-21 10:08:39,893 [INFO] [iaglobal.token_bucket] [LOCAL_GATE] Congestion alert -> tier=qwen usage=0.8% conc=6/6 rejections=5
+2026-07-21 10:08:39,893 [INFO] [iaglobal.token_bucket] [LOCAL_GATE] Congestion alert -> tier=lfm usage=0.8% conc=8/8 rejections=6
+2026-07-21 10:08:39,893 [INFO] [iaglobal.stress_tribunal] Concurrent load: glm4=2/27, qwen=6/27, lfm=8/27
+2026-07-21 10:08:39,893 [INFO] [iaglobal.stress_tribunal] Bucket limits validated: glm4<=2, qwen<=6, lfm<=8
+2026-07-21 10:08:40,399 [INFO] [iaglobal.token_bucket] [LOCAL_GATE] Congestion alert -> tier=qwen usage=0.8% conc=6/6 rejections=5
+2026-07-21 10:08:41,917 [INFO] [iaglobal.token_bucket] [LOCAL_GATE] Congestion alert -> tier=glm4 usage=1.7% conc=2/2 rejections=2

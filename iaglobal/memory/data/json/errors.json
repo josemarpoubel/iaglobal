@@ -1,1 +1,16 @@
-{"updated_at": "", "learning_errors": [], "runtime_errors": []}
+{
+  "updated_at": "2026-07-21T13:08:31.904517+00:00",
+  "learning_errors": [],
+  "runtime_errors": [
+    {
+      "timestamp": "2026-07-21T13:08:31.904467+00:00",
+      "component": "builder",
+      "severity": "ERROR",
+      "execution_id": null,
+      "message": "Handler not found for node: symbiont_handshake",
+      "details": {
+        "node": "symbiont_handshake"
+      }
+    }
+  ]
+}

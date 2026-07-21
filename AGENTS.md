@@ -1624,3 +1624,19 @@ Execute com:
 ```bash
 python -m pytest iaglobal/tests/test_psc_hierarchy.py -v
 ```
+
+## Topology Contract — Pipeline Representation Synchronization
+
+Whenever an agent creates, removes, or renames a pipeline node, it must keep the four representations synchronized:
+
+| Representation | File |
+|---|---|
+| `PIPELINE_SKILLS` | `graphs/pipeline_definition.py` |
+| `RUN_NODE_NAMES` | `graphs/builder.py` |
+| `PHASES` + `NODE_DEPENDENCIES` | `graphs/topology.py` |
+
+All modifications must preserve the 8 invariants defined in `docs/topology_contract.md` and keep `tests/test_topology_contract.py` passing.
+
+```bash
+python -m pytest iaglobal/tests/test_topology_contract.py -v
+```

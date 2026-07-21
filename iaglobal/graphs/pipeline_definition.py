@@ -297,6 +297,7 @@ PIPELINE_SKILLS: List[tuple[str, Dict[str, Any]]] = [
         {"strategy": "general", "depends_on": ["evolution_committee"]},
     ),
     ("evolution_trigger", {"strategy": "general", "depends_on": ["pipeline_updater"]}),
+    ("fusion", {"strategy": "general", "depends_on": ["evolution_trigger"]}),
     # ======================================================
     # ORPHAN AGENTS — handlers delegating to agent classes
     # ======================================================

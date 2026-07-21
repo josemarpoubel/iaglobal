@@ -1,4 +1,3 @@
-```
 # Data files and databases
 iaglobal/memory/data/db/*.db
 iaglobal/memory/data/json/*.json
@@ -12,7 +11,8 @@ iaglobal/memory/data/ancestry_tree.jsonl
 
 # Obsidian vault files
 iaglobal/obsidian/**/*.md
-```
+iaglobal/obsidian/**/*.cbor
+
 .env
 
 # Python artifacts
@@ -44,3 +44,8 @@ iaglobal/obsidian/epigenetic/*.cbor
 # Build artifacts
 iaglobal.egg-info/
 *.egg-info/
+.goosehints
+.opencode.json
+.pytest_cache
+.ruff_cache
+

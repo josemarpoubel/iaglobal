@@ -10,15 +10,20 @@ Refatorado conforme leiame.md:
 - Unificação das fases qualidade + correção (ciclo interno)
 """
 
+from collections import Counter
+
 PHASES = {
     "definicao": [
-        "orchestrator_pump",  # Pré-condicionamento metabólico de SAMe
-        "lineage_proof",  # Prova de derivação soberana (SHA3-512)
+        "orchestrator_pump",
+        "lineage_proof",
         "agentmailbox",
         "prompt_intake",
-        "context_weaver",  # Novo: injeta marcadores epigenéticos
+        "interpreter",
+        "web_classifier",
+        "typing_agent",
+        "multi_agent",
+        "ingestion",
         "prompt_improver",
-        "law_of_thought_enforcer",  # Obrigatório: valida reasoning antes de qualquer chamada downstream
         "enhancement",
         "orchestrator_agent",
         "pm",
@@ -41,8 +46,6 @@ PHASES = {
         "performance_design",
         "observability_design",
         "architecture_validator",
-        "mini_evaluator_post_arch",  # Gate após arquitetura
-        "immune_check",  # Anti-parasitas digital
     ],
     "planejamento": [
         "applied_ai_engineer",
@@ -54,13 +57,13 @@ PHASES = {
         "coder",
         "multi_coder",
         "frontend_builder",
+        "genesis_builder",
         "code_executor",
         "backend_builder",
         "api_builder",
         "database_builder",
-        "mini_evaluator_post_build",  # Gate pós construção
     ],
-    "qualidade": [  # Unificada: qualidade + correção (ciclo interno)
+    "qualidade": [
         "test_generator",
         "integrator",
         "reviewer",
@@ -68,22 +71,32 @@ PHASES = {
         "security_audit",
         "performance_audit",
         "compliance_audit",
-        "debug_coder",  # Ciclo interno de correção (máx 3 retries)
+        "lsp_validator",
+        "tester",
+        "qa",
+        "debug_unificado",
         "fix_validator",
-        "failure_analysis",  # Só executa se retry estourar
+        "failure_analysis",
+        "risk_analysis",
+        "security",
+        "performance",
+        "validator_retry",
     ],
     "entrega": [
         "documentation",
         "deployment_plan",
-        "critic",  # MOVED: agora antes do release (gate de qualidade)
-        "release",  # Só executa se critic aprovar
+        "critic",
+        "release",
+        "artifact_writer",
         "metrics",
         "optimization",
         "retrospective",
+        "reflexion",
         "result_agent",
         "knowledge_writer",
         "memory_writer",
         "memory_cleaner",
+        "scheduler",
     ],
     "metacognicao": [
         "evaluator",
@@ -93,31 +106,19 @@ PHASES = {
         "evolution_committee",
         "pipeline_updater",
         "evolution_trigger",
-        "symbiont_handshake",  # Handshake para sistemas externos
-        "entropy_sentinel",  # Lei da Ordem
-        "vacuum_strength",  # Aplica Lei do Vácuo da Prosperidade
-        "clarity_directive",  # Direção Autônoma (clareamento via IVM)
-        "fugue_compartment",  # Processamento de tarefas críticas em segundo plano
-        "fusion",  # Fusão de agentes (DNA resonance)
+        "evolution_knowledge",
+        "symbiont_handshake",
+        "entropy_sentinel",
+        "fusion",
         "auditor_sentinel",
-        "metabolic_pruning",
-        "immune_exchange",  # Recepção de vacinas imunológicas
-        "immune_monitor",
         "apoptosis_kill",
-        "adaptive_router",  # Roteamento adaptativo via IVM
-        "ga_router_evolve",  # Evolução dos pesos IVM via GA
-        "proposal_quarantine",  # Quarentena de propostas
-        "ai_audit_compliance",  # Auditoria conformidade às leis
-        "success_ritual",  # Ritual de registro de sucesso
-        "meta_director",  # Propósito macro autônomo
+        "system_analysis",
     ],
 }
 
-# Dicionário de dependências intra-phase e inter-phase
 NODE_DEPENDENCIES = {
     "scheduler": ["agentmailbox"],
-    "immune_check": ["mini_evaluator_post_arch"],  # Anti-parasitas após arch
-    "planner": ["immune_check", "agentmailbox"],  # Pode vir de mailbox ou immune_check
+    "planner": ["agentmailbox"],
     "coder": ["prompt_builder"],
     "multi_coder": ["coder"],
     "frontend_builder": ["multi_coder"],
@@ -125,14 +126,9 @@ NODE_DEPENDENCIES = {
     "api_builder": ["backend_builder"],
     "database_builder": ["multi_coder", "backend_builder"],
     "code_executor": ["frontend_builder"],
-    "immune_check_build": ["code_executor"],  # Anti-parasitas pós-build
-    "mini_evaluator_post_build": ["immune_check_build"],  # Gate pós construção
     "enhancement": ["prompt_intake"],
-    "context_weaver": ["prompt_intake"],  # Novo gate epigenético
-    "prompt_improver": ["context_weaver"],  # Agora usa context_weaver
-    "law_of_thought_enforcer": [
-        "prompt_improver"
-    ],  # Valida reasoning antes de continuar
+    "prompt_improver": ["prompt_intake"],
+    "orchestrator_agent": ["enhancement"],
     "pm": ["requirements"],
     "requirements": ["domain_analysis"],
     "domain_analysis": ["business_rules"],
@@ -155,12 +151,9 @@ NODE_DEPENDENCIES = {
     "threat_modeling": ["architecture_validator"],
     "performance_design": ["architecture_validator"],
     "observability_design": ["architecture_validator"],
-    "mini_evaluator_post_arch": ["architecture_validator"],  # Gate após arquitetura
-    "immune_check": ["mini_evaluator_post_arch"],  # Anti-parasitas digital
-    "applied_ai_engineer": ["immune_check"],
-    "planner": ["applied_ai_engineer"],  # Aguarda otimização de IA aplicada
-    "mini_evaluator_post_build": ["code_executor"],  # Gate pós construção
-    "task_breakdown": ["immune_check"],  # After immune check, not planner
+    "applied_ai_engineer": ["architecture_validator"],
+    "planner": ["applied_ai_engineer"],
+    "task_breakdown": ["architecture_validator"],
     "execution_plan": ["task_breakdown"],
     "test_generator": ["database_builder"],
     "integrator": ["test_generator"],
@@ -169,13 +162,12 @@ NODE_DEPENDENCIES = {
     "security_audit": ["semantic_validator"],
     "performance_audit": ["security_audit"],
     "compliance_audit": ["performance_audit"],
-    "debug_coder": ["compliance_audit"],  # Ciclo interno de correção
-    "fix_validator": ["debug_coder"],
-    "failure_analysis": ["fix_validator"],  # Só se retry estourar
+    "fix_validator": ["compliance_audit"],
+    "failure_analysis": ["fix_validator"],
     "documentation": ["fix_validator"],
     "deployment_plan": ["documentation"],
-    "release": ["critic"],  # Gate do critic
-    "critic": ["deployment_plan"],  # MOVED: antes do release
+    "release": ["critic"],
+    "critic": ["deployment_plan"],
     "metrics": ["release"],
     "optimization": ["metrics"],
     "retrospective": ["optimization"],
@@ -193,16 +185,8 @@ NODE_DEPENDENCIES = {
     "symbiont_handshake": ["evolution_trigger"],
     "entropy_sentinel": ["symbiont_handshake"],
     "auditor_sentinel": ["entropy_sentinel"],
-    "metabolic_pruning": ["auditor_sentinel"],
-    "immune_exchange": ["metabolic_pruning"],
-    "immune_monitor": ["immune_exchange"],
-    "apoptosis_kill": ["immune_monitor"],
-    "adaptive_router": ["apoptosis_kill"],
-    "ga_router_evolve": ["adaptive_router"],
-    "proposal_quarantine": ["ga_router_evolve"],
-    "ai_audit_compliance": ["proposal_quarantine"],
-    "success_ritual": ["ai_audit_compliance"],
-    "meta_director": ["success_ritual"],
+    "fusion": ["auditor_sentinel"],
+    "apoptosis_kill": ["fusion"],
 }
 
 
@@ -214,4 +198,163 @@ def get_node_phase(node_name: str) -> str:
     return "unknown"
 
 
-__all__ = ["PHASES", "NODE_DEPENDENCIES", "get_node_phase"]
+def audit_representations(
+    pipeline_nodes: set[str],
+    builder_nodes: set[str],
+    run_functions: set[str] | None = None,
+) -> dict:
+    """
+    Architecture contract validator.
+
+    Verifies consistency between every architectural representation of
+    the execution pipeline:
+
+    - PIPELINE_SKILLS
+    - RUN_NODE_NAMES
+    - PHASES
+    - NODE_DEPENDENCIES
+
+    Returns a dictionary containing:
+      - diagnostic flags (result["checks"])
+      - set differences
+      - reachability information
+      - cycle information
+
+    The returned structure is part of the project's architectural
+    contract and is consumed by tests/test_topology_contract.py.
+
+    Any new architectural invariant should be implemented here before
+    corresponding tests are introduced.
+    """
+    topology_nodes = set()
+    for nodes in PHASES.values():
+        topology_nodes.update(nodes)
+    topology_nodes.update(NODE_DEPENDENCIES.keys())
+    for deps in NODE_DEPENDENCIES.values():
+        topology_nodes.update(deps)
+
+    phase_nodes: set[str] = set()
+    for nodes in PHASES.values():
+        phase_nodes.update(nodes)
+
+    registered = pipeline_nodes | builder_nodes | topology_nodes
+
+    # ── Set differences ──
+    pipeline_without_phase = sorted(pipeline_nodes - phase_nodes)
+    builder_without_phase = sorted(builder_nodes - phase_nodes)
+
+    # ── Dependencies without phase ──
+    dep_nodes: set[str] = set(NODE_DEPENDENCIES.keys())
+    for deps in NODE_DEPENDENCIES.values():
+        dep_nodes.update(deps)
+    dependency_without_phase = sorted(dep_nodes - phase_nodes)
+
+    # ── Duplicate phase assignments ──
+    phase_counts = Counter()
+    for nodes in PHASES.values():
+        phase_counts.update(nodes)
+    duplicate_phase_nodes = sorted(
+        n for n, count in phase_counts.items() if count > 1
+    )
+
+    result: dict = {
+        "pipeline_count": len(pipeline_nodes),
+        "builder_count": len(builder_nodes),
+        "topology_count": len(topology_nodes),
+        "pipeline_minus_builder": sorted(pipeline_nodes - builder_nodes),
+        "builder_minus_pipeline": sorted(builder_nodes - pipeline_nodes),
+        "topology_minus_pipeline": sorted(topology_nodes - pipeline_nodes),
+        "pipeline_minus_topology": sorted(pipeline_nodes - topology_nodes),
+        "all_three_common": sorted(pipeline_nodes & builder_nodes & topology_nodes),
+        "pipeline_without_phase": pipeline_without_phase,
+        "builder_without_phase": builder_without_phase,
+        "dependency_without_phase": dependency_without_phase,
+        "duplicate_phase_nodes": duplicate_phase_nodes,
+    }
+
+    # ── Dangling dependency references ──
+    dangling = []
+    for node, deps in NODE_DEPENDENCIES.items():
+        for dep in deps:
+            if dep not in topology_nodes and dep not in pipeline_nodes and dep not in builder_nodes:
+                dangling.append((node, dep))
+    result["dangling_deps"] = dangling
+
+    # ── Orphan functions (run_* without registration) ──
+    if run_functions is not None:
+        orphan_fn = sorted(run_functions - registered)
+    else:
+        orphan_fn = []
+    result["orphan_run_functions"] = orphan_fn
+
+    # ── Cycle detection (DFS three-color) ──
+    color: dict[str, int] = {n: 0 for n in NODE_DEPENDENCIES}
+    cycles: list[list[str]] = []
+
+    def _dfs_cycle(n: str, path: list[str]) -> None:
+        color[n] = 1
+        path.append(n)
+        for dep in NODE_DEPENDENCIES.get(n, []):
+            if color.get(dep) == 1:
+                idx = path.index(dep)
+                cycles.append(path[idx:] + [dep])
+            elif color.get(dep) == 0:
+                _dfs_cycle(dep, path)
+        path.pop()
+        color[n] = 2
+
+    for n in list(NODE_DEPENDENCIES):
+        if color.get(n) == 0:
+            _dfs_cycle(n, [])
+
+    result["cycles"] = cycles
+
+    # ── Reachability (roots = PHASES roots + NODE_DEPENDENCIES roots) ──
+    roots = set()
+    for n in topology_nodes:
+        if n not in NODE_DEPENDENCIES:
+            roots.add(n)  # PHASES-only nodes are implicit roots
+    for n, deps in NODE_DEPENDENCIES.items():
+        if not deps:
+            roots.add(n)
+    all_dep_refs: set[str] = set()
+    for deps in NODE_DEPENDENCIES.values():
+        all_dep_refs.update(deps)
+    for d in all_dep_refs:
+        if d not in set(NODE_DEPENDENCIES.keys()):
+            roots.add(d)
+
+    visited: set[str] = set()
+    stack = list(roots)
+    while stack:
+        n = stack.pop()
+        if n in visited:
+            continue
+        visited.add(n)
+        for node_, deps_ in NODE_DEPENDENCIES.items():
+            if n in deps_:
+                stack.append(node_)
+
+    result["reachable_from_roots"] = len(visited)
+    result["total_in_graph"] = len(topology_nodes)
+    result["unreachable"] = sorted(topology_nodes - visited)
+
+    # ── Diagnostic flags ──
+    result["checks"] = {
+        "no_cycles": len(cycles) == 0,
+        "no_dangling_deps": len(dangling) == 0,
+        "no_orphan_run_functions": len(orphan_fn) == 0,
+        "all_unreachable_exist": all(
+            n in pipeline_nodes or n in builder_nodes or n in topology_nodes
+            for n in result["unreachable"]
+        ),
+        "no_pipeline_without_phase": len(pipeline_without_phase) == 0,
+        "no_builder_without_phase": len(builder_without_phase) == 0,
+        "no_dependency_without_phase": len(dependency_without_phase) == 0,
+        "no_duplicate_phase_nodes": len(duplicate_phase_nodes) == 0,
+    }
+    result["valid"] = all(result["checks"].values())
+    return result
+
+
+__all__ = ["PHASES", "NODE_DEPENDENCIES", "get_node_phase", "audit_representations"]

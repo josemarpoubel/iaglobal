@@ -727,5 +727,86 @@
     "duration_hours": null,
     "law": "Lei da Obediencia",
     "timestamp": 1784636287.335943
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "reflexion",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639311.92882
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "coder",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639311.9381535
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "executor",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639311.947668
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "evo_agent",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639311.9566112
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639311.9657516
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "reflexion",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639311.9811978
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "executor",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639311.9932208
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "evo_agent",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639312.0033953
+  },
+  {
+    "type": "apoptose_contratual",
+    "agent_id": "",
+    "motivo": "PSC: acesso cloud sem autorizacao do CriticAgent",
+    "violation_type": "psc_violation",
+    "duration_hours": null,
+    "law": "Lei da Obediencia",
+    "timestamp": 1784639312.014001
   }
 ]

@@ -35,12 +35,11 @@ logger = logging.getLogger("ia-global")
 # List of node names in canonical order (7 phases from ROADMAP)
 # Updated per leiame.md: context_weaver + mini_evaluator + critic reordering
 RUN_NODE_NAMES: List[str] = [
-    # Messaging (2) — roda antes de tudo para ativar mailboxes e corrigir claim
+    # Messaging (2)
     "agentmailbox",
     "scheduler",
-    # Definition (20)
+    # Definition
     "prompt_intake",
-    "context_weaver",
     "prompt_improver",
     "enhancement",
     "orchestrator_agent",
@@ -64,24 +63,19 @@ RUN_NODE_NAMES: List[str] = [
     "performance_design",
     "observability_design",
     "architecture_validator",
-    "mini_evaluator_post_arch",
-    # Immune Check - verificação anti-parasitas
-    "immune_check",
-    # Planning (3)
+    # Planning
     "planner",
     "task_breakdown",
     "execution_plan",
-    # Construction (6) — ordem correta: coder → multi_coder → frontend_builder → code_executor
+    # Construction
     "coder",
     "multi_coder",
     "frontend_builder",
     "code_executor",
-    "immune_check_build",
     "backend_builder",
     "database_builder",
     "api_builder",
-    "mini_evaluator_post_build",
-    # Quality + Correction (unified - ciclo interno com retry)
+    # Quality + Correction
     "test_generator",
     "integrator",
     "reviewer",
@@ -89,10 +83,9 @@ RUN_NODE_NAMES: List[str] = [
     "security_audit",
     "performance_audit",
     "compliance_audit",
-    "debug_coder",
     "fix_validator",
     "failure_analysis",
-    # Delivery (critic antes do release)
+    # Delivery
     "documentation",
     "deployment_plan",
     "critic",
@@ -104,7 +97,7 @@ RUN_NODE_NAMES: List[str] = [
     "knowledge_writer",
     "memory_writer",
     "memory_cleaner",
-    # Metacognition (7)
+    # Metacognition
     "evaluator",
     "gap_analyzer",
     "skill_generator",
@@ -115,22 +108,9 @@ RUN_NODE_NAMES: List[str] = [
     "symbiont_handshake",
     "entropy_sentinel",
     "auditor_sentinel",
-    "metabolic_pruning",
-    "immune_exchange",  # Recepção de vacinas imunológicas
-    "immune_monitor",
+    "fusion",
     "apoptosis_kill",
-    "adaptive_router",  # Roteamento adaptativo via IVM
-    "ga_router_evolve",  # Evolução dos pesos IVM via GA
-    "proposal_quarantine",  # Quarentena de propostas
-    "ai_audit_compliance",  # Auditoria de conformidade às leis
-    "meta_director"  # Propósito macro autônomo
     "evolution_knowledge",
-    "evolution_homocysteine",
-    "evolution_methylation",
-    "evolution_skill_executor",
-    "evolution_dynamic_registry",
-    "multi_coder",  # Special construction node
-    "failure_analysis",  # Coleta e analisa falhas do sistema (errors.json, metrics, logs)
 ]
 
 
