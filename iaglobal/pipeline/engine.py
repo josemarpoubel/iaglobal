@@ -348,7 +348,7 @@ class PipelineEngine:
                 "memory": getattr(state, "memory", {}),
                 "chosen_model": chosen_model,
                 "parallel": parallel,
-                "__exec_ctx": exec_ctx,
+                "__exec_ctx": state.execution_context,
             }
             graph_result = await state.graph.async_run(ctx)
         except Exception as e:

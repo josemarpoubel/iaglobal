@@ -1,0 +1,1 @@
+[10:24:48] contrato insatisfeito: Skill 'release' requer inputs faltando: ['path', 'documentation']. Disponíveis n — fallback

@@ -1,0 +1,784 @@
+{
+  "remsleep.iniciar_fase_rem": [
+    {
+      "function": "remsleep.iniciar_fase_rem",
+      "ctx_keys": [],
+      "timestamp": 1784640093.5820289,
+      "datetime": "2026-07-21T10:21:33.582029"
+    }
+  ],
+  "provider_router.async_route_generate": [
+    {
+      "function": "provider_router.async_route_generate",
+      "ctx_keys": [],
+      "timestamp": 1784640117.4313588,
+      "datetime": "2026-07-21T10:21:57.431359"
+    },
+    {
+      "function": "provider_router.async_route_generate",
+      "ctx_keys": [],
+      "timestamp": 1784640117.9955723,
+      "datetime": "2026-07-21T10:21:57.995572"
+    },
+    {
+      "function": "provider_router.async_route_generate",
+      "ctx_keys": [],
+      "timestamp": 1784640267.3887928,
+      "datetime": "2026-07-21T10:24:27.388793"
+    },
+    {
+      "function": "provider_router.async_route_generate",
+      "ctx_keys": [],
+      "timestamp": 1784640311.2811184,
+      "datetime": "2026-07-21T10:25:11.281118"
+    }
+  ],
+  "bandit.generate": [
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640117.4742255,
+      "datetime": "2026-07-21T10:21:57.474226"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640118.0451317,
+      "datetime": "2026-07-21T10:21:58.045132"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640124.2290452,
+      "datetime": "2026-07-21T10:22:04.229045"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640124.283509,
+      "datetime": "2026-07-21T10:22:04.283509"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640124.355625,
+      "datetime": "2026-07-21T10:22:04.355625"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640124.4066415,
+      "datetime": "2026-07-21T10:22:04.406641"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640124.4535995,
+      "datetime": "2026-07-21T10:22:04.453599"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640131.0306122,
+      "datetime": "2026-07-21T10:22:11.030612"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640131.0831466,
+      "datetime": "2026-07-21T10:22:11.083147"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640137.810667,
+      "datetime": "2026-07-21T10:22:17.810667"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640138.008725,
+      "datetime": "2026-07-21T10:22:18.008725"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640144.504186,
+      "datetime": "2026-07-21T10:22:24.504186"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640151.264765,
+      "datetime": "2026-07-21T10:22:31.264765"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640151.4231052,
+      "datetime": "2026-07-21T10:22:31.423105"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640157.8965654,
+      "datetime": "2026-07-21T10:22:37.896565"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640164.3633256,
+      "datetime": "2026-07-21T10:22:44.363326"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640170.8262806,
+      "datetime": "2026-07-21T10:22:50.826281"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640177.3521307,
+      "datetime": "2026-07-21T10:22:57.352131"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640177.3914323,
+      "datetime": "2026-07-21T10:22:57.391432"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640183.9629698,
+      "datetime": "2026-07-21T10:23:03.962970"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640190.4496477,
+      "datetime": "2026-07-21T10:23:10.449648"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640197.8713434,
+      "datetime": "2026-07-21T10:23:17.871343"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640198.0463178,
+      "datetime": "2026-07-21T10:23:18.046318"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640204.4888868,
+      "datetime": "2026-07-21T10:23:24.488887"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640211.0872073,
+      "datetime": "2026-07-21T10:23:31.087207"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640211.141098,
+      "datetime": "2026-07-21T10:23:31.141098"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640211.1963255,
+      "datetime": "2026-07-21T10:23:31.196326"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640218.4900482,
+      "datetime": "2026-07-21T10:23:38.490048"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640218.5363245,
+      "datetime": "2026-07-21T10:23:38.536325"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640218.644951,
+      "datetime": "2026-07-21T10:23:38.644951"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640218.6860871,
+      "datetime": "2026-07-21T10:23:38.686087"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640218.770088,
+      "datetime": "2026-07-21T10:23:38.770088"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640218.8037336,
+      "datetime": "2026-07-21T10:23:38.803734"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640225.3135872,
+      "datetime": "2026-07-21T10:23:45.313587"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640232.0722113,
+      "datetime": "2026-07-21T10:23:52.072211"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640232.1726458,
+      "datetime": "2026-07-21T10:23:52.172646"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640238.7007437,
+      "datetime": "2026-07-21T10:23:58.700744"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640245.9844701,
+      "datetime": "2026-07-21T10:24:05.984470"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640246.0859106,
+      "datetime": "2026-07-21T10:24:06.085911"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640259.348531,
+      "datetime": "2026-07-21T10:24:19.348531"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640273.907768,
+      "datetime": "2026-07-21T10:24:33.907768"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640280.553112,
+      "datetime": "2026-07-21T10:24:40.553112"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640280.606313,
+      "datetime": "2026-07-21T10:24:40.606313"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640287.850012,
+      "datetime": "2026-07-21T10:24:47.850012"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640287.8766618,
+      "datetime": "2026-07-21T10:24:47.876662"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640287.973543,
+      "datetime": "2026-07-21T10:24:47.973543"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640288.0138316,
+      "datetime": "2026-07-21T10:24:48.013832"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640294.6243017,
+      "datetime": "2026-07-21T10:24:54.624302"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640294.6524332,
+      "datetime": "2026-07-21T10:24:54.652433"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640301.2331238,
+      "datetime": "2026-07-21T10:25:01.233124"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640301.282536,
+      "datetime": "2026-07-21T10:25:01.282536"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640307.836779,
+      "datetime": "2026-07-21T10:25:07.836779"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640311.2798343,
+      "datetime": "2026-07-21T10:25:11.279834"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640314.448602,
+      "datetime": "2026-07-21T10:25:14.448602"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640317.7565668,
+      "datetime": "2026-07-21T10:25:17.756567"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640324.5758345,
+      "datetime": "2026-07-21T10:25:24.575835"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640324.6322472,
+      "datetime": "2026-07-21T10:25:24.632247"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640324.8481734,
+      "datetime": "2026-07-21T10:25:24.848173"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640331.3557808,
+      "datetime": "2026-07-21T10:25:31.355781"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640338.0167964,
+      "datetime": "2026-07-21T10:25:38.016796"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640344.5689037,
+      "datetime": "2026-07-21T10:25:44.568904"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640351.3970926,
+      "datetime": "2026-07-21T10:25:51.397093"
+    },
+    {
+      "function": "bandit.generate",
+      "ctx_keys": [],
+      "timestamp": 1784640358.1574876,
+      "datetime": "2026-07-21T10:25:58.157488"
+    }
+  ],
+  "critic.arbitrar_geracao": [
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640117.474252,
+      "datetime": "2026-07-21T10:21:57.474252"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640118.0451648,
+      "datetime": "2026-07-21T10:21:58.045165"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640124.2290819,
+      "datetime": "2026-07-21T10:22:04.229082"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640124.2835398,
+      "datetime": "2026-07-21T10:22:04.283540"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640124.3556516,
+      "datetime": "2026-07-21T10:22:04.355652"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640124.4066772,
+      "datetime": "2026-07-21T10:22:04.406677"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640124.4536183,
+      "datetime": "2026-07-21T10:22:04.453618"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640131.030632,
+      "datetime": "2026-07-21T10:22:11.030632"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640131.0831652,
+      "datetime": "2026-07-21T10:22:11.083165"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640137.810694,
+      "datetime": "2026-07-21T10:22:17.810694"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640138.008756,
+      "datetime": "2026-07-21T10:22:18.008756"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640144.504212,
+      "datetime": "2026-07-21T10:22:24.504212"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640151.2647834,
+      "datetime": "2026-07-21T10:22:31.264783"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640151.4231448,
+      "datetime": "2026-07-21T10:22:31.423145"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640157.8965898,
+      "datetime": "2026-07-21T10:22:37.896590"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640164.3633506,
+      "datetime": "2026-07-21T10:22:44.363351"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640170.8263013,
+      "datetime": "2026-07-21T10:22:50.826301"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640177.352164,
+      "datetime": "2026-07-21T10:22:57.352164"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640177.3914564,
+      "datetime": "2026-07-21T10:22:57.391456"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640183.9630044,
+      "datetime": "2026-07-21T10:23:03.963004"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640190.4496799,
+      "datetime": "2026-07-21T10:23:10.449680"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640197.871401,
+      "datetime": "2026-07-21T10:23:17.871401"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640198.046347,
+      "datetime": "2026-07-21T10:23:18.046347"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640204.4889061,
+      "datetime": "2026-07-21T10:23:24.488906"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640211.0872328,
+      "datetime": "2026-07-21T10:23:31.087233"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640211.1411183,
+      "datetime": "2026-07-21T10:23:31.141118"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640211.1963456,
+      "datetime": "2026-07-21T10:23:31.196346"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640218.49008,
+      "datetime": "2026-07-21T10:23:38.490080"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640218.5363495,
+      "datetime": "2026-07-21T10:23:38.536350"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640218.6449876,
+      "datetime": "2026-07-21T10:23:38.644988"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640218.686128,
+      "datetime": "2026-07-21T10:23:38.686128"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640218.7701185,
+      "datetime": "2026-07-21T10:23:38.770118"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640218.8037584,
+      "datetime": "2026-07-21T10:23:38.803758"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640225.3136191,
+      "datetime": "2026-07-21T10:23:45.313619"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640232.0722363,
+      "datetime": "2026-07-21T10:23:52.072236"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640232.1726773,
+      "datetime": "2026-07-21T10:23:52.172677"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640238.7007623,
+      "datetime": "2026-07-21T10:23:58.700762"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640245.98449,
+      "datetime": "2026-07-21T10:24:05.984490"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640246.0859313,
+      "datetime": "2026-07-21T10:24:06.085931"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640273.9078124,
+      "datetime": "2026-07-21T10:24:33.907812"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640280.5531394,
+      "datetime": "2026-07-21T10:24:40.553139"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640280.606332,
+      "datetime": "2026-07-21T10:24:40.606332"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640287.8500412,
+      "datetime": "2026-07-21T10:24:47.850041"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640287.8767278,
+      "datetime": "2026-07-21T10:24:47.876728"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640287.9735613,
+      "datetime": "2026-07-21T10:24:47.973561"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640288.0138657,
+      "datetime": "2026-07-21T10:24:48.013866"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640294.6243372,
+      "datetime": "2026-07-21T10:24:54.624337"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640294.6524532,
+      "datetime": "2026-07-21T10:24:54.652453"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640301.2331545,
+      "datetime": "2026-07-21T10:25:01.233155"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640301.282562,
+      "datetime": "2026-07-21T10:25:01.282562"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640307.8368084,
+      "datetime": "2026-07-21T10:25:07.836808"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640314.448622,
+      "datetime": "2026-07-21T10:25:14.448622"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640317.7566023,
+      "datetime": "2026-07-21T10:25:17.756602"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640324.575855,
+      "datetime": "2026-07-21T10:25:24.575855"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640324.632282,
+      "datetime": "2026-07-21T10:25:24.632282"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640324.8481972,
+      "datetime": "2026-07-21T10:25:24.848197"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640331.3558145,
+      "datetime": "2026-07-21T10:25:31.355814"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640338.01686,
+      "datetime": "2026-07-21T10:25:38.016860"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640344.5689316,
+      "datetime": "2026-07-21T10:25:44.568932"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640351.3971167,
+      "datetime": "2026-07-21T10:25:51.397117"
+    },
+    {
+      "function": "critic.arbitrar_geracao",
+      "ctx_keys": [],
+      "timestamp": 1784640358.1575074,
+      "datetime": "2026-07-21T10:25:58.157507"
+    }
+  ]
+}

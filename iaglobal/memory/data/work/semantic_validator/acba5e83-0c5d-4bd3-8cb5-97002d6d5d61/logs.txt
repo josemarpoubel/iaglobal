@@ -1,0 +1,1 @@
+[10:24:33] contrato insatisfeito: Skill 'semantic_validator' requer inputs faltando: ['reviewer']. Disponíveis no  — fallback

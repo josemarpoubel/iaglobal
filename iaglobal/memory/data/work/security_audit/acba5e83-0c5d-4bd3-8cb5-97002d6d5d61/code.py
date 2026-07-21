@@ -1,0 +1,1 @@
+{'security_audit_report': {'total_issues': 1, 'severity_count': {'high': 0, 'medium': 1, 'low': 0}, 'issues': [{'description': 'Debug mode ativo em produção', 'severity': 'medium', 'pattern': 'debug\\s*=\\s*True'}]}, 'security_issues': [{'description': 'Debug mode ativo em produção', 'severity': 'medium', 'pattern': 'debug\\s*=\\s*True'}]}

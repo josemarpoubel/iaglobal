@@ -1,0 +1,1 @@
+{'evaluations': [], 'all_approved': True, 'total': 0, 'approved_count': 0, 'rejected_count': 0, 'status': 'approved', 'omnimind_guidance': 'Aprovado: 0/0'}

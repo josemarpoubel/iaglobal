@@ -1,0 +1,1 @@
+[10:23:52] contrato insatisfeito: Skill 'test_generator' requer inputs faltando: ['backend_code', 'frontend_code', — fallback

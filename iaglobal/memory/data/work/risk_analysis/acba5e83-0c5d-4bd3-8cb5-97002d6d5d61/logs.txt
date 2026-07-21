@@ -1,0 +1,1 @@
+[10:23:31] contrato insatisfeito: Skill 'risk_analysis' requer inputs faltando: ['architecture']. Disponíveis no c — fallback

@@ -1,0 +1,2 @@
+[10:25:44] contrato insatisfeito: Skill 'evolution_committee' requer inputs faltando: ['sandbox_validator']. Dispo — fallback
+[10:25:44] executado com sucesso

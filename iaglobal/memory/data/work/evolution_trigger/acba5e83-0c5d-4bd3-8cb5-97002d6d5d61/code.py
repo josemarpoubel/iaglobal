@@ -1,0 +1,1 @@
+{'evolution_triggered': True, 'reason': 'Score baixo (0) — necessário evoluir agentes', 'score': 0, 'same_balance': 90, 'same_used': 10, 'status': 'triggered'}

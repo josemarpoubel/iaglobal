@@ -1,0 +1,2 @@
+[10:25:51] contrato insatisfeito: Skill 'evolution_trigger' requer inputs faltando: ['pipeline_updater']. Disponív — fallback
+[10:25:51] executado com sucesso

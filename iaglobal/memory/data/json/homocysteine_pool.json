@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "skill_name": "skill_72e00693",
+    "skill_description": "Skill derivada de: Análise metabólica do sistema iaglobal:\nIVM dados: {'agents_ativos': 53, 'agents_excelentes': 0, 'agents_criticos': 51, ",
+    "generation": 0,
+    "score": 0.7,
+    "route": "guardrail",
+    "source_gap": "Análise metabólica do sistema iaglobal:\nIVM dados: {'agents_ativos': 53, 'agents_excelentes': 0, 'agents_criticos': 51, 'alerts_triggered': 115, 'latency_baseline_ms': 1000.0, 'weights': {'productivit",
+    "created_at": 1784640331.524496
+  }
+]

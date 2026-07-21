@@ -1,0 +1,1 @@
+[10:23:03] contrato insatisfeito: Skill 'knowledge_analyzer' requer inputs faltando: ['local_knowledge']. Disponív — fallback

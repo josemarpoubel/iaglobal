@@ -1,0 +1,1 @@
+[10:23:11] contrato insatisfeito: Skill 'technology_selection' requer inputs faltando: ['business_rules']. Disponí — fallback

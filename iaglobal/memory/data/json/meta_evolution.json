@@ -1,1 +1,23 @@
-[]
+{
+  "current_params": {
+    "mutation_rate": 0.08,
+    "crossover_rate": 0.36,
+    "selection_pressure": 0.8,
+    "population_size": 6,
+    "exploration_rate": 0.2
+  },
+  "trials": [
+    {
+      "params": {
+        "mutation_rate": 0.1,
+        "crossover_rate": 0.3,
+        "selection_pressure": 0.8,
+        "population_size": 6,
+        "exploration_rate": 0.2
+      },
+      "improvement": 0.0,
+      "timestamp": 1784640351.598971,
+      "task_type": "general"
+    }
+  ]
+}

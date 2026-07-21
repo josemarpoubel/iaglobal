@@ -1,0 +1,1 @@
+[10:25:38] contrato insatisfeito: Skill 'sandbox_validator' requer inputs faltando: ['skill_generator']. Disponíve — fallback

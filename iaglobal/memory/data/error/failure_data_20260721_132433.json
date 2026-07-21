@@ -1,0 +1,91 @@
+{
+  "errors": {
+    "total": 9,
+    "by_component": {
+      "builder": 1,
+      "iaglobal": 6,
+      "iaglobal.core.mitochondrial_probe": 1,
+      "iaglobal.graphs.nodes.validator_retry": 1
+    },
+    "entries": [
+      {
+        "timestamp": "2026-07-21T13:08:31.904467+00:00",
+        "component": "builder",
+        "severity": "ERROR",
+        "execution_id": null,
+        "message": "Handler not found for node: symbiont_handshake",
+        "details": {
+          "node": "symbiont_handshake"
+        }
+      },
+      {
+        "timestamp": "2026-07-21T13:20:56.650177Z",
+        "component": "iaglobal",
+        "source": "iaglobal",
+        "message": "💀 [APOPTOSIS] Falha crítica na execução do grafo: name 'exec_ctx' is not defined",
+        "traceback": ""
+      },
+      {
+        "timestamp": "2026-07-21T13:20:56.655882Z",
+        "component": "iaglobal",
+        "source": "iaglobal",
+        "message": "💥 [ASYNC PIPELINE] Failure: Falha na execução do grafo: name 'exec_ctx' is not defined",
+        "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/pipeline/engine.py\", line 351, in _async_generation_stage\n    \"__exec_ctx\": exec_ctx,\n                  ^^^^^^^^\nNameError: name 'exec_ctx' is not defined\n\nThe above exception was the direct cause of the following exception:\n\nTraceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/pipeline/engine.py\", line 148, in async_execute\n    await self._async_generation_stage(state, parallel=parallel)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/pipeline/engine.py\", line 367, in _async_generation_stage\n    raise RuntimeError(f\"Falha na execução do grafo: {e}\") from e\nRuntimeError: Falha na execução do grafo: name 'exec_ctx' is not defined\n"
+      },
+      {
+        "timestamp": "2026-07-21T13:23:31.640819Z",
+        "component": "iaglobal.core.mitochondrial_probe",
+        "source": "iaglobal.core.mitochondrial_probe",
+        "message": "[MITO-PROBE] ⚠️ GRADIENTE EM COLAPSO: 434ms de lag (threshold=250ms)",
+        "traceback": ""
+      },
+      {
+        "timestamp": "2026-07-21T13:23:32.667924Z",
+        "component": "iaglobal",
+        "source": "iaglobal",
+        "message": "Syntax error: unindent does not match any outer indentation level (<unknown>, line 3)",
+        "traceback": ""
+      },
+      {
+        "timestamp": "2026-07-21T13:23:32.681155Z",
+        "component": "iaglobal",
+        "source": "iaglobal",
+        "message": "Syntax error: unindent does not match any outer indentation level (<unknown>, line 3)",
+        "traceback": ""
+      },
+      {
+        "timestamp": "2026-07-21T13:23:45.404819Z",
+        "component": "iaglobal",
+        "source": "iaglobal",
+        "message": "Syntax error: unexpected indent (<unknown>, line 1)",
+        "traceback": ""
+      },
+      {
+        "timestamp": "2026-07-21T13:23:45.582354Z",
+        "component": "iaglobal",
+        "source": "iaglobal",
+        "message": "Syntax error: unindent does not match any outer indentation level (<unknown>, line 3)",
+        "traceback": ""
+      },
+      {
+        "timestamp": "2026-07-21T13:23:52.172973Z",
+        "component": "iaglobal.graphs.nodes.validator_retry",
+        "source": "iaglobal.graphs.nodes.validator_retry",
+        "message": "[VALIDATOR_RETRY] Código inválido após 1 tentativas: unexpected indent (<unknown>, line 1) | 492 chars",
+        "traceback": ""
+      }
+    ],
+    "path": "/home/kitohamachi/iaglobal-main/iaglobal/memory/data/json/errors.json"
+  },
+  "metrics": {
+    "total_calls": 0,
+    "by_provider": {}
+  },
+  "logs": {
+    "lines": 1969,
+    "tail_lines": 50,
+    "content": "2026-07-21 10:23:58,839 [INFO] [iaglobal.graphs.nodes.no_genesis_builder] [GENESIS_BUILDER] Bootstrap de pipeline multiagente finalizado com sucesso.\n2026-07-21 10:23:58,839 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.\n2026-07-21 10:23:58,840 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...\n2026-07-21 10:23:58,846 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=392 | tags=[]\n2026-07-21 10:23:58,846 [INFO] [iaglobal] [ARBITER mode=enforce] reviewer memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM\n2026-07-21 10:23:58,847 [INFO] [iaglobal] [ARBITER mode=enforce] reviewer nao resolvido em casa — escalando via critic\n2026-07-21 10:23:58,847 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=reviewer | IVM=0.100 | classificacao=falha\n2026-07-21 10:23:58,847 [INFO] [iaglobal] 🧠 MemoryVector inicializado com banco: /home/kitohamachi/iaglobal-main/iaglobal/memory/data/db/core.db\n2026-07-21 10:23:58,972 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reviewer | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]\n2026-07-21 10:23:58,972 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.\n2026-07-21 10:23:58,980 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=392 | tags=[]\n2026-07-21 10:23:58,981 [INFO] [iaglobal] [ARBITER mode=enforce] code_executor memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM\n2026-07-21 10:23:58,981 [INFO] [iaglobal] [ARBITER mode=enforce] code_executor nao resolvido em casa — escalando via critic\n2026-07-21 10:23:58,981 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=code_executor | IVM=0.100 | classificacao=falha\n2026-07-21 10:23:59,046 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=code_executor | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]\n2026-07-21 10:24:05,883 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=code_executor | IVM=0.050 | classificacao=falha\n2026-07-21 10:24:05,984 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=code_executor | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]\n2026-07-21 10:24:05,984 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=reviewer | IVM=0.050 | classificacao=falha\n2026-07-21 10:24:06,085 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=reviewer | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]\n2026-07-21 10:24:06,089 [WARNING] [iaglobal] [TRACE] Silent drop detectado em reviewer - nó sem output válido\n2026-07-21 10:24:15,647 [INFO] [iaglobal.core.few_shot_provider] [FEW-SHOT] Embedder carregado: sentence-transformers/all-MiniLM-L6-v2\n2026-07-21 10:24:15,979 [INFO] [iaglobal.core.few_shot_provider] [FEW-SHOT] 17 candidates -> 2 selected | sources={'skill_registry': 2} | embedder=sentence-transformers/all-MiniLM-L6-v2 | 17220ms\n2026-07-21 10:24:15,979 [INFO] [iaglobal] [CRITIC] Avaliando com modelo local...\n2026-07-21 10:24:19,297 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.314 | classificacao=crítico\n2026-07-21 10:24:19,348 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.314 | P=0.500 E=0.048 C=0.250 | pesos=[P=0.50 E=0.30 C=0.20]\n2026-07-21 10:24:19,348 [INFO] [iaglobal] [ROUTER] OLLAMA_ONLY ativo — roteando direto para ollama (async)\n2026-07-21 10:24:27,355 [INFO] [iaglobal] [ROUTER] Sucesso: ollama (7.99s, 209 chars)\n2026-07-21 10:24:27,355 [INFO] [iaglobal] [METRICS] record provider=ollama model=ollama/qwen2.5:0.5b success=True latency_ms=7989 tokens=793 cost=0.000000 task=critic\n2026-07-21 10:24:27,355 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=critic | IVM=0.444 | classificacao=crítico\n2026-07-21 10:24:27,388 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=critic | IVM=0.444 | P=0.667 E=0.069 C=0.450 | pesos=[P=0.50 E=0.30 C=0.20]\n2026-07-21 10:24:27,388 [INFO] [iaglobal] [CRITIC] Avaliação local OK (score médio=86.2)\n2026-07-21 10:24:27,413 [INFO] [iaglobal] [CRITIC] Rejeitado: score=30.0 issues=['Resposta vazia ou muito curta']\n2026-07-21 10:24:27,413 [INFO] [iaglobal.graphs.nodes.no_qa] [QA] Avaliação finalizada. Resultado estruturado com sucesso.\n2026-07-21 10:24:27,433 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Iniciando varredura paralela em camadas de memórias locais...\n2026-07-21 10:24:27,434 [INFO] [iaglobal] 🧠 MemoryVector inicializado com banco: /home/kitohamachi/iaglobal-main/iaglobal/memory/data/db/core.db\n2026-07-21 10:24:27,465 [INFO] [iaglobal.graphs.nodes.no_local_knowledge] [LOCAL_KNOWLEDGE] Varredura finalizada. Nenhum conhecimento local correspondente encontrado.\n2026-07-21 10:24:27,466 [INFO] [iaglobal.cognition.memory_first_router] [MEMORY_FIRST] Obsidian hit | len=392 | tags=[]\n2026-07-21 10:24:27,466 [INFO] [iaglobal] [ARBITER mode=enforce] qa memoria rejeitada (conf_base=0.75 eff=0.75 < limiar=0.85) — forcando LLM\n2026-07-21 10:24:27,467 [INFO] [iaglobal] [ARBITER mode=enforce] qa nao resolvido em casa — escalando via critic\n2026-07-21 10:24:27,467 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=qa | IVM=0.100 | classificacao=falha\n2026-07-21 10:24:27,538 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=qa | IVM=0.100 | P=0.000 E=0.000 C=0.500 | pesos=[P=0.40 E=0.40 C=0.20]\n2026-07-21 10:24:33,868 [WARNING] [iaglobal.chappie.ivm_axiom] [IVMAxiom] 🚨 ALERTA DE DEGRADAÇÃO | agent=qa | IVM=0.050 | classificacao=falha\n2026-07-21 10:24:33,907 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Métricas atualizadas | agent=qa | IVM=0.050 | P=0.000 E=0.000 C=0.250 | pesos=[P=0.40 E=0.40 C=0.20]\n2026-07-21 10:24:33,910 [WARNING] [iaglobal] [GRAPH] Nó 'code_executor' falhou: Skill 'code_executor' requer inputs faltando: ['coder']. Disponíveis no contexto: ['code', 'intake_report', 'domain', 'objective', 'ambiguity_level', 'mailbox_ready', 'improved_prompt', 'workdir']\n2026-07-21 10:24:33,912 [WARNING] [iaglobal] [GRAPH] Nó 'qa' falhou: Skill 'qa' requer inputs faltando: ['integrator']. Disponíveis no contexto: ['code', 'intake_report', 'domain', 'objective', 'ambiguity_level', 'mailbox_ready', 'improved_prompt', 'workdir']\n2026-07-21 10:24:33,913 [WARNING] [iaglobal] [GRAPH] Nó 'reviewer' falhou: None\n2026-07-21 10:24:33,915 [WARNING] [iaglobal] [ASYNC] BATCH EXECUTANDO: ['failure_analysis', 'semantic_validator', 'tester']\n2026-07-21 10:24:33,920 [WARNING] [iaglobal] [SKILL] 'tester' sem run_fn. Redirecionando para barramento genérico da instância.\n2026-07-21 10:24:33,971 [INFO] [iaglobal.graphs.nodes.no_failure_analysis] [FAILURE_ANALYSIS] Iniciando ciclo assíncrono de auditoria forense de falhas...\n2026-07-21 10:24:33,972 [INFO] [iaglobal.graphs.nodes.no_semantic_validator] [SEMANTIC] No code to validate",
+    "path": "/home/kitohamachi/iaglobal-main/iaglobal/memory/data/logs/app.log"
+  },
+  "collected_at": "2026-07-21T13:24:33.975966+00:00"
+}

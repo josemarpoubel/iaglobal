@@ -1,0 +1,1 @@
+[10:22:11] contrato insatisfeito: Skill 'task_breakdown' requer inputs faltando: ['planner']. Disponíveis no conte — fallback

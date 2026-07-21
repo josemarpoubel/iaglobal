@@ -1,0 +1,1 @@
+{'performance_audit_report': {'total_bottlenecks': 0, 'severity_count': {'critical': 0, 'high': 0, 'medium': 0, 'low': 0, 'info': 0}, 'risk_score': 0, 'bottlenecks': [], 'structural_flags': [], 'recidivism_flags': []}, 'bottlenecks': []}

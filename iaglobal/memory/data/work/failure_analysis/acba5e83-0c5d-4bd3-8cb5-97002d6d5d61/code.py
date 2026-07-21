@@ -1,0 +1,1 @@
+{'error_type': 'clean', 'findings': [], 'suggestion_count': 0, 'guardrail_suggestions': [], 'requirement_violations': [], 'guardrail': None, 'report_path': '/home/kitohamachi/iaglobal-main/iaglobal/memory/data/error/failure_report_20260721_132433.md', 'data_path': '/home/kitohamachi/iaglobal-main/iaglobal/memory/data/error/failure_data_20260721_132433.json'}

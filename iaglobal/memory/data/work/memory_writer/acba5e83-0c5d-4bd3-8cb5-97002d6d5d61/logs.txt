@@ -1,0 +1,1 @@
+[10:24:54] contrato insatisfeito: Skill 'memory_writer' requer inputs faltando: ['result_agent']. Disponíveis no c — fallback
