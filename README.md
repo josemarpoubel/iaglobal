@@ -525,20 +525,20 @@ Before July 2026, agents could only communicate **vertically** (Agent → Critic
 The `SocialRegistry` solved this by introducing a **hormonal advertisement system**:
 
 ```
-┌──────────────────────────────────────────────────────────────────┐
-│  SocialRegistry (singleton)                                      │
-│                                                                  │
+┌─────────────────────────────────────────────────────────────────┐
+│  SocialRegistry (singleton)                                     │
+│                                                                 │
 │  publish(adv)   → upsert skills + load_factor                   │
 │  heartbeat(id)  → update last_seen (TTL=120s)                   │
 │  withdraw(id)   → remove agent (voluntary apoptosis)            │
 │  query(domain)  → live list sorted by proficiency descending    │
 │  get(id)        → Advertisement or None (stale returns None)    │
-│                                                                  │
-│  AcetylcholineBus channels:                                      │
+│                                                                 │
+│  AcetylcholineBus channels:                                     │
 │    social.agent.advertise  → _on_advertise  → publish()         │
 │    social.agent.heartbeat  → _on_heartbeat  → heartbeat()       │
 │    social.agent.withdraw   → _on_withdraw   → withdraw()        │
-└──────────────────────────────────────────────────────────────────┘
+└─────────────────────────────────────────────────────────────────┘
 ```
 
 **Before** (vertical only):
@@ -548,14 +548,14 @@ Agent A ──request──→ Critic ──evaluate──→ Bandit ──selec
 
 **After** (vertical + horizontal):
 ```
-                        ┌─ SocialRegistry ──────────────────────┐
+                        ┌─ SocialRegistry ─────────────────────┐
                         │  agent-b: code(0.92)  load=0.3       │
                         │  agent-c: test(0.85)  load=0.1       │
                         └──────────────────────────────────────┘
                                ↑ heartbeat / advertise
                                ↑
 Agent A ──request──→ Critic ──evaluate──→ Bandit ──select──→ Provider
-      │                                                              │
+      │                                                             │
       └── query("test", min=0.8) → [agent-c] ──delegate──→──────────┘
                  (horizontal cooperation, bypasses pipeline)
 ```
@@ -1066,18 +1066,18 @@ iaglobal operava com um único modelo local (`qwen2.5:0.5b` como Operário). A p
 │                    TRIBUNAI COGNITIVO (3 Camadas)                │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  CognitiveRouter.resolve_route(node_id, task_type) → route_name │
+│  CognitiveRouter.resolve_route(node_id, task_type) → route_name  │
 │                                                                  │
-│  ┌─────────────────────┐  ┌────────────┐  ┌──────────────────┐  │
-│  │ JUIZ (GLM4-1.2B)    │  │ OPERÁRIO   │  │ SENTINELA        │  │
-│  │                     │  │ (Qwen0.5B) │  │ (LFM-230M)       │  │
-│  │ critic, failure_    │  │ coder,     │  │ sandbox_valid,   │  │
-│  │ analysis, system_   │  │ planner,   │  │ lsp_valid, audit,│  │
-│  │ design, req_corr    │  │ pm, etc.   │  │ monitor, etc.    │  │
-│  │ max_conc=1          │  │ max_conc=3 │  │ max_conc=5       │  │
-│  │ timeout=120s        │  │ timeout=60s│  │ timeout=30s      │  │
-│  │ fallback→operário   │  │ (sem fb)   │  │ (sem fb)         │  │
-│  └─────────┬───────────┘  └──────┬─────┘  └────────┬─────────┘  │
+│  ┌─────────────────────┐  ┌────────────┐  ┌──────────────────┐   │
+│  │ JUIZ (GLM4-1.2B)    │  │ OPERÁRIO   │  │ SENTINELA        │   │
+│  │                     │  │ (Qwen0.5B) │  │ (LFM-230M)       │   │
+│  │ critic, failure_    │  │ coder,     │  │ sandbox_valid,   │   │
+│  │ analysis, system_   │  │ planner,   │  │ lsp_valid, audit,│   │
+│  │ design, req_corr    │  │ pm, etc.   │  │ monitor, etc.    │   │
+│  │ max_conc=1          │  │ max_conc=3 │  │ max_conc=5       │   │
+│  │ timeout=120s        │  │ timeout=60s│  │ timeout=30s      │   │
+│  │ fallback→operário   │  │ (sem fb)   │  │ (sem fb)         │   │
+│  └─────────┬───────────┘  └──────┬─────┘  └────────┬─────────┘   │
 │            │                     │                  │            │
 │            └──────────┬──────────┴──────┬───────────┘            │
 │                       ▼                  ▼                       │
@@ -1273,21 +1273,21 @@ O iaglobal implementa um **metabolismo imunológico funcional** que diferencia r
 
 ```
                               ┌──────────────────────┐
-                              │   EvoAgent.handle()   │
-                              │  (córtex consciente)   │
+                              │   EvoAgent.handle()  │
+                              │  (córtex consciente) │
                               └──────────┬───────────┘
                                          │ gera código
                                          ▼
                               ┌──────────────────────┐
-                              │    code_executor      │
-                              │  (ação no mundo real) │
+                              │    code_executor     │
+                              │  (ação no mundo real)│
                               └──────────┬───────────┘
                                          │ falha?
                                 ┌────────┴────────┐
                                 ▼                  ▼
                       ┌──────────────────┐   ┌──────────────┐
                       │ FailureAnalyzer  │   │  sucesso →   │
-                      │  (macrófago)     │   │  Expression   │
+                      │  (macrófago)     │   │  Expression  │
                       └────────┬─────────┘   └──────────────┘
                                │ fingerprint (SHA256 sanitizado)
                                ▼
@@ -1301,7 +1301,7 @@ O iaglobal implementa um **metabolismo imunológico funcional** que diferencia r
                     ┌──────────┴──────────┐
                     ▼                     ▼
              ┌──────────────┐    ┌──────────────────┐
-             │ HIT (inata)  │    │ MISS (adaptativa) │
+             │ HIT (inata)  │    │ MISS (adaptativa)│
              │ ← 36ms       │    └────────┬─────────┘
              │ Vacina       │             │ generate_
              │ aplicada     │             │ correction_plan
@@ -1316,9 +1316,9 @@ O iaglobal implementa um **metabolismo imunológico funcional** que diferencia r
                                   │               │
                                   ▼               ▼
                            ┌──────────────────────────┐
-                           │   register_vaccine()      │
-                           │   → VaccineLedger         │
-                           │   → ImmuneMemoryExchange  │
+                           │   register_vaccine()     │
+                           │   → VaccineLedger        │
+                           │   → ImmuneMemoryExchange │
                            └──────────┬───────────────┘
                                       │ RecoveryMetrics
                                       ▼
