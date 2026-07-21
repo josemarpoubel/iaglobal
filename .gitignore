@@ -32,6 +32,12 @@ iaglobal/memory/data/*.log
 # Test artifacts
 tests/temp/
 
+# Runtime caches and execution artifacts
+iaglobal/memory/data/cache/
+iaglobal/memory/data/error/
+iaglobal/memory/data/work/
+iaglobal/memory/data/life_signals.json
+
 # Root-level runtime artifacts (avoid accidental commits)
 *.db
 *.log
