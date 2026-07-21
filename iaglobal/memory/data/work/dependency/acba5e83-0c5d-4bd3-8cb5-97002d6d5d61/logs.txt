@@ -1,2 +1,0 @@
-[10:23:10] contrato insatisfeito: Skill 'dependency' requer inputs faltando: ['path', 'requirements']. Disponíveis — fallback
-[10:23:11] executado com sucesso

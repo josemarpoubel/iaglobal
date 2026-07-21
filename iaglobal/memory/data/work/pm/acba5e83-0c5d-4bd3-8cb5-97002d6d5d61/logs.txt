@@ -1,1 +1,0 @@
-[10:22:11] contrato insatisfeito: Skill 'pm' requer inputs faltando: ['requirements']. Disponíveis no contexto: [' — fallback

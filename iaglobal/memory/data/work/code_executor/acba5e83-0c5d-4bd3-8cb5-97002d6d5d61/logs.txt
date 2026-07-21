@@ -1,1 +1,0 @@
-[10:23:58] contrato insatisfeito: Skill 'code_executor' requer inputs faltando: ['coder']. Disponíveis no contexto — fallback

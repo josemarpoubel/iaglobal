@@ -1,1 +1,0 @@
-[10:22:24] contrato insatisfeito: Skill 'requirements' requer inputs faltando: ['refined_task']. Disponíveis no co — fallback

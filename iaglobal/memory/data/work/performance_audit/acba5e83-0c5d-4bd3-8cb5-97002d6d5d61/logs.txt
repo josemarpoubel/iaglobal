@@ -1,2 +1,0 @@
-[10:24:40] contrato insatisfeito: Skill 'performance_audit' requer inputs faltando: ['performance_requirements'].  — fallback
-[10:24:41] executado com sucesso

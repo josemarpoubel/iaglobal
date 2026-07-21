@@ -1,2 +1,0 @@
-[10:23:31] contrato insatisfeito: Skill 'observability_design' requer inputs faltando: ['architect']. Disponíveis  — fallback
-[10:23:31] executado com sucesso

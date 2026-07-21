@@ -1,2 +1,0 @@
-[10:23:58] contrato insatisfeito: Skill 'genesis_builder' requer inputs faltando: ['blockchain_name', 'author']. D — fallback
-[10:23:58] executado com sucesso

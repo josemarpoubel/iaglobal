@@ -1,1 +1,0 @@
-[DELEGATE_TO_GRAPH] task=Crie uma API REST simples de gerenciamento de tarefas usando FastAPI e memória em dicionário, com 3 endpoints: criar, listar e deletar tarefas.

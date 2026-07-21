@@ -1,2 +1,0 @@
-[10:23:52] contrato insatisfeito: Skill 'integrator' requer inputs faltando: ['frontend_builder']. Disponíveis no  — fallback
-[10:23:52] executado com sucesso

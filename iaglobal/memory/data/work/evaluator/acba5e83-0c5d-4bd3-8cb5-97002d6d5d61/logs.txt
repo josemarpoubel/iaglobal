@@ -1,1 +1,0 @@
-[10:25:07] contrato insatisfeito: Skill 'evaluator' requer inputs faltando: ['result_agent']. Disponíveis no conte — fallback
