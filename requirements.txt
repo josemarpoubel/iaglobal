@@ -72,3 +72,5 @@ prettytable==3.17.0
 datasets==4.8.5
 openai==2.6.1
 pydantic-ai
+pytest-asyncio
+pytest
