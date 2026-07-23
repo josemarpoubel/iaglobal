@@ -29,6 +29,16 @@ tests/temp/
 # Epigenetic state (regenerable)
 iaglobal/obsidian/epigenetic/*.cbor
 
+# Generated listings / debris
+iaglobal/dirs.txt
+iaglobal/extensoes.txt
+iaglobal/maiores_py.txt
+iaglobal/tree_*.txt
+*.bak
+
+# Runtime state files
+*.json.lock
+
 # Build artifacts
 iaglobal.egg-info/
 *.egg-info/
