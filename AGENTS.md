@@ -5,7 +5,7 @@
 ```bash
 source venv/bin/activate
 pip install -e .
-cp .env.example .env   # configure OLLAMA_MODEL, API keys, etc.
+# .env already has defaults; edit to set API keys, OLLAMA_MODEL, etc.
 
 # Optional: set SEARXNG_URL in .env (default: http://localhost:8005)
 ```
