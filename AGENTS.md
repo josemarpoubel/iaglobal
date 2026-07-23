@@ -7,8 +7,7 @@ source venv/bin/activate
 pip install -e .
 cp .env.example .env   # configure OLLAMA_MODEL, API keys, etc.
 
-# Optional: start local meta-search engine (SearXNG)
-docker compose -f docker-compose.search.yml up -d
+# Optional: set SEARXNG_URL in .env (default: https://paulgo.io)
 ```
 
 Run tests: `python -m pytest iaglobal/tests/ -q`
@@ -50,8 +49,7 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 | CLI system dashboard | `iaglobal status` |
 | CLI history | `iaglobal history --list` / `iaglobal history <id> --explain` |
 | Run evolution lab | `OLLAMA_BASE_URL=http://localhost:11434 evolution-lab` |
-| Start SearXNG | `docker compose -f docker-compose.search.yml up -d` |
-| Stop SearXNG | `docker compose -f docker-compose.search.yml down` |
+| Set SEARXNG_URL | `export SEARXNG_URL=https://paulgo.io` (default) |
 
 ## Before You Commit
 
@@ -112,7 +110,7 @@ norecursedirs = "scripts venv .git .pytest_cache temp"
 | `METABOLIC_STORAGE_TYPE` | `auto` | metabolic_adapter |
 | `PIPELINE_MAX_WORKERS` | `8` | pipeline engine |
 | `PROVIDER_TIMEOUT` | `30` | provider_router |
-| `SEARXNG_URL` | `http://localhost:8005` | _search_sources.py |
+| `SEARXNG_URL` | `https://paulgo.io` | _search_sources.py |
 
 ```bash
 # Storage type (consumido pelo MetabolicDataAdapter e MemoryFirstRouter)

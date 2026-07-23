@@ -465,7 +465,7 @@ A implantação do SearXNG está no nível de infraestrutura de busca web, que �
 │  │  SearXNG (Docker)                                     │  │
 │  │  - Meta-buscador (Google+Bing+DDG)                    │  │
 │  │  - Circuit breaker                                    │  │
-│  │  - Status: ✅ ONLINE (localhost:4000)                 │  │
+│  │  - Status: ✅ ONLINE (paulgo.io)                 │  │
 │  └──────────────────────────────────────────────────────┘  │
 └─────────────────────────────────────────────────────────────┘
                             │
@@ -1098,7 +1098,7 @@ Input: "Como implementar autenticação com OAuth 2.1 PKCE em Next.js 2026?"
   │
   └─ [09:15:23.472] searxng_search() → INICIANDO BUSCA...
      ├─ Query expandida: "OAuth 2.1 PKCE Next.js authentication 2026 best practices"
-     ├─ SearXNG endpoint: http://localhost:4000/search?q=...&format=json
+     ├─ SearXNG endpoint: http://paulgo.io/search?q=...&format=json
      ├─ Engines: Google, Bing, DuckDuckGo
      └─ [09:15:24.891] ✅ 34 resultados encontrados
 

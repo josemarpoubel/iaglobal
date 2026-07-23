@@ -3751,7 +3751,7 @@ ESTIMATED_TOKENS_PER_EXAMPLE = 300
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│           SearXNG Instance (localhost:8005)                 │
+│           SearXNG Instance (paulgo.io)                 │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │  /search?q={query}&format=json&language=en           │   │
 │  │ → JSON: { results: [ {title, url, content, engine} ]}│   │
@@ -3790,7 +3790,7 @@ def _searxng_ttl() -> float:
 def searxng_search(query: str) -> str:
     import urllib.parse as _up
     
-    base = _searxng_base_url()  # http://localhost:8005
+    base = _searxng_base_url()  # http://paulgo.io
     q = _up.quote(query)
     
     # URL formatada
@@ -3858,10 +3858,10 @@ return "\n\n".join(lines)
 **Variável de Ambiente**:
 ```bash
 # .env
-SEARXNG_URL=http://localhost:4000
+SEARXNG_URL=http://paulgo.io
 ```
 
-**Default**: `http://localhost:4000` (se não especificado)
+**Default**: `http://paulgo.io` (se não especificado)
 
 ### Comparação: SearXNG vs Outros Provedores
 
