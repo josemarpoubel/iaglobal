@@ -58,7 +58,6 @@ ruff
 safetensors==0.7.0
 scikit-learn
 scrapy
-sentence-transformers
 sentencepiece==0.2.1
 service-identity
 sqlalchemy
@@ -67,7 +66,6 @@ tensorboard==2.20.0
 tokenizers
 torch
 tqdm==4.67.3
-transformers==5.10.2
 triton==3.5.1
 twisted
 typing_extensions==4.15.0
