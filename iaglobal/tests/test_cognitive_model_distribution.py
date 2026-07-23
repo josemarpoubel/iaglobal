@@ -28,7 +28,7 @@ from iaglobal.agents.agent_base import AgentBase
 
 EXPECTED_ROLES = {
     CognitiveRole.JUIZ: {
-        "model_id": "yasserrmd/GLM4.7-Distill-LFM2.5-1.2B:latest",
+        "model_id": "qwen2.5:0.5b",
         "node_example": "critic",
     },
     CognitiveRole.OPERARIO: {
@@ -36,7 +36,7 @@ EXPECTED_ROLES = {
         "node_example": "coder",
     },
     CognitiveRole.SENTINELA: {
-        "model_id": "oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM",
+        "model_id": "qwen2.5:0.5b",
         "node_example": "sandbox_validator",
     },
 }
@@ -222,13 +222,13 @@ async def test_ollama_only_respects_model_param(monkeypatch):
     monkeypatch.setattr(pr, "_enrich_prompt_with_learned_knowledge", fake_enrich)
 
     result = await pr.async_route_generate(
-        model="ollama/yasserrmd/GLM4.7-Distill-LFM2.5-1.2B:latest",
+        model="ollama/qwen2.5:0.5b",
         prompt="test",
         node_id="critic",
     )
     assert result == "fake response"
     assert len(captured) == 1
-    assert "GLM4" in captured[0], f"Esperava GLM4 no model, obtido: {captured[0]}"
+    assert "qwen2.5" in captured[0], f"Esperava qwen2.5 no model, obtido: {captured[0]}"
 
 
 @pytest.mark.asyncio
@@ -319,13 +319,13 @@ async def test_async_route_generate_no_hardcoded_strings(monkeypatch):
     )
 
     result = await pr.async_route_generate(
-        model="ollama/oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM",
+        model="ollama/qwen2.5:0.5b",
         prompt="test",
         node_id="sandbox_validator",
     )
     assert result
-    assert captured and "lfm2.5" in captured[0].lower(), (
-        f"Esperava lfm2.5 no model, obtido: {captured}"
+    assert captured and "qwen2.5" in captured[0].lower(), (
+        f"Esperava qwen2.5 no model, obtido: {captured}"
     )
 
 

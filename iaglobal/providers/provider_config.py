@@ -24,15 +24,15 @@ class CognitiveRole(Enum):
 # e a rota de degradação graciosa (fallback_role).
 COGNITIVE_MODELS = {
     CognitiveRole.JUIZ: {
-        "model_id": "yasserrmd/GLM4.7-Distill-LFM2.5-1.2B:latest",
+        "model_id": "qwen2.5:0.5b",
         "type": "ollama",
-        "max_concurrent_requests": 1,
-        "tokens_per_minute_limit": 4096,
+        "max_concurrent_requests": 3,
+        "tokens_per_minute_limit": 8192,
         "priority_score": 1.0,
         "fallback_role": CognitiveRole.OPERARIO,
-        "timeout_seconds": 180,
-        "context_window": 4096,
-        "num_predict": 512,
+        "timeout_seconds": 60,
+        "context_window": 8192,
+        "num_predict": 2048,
     },
     CognitiveRole.OPERARIO: {
         "model_id": "qwen2.5:0.5b",
@@ -46,15 +46,15 @@ COGNITIVE_MODELS = {
         "num_predict": 2048,
     },
     CognitiveRole.SENTINELA: {
-        "model_id": "oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM",
+        "model_id": "qwen2.5:0.5b",
         "type": "ollama",
-        "max_concurrent_requests": 5,
-        "tokens_per_minute_limit": 15000,
+        "max_concurrent_requests": 3,
+        "tokens_per_minute_limit": 8192,
         "priority_score": 0.8,
         "fallback_role": None,
-        "timeout_seconds": 30,
-        "context_window": 4096,
-        "num_predict": 512,
+        "timeout_seconds": 60,
+        "context_window": 8192,
+        "num_predict": 2048,
     },
 }
 
