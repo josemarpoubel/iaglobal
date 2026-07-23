@@ -6,16 +6,15 @@ import logging
 
 from typing import Optional
 
-from iaglobal.providers.provider_config import ProviderConfig
+from iaglobal.providers.provider_config import (
+    ProviderConfig,
+    get_role_by_model_id,
+    get_model_config,
+)
 from iaglobal.providers.token_usage import TokenCollector
 
 logger = logging.getLogger("iaglobal.providers.ollama")
 
-# Lock compartilhado com bandit.py — apenas 1 inferência local por vez
-_OLLAMA_CPU_LOCK = asyncio.Semaphore(1)
-# Export para bandit.py usar o mesmo lock
-OLLAMA_CPU_LOCK = _OLLAMA_CPU_LOCK
-_ollama_semaphore = asyncio.Semaphore(4)
 _loaded_models: set[str] = set()
 
 # PATCH: Modelos quantizados menores para fallback
@@ -102,10 +101,28 @@ async def async_generate(
 
     base_url = ProviderConfig.OLLAMA_URL.strip().rstrip("/")
     system_msg = "Always respond in English. If it's code, use the appropriate language (HTML, Python, etc)."
-    # Optimized parameters for qwen2.5:0.5b:
+
+    role = get_role_by_model_id(model)
+    model_config = get_model_config(role) if role else None
+    num_predict = model_config.get("num_predict", 1024) if model_config else 1024
+    num_ctx = model_config.get("context_window", 4096) if model_config else 4096
+    # Optimized parameters for small local models:
     # - temperature=0.1 → deterministic, avoids syntax hallucination
-    # - num_ctx=4096    → attention window compatible with small model
-    ollama_options = {"temperature": 0.1, "num_ctx": 4096, "keep_alive": "10m"}
+    # - num_ctx → attention window, configurável por modelo via provider_config
+    # - num_predict → limite de geração, configurável por modelo via provider_config
+    # - keep_alive → mantém modelo na RAM por 10 minutos
+    ollama_options = {
+        "temperature": 0.1,
+        "num_ctx": num_ctx,
+        "num_predict": num_predict,
+        "keep_alive": "10m",
+    }
+    logger.info(
+        "[OLLAMA] model=%s num_ctx=%d num_predict=%d",
+        model,
+        num_ctx,
+        num_predict,
+    )
     endpoints_payloads = [
         (
             urljoin(base_url + "/", "v1/chat/completions"),
@@ -146,59 +163,55 @@ async def async_generate(
     last_error = None
     import aiohttp
 
-    async with _ollama_semaphore:
-        session = await get_session()
-        for url, payload in endpoints_payloads:
-            print(f"  📡 Ollama async: {url} model={payload.get('model', '?')}")
-            try:
-                async with session.post(
-                    url,
-                    json=payload,
-                    headers={"Content-Type": "application/json"},
-                    timeout=aiohttp.ClientTimeout(total=timeout),
-                ) as resp:
-                    text = await resp.text()
-                    print(
-                        f"  📡 Ollama async: {url} -> {resp.status} ({len(text)} bytes)"
-                    )
-                    if resp.status != 200:
-                        last_error = f"HTTP {resp.status}"
-                        continue
-                    data = json.loads(text)
+    session = await get_session()
+    for url, payload in endpoints_payloads:
+        print(f"  📡 Ollama async: {url} model={payload.get('model', '?')}")
+        try:
+            async with session.post(
+                url,
+                json=payload,
+                headers={"Content-Type": "application/json"},
+                timeout=aiohttp.ClientTimeout(total=timeout),
+            ) as resp:
+                text = await resp.text()
+                print(f"  📡 Ollama async: {url} -> {resp.status} ({len(text)} bytes)")
+                if resp.status != 200:
+                    last_error = f"HTTP {resp.status}"
+                    continue
+                data = json.loads(text)
 
-                    # Extrair token usage (Ollama retorna em formatos diferentes)
-                    if token_collector:
-                        if "usage" in data:
-                            pt = data["usage"].get("prompt_tokens", 0)
-                            ct = data["usage"].get("completion_tokens", 0)
-                            if pt or ct:
-                                token_collector(pt, ct)
-                        elif "prompt_eval_count" in data:
-                            pt = data.get("prompt_eval_count", 0)
-                            ct = data.get("eval_count", 0)
-                            if pt or ct:
-                                token_collector(pt, ct)
+                if token_collector:
+                    if "usage" in data:
+                        pt = data["usage"].get("prompt_tokens", 0)
+                        ct = data["usage"].get("completion_tokens", 0)
+                        if pt or ct:
+                            token_collector(pt, ct)
+                    elif "prompt_eval_count" in data:
+                        pt = data.get("prompt_eval_count", 0)
+                        ct = data.get("eval_count", 0)
+                        if pt or ct:
+                            token_collector(pt, ct)
 
-                    if "choices" in data:
-                        result = data["choices"][0]["message"]["content"].strip()
-                    elif "message" in data:
-                        result = data["message"]["content"].strip()
-                    elif "response" in data:
-                        result = data["response"].strip()
-                    else:
-                        last_error = "Formato de resposta desconhecido"
-                        continue
-                    if result:
-                        return result
-            except asyncio.TimeoutError:
-                print(f"  ⏱️ Ollama async timeout: {url}")
-                last_error = f"Timeout ({timeout}s)"
-                continue
-            except aiohttp.ClientConnectorError:
-                raise RuntimeError(f"Ollama não acessível em {base_url}.")
-            except Exception as e:
-                last_error = str(e)
-                continue
+                if "choices" in data:
+                    result = data["choices"][0]["message"]["content"].strip()
+                elif "message" in data:
+                    result = data["message"]["content"].strip()
+                elif "response" in data:
+                    result = data["response"].strip()
+                else:
+                    last_error = "Formato de resposta desconhecido"
+                    continue
+                if result:
+                    return result
+        except asyncio.TimeoutError:
+            print(f"  ⏱️ Ollama async timeout: {url}")
+            last_error = f"Timeout ({timeout}s)"
+            continue
+        except aiohttp.ClientConnectorError:
+            raise RuntimeError(f"Ollama não acessível em {base_url}.")
+        except Exception as e:
+            last_error = str(e)
+            continue
     raise RuntimeError(f"Ollama endpoints falharam: {last_error}")
 
 

@@ -163,6 +163,77 @@ _WEB_INDICATORS: frozenset[str] = frozenset(
         "rabbitmq",
         "kafka",
         "celery",
+        # ── Portuguese task-oriented indicators ──
+        "como criar",
+        "como fazer",
+        "como implementar",
+        "como construir",
+        "como construir",
+        "como desenvolver",
+        "como usar",
+        "como configurar",
+        "como instalar",
+        "como deploy",
+        "como publicar",
+        "tutorial",
+        "guia",
+        "passo a passo",
+        "exemplo",
+        "exemplo de código",
+        "código fonte",
+        "código exemplo",
+        "site",
+        "página web",
+        "frontend",
+        "backend",
+        "aplicação",
+        "aplicacao",
+        "sistema",
+        "ferramenta",
+        "biblioteca",
+        "framework",
+        "linguagem",
+        "programação",
+        "programacao",
+        "função",
+        "funcao",
+        "classe",
+        "método",
+        "metodo",
+        "função",
+        "algoritmo",
+        "estrutura de dados",
+        "banco de dados",
+        "sql",
+        "consulta",
+        "query",
+        "autenticação",
+        "autenticacao",
+        "autorização",
+        "autorizacao",
+        "upload",
+        "download",
+        "notificação",
+        "notificacao",
+        "email",
+        "relatório",
+        "relatorio",
+        "pdf",
+        "csv",
+        "json",
+        "xml",
+        "formulário",
+        "formulario",
+        "validação",
+        "validacao",
+        "criptografia",
+        "segurança",
+        "seguranca",
+        "teste unitário",
+        "teste unitario",
+        "teste de integração",
+        "teste de integracao",
+        "mock",
     }
 )
 
@@ -364,6 +435,48 @@ class SearchMiddleware:
     # ══════════════════════════════════════════════════════════════════
 
     @classmethod
+    def _is_portuguese_query(cls, prompt: str) -> bool:
+        """Heurística para detectar query em português natural.
+
+        Retorna True se o prompt contém palavras típicas de consulta
+        em português que indicam necessidade de informação externa.
+        """
+        lower = prompt.lower()
+        pt_query_words = {
+            "como",
+            "qual",
+            "quais",
+            "onde",
+            "quando",
+            "quanto",
+            "por que",
+            "porque",
+            "para que",
+            "o que é",
+            "o que e",
+            "existe",
+            "existem",
+            "preciso",
+            "precisa",
+            "quero",
+            "gostaria",
+            "pode",
+            "poderia",
+            "tem como",
+            "há como",
+            "ha como",
+            "melhor",
+            "pior",
+            "diferença",
+            "diferenca",
+            "entre",
+            "versus",
+            "vs",
+        }
+        words = set(lower.split())
+        return bool(words & pt_query_words)
+
+    @classmethod
     def _needs_web_search(cls, prompt: str, node_id: str) -> bool:
         """
         Decide se o prompt requer busca web externa.
@@ -371,14 +484,19 @@ class SearchMiddleware:
         Compara contagem de indicadores web vs indicadores de tarefa interna
         usando frozensets pré-compilados (compilados uma vez no módulo).
 
+        Agora também detecta consultas em português natural, garantindo que
+        prompts como "como criar um site com flask" disparem busca mesmo sem
+        os indicadores web técnicos tradicionais.
+
         Retorna True se há evidência de que informação externa é necessária.
         """
         prompt_lower = prompt.lower()
 
         web_score = sum(1 for ind in _WEB_INDICATORS if ind in prompt_lower)
         internal_score = sum(1 for ind in _INTERNAL_INDICATORS if ind in prompt_lower)
+        is_pt = cls._is_portuguese_query(prompt)
 
-        if internal_score > web_score:
+        if internal_score > web_score and not is_pt:
             logger.debug(
                 "[SEARCH] Task INTERNA: web=%d internal=%d | agent=%s",
                 web_score,
@@ -387,12 +505,13 @@ class SearchMiddleware:
             )
             return False
 
-        if web_score >= 1:
+        if web_score >= 1 or is_pt:
             matched = [ind for ind in _WEB_INDICATORS if ind in prompt_lower][:5]
             logger.debug(
-                "[SEARCH] Task WEB: web=%d internal=%d | matches=%s | agent=%s",
+                "[SEARCH] Task WEB: web=%d internal=%d pt=%s | matches=%s | agent=%s",
                 web_score,
                 internal_score,
+                is_pt,
                 matched,
                 node_id,
             )
@@ -472,6 +591,13 @@ class SearchMiddleware:
             with DDGS() as ddgs:
                 results = list(ddgs.text(query, max_results=cls._WEB_MAX_RESULTS * 2))
                 validated = validator.filter_by_score(results, min_score=0.6)
+
+            # Fallback: if validation returns nothing, use unvalidated results
+            if not validated:
+                logger.debug(
+                    "[SEARCH] Validação retornou vazio — usando resultados brutos"
+                )
+                validated = results[: cls._WEB_MAX_RESULTS]
 
             lines: list[str] = []
             for r in validated[: cls._WEB_MAX_RESULTS]:
@@ -718,6 +844,66 @@ class SearchMiddleware:
         return "\n".join(parts)
 
     # ══════════════════════════════════════════════════════════════════
+    # Python-driven result processing
+    # ══════════════════════════════════════════════════════════════════
+
+    @classmethod
+    def _process_results_with_python(cls, raw_context: str) -> str:
+        """Processa resultados de busca com Python antes da injeção.
+
+        Extrai blocos de código, URLs, e fatos-chave do texto bruto,
+        produzindo um resumo estruturado em vez de snippets soltos.
+        Executado em-process — sem subprocesso — para manter latência baixa.
+
+        Pode ser refatorado futuramente para rodar via SandboxExecutor
+        se o processamento se tornar muito complexo.
+        """
+        import json
+        import re
+
+        if not raw_context:
+            return ""
+
+        # ── 1. Extrai blocos de código ──
+        code_blocks: list[dict] = []
+        for match in re.finditer(r"```(\w*)\n(.*?)```", raw_context, re.DOTALL):
+            lang = match.group(1) or "text"
+            code = match.group(2).strip()
+            if len(code) > 20:
+                code_blocks.append({"lang": lang, "code": code})
+
+        # ── 2. Extrai URLs ──
+        urls = list(dict.fromkeys(re.findall(r"https?://[^\s)>\"']+", raw_context)))
+
+        # ── 3. Extrai bullet points com score ──
+        bullets: list[str] = []
+        for line in raw_context.split("\n"):
+            stripped = line.strip()
+            if stripped.startswith("- ") and len(stripped) > 30:
+                bullets.append(stripped[2:].split("(score=")[0].strip()[:200])
+
+        # ── 4. Monta saída estruturada ──
+        parts: list[str] = []
+
+        if bullets:
+            parts.append("## Fatos")
+            for b in bullets[:6]:
+                parts.append(f"- {b}")
+
+        if code_blocks:
+            parts.append("## Código Relevante")
+            for cb in code_blocks[:3]:
+                label = cb["lang"].capitalize() if cb["lang"] != "text" else "Código"
+                parts.append(f"```{cb['lang']}\n{cb['code']}\n```")
+
+        if urls:
+            parts.append("## Referências")
+            for u in urls[:5]:
+                parts.append(f"- {u}")
+
+        return "\n\n".join(parts)
+
+    # ══════════════════════════════════════════════════════════════════
     # Sanitização
     # ══════════════════════════════════════════════════════════════════
 
@@ -846,11 +1032,17 @@ class SearchMiddleware:
             logger.debug("[SEARCH] %s: sem resultados web/RAG", node_id)
             return prompt
 
-        # ── 7. Síntese opcional (FASE 4) ───────────────────────────
-        if cls._enable_synthesis:
-            raw_context = await cls._synthesize_context(raw_context)
+        # ── 7. Processa com Python antes da injeção ────────────────
+        processed = await asyncio.to_thread(
+            cls._process_results_with_python, raw_context
+        )
+        context_to_inject = processed if processed else raw_context
 
-        enriched = cls._inject(prompt, raw_context)
+        # ── 8. Síntese opcional (FASE 4) ───────────────────────────
+        if cls._enable_synthesis:
+            context_to_inject = await cls._synthesize_context(context_to_inject)
+
+        enriched = cls._inject(prompt, context_to_inject)
         added_chars = len(enriched) - len(prompt)
         logger.info(
             "[SEARCH_MIDDLEWARE] %s: +%d chars | queries=%d | hash=%s",

@@ -25,9 +25,11 @@ async def run_knowledge_writer(ctx: Dict[str, Any]) -> Dict[str, Any]:
             continue
         if isinstance(artifact, str) and artifact.strip():
             code = artifact
+            _found_in = source
             break
         if hasattr(artifact, "code") and artifact.code:
             code = artifact.code
+            _found_in = source
             break
 
     if not task_str and not code:
@@ -37,8 +39,13 @@ async def run_knowledge_writer(ctx: Dict[str, Any]) -> Dict[str, Any]:
     try:
         agent = KnowledgeWriterAgent()
         if code:
+            logger.info(
+                "[KNOWLEDGE_WRITER] Aprendendo de source=%s len=%d",
+                _found_in,
+                len(code),
+            )
             result = agent.learn_from_conversation(
-                prompt=task_str, response=code, source="pipeline"
+                prompt=task_str, response=code, source=_found_in
             )
         else:
             result = agent.learn_from_text(task_str, source="pipeline")

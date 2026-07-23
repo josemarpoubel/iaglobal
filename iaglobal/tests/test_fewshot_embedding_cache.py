@@ -93,7 +93,6 @@ def test_get_or_compute_embedding_caches(provider_with_cache):
         assert emb1 == emb2
 
 
-@pytest.mark.skip(reason="Slow - requer sentence-transformers")
 def test_preload_embeddings(provider_with_cache):
     """Preload carrega modelo e cacheia exemplos."""
     start = time.time()
@@ -202,3 +201,7 @@ async def test_ingest_dlq_appears_in_format(provider_dlq, dlq_quarantine):
     section = result.section
     assert "❌" in section
     assert "a evitar" in section
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v", "-x"])

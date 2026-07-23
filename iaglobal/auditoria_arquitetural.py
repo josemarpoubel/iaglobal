@@ -172,8 +172,10 @@ _KNOWN_DISTINCT: Dict[str, str] = {
     "evolution=Replay Evolutivo | "
     "cognition.awareness=Estado Cognitivo",
     "ProviderRegistry": "DEPRECATED — use LLMProviderRegistry (providers.contract) ou ContextProviderRegistry (pipeline.context)",
-    "LLMProviderRegistry": "providers.contract=Registry de LLM Providers (Groq, NVIDIA, Ollama, etc.)",
-    "ContextProviderRegistry": "pipeline.context=Registry de ContextProviders por nó do pipeline",
+    "LLMProviderRegistry": "providers.contract=Registry de LLM Providers (Groq, NVIDIA, Ollama, etc.) — CANÔNICO",
+    "ContextProviderRegistry": "pipeline.context=Registry de ContextProviders por nó do pipeline — CANÔNICO",
+    "registry": "DEPRECATED alias — use llm_provider_registry (providers.contract)",
+    "provider_registry": "DEPRECATED alias — use context_provider_registry (pipeline.context)",
     "FusionEngine": "genesis=Fusão Genética | memory=Fusão de Memórias",
     "RewardAggregator": "evolution=Recompensa Evolutiva | "
     "feedback=Recompensa de Feedback",
@@ -202,10 +204,7 @@ _COLLISION_VOCABULARY: Dict[str, str] = {
     # - MCPPlaceholder → módulo compartilhado (mcp/placeholder.py)
     # - RuleResult → unificado (importado de semantic_validator.py)
     # - verify_genesis_integrity → verify_genesis_blueprint_consistency (certify_block.py)
-    # Pendente (alto risco — requer testes):
-    "SemanticValidatorAgent": "agents.semantic_validator=Sequencial, sem timeout | "
-    "agents.validator=Paralelo, timeout, fail-fast (substitui o original) | "
-    "→ consolidar: validator.py substitui ou estende semantic_validator.py",
+    # - SemanticValidatorAgent → validator.py deprecated; uso unificado em semantic_validator.py
 }
 
 _GENERIC_NAMES = {"Config", "Manager", "Handler", "Provider", "Base", "Error"}

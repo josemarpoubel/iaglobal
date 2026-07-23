@@ -46,3 +46,7 @@ class PipelineState:
     intent: TaskIntent = TaskIntent.GENERAL
 
     execution_context: Any = None
+
+    execution_report: Optional[Dict[str, Any]] = None
+
+    chosen_model: Optional[str] = None

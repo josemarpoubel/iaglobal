@@ -39,17 +39,30 @@ async def run_qa(ctx: Dict[str, Any]) -> Dict[str, Any]:
         # (LocalSummarizer dentro de avaliar() comprime o output antes do LLM)
         agent = CriticAgent()
         result = await agent.avaliar(task, prompt, output)
-        logger.info("[QA] Avaliação finalizada. Resultado estruturado com sucesso.")
 
         latency_ms = (time.time() - start_time) * 1000.0
 
-        # Considera sucesso de QA se o agente conseguiu emitir um veredito válido
+        # Valida o contrato do Critic antes de registrar sucesso
         is_success = isinstance(result, dict) and "approved" in result
+        if is_success:
+            logger.info("[QA] Avaliação concluída. approved=%s", result.get("approved"))
+        else:
+            logger.warning(
+                "[QA] Critic retornou resposta sem campo 'approved'. keys=%s",
+                list(result.keys()) if isinstance(result, dict) else None,
+            )
 
         # Retorno higienizado cumprindo estritamente as Regras 1, 3 e 5 do AGENTS.md
         return {
             "output": result.get("feedback", "QA finalizado"),
-            "qa": result,
+            "qa": result
+            if is_success
+            else {
+                "approved": False,
+                "structured": False,
+                "error": "critic_missing_verdict",
+                "critic_result": result,
+            },
             "execution_metrics": {
                 "model": resolved_model,
                 "success": is_success,

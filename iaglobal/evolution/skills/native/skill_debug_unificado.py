@@ -15,7 +15,6 @@ from typing import List
 
 from iaglobal.evolution.skills.native.skill import Skill
 from iaglobal.models.task import Task
-from iaglobal.agents.debugger_agent import DebuggerAgent
 from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.skills.debug_unificado")
@@ -43,7 +42,7 @@ class SkillDebugUnificado(Skill):
             tags=["debug", "correction", "lsp", "self-healing"],
             version="1.0.0",
         )
-        self.debugger_agent = DebuggerAgent(max_attempts=3)
+        self.debugger_agent = None
 
     async def execute(self, task: Task) -> str:
         """
@@ -85,6 +84,10 @@ class SkillDebugUnificado(Skill):
 
         # Sem erro de sintaxe → tenta execução normal com DebuggerAgent
         logger.info("[SKILL-DEBUG] Sem erro de sintaxe → execução normal")
+        if self.debugger_agent is None:
+            from iaglobal.agents.debugger_agent import DebuggerAgent
+
+            self.debugger_agent = DebuggerAgent(max_attempts=3)
         result = await self.debugger_agent.run(task)
 
         elapsed = time.time() - start
@@ -122,6 +125,10 @@ class SkillDebugUnificado(Skill):
         )
 
         # Usa _repair_code diretamente com o erro LSP
+        if self.debugger_agent is None:
+            from iaglobal.agents.debugger_agent import DebuggerAgent
+
+            self.debugger_agent = DebuggerAgent(max_attempts=3)
         repaired_code, model_used = await self.debugger_agent._repair_code(
             task=fake_task,
             code=code,

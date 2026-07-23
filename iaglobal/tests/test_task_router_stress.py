@@ -130,18 +130,20 @@ class TestTokenBucketStress:
 
     @pytest.mark.asyncio
     async def test_glm4_bucket_capacity(self, token_gate_instance):
-        """Bucket glm4 deve aceitar 2 aquisições consecutivas (capacity=2)."""
+        """Bucket glm4 deve aceitar 4 aquisições consecutivas (capacity=4)."""
         gate = token_gate_instance
-        # no_critic → tier glm4 (capacity=2)
+        # no_critic → tier glm4 (capacity=4)
         results = []
-        for i in range(3):
+        for i in range(5):
             allowed = await gate.try_acquire("no_critic")
             results.append(allowed)
 
-        # Primeiros 2 devem passar, 3º deve falhar
+        # Primeiros 4 devem passar, 5º deve falhar
         assert results[0] == True, "First glm4 acquire should pass"
         assert results[1] == True, "Second glm4 acquire should pass"
-        assert results[2] == False, "Third glm4 acquire should fail (bucket empty)"
+        assert results[2] == True, "Third glm4 acquire should pass"
+        assert results[3] == True, "Fourth glm4 acquire should pass"
+        assert results[4] == False, "Fifth glm4 acquire should fail (bucket empty)"
 
     @pytest.mark.asyncio
     async def test_qwen_bucket_capacity(self, token_gate_instance):
@@ -192,7 +194,7 @@ class TestCongestionAlerts:
         """Alerta de congestão deve ser disparado quando bucket atinge limite."""
         gate = token_gate_instance
 
-        # Enche bucket glm4 (capacidade 2) até disparar alerta
+        # Enche bucket glm4 (capacidade 4) até disparar alerta
         alerts_received = []
 
         def capture_alert(msg):
@@ -203,15 +205,15 @@ class TestCongestionAlerts:
 
         bus.subscribe("tier_congestion_alert", capture_alert)
 
-        # Dispara aquisições até encher
-        for i in range(5):
+        # Dispara aquisições até gerar rejeições suficientes para alerta
+        for i in range(7):
             await gate.try_acquire("no_critic")
             await asyncio.sleep(0.1)  # Aguarda evento ser processado
 
         # Verifica se alerta foi disparado (pode demorar um pouco)
         await asyncio.sleep(0.5)
 
-        # bucket glm4 capacity=2, alerta dispara após 70% rejeições = ~2 rejeições
+        # bucket glm4 capacity=4, alerta dispara após >=70% rejeições => >=3 rejeições
         assert gate._alerts_fired.get("glm4", 0) >= 1, (
             "Congestion alert should be fired for glm4"
         )
@@ -293,8 +295,8 @@ class TestConcurrentLoad:
         # Buckets não devem permitir mais que capacity
         # Nota: Como é singleton, buckets podem estar vazios de testes anteriores
         # Então testamos que NÃO excede capacity
-        assert glm4_successes <= 2, (
-            f"glm4 should have max 2 successes, got {glm4_successes}"
+        assert glm4_successes <= 4, (
+            f"glm4 should have max 4 successes, got {glm4_successes}"
         )
         assert qwen_successes <= 6, (
             f"qwen should have max 6 successes, got {qwen_successes}"
@@ -363,7 +365,7 @@ class TestHomeostaticDegradation:
         assert "lfm" in gate.buckets
 
         # Verifica capacidades
-        assert gate.buckets["glm4"].capacity == 2
+        assert gate.buckets["glm4"].capacity == 4
         assert gate.buckets["qwen"].capacity == 6
         assert gate.buckets["lfm"].capacity == 8
 

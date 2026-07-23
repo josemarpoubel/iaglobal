@@ -29,8 +29,10 @@ class TestSkillExistence:
         from iaglobal.evolution.skills.native.skill_debug_unificado import (
             SkillDebugUnificado,
         )
+        from iaglobal.agents.debugger_agent import DebuggerAgent
 
         skill = SkillDebugUnificado()
+        skill.debugger_agent = DebuggerAgent(max_attempts=1)
         ast_gw = skill.debugger_agent.ast_gateway
         assert isinstance(ast_gw, ASTGateway)
         result = ast_gw.parse("def foo(): pass")

@@ -455,7 +455,7 @@ def test_effective_agent_in_bandit_generate(monkeypatch, bandit_module):
 
     orig_acquire = bandit_module.BanditPolicy.acquire_model
 
-    async def _fake_acquire(self, model_name, node_id=""):
+    async def _fake_acquire(self, model_name, node_id="", execution_id=""):
         return True
 
     monkeypatch.setattr(bandit_module.BanditPolicy, "acquire_model", _fake_acquire)

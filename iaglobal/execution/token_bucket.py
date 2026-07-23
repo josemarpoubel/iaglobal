@@ -73,8 +73,11 @@ class LocalModelGate:
     }
 
     # Capacidades por tier do ROADMAP_2
+    # glm4=4 porque 2 slots são insuficientes com 20+ agentes concorrentes:
+    # cada inferência local leva 30-60s, então 2 slots geram fila de 18+
+    # agentes que estouram timeout e entram em retry espiral.
     BUCKET_CAPACITY: ClassVar[dict[str, int]] = {
-        "glm4": 2,  # Juiz: processamento crítico, 1 por vez
+        "glm4": 4,  # Juiz: processamento crítico, 4 em lote
         "qwen": 6,  # Operário: fluxo principal, throughput moderado
         "lfm": 8,  # Sentinela: monitor+validation rápido, paralelismo máximo
     }
@@ -86,11 +89,16 @@ class LocalModelGate:
         self.router = TaskRouter()
 
         # Buckets independentes por tier
+        # fill_rate = capacity (refil completo em 1s) para que o único
+        # limitante seja max_concurrent (slots de concorrência), não o
+        # refil lento de tokens. fill_rate anterior (capacity/60 = 0.067
+        # tok/s) criava um gargalo de 1 request a cada 15s mesmo com
+        # slots ociosos, porque tokens não são restaurados em release().
         self.buckets: Dict[str, TokenBucket] = {}
         for tier in self.BUCKET_CAPACITY:
             self.buckets[tier] = TokenBucket(
                 capacity=self.BUCKET_CAPACITY[tier],
-                fill_rate=self.BUCKET_CAPACITY[tier] / 60.0,  # 1 tok/s
+                fill_rate=self.BUCKET_CAPACITY[tier],  # refil completo em 1s
                 max_concurrent=self.BUCKET_CAPACITY[tier],
             )
 
@@ -131,20 +139,42 @@ class LocalModelGate:
                 return prio
         return 0.35  # default baixo — fail-safe
 
-    async def release(self, node_id: str) -> None:
-        """Libera slot no bucket do tier do node_id."""
-        tier = self._get_tier_from_node(node_id)
+    async def release(self, node_id: str, model_name: str = "") -> None:
+        """Libera slot no bucket do tier do node_id.
+
+        Se model_name for fornecido, o tier é derivado do modelo em vez do
+        node_id, mantendo consistência com try_acquire().
+        """
+        tier = (
+            self._tier_from_model(model_name)
+            if model_name
+            else self._get_tier_from_node(node_id)
+        )
         bucket = self.buckets.get(tier)
         if bucket:
             await bucket.release()
 
-    async def try_acquire(self, node_id: str) -> bool:
+    @staticmethod
+    def _tier_from_model(model_name: str) -> str:
+        """Deriva o tier cognitivo a partir do nome do modelo."""
+        if "glm4" in model_name:
+            return "glm4"
+        if "lfm" in model_name:
+            return "lfm"
+        return "qwen"
+
+    async def try_acquire(self, node_id: str, model_name: str = "") -> bool:
         """Tenta adquirir um slot no bucket do tier do node_id.
 
-        Retorna True se adquirido, False se deve usar synthetic_success (fallback).
-        Se rejeição por tier > 70%, dispara um sinal de “altamente congestionado”.
+        Se model_name for fornecido, o tier é derivado do modelo (e não do
+        node_id), permitindo que um agente critic use o bucket qwen quando
+        estiver requisitando o modelo qwen (fallback).
         """
-        tier = self._get_tier_from_node(node_id)
+        tier = (
+            self._tier_from_model(model_name)
+            if model_name
+            else self._get_tier_from_node(node_id)
+        )
         bucket = self.buckets.get(tier)
         if not bucket:
             # Em caso de tier desconhecido, assume fall back (sem aquisição)
@@ -153,9 +183,17 @@ class LocalModelGate:
         # priority retido para uso futuro (circuit breaker por tier);
         # o BucketManager.TokenBucket controla concorrência por capacidade.
         _ = self.get_priority(node_id)
+
+        # Timeout dependente do tier cognitivo:
+        # - glm4 (Juiz): inferência de 30-60s, precisa de fila longa
+        # - qwen (Operário): throughput médio, fila moderada
+        # - lfm (Sentinela): rápido, fila curta
+        tier_timeout: dict[str, float] = {"glm4": 30.0, "qwen": 10.0, "lfm": 5.0}
+        _timeout = tier_timeout.get(tier, 5.0)
+
         acquired = await bucket.acquire(
             estimated_tokens=1,
-            timeout=0.5,  # timeout curto — proxy para queue sem bloqueio
+            timeout=_timeout,
         )
 
         # Registrar rejeição para métricas

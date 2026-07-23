@@ -31,9 +31,7 @@ def _topology_nodes() -> set[str]:
     return nodes
 
 
-def _topological_sort(
-    nodes: set[str], deps: dict[str, list[str]]
-) -> list[str]:
+def _topological_sort(nodes: set[str], deps: dict[str, list[str]]) -> list[str]:
     in_degree = {n: 0 for n in nodes}
     for node in deps:
         if node in in_degree:

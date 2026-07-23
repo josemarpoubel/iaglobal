@@ -77,8 +77,18 @@ async def run_backend_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 len(code_output),
             )
         else:
+            _preview = (code_output or "")[:200]
+            _len = len(code_output or "")
+
+            from iaglobal.utils.generation_classifier import classify_generation
+
+            _kind = classify_generation(code_output or "")
             logger.warning(
-                "[BACKEND_BUILDER] Geração retornou código vazio ou inválido."
+                "[BACKEND_BUILDER] Geração retornou código vazio ou inválido. "
+                "len=%d kind=%s preview=%s",
+                _len,
+                _kind.value,
+                _preview,
             )
 
         latency_ms = (time.time() - start_time) * 1000.0

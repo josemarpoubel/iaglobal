@@ -126,7 +126,7 @@ class TestLocalModelGate:
         assert "lfm" in gate.buckets
 
         # Capacidades corretas
-        assert gate.buckets["glm4"].capacity == 2
+        assert gate.buckets["glm4"].capacity == 4
         assert gate.buckets["qwen"].capacity == 6
         assert gate.buckets["lfm"].capacity == 8
 

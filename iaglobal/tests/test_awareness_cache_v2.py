@@ -30,19 +30,28 @@ class TestCausalAwareness:
         cache = AwarenessCache()
         execution_id = "exec_causal_1"
 
-        # Setup: architect → coder (coder depende de architect)
+        # Setup: architect BLOCKED → planner COMPLETED
+        # coder BLOCKED → architect (BLOCKED)
+        await cache.publish(
+            execution_id=execution_id,
+            node_id="planner",
+            status=NodeStatus.COMPLETED.value,
+            summary="Plano pronto",
+            domain=NodeDomain.PLANNING.value,
+        )
         await cache.publish(
             execution_id=execution_id,
             node_id="architect",
-            status=NodeStatus.COMPLETED.value,
-            summary="Schema pronto",
+            status=NodeStatus.BLOCKED.value,
+            summary="Aguardando plano",
             domain=NodeDomain.ARCHITECTURE.value,
+            depends_on=["planner"],
         )
         await cache.publish(
             execution_id=execution_id,
             node_id="coder",
             status=NodeStatus.BLOCKED.value,
-            summary="Aguardando schema",
+            summary="Aguardando architect",
             domain=NodeDomain.CODING.value,
             depends_on=["architect"],
         )
@@ -51,12 +60,10 @@ class TestCausalAwareness:
         chains = await cache.snapshot(execution_id, relevance="blocking")
 
         assert isinstance(chains, list)
-        assert len(chains) == 1
-        chain = chains[0]
-        assert isinstance(chain, CausalChain)
-        assert chain.blocked_node == "coder"
-        assert chain.depth >= 1
-        assert "architect" in chain.blocking_chain or chain.root_cause == "architect"
+        assert len(chains) == 2  # architect e coder estão blocked
+        coder_chain = [c for c in chains if c.blocked_node == "coder"][0]
+        assert isinstance(coder_chain, CausalChain)
+        assert "architect" in coder_chain.blocking_chain
 
         await cache.close()
 
@@ -101,14 +108,12 @@ class TestCausalAwareness:
         chains = await cache.snapshot(execution_id, relevance="blocking")
 
         assert len(chains) == 3  # architect, coder, tester bloqueados
-        # Verifica que tester tem cadeia completa
+        # Verifica que tester tem cadeia até architect (planner é COMPLETED)
         tester_chain = next(c for c in chains if c.blocked_node == "tester")
         assert "coder" in tester_chain.blocking_chain
         assert "architect" in tester_chain.blocking_chain
-        assert (
-            "planner" in tester_chain.blocking_chain
-            or tester_chain.root_cause == "planner"
-        )
+        assert "planner" not in tester_chain.blocking_chain  # planner é COMPLETED
+        assert tester_chain.root_cause == "architect"
 
         await cache.close()
 
@@ -147,7 +152,7 @@ class TestCausalAwareness:
         assert explanation is not None
         assert "coder" in explanation
         assert "architect" in explanation
-        assert "planner" in explanation
+        assert "planner" not in explanation  # planner é COMPLETED
 
         await cache.close()
 

@@ -14,7 +14,7 @@ Cobertura:
 
   Fase 2 — Integração com Agentes:
     - tool_caller_agent.py: ToolCallerAgent seleção e execução
-    - validation/engine.py: validate_mcp_call schema checking
+    - validation/validation_engine.py: validate_mcp_call schema checking
 
   Fase 3 — Segurança:
     - security/mcp_sandbox.py: MCPSandbox whitelist/rate-limit/audit
@@ -31,7 +31,7 @@ from pathlib import Path
 import pytest
 
 from iaglobal._paths import PROJECT_ROOT
-from iaglobal.validation.engine import FeedbackEngine
+from iaglobal.validation.validation_engine import FeedbackEngine
 from iaglobal.immunity.glutathione_guardrails import (
     GlutathioneGuardrails,
     MCP_RATE_LIMITS,
@@ -318,7 +318,7 @@ class TestToolCallerAgent:
 
 
 class TestValidationEngineMCP:
-    """validation/engine.py — validate_mcp_call schema checking."""
+    """validation/validation_engine.py — validate_mcp_call schema checking."""
 
     def test_valid_call_passes(self):
         engine = FeedbackEngine()

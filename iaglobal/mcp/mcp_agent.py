@@ -282,11 +282,15 @@ class MCPAgent:
         }
 
     def _get_ivm(self) -> float:
-        """Retorna o Índice de Viabilidade Metabólica atual (método auxiliar)."""
-        # Simulação: IVM baseado em invariantes
+        """Retorna o Índice de Viabilidade Metabólica atual via IVMAxiom canônico."""
         try:
-            # Este método é chamado de forma síncrona no mcp_server.py
-            # Retorna valor padrão quando não há loop async
+            from iaglobal.chappie.ivm_axiom import get_ivm_axiom
+
+            ivm_axiom = get_ivm_axiom()
+            if ivm_axiom is not None:
+                ivm = ivm_axiom.get_ivm("mcp_agent")
+                if ivm is not None:
+                    return ivm
             return 0.85
         except Exception:
             return 0.5

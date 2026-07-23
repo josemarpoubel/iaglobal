@@ -112,13 +112,13 @@ def _search_urls(query: str, max_results: int = _MAX_RESULTS) -> list[str]:
         logger.debug("[URLS] DDGS falhou: %s", e)
 
     try:
-        from duckduckgo_search import DDGS
+        from ddgs import DDGS
 
         with DDGS() as ddgs:
             results = list(ddgs.text(query, max_results=max_results))
             return [r["href"] for r in results if r.get("href")]
     except Exception as e:
-        logger.debug("[URLS] duckduckgo_search falhou: %s", e)
+        logger.debug("[URLS] ddgs fallback falhou: %s", e)
 
     return []
 

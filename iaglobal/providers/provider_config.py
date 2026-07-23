@@ -30,7 +30,9 @@ COGNITIVE_MODELS = {
         "tokens_per_minute_limit": 4096,
         "priority_score": 1.0,
         "fallback_role": CognitiveRole.OPERARIO,
-        "timeout_seconds": 120,
+        "timeout_seconds": 180,
+        "context_window": 4096,
+        "num_predict": 512,
     },
     CognitiveRole.OPERARIO: {
         "model_id": "qwen2.5:0.5b",
@@ -40,6 +42,8 @@ COGNITIVE_MODELS = {
         "priority_score": 0.5,
         "fallback_role": None,
         "timeout_seconds": 60,
+        "context_window": 8192,
+        "num_predict": 2048,
     },
     CognitiveRole.SENTINELA: {
         "model_id": "oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM",
@@ -49,6 +53,8 @@ COGNITIVE_MODELS = {
         "priority_score": 0.8,
         "fallback_role": None,
         "timeout_seconds": 30,
+        "context_window": 4096,
+        "num_predict": 512,
     },
 }
 
@@ -95,7 +101,7 @@ _MAP = {
     "DEFAULT_OPENROUTER_MODEL": ("DEFAULT_OPENROUTER_MODEL", None),
     "DEFAULT_MISTRAL_MODEL": ("DEFAULT_MISTRAL_MODEL", None),
     "DEFAULT_GEMINI_MODEL": ("DEFAULT_GEMINI_MODEL", None),
-    "SEARXNG_URL": ("SEARXNG_URL", "http://localhost:4000"),
+    "SEARXNG_URL": ("SEARXNG_URL", "http://localhost:8005"),
 }
 
 

@@ -21,3 +21,5 @@ class PipelineResult:
     errors: List[str] = field(default_factory=list)
 
     script_path: Optional[str] = None
+
+    execution_report: Optional[Dict[str, Any]] = None

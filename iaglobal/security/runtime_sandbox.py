@@ -423,6 +423,18 @@ def _make_restricted_builtins(
     restricted["open"] = _block("open", agent_id, audit_logger)
 
     # 3. Copia builtins seguros do módulo original
+    # setattr/delattr/getattr/globals/vars/dir/open já foram substituídos acima;
+    # não sobrescrevê-los com o builtin original.
+    skip_names = {
+        "setattr",
+        "delattr",
+        "getattr",
+        "globals",
+        "vars",
+        "dir",
+        "open",
+        "__import__",
+    }
     safe_names = (
         "abs",
         "all",
@@ -436,7 +448,6 @@ def _make_restricted_builtins(
         "chr",
         "classmethod",
         "complex",
-        "delattr",
         "dict",
         "divmod",
         "enumerate",
@@ -470,7 +481,6 @@ def _make_restricted_builtins(
         "reversed",
         "round",
         "set",
-        "setattr",
         "slice",
         "sorted",
         "staticmethod",
@@ -484,6 +494,8 @@ def _make_restricted_builtins(
         "__name__",
     )
     for name in safe_names:
+        if name in skip_names:
+            continue
         if hasattr(_orig, name):
             restricted[name] = getattr(_orig, name)
 
@@ -511,8 +523,12 @@ def _blocked_introspection(name: str) -> Any:
                 if not k.startswith("__") and k not in BLOCKED_BUILTINS
             }
         if name == "vars":
-            obj = args[0] if args else sys._getframe(1)
-            d = vars(obj) if hasattr(obj, "__dict__") else {}
+            if args:
+                obj = args[0]
+                d = vars(obj) if hasattr(obj, "__dict__") else {}
+            else:
+                frame = sys._getframe(1)
+                d = frame.f_locals
             return {k: v for k, v in d.items() if not k.startswith("__")}
         if name == "dir":
             obj = args[0] if args else sys._getframe(1)

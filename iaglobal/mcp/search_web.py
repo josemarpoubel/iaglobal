@@ -49,7 +49,7 @@ class WebSearchTool:
         self, query: str, max_results: int
     ) -> list[dict[str, Any]]:
         try:
-            from duckduckgo_search import DDGS
+            from ddgs import DDGS
 
             with DDGS() as ddgs:
                 results = []

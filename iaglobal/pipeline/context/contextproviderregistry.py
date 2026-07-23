@@ -13,6 +13,7 @@ Uso:
 
 from __future__ import annotations
 
+import warnings
 from typing import Dict, Optional, Type
 
 from iaglobal.pipeline.context.protocol import (
@@ -73,15 +74,42 @@ class ProviderRegistry(ContextProviderRegistry):
     Alias de compatibilidade temporária.
 
     DEPRECATED: Use ContextProviderRegistry diretamente.
-    Será removido na versão 2.0.
+    Será removido quando não houver consumidores ativos.
+
+    Attributes:
+        __deprecated__: True (para ferramentas de análise estática)
+        __replacement__: "ContextProviderRegistry"
     """
 
-    pass
+    __deprecated__ = True
+    __replacement__ = "ContextProviderRegistry"
+
+    def __new__(cls, *args, **kwargs):
+        warnings.warn(
+            "ProviderRegistry is deprecated; use ContextProviderRegistry",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return super().__new__(cls)
 
 
 context_provider_registry = ContextProviderRegistry()
 
 provider_registry = context_provider_registry
+"""
+Alias de compatibilidade temporária.
+
+DEPRECATED: Use context_provider_registry diretamente.
+"""
+
+__all__ = [
+    "ContextProviderRegistry",
+    "context_provider_registry",
+    # Deprecated
+    "ProviderRegistry",
+    "provider_registry",
+    "register_provider",
+]
 
 
 def register_provider(node_name: str):

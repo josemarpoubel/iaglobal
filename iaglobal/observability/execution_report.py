@@ -8,187 +8,131 @@ para gerar relatório estruturado por execução.
 
 from __future__ import annotations
 
-import json
-import time
-from dataclasses import dataclass, field
-from pathlib import Path
-from typing import Any, Dict, List, Optional
+from dataclasses import dataclass
+from typing import Any, Dict, Optional
 
-from iaglobal.core.agent_roles import AgentRole
-from iaglobal.core.role_resolver import RoleResolver
-from iaglobal.providers.provider_metrics import metrics as provider_metrics
 from iaglobal.observability.execution_events import (
     ExecutionEvent,
     NODE_STARTED,
     NODE_FINISHED,
-    PROVIDER_SELECTED,
-    FALLBACK,
-    RETRY,
     get_event_bus,
 )
 
+# Optional import for semaphore health
+try:
+    from iaglobal.observability.semaphore_tracker import get_semaphore_tracker
+except Exception:  # pragma: no cover - optional
+    get_semaphore_tracker = None  # type: ignore
+
+# Global holder for current execution report
+_execution_report: Optional["ExecutionReport"] = None
+
 
 @dataclass
-class NodeRecord:
+class _NodeRecord:
     node: str
-    role: str
-    provider: Optional[str] = None
-    model: Optional[str] = None
-    latency_ms: float = 0.0
-    fallback_count: int = 0
-    retry_count: int = 0
-    status: str = "pending"
+    start_time: float = 0.0
+    status: str = "pending"  # pending, success, failed
+    latency: float = 0.0
     exception: Optional[str] = None
-    start_time: float = field(default_factory=time.time)
-    end_time: Optional[float] = None
-    provider_attempts: List[Dict[str, Any]] = field(default_factory=list)
 
 
 class ExecutionReport:
-    def __init__(self, execution_id: str, output_path: Optional[Path] = None) -> None:
+    def __init__(self, execution_id: str) -> None:
         self.execution_id = execution_id
-        self.started_at = time.time()
-        self.finished_at: Optional[float] = None
-        self.nodes: Dict[str, NodeRecord] = {}
-        self._output_path = output_path or Path("/tmp/iaglobal_execution_report.json")
-
-        # Subscribe to events
-        bus = get_event_bus()
-        bus.subscribe(NODE_STARTED, self._on_node_started)
-        bus.subscribe(NODE_FINISHED, self._on_node_finished)
-        bus.subscribe(PROVIDER_SELECTED, self._on_provider_selected)
-        bus.subscribe(FALLBACK, self._on_fallback)
-        bus.subscribe(RETRY, self._on_retry)
+        self.nodes: Dict[str, _NodeRecord] = {}
+        self._bus = get_event_bus()
+        self._bus.subscribe(NODE_STARTED, self._on_node_started)
+        self._bus.subscribe(NODE_FINISHED, self._on_node_finished)
 
     def _on_node_started(self, event: ExecutionEvent) -> None:
-        role = RoleResolver.resolve(event.node_id)
-        self.nodes[event.node_id] = NodeRecord(
-            node=event.node_id,
-            role=role.value,
-            start_time=event.timestamp,
-            status="running",
-        )
+        if event.execution_id != self.execution_id:
+            return
+        rec = self.nodes.get(event.node_id)
+        if rec is None:
+            rec = _NodeRecord(node=event.node_id)
+            self.nodes[event.node_id] = rec
+        rec.start_time = event.timestamp
 
     def _on_node_finished(self, event: ExecutionEvent) -> None:
-        rec = self.nodes.get(event.node_id)
-        if not rec:
+        if event.execution_id != self.execution_id:
             return
-        rec.end_time = event.timestamp
-        rec.latency_ms = (rec.end_time - rec.start_time) * 1000
-        rec.status = "success" if event.payload.get("success", False) else "failed"
+        rec = self.nodes.get(event.node_id)
+        if rec is None:
+            rec = _NodeRecord(node=event.node_id)
+            self.nodes[event.node_id] = rec
+        rec.status = "success" if event.payload.get("success") else "failed"
+        rec.latency = float(event.payload.get("latency", 0.0))
         rec.exception = event.payload.get("error")
 
-    def _on_provider_selected(self, event: ExecutionEvent) -> None:
-        rec = self.nodes.get(event.node_id)
-        if rec:
-            rec.provider = event.payload.get("provider")
-            rec.model = event.payload.get("model")
-            if "attempt" in event.payload:
-                rec.provider_attempts.append(event.payload["attempt"])
-
-    def _on_fallback(self, event: ExecutionEvent) -> None:
-        rec = self.nodes.get(event.node_id)
-        if rec:
-            rec.fallback_count += 1
-            if "attempt" in event.payload:
-                rec.provider_attempts.append(event.payload["attempt"])
-
-    def _on_retry(self, event: ExecutionEvent) -> None:
-        rec = self.nodes.get(event.node_id)
-        if rec:
-            rec.retry_count += 1
-
     def finish(self) -> Dict[str, Any]:
-        self.finished_at = time.time()
-        total_duration = (self.finished_at - self.started_at) * 1000
-
-        by_role: Dict[str, int] = {}
-        by_provider: Dict[str, int] = {}
-        llm_calls = 0
-        local_only = 0
-        fallbacks = 0
-        retries = 0
-        failures = 0
-
+        # Build summary
+        total = len(self.nodes)
+        executed = sum(
+            1 for n in self.nodes.values() if n.status in ("success", "failed")
+        )
+        failures = sum(1 for n in self.nodes.values() if n.status == "failed")
+        nodes_out = []
         for rec in self.nodes.values():
-            by_role[rec.role] = by_role.get(rec.role, 0) + 1
-            if rec.provider:
-                by_provider[rec.provider] = by_provider.get(rec.provider, 0) + 1
-            if rec.provider and rec.provider != "ollama":
-                llm_calls += 1
-            else:
-                local_only += 1
-            fallbacks += rec.fallback_count
-            retries += rec.retry_count
-            if rec.status == "failed":
-                failures += 1
-
-        report = {
-            "execution_id": self.execution_id,
-            "started_at": time.strftime(
-                "%Y-%m-%dT%H:%M:%S", time.gmtime(self.started_at)
-            ),
-            "finished_at": time.strftime(
-                "%Y-%m-%dT%H:%M:%S", time.gmtime(self.finished_at)
-            ),
-            "total_duration_ms": round(total_duration, 1),
-            "summary": {
-                "total_nodes": len(self.nodes),
-                "executed": sum(
-                    1 for r in self.nodes.values() if r.status != "pending"
-                ),
-                "llm_calls": llm_calls,
-                "local_only": local_only,
-                "fallbacks": fallbacks,
-                "retries": retries,
-                "failures": failures,
-                "by_role": by_role,
-                "by_provider": by_provider,
-            },
-            "provider_metrics_raw": provider_metrics.buffer,
-            "nodes": [
+            nodes_out.append(
                 {
                     "node": rec.node,
-                    "role": rec.role,
-                    "provider": rec.provider,
-                    "model": rec.model,
-                    "latency_ms": round(rec.latency_ms, 1),
-                    "fallback_count": rec.fallback_count,
-                    "retry_count": rec.retry_count,
                     "status": rec.status,
+                    "latency": rec.latency,
                     "exception": rec.exception,
-                    "provider_attempts": rec.provider_attempts,
-                    "start_time": time.strftime(
-                        "%Y-%m-%dT%H:%M:%S", time.gmtime(rec.start_time)
-                    ),
-                    "end_time": time.strftime(
-                        "%Y-%m-%dT%H:%M:%S", time.gmtime(rec.end_time)
-                    )
-                    if rec.end_time
-                    else None,
                 }
-                for rec in self.nodes.values()
-            ],
+            )
+
+        # Timeline text with node info
+        lines = ["Execution Timeline:"]
+        for rec in self.nodes.values():
+            lines.append(
+                f"  {rec.node}: {rec.status} ({rec.latency:.2f}s)"
+                + (f" - {rec.exception}" if rec.exception else "")
+            )
+
+        # Semaphore health if tracker available
+        if get_semaphore_tracker is not None:
+            tracker = get_semaphore_tracker()
+            health = tracker.health_report()
+            if health:
+                lines.append("\nSemaphore Health:")
+                for model, metrics in health.items():
+                    lines.append(
+                        f"  {model}: timeouts={metrics['timeouts']} "
+                        f"avg_wait={metrics['avg_wait_ms']}ms "
+                        f"timeout_rate={metrics['timeout_rate']}"
+                    )
+
+        timeline_text = "\n".join(lines)
+
+        # Simple mermaid DAG representation
+        mermaid_lines = ["graph TD"]
+        for rec in self.nodes.values():
+            mermaid_lines.append(f'    {rec.node}["{rec.node}"]')
+        # add dummy edges to show order based on start_time
+        sorted_nodes = sorted(self.nodes.values(), key=lambda r: r.start_time)
+        for i in range(len(sorted_nodes) - 1):
+            mermaid_lines.append(
+                f"    {sorted_nodes[i].node} --> {sorted_nodes[i + 1].node}"
+            )
+        mermaid_dag = "\n".join(mermaid_lines)
+
+        return {
+            "summary": {
+                "total_nodes": total,
+                "executed": executed,
+                "failures": failures,
+            },
+            "nodes": nodes_out,
+            "timeline_text": timeline_text,
+            "mermaid_dag": mermaid_dag,
         }
 
-        try:
-            self._output_path.write_text(
-                json.dumps(report, indent=2, ensure_ascii=False)
-            )
-        except Exception:
-            pass
 
-        return report
-
-
-_execution_report: Optional[ExecutionReport] = None
-
-
-def init_execution_report(
-    execution_id: str, output_path: Optional[Path] = None
-) -> ExecutionReport:
+def init_execution_report(execution_id: str) -> ExecutionReport:
     global _execution_report
-    _execution_report = ExecutionReport(execution_id, output_path)
+    _execution_report = ExecutionReport(execution_id)
     return _execution_report
 
 

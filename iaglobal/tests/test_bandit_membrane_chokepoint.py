@@ -120,7 +120,7 @@ def test_bandit_generate_enforce_confines(monkeypatch, bandit_module):
                 pass
 
         # Mock acquire_model (classe/método) para evitar dependência de semáforo real
-        async def _fake_acquire(self, model_name, node_id=""):
+        async def _fake_acquire(self, model_name, node_id="", execution_id=""):
             return True
 
         monkeypatch.setattr(bandit_module.BanditPolicy, "acquire_model", _fake_acquire)
@@ -169,7 +169,7 @@ def test_bandit_generate_shadow_logs_only(monkeypatch, bandit_module, caplog):
                 pass
 
         # Mock acquire_model (classe/método) para evitar dependência de semáforo real
-        async def _fake_acquire(self, model_name, node_id=""):
+        async def _fake_acquire(self, model_name, node_id="", execution_id=""):
             return True
 
         monkeypatch.setattr(bandit_module.BanditPolicy, "acquire_model", _fake_acquire)

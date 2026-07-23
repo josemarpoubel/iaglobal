@@ -179,7 +179,7 @@ obj = MyClass()
 val = getattr(obj, 'value')
 """
         local_vars = {}
-        exec_sandboxed(code, safe)
+        exec_sandboxed(code, safe, local_vars)
         assert local_vars["val"] == 42
 
     def test_getattr_builtins_bloqueado(self, sandbox):
@@ -208,7 +208,7 @@ obj = MyClass()
 setattr(obj, 'value', 42)
 """
         local_vars = {}
-        exec_sandboxed(code, safe)
+        exec_sandboxed(code, safe, local_vars)
         assert getattr(local_vars["obj"], "value") == 42
 
 
@@ -226,9 +226,8 @@ class TestIntrospection:
 x = 42
 g = globals()
 """
-        local_vars = {}
         exec_sandboxed(code, safe)
-        g = local_vars["g"]
+        g = safe["g"]
         assert "x" in g
         assert "eval" not in g
 
@@ -240,7 +239,7 @@ y = 2
 v = vars()
 """
         local_vars = {}
-        exec_sandboxed(code, safe)
+        exec_sandboxed(code, safe, local_vars)
         v = local_vars["v"]
         assert "x" in v and "y" in v
 
@@ -253,7 +252,7 @@ class MyClass:
 d = dir(MyClass())
 """
         local_vars = {}
-        exec_sandboxed(code, safe)
+        exec_sandboxed(code, safe, local_vars)
         d = local_vars["d"]
         assert "public" in d
         assert "__private" not in d
@@ -274,7 +273,7 @@ import math
 result = math.sqrt(25) + math.pow(2, 3)
 """
         local_vars = {}
-        exec_sandboxed(code, safe)
+        exec_sandboxed(code, safe, local_vars)
         assert local_vars["result"] == 13.0
 
     def test_codigo_malicioso_eval_bloqueado(self, sandbox):

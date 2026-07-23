@@ -4,6 +4,10 @@
 
 import os
 
+from iaglobal.utils.logger import get_logger
+
+logger = get_logger("iaglobal.execution.executor")
+
 
 async def blackjack_executar_local(modelo: str, prompt: str) -> str:
     """Execute LLM call via Ollama (async-safe wrapper)."""
@@ -27,8 +31,6 @@ async def blackjack_executar_local(modelo: str, prompt: str) -> str:
             data = await r.json()
             return data.get("response", "")
     except Exception as e:
-        from iaglobal.utils.logger import logger
-
         logger.warning("[Ollama] %s", e)
         return ""
 

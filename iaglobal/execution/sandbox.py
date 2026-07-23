@@ -17,7 +17,7 @@ from iaglobal.validation.ast_security import (
     inspecionar_seguranca_codigo,
     ASTSecurityEngine,
 )
-from iaglobal.validation.engine import ValidationEngine
+from iaglobal.validation.validation_engine import ValidationEngine
 from iaglobal.security.ast_gateway import ASTGateway
 
 _ast_gateway = ASTGateway()

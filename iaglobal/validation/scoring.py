@@ -5,7 +5,7 @@
 import ast
 from typing import Dict, Any
 from iaglobal.utils.logger import logger
-from iaglobal.validation.engine import ValidationEngine
+from iaglobal.validation.validation_engine import ValidationEngine
 from iaglobal.security.ast_gateway import ASTGateway
 
 _ast_gateway = ASTGateway()

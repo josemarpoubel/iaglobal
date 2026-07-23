@@ -321,7 +321,18 @@ class MetabolicRhythm:
                     )
 
     def _update_homeostasis_score(self) -> None:
-        """Atualiza score de homeostase baseado no equilíbrio energético."""
+        """Atualiza score de homeostase baseado no equilíbrio energético.
+
+        NOTA: Esta função usa pesos 0.4/0.4/0.2 para CPU/ATP/estabilidade,
+        que são coincidentemente iguais aos pesos base do IVM (P/E/C).
+        Isto NÃO é o IVM canônico — é um cálculo de homeostase de ritmo
+        metabólico com métricas diferentes (cpu_score, atp_score, stability_score).
+        """
+        # Pesos específicos de homeostase (não confundir com IVM)
+        PESO_CPU = 0.4
+        PESO_ATP = 0.4
+        PESO_ESTABILIDADE = 0.2
+
         with self._rlock:
             # Fatores de homeostase:
             # 1. Proximidade do target de CPU budget
@@ -338,7 +349,7 @@ class MetabolicRhythm:
 
             # Homeostasis = média ponderada
             homeostasis = (
-                (cpu_score * 0.4) + (atp_score * 0.4) + (stability_score * 0.2)
+                (cpu_score * PESO_CPU) + (atp_score * PESO_ATP) + (stability_score * PESO_ESTABILIDADE)
             )
 
             self._state.homeostasis_score = homeostasis

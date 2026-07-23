@@ -377,7 +377,7 @@ if "hf_router" in ASYNC_PROVIDERS:
 # modelos cloud (Groq/NVIDIA/OpenRouter/Gemini/...) quando são o agente crítico,
 # que aponta correções. Todos os demais usam Ollama local, forçando-os a evoluir
 # com o próprio substrato (Lei da Evolução: adaptar ou perecer).
-_LOCAL_PROVIDERS = {"ollama"}
+_LOCAL_PROVIDERS = {"ollama", "ollama_glm4", "ollama_lfm"}
 
 
 # Sinal estruturado de membrana — INDEPENDENTE de nível de log (observabilidade
@@ -1080,12 +1080,20 @@ async def _async_fallback_chain(
             "[ROUTER] OLLAMA_ONLY ativo — async fallback chain direto para ollama"
         )
         enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
+        # Tenta CognitiveRouter primeiro para respeitar a role do node_id
+        try:
+            route = CognitiveRouter.resolve_route(node_id, task_type)
+            fallback_model = f"ollama/{CognitiveRouter.resolve_model_id(route)}"
+        except Exception:
+            fallback_model = "ollama/qwen2.5:0.5b"
         result = await _async_safe_call(
-            "ollama", ollama_async_generate, enriched, "ollama/qwen2.5:0.5b", task_type
+            "ollama", ollama_async_generate, enriched, fallback_model, task_type
         )
         if result:
             return result
-        raise RuntimeError("Ollama falhou mesmo em modo OLLAMA_ONLY.")
+        raise RuntimeError(
+            f"Ollama falhou mesmo em modo OLLAMA_ONLY (model={fallback_model})."
+        )
 
     # Modo paralelo é o default. Para forçar sequencial: SEQUENTIAL_FALLBACK=yes
     sequential = os.environ.get("SEQUENTIAL_FALLBACK", "").lower() in (
@@ -1250,23 +1258,30 @@ async def async_route_generate(
     delegated = False
     result = None
     _SERVED_FROM_CACHE.set(False)
+    original = str(model or "").strip()
     try:
         if os.environ.get("OLLAMA_ONLY", "").lower() in ("1", "true", "yes"):
+            effective = (
+                original if original and original != "auto" else "ollama/qwen2.5:0.5b"
+            )
+            effective = CognitiveRouter.ROUTE_TO_MODEL.get(effective, effective)
             logger.info(
-                "[ROUTER] OLLAMA_ONLY ativo — roteando direto para ollama (async)"
+                "[ROUTER] OLLAMA_ONLY ativo — roteando direto para ollama (model=%s)",
+                effective,
             )
             enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
             result = await _async_safe_call(
                 "ollama",
                 ollama_async_generate,
                 enriched,
-                "ollama/qwen2.5:0.5b",
+                effective,
                 task_type,
             )
             if result:
                 return result
-            raise RuntimeError("Ollama falhou mesmo em modo OLLAMA_ONLY.")
-        original = str(model or "").strip()
+            raise RuntimeError(
+                f"Ollama falhou mesmo em modo OLLAMA_ONLY (model={effective})."
+            )
         if not original or original == "auto":
             delegated = True
             return await async_route_generate_parallel(
@@ -1291,17 +1306,21 @@ async def async_route_generate(
             )
             record_membrane_decision(node_id, "redirected_local", [original])
             enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
+            # Preserva o model_id do original (ex: ollama/yasserrmd/GLM4.7-...)
+            redirected = (
+                original if original.startswith("ollama/") else f"ollama/{original}"
+            )
             result = await _async_safe_call(
                 "ollama",
                 ollama_async_generate,
                 enriched,
-                "ollama/qwen2.5:0.5b",
+                redirected,
                 task_type,
             )
             if result:
                 return result
             raise RuntimeError(
-                "Ollama falhou sob restrição de membrana (apenas local)."
+                f"Ollama falhou sob restrição de membrana (model={redirected})."
             )
 
         func = ASYNC_PROVIDERS.get(provider)

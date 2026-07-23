@@ -12,6 +12,19 @@ import pytest
 pytestmark = pytest.mark.asyncio(loop_scope="function")
 
 
+def _expected_concurrency(model_name: str, bp) -> int:
+    """Retorna a concorrência esperada para um modelo, lendo do provider_config."""
+    if "groq/" in model_name or "nvidia/" in model_name:
+        return bp.CLOUD_MODEL_CONCURRENCY
+    from iaglobal.providers.provider_config import COGNITIVE_MODELS, CognitiveRole
+
+    raw = model_name.replace("ollama/", "", 1)
+    for role, cfg in COGNITIVE_MODELS.items():
+        if cfg["model_id"] == raw:
+            return cfg.get("max_concurrent_requests", bp.LOCAL_MODEL_CONCURRENCY)
+    return bp.LOCAL_MODEL_CONCURRENCY
+
+
 @pytest.fixture(autouse=True)
 def reset_bandit():
     """Reseta estado global do BanditPolicy entre testes."""
@@ -97,10 +110,14 @@ async def test_semaphore_invariante_acquire_release(monkeypatch):
         f"  Total: {n_concurrent} | OK={successes} | empty={failures} | exc={exceptions}"
     )
 
-    # Verifica semáforo: _value deve ser == initial (CLOUD_MODEL_CONCURRENCY ou LOCAL_MODEL_CONCURRENCY)
+    # Verifica semáforo: _value deve ser o max_concurrent_requests do provider_config
     sem = bp.MODEL_SEMAPHORES.get("ollama/qwen2.5:0.5b")
     if sem is not None:
-        expected_initial = bp.LOCAL_MODEL_CONCURRENCY  # 4
+        from iaglobal.providers.provider_config import COGNITIVE_MODELS, CognitiveRole
+
+        expected_initial = COGNITIVE_MODELS[CognitiveRole.OPERARIO].get(
+            "max_concurrent_requests", bp.LOCAL_MODEL_CONCURRENCY
+        )
         assert sem._value == expected_initial, (
             f"Semaphore leak: _value={sem._value}, expected={expected_initial}"
         )
@@ -142,11 +159,7 @@ async def test_semaphore_invariante_multiplos_modelos(monkeypatch):
     for model_name in candidates:
         sem = bp.MODEL_SEMAPHORES.get(model_name)
         if sem is not None:
-            expected = (
-                bp.CLOUD_MODEL_CONCURRENCY
-                if "groq/" in model_name
-                else bp.LOCAL_MODEL_CONCURRENCY
-            )
+            expected = _expected_concurrency(model_name, bp)
             assert sem._value == expected, (
                 f"Semaphore leak em {model_name}: _value={sem._value}, expected={expected}"
             )
@@ -213,7 +226,7 @@ async def test_semaphore_sem_vazamento_apos_falha_total(monkeypatch):
     # Força acquire_model a sempre retornar False (simula gate cheio)
     orig_acquire = BanditPolicy.acquire_model
 
-    async def _always_fail(self, model_name, node_id=""):
+    async def _always_fail(self, model_name, node_id="", execution_id=""):
         return False
 
     monkeypatch.setattr(BanditPolicy, "acquire_model", _always_fail)
@@ -243,11 +256,7 @@ async def test_semaphore_sem_vazamento_apos_falha_total(monkeypatch):
     for model_name in candidates:
         sem = bp.MODEL_SEMAPHORES.get(model_name)
         if sem is not None:
-            expected = (
-                bp.CLOUD_MODEL_CONCURRENCY
-                if "groq/" in model_name
-                else bp.LOCAL_MODEL_CONCURRENCY
-            )
+            expected = _expected_concurrency(model_name, bp)
             assert sem._value == expected, (
                 f"Semaphore corrompido em {model_name}: _value={sem._value}, expected={expected}"
             )
@@ -384,10 +393,11 @@ async def test_semaphore_resiliencia_apos_multiplos_timeouts(monkeypatch):
 
     sem = bp.MODEL_SEMAPHORES.get("ollama/qwen2.5:0.5b")
     if sem is not None:
-        assert sem._value == bp.LOCAL_MODEL_CONCURRENCY, (
-            f"Semaphore leak apos {n_calls} chamadas: _value={sem._value}, expected={bp.LOCAL_MODEL_CONCURRENCY}"
+        expected = _expected_concurrency("ollama/qwen2.5:0.5b", bp)
+        assert sem._value == expected, (
+            f"Semaphore leak apos {n_calls} chamadas: _value={sem._value}, expected={expected}"
         )
-        print(f"  Semaphore: {sem._value}/{bp.LOCAL_MODEL_CONCURRENCY} ✅")
+        print(f"  Semaphore: {sem._value}/{expected} ✅")
 
     stuck = [m for m, v in bp._model_in_use.items() if v]
     assert not stuck, f"Modelos presos: {stuck}"

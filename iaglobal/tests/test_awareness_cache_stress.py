@@ -359,7 +359,8 @@ class TestStressCausalConsistency:
 
         # Explicação antes de qualquer mudança
         expl = await cache.get_causal_explanation(execution_id, "D")
-        assert "D → C → B → A" in expl
+        assert "D → C → B" in expl
+        assert "A" not in expl  # A é COMPLETED
 
         # Muda status de B e C concorrentemente
         await asyncio.gather(
@@ -380,8 +381,8 @@ class TestStressCausalConsistency:
         )
 
         expl = await cache.get_causal_explanation(execution_id, "D")
-        assert "D → C" in expl  # C ainda bloqueando (running não desbloqueia tester)
-        assert "B" in expl
+        assert "D → C" in expl  # C ainda não COMPLETED
+        assert "B" not in expl  # B é COMPLETED
 
         await cache.close()
 

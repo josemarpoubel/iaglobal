@@ -126,7 +126,50 @@ def _try_import_handler(name: str) -> Callable:
             return fn  # type: ignore
     except Exception:
         pass
-    record_error("builder", f"Handler not found for node: {name}", {"node": name})
+
+    # Log error with classification
+    error_msg = f"Handler not found for node: {name}"
+    error_detail = {"node": name, "error_type": "handler_not_found"}
+
+    # Classify the error
+    try:
+        mod = importlib.import_module(f"iaglobal.graphs.nodes.no_{name}")
+        # Module exists but function doesn't
+        error_detail["cause"] = "function_missing"
+        error_detail["available"] = [x for x in dir(mod) if not x.startswith("_")]
+    except ImportError as e:
+        # Module doesn't exist OR dependency failure
+        error_str = str(e).lower()
+
+        # Check for dependency failure (circular import, missing dependency, etc.)
+        if "circular" in error_str:
+            error_detail["cause"] = "circular_import"
+        elif "no module named" in error_str and f"no_{name}" not in error_str:
+            # Import failed due to missing dependency, not the module itself
+            error_detail["cause"] = "dependency_failure"
+            error_detail["missing_dependency"] = error_str
+        elif "relative import" in error_str:
+            error_detail["cause"] = "relative_import_error"
+        else:
+            # Module truly doesn't exist
+            error_detail["cause"] = "module_not_found"
+
+        error_detail["import_error"] = str(e)
+    except Exception as e:
+        # Other initialization error
+        error_detail["cause"] = "initialization_error"
+        error_detail["error"] = str(e)
+        error_detail["error_type_full"] = type(e).__name__
+
+    record_error("builder", error_msg, error_detail)
+    logger.error(
+        "[BUILDER] %s | cause=%s | available=%s | import_error=%s",
+        error_msg,
+        error_detail.get("cause", "unknown"),
+        error_detail.get("available", []),
+        error_detail.get("import_error", "N/A")[:100],
+    )
+
     return _noop_fn()  # type: ignore
 
 

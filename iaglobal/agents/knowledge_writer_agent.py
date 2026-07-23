@@ -127,7 +127,28 @@ class KnowledgeWriterAgent(AgentBase):
             self._store_entry(code)
             results["code_snippets"].append(code["title"])
             self._code_to_concepts(code, concepts)
-            logger.info(f"[KB-WRITER] Código extraído: {code['title'][:50]}")
+            _title = code["title"]
+            _content = code.get("content") or ""
+            _preview = _content[:80]
+            logger.info(
+                "[KB-WRITER] Código extraído: source=%s title=%s preview=%s",
+                source,
+                _title[:50],
+                _preview,
+            )
+
+            from iaglobal.utils.generation_classifier import classify_generation
+
+            kind = classify_generation(_content)
+            if kind.name in ("HTML", "ERROR_PAGE"):
+                logger.warning(
+                    "[KB-WRITER] Resposta classificada como %s, não código. "
+                    "source=%s len=%d preview=%s",
+                    kind.value,
+                    source,
+                    len(_content),
+                    _preview[:100],
+                )
 
         if prompt.endswith("?") or prompt_lower.startswith(
             ("what", "how", "why", "qual", "como", "o que")

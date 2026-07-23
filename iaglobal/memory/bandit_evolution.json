@@ -2,9 +2,9 @@
   "fitness_records": {
     "groq/llama-3.3-70b-versatile": {
       "provider_id": "groq/llama-3.3-70b-versatile",
-      "total_uses": 107,
+      "total_uses": 148,
       "successful_uses": 9,
-      "failed_uses": 98,
+      "failed_uses": 139,
       "ivm_history": [
         0.1,
         0.1,
@@ -27,12 +27,12 @@
         0.1,
         0.1
       ],
-      "ivm_media_movel": 0.12374326255373524,
-      "strikes_consecutivos": 90,
+      "ivm_media_movel": 0.1,
+      "strikes_consecutivos": 131,
       "ultimo_banimento": null,
-      "latencia_media_ms": 790.7231760064808,
-      "custo_medio_creditos": 0.9999872957652522,
-      "fitness_score": 0.47424595753224114
+      "latencia_media_ms": 2583.429770306252,
+      "custo_medio_creditos": 0.9999998309981739,
+      "fitness_score": 0.3374164648479262
     },
     "unknown": {
       "provider_id": "unknown",
@@ -53,29 +53,33 @@
     },
     "ollama/qwen2.5:0.5b": {
       "provider_id": "ollama/qwen2.5:0.5b",
-      "total_uses": 4,
+      "total_uses": 8,
       "successful_uses": 0,
-      "failed_uses": 4,
+      "failed_uses": 8,
       "ivm_history": [
+        0.1,
+        0.1,
+        0.1,
+        0.1,
         0.1,
         0.1,
         0.1,
         0.1
       ],
       "ivm_media_movel": 0.1,
-      "strikes_consecutivos": 4,
+      "strikes_consecutivos": 8,
       "ultimo_banimento": null,
-      "latencia_media_ms": 5.587364721298218,
-      "custo_medio_creditos": 0.034390000000000004,
+      "latencia_media_ms": 12.344959945158958,
+      "custo_medio_creditos": 0.056953279000000016,
       "fitness_score": 0.46
     }
   },
   "banned_providers": {
-    "ollama/qwen2.5:0.5b": "2026-07-21T01:02:11.173965+00:00"
+    "groq/llama-3.3-70b-versatile": "2026-07-23T23:37:42.715697+00:00",
+    "ollama/qwen2.5:0.5b": "2026-07-24T02:01:53.015881+00:00"
   },
   "weights": {
-    "groq/llama-3.3-70b-versatile": 1.012302602138178,
-    "unknown": 0.9813364350520096
+    "unknown": 1.0076466528254162
   },
-  "updated_at": "2026-07-20T01:02:11.173965+00:00"
+  "updated_at": "2026-07-23T02:01:53.015881+00:00"
 }

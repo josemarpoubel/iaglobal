@@ -10,6 +10,7 @@ import ast
 import re
 import asyncio
 import time
+import logging
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Dict, Any, List, Optional, Pattern
@@ -17,9 +18,15 @@ from typing import Dict, Any, List, Optional, Pattern
 from iaglobal.utils.helpers import run_async_safe
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal.security.ast_gateway import ASTGateway
+from iaglobal.diagnostics.python_normalizer import PythonNormalizer
+
+logger = logging.getLogger("iaglobal.agents.semantic_validator")
 
 # Gateway singleton para AST parsing
 _ast_gateway = ASTGateway()
+
+# Normalizer singleton para normalização sintática
+_normalizer = PythonNormalizer()
 
 
 # =============================================================================
@@ -381,10 +388,12 @@ class SemanticValidatorAgent(AgentBase):
         self,
         registry: Optional[RuleRegistry] = None,
         pass_threshold: float = DEFAULT_PASS_THRESHOLD,
+        timeout: float = 60.0,
     ):
         super().__init__(agent_name="semantic_validator")
         self.registry = registry or RuleRegistry.default()
         self.pass_threshold = pass_threshold
+        self.timeout = timeout
 
     def validate(self, code: str, task: str = "") -> Dict[str, Any]:
         result = run_async_safe(self.validate_async, code, task)
@@ -392,36 +401,133 @@ class SemanticValidatorAgent(AgentBase):
             return result.to_legacy_dict()
         return result
 
+    async def _safe_detect_language(self, code: str) -> Language:
+        """Detecta linguagem sem bloquear o event loop."""
+        try:
+            if asyncio.iscoroutinefunction(LanguageDetector.detect):
+                return await LanguageDetector.detect(code)
+            return await asyncio.to_thread(LanguageDetector.detect, code)
+        except Exception as e:
+            logger.warning(
+                "[SEMANTIC] Falha ao detectar linguagem: %s. Assumindo 'python'.", e
+            )
+            return Language.PYTHON
+
+    async def _evaluate_rule_safe(
+        self, rule, code: str, task: str, language: Language
+    ) -> Optional[RuleResult]:
+        """Avalia regra com tratamento resiliente de erros."""
+        rule_name = getattr(rule, "name", rule.__class__.__name__)
+        try:
+            if asyncio.iscoroutinefunction(rule.evaluate):
+                result = await rule.evaluate(code, task, language)
+            else:
+                result = await asyncio.to_thread(rule.evaluate, code, task, language)
+            return result
+        except SyntaxError as e:
+            # Syntax errors are intentionally assigned weight=0.0.
+            # They are handled earlier by ASTGateway and ValidationEngine,
+            # which already stop invalid code before semantic ranking.
+            # Keeping zero weight avoids double-penalizing the same failure.
+            return RuleResult(
+                name=rule_name,
+                description=f"Erro de sintaxe no código: {e.msg} (linha {e.lineno})",
+                passed=False,
+                weight=0.0,
+                category="syntax",
+                suggestion=None,
+            )
+        except Exception as e:
+            logger.warning(
+                "[SEMANTIC] Regra '%s' falhou com erro inesperado: %s", rule_name, e
+            )
+            return None
+
     async def validate_async(self, code: str, task: str = "") -> ValidationResult:
         start_time = time.time()
 
-        language = await LanguageDetector.detect(code)
-        rule_results = []
+        # Fail-fast para código vazio
+        if not code or not code.strip():
+            return ValidationResult(
+                valid=False,
+                score=0.0,
+                language=Language.GENERIC,
+                errors=["Código vazio ou nulo fornecido para validação."],
+            )
 
-        for rule in self.registry.rules:
+        try:
+            # Pipeline de normalização sintática antes da validação
+            # Isso garante que o score não seja penalizado por questões cosméticas
             try:
-                result = await rule.evaluate(code, task, language)
-                if result is not None:
-                    rule_results.append(result)
+                norm_result = _normalizer.normalize(code)
+                if norm_result.syntax_valid:
+                    logger.debug(
+                        f"Código normalizado: format={len(norm_result.ruff_format_errors)}, "
+                        f"check={len(norm_result.ruff_check_errors)}"
+                    )
+                    code = norm_result.fixed  # Usa código normalizado
+                else:
+                    logger.debug(
+                        f"Normalização falhou: {norm_result.syntax_error}. "
+                        f"Usando código original."
+                    )
             except Exception as e:
-                rule_results.append(
-                    RuleResult(rule.name, str(e), False, rule.weight or 100.0, "error")
-                )
+                logger.warning(f"Normalização falhou: {e}. Usando código original.")
 
-        score, score_by_category, errors, suggestions = ScoreAggregator.aggregate(
-            rule_results
-        )
-        valid = score >= self.pass_threshold and len(errors) == 0
+            language = await self._safe_detect_language(code)
 
-        elapsed_ms = (time.time() - start_time) * 1000
+            # Paralelismo com timeout global
+            tasks = [
+                self._evaluate_rule_safe(rule, code, task, language)
+                for rule in self.registry.rules
+            ]
+            results = await asyncio.wait_for(
+                asyncio.gather(*tasks), timeout=self.timeout
+            )
 
-        return ValidationResult(
-            valid=valid,
-            score=score,
-            language=language,
-            errors=errors,
-            suggestions=suggestions,
-            rule_results=rule_results,
-            score_by_category=score_by_category,
-            elapsed_ms=elapsed_ms,
-        )
+            valid_results = [r for r in results if r is not None]
+
+            score, score_by_category, errors, suggestions = ScoreAggregator.aggregate(
+                valid_results
+            )
+
+            execution_time = (time.time() - start_time) * 1000
+
+            logger.info(
+                "[SEMANTIC] score=%.2f valid=%s lang=%s time=%.2fms errors=%d",
+                score,
+                score >= self.pass_threshold,
+                language.value if hasattr(language, "value") else str(language),
+                execution_time,
+                len(errors),
+            )
+
+            return ValidationResult(
+                valid=score >= self.pass_threshold and len(errors) == 0,
+                score=score,
+                language=language,
+                errors=errors,
+                suggestions=suggestions,
+                rule_results=valid_results,
+                score_by_category=score_by_category,
+                elapsed_ms=execution_time,
+            )
+
+        except asyncio.TimeoutError:
+            logger.error(
+                "[SEMANTIC] Timeout de %ss atingido na validação.", self.timeout
+            )
+            return ValidationResult(
+                valid=False,
+                score=0.0,
+                language=Language.GENERIC,
+                errors=[f"Validação excedeu o timeout de {self.timeout}s."],
+            )
+        except Exception as e:
+            logger.exception("[SEMANTIC] Erro inesperado na validação.")
+            return ValidationResult(
+                valid=False,
+                score=0.0,
+                language=Language.GENERIC,
+                errors=[f"Erro interno no validador: {str(e)}"],
+            )

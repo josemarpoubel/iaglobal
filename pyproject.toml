@@ -100,16 +100,13 @@ gravar-instintos = "scripts.gravar_instintos:main"
 testar = "pytest:main"
 
 [tool.pytest.ini_options]
-norecursedirs = "scripts venv .git .pytest_cache temp"
-# Altera para buscar testes a partir da raiz do repositório
+filterwarnings = [
+    "ignore::DeprecationWarning:.*SwigPy.*"
+]
+norecursedirs = ["scripts", "venv", ".git", ".pytest_cache", "temp"]
 testpaths = ["."]
-# Garante que a raiz do projeto esteja no PATH do Python durante os testes
 pythonpath = ["."]
-# Só considera arquivos que começam com 'test_'
 python_files = ["test_*.py"]
-# Só considera classes que começam com 'Test'
 python_classes = ["Test*"]
-# Só considera funções que começam com 'test_'
 python_functions = ["test_*"]
 asyncio_mode = "auto"
-

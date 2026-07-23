@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import asyncio
 import logging
+import warnings
 from dataclasses import dataclass
 from typing import Any, Callable, Optional, Protocol, runtime_checkable
 
@@ -140,12 +141,38 @@ class ProviderRegistry(LLMProviderRegistry):
     Alias de compatibilidade temporária.
 
     DEPRECATED: Use LLMProviderRegistry diretamente.
-    Será removido na versão 2.0.
+    Será removido quando não houver consumidores ativos.
+
+    Attributes:
+        __deprecated__: True (para ferramentas de análise estática)
+        __replacement__: "LLMProviderRegistry"
     """
 
-    pass
+    __deprecated__ = True
+    __replacement__ = "LLMProviderRegistry"
+
+    def __init__(self, *args, **kwargs):
+        warnings.warn(
+            "ProviderRegistry is deprecated; use LLMProviderRegistry",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        super().__init__(*args, **kwargs)
 
 
 llm_provider_registry = LLMProviderRegistry()
 
 registry = llm_provider_registry
+"""
+Alias de compatibilidade temporária.
+
+DEPRECATED: Use llm_provider_registry diretamente.
+"""
+
+__all__ = [
+    "LLMProviderRegistry",
+    "llm_provider_registry",
+    # Deprecated
+    "ProviderRegistry",
+    "registry",
+]

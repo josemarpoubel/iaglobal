@@ -69,13 +69,12 @@ class QueryEngine:
         execution_id: str,
         activities: dict[str, AgentActivity],
     ) -> list[CausalChain]:
-        """
-        Constrói cadeias causais para snapshot(relevance="blocking").
+        """Constrói cadeias causais para snapshot(relevance="blocking").
 
         Semântica OPERACIONAL (estado vivo do organismo):
         Um nó entra na cadeia se está BLOCKED OU se alguma dependência ainda
         não está COMPLETED (causalmente aguardando progresso). O rastreio segue
-        depends_on até a causa raiz, independente do status dos ancestrais.
+        depends_on até a causa raiz, considerando apenas dependências não-COMPLETED.
 
         Esta é uma fotografia do bloqueio instantâneo — diferente da
         causalidade HISTÓRICA persistida por CausalEngine.build_blocking_chains
@@ -86,17 +85,17 @@ class QueryEngine:
             if not self._is_operationally_blocked(activity, activities):
                 continue
             chain = self._trace_dependency_chain(node_id, activities)
-            if chain:
-                root_cause = chain[-1] if chain else None
-                chains.append(
-                    CausalChain(
-                        execution_id=execution_id,
-                        blocked_node=node_id,
-                        blocking_chain=tuple(chain),
-                        root_cause=root_cause,
-                        depth=len(chain),
-                    )
+            root_cause = chain[-1] if chain else None
+            chains.append(
+                CausalChain(
+                    execution_id=execution_id,
+                    blocked_node=node_id,
+                    blocking_chain=tuple(chain),
+                    root_cause=root_cause,
+                    depth=len(chain),
                 )
+            )
+
         return chains
 
     @staticmethod
@@ -121,11 +120,10 @@ class QueryEngine:
         activities: dict[str, AgentActivity],
         visited: set | None = None,
     ) -> list[str]:
-        """
-        Rastreia recursivamente a cadeia de dependências (depends_on).
+        """Rastreia recursivamente a cadeia de dependências (depends_on).
 
-        Semântica operacional: rastreia TODAS as dependências até a causa raiz,
-        mesmo que um ancestral já esteja COMPLETED.
+        Semântica operacional: segue apenas dependências NÃO COMPLETED,
+        pois apenas elas podem estar bloqueando o nó atual.
         """
         if visited is None:
             visited = set()
@@ -138,10 +136,14 @@ class QueryEngine:
         chain: list[str] = []
 
         for dep in activity.depends_on:
-            if dep in activities:
-                chain.append(dep)
-                sub_chain = self._trace_dependency_chain(dep, activities, visited)
-                chain.extend(sub_chain)
+            if dep not in activities:
+                continue
+            dep_activity = activities[dep]
+            if dep_activity.status == NodeStatus.COMPLETED.value:
+                continue
+            chain.append(dep)
+            sub_chain = self._trace_dependency_chain(dep, activities, visited)
+            chain.extend(sub_chain)
 
         return chain
 

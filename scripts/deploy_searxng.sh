@@ -44,7 +44,7 @@ case "$ACTION" in
         
         # Health check
         for i in {1..10}; do
-            if curl -s "http://localhost:4000/search?q=test&format=json" > /dev/null 2>&1; then
+            if curl -s "http://localhost:8005/search?q=test&format=json" > /dev/null 2>&1; then
                 echo "✅ SearXNG is ready!"
                 break
             fi
@@ -57,11 +57,10 @@ case "$ACTION" in
         docker compose -f "$COMPOSE_FILE" ps
         echo ""
         echo "🌐 Access Points:"
-        echo "   - SearXNG: http://localhost:4000"
-        echo "   - YaCy:    http://localhost:8090"
+        echo "   - SearXNG: http://localhost:8005"
         echo ""
         echo "🧪 Test Commands:"
-        echo "   curl 'http://localhost:4000/search?q=flask+rest+api&format=json'"
+        echo "   curl 'http://localhost:8005/search?q=flask+rest+api&format=json'"
         echo "   python -c \"from iaglobal.graphs.nodes._search_sources import searxng_search; print(searxng_search('flask tutorial'))\""
         echo ""
         ;;
@@ -90,16 +89,10 @@ case "$ACTION" in
         docker compose -f docker-compose.search.yml ps
         echo ""
         echo "🔍 Health Check:"
-        if curl -s "http://localhost:4000/search?q=test&format=json" > /dev/null 2>&1; then
+        if curl -s "http://localhost:8005/search?q=test&format=json" > /dev/null 2>&1; then
             echo "   ✅ SearXNG: ONLINE"
         else
             echo "   ❌ SearXNG: OFFLINE"
-        fi
-        
-        if curl -s "http://localhost:8090" > /dev/null 2>&1; then
-            echo "   ✅ YaCy: ONLINE"
-        else
-            echo "   ❌ YaCy: OFFLINE"
         fi
         ;;
         
@@ -109,7 +102,7 @@ case "$ACTION" in
         
         # Test 1: SearXNG endpoint
         echo "1️⃣  Testing SearXNG JSON endpoint..."
-        RESPONSE=$(curl -s "http://localhost:4000/search?q=flask+rest+api&format=json")
+        RESPONSE=$(curl -s "http://localhost:8005/search?q=flask+rest+api&format=json")
         if echo "$RESPONSE" | python3 -c "import sys, json; data=json.load(sys.stdin); print(f'   Results: {len(data.get(\"results\", []))}')" 2>/dev/null; then
             echo "   ✅ SearXNG responding correctly"
         else
@@ -151,7 +144,7 @@ print('   ✅ Circuit breaker state accessible')
         echo "Usage: $0 {up|down|restart|logs|status|test}"
         echo ""
         echo "Commands:"
-        echo "   up      - Start SearXNG and YaCy"
+        echo "   up      - Start SearXNG"
         echo "   down    - Stop services"
         echo "   restart - Restart services"
         echo "   logs    - Show logs"

@@ -14,8 +14,9 @@ from .result import PipelineResult
 from .stages import PipelineStage
 
 from iaglobal._paths import SCRIPTS_DIR, RESULTS_DIR
-from iaglobal.validation.engine import ValidationEngine
+from iaglobal.validation.validation_engine import ValidationEngine
 from iaglobal.validation.js_validator import detect_lang
+from iaglobal.diagnostics.python_normalizer import normalize_before_repair
 from iaglobal.providers.provider_router import CREDIT_CANDIDATES as credit_candidates_fn
 
 from iaglobal.utils.logger import get_logger
@@ -159,6 +160,60 @@ class PipelineEngine:
             await self._async_metabolism_stage(state)
 
             await self._async_learn_stage(state)
+
+            # ── EvolutionFeedbackHook: sinal unificado de feedback evolutivo ──
+            try:
+                from iaglobal.evolution.evolution_feedback_hook import (
+                    EvolutionFeedbackHook,
+                    EvolutionSignal,
+                )
+                from iaglobal.observability.semaphore_tracker import (
+                    get_semaphore_tracker,
+                )
+                from iaglobal.utils.generation_classifier import classify_generation
+
+                candidates = [m for _, m in credit_candidates_fn()]
+                chosen_model_for_feedback = None
+                try:
+                    chosen_model_for_feedback = getattr(
+                        self.orchestrator, "bandit", None
+                    ) and self.orchestrator.bandit.select_model(
+                        node_id="cognitive_dag_root",
+                        task_type="dev_fast",
+                        candidates=candidates,
+                    )
+                except Exception:
+                    chosen_model_for_feedback = (
+                        candidates[0] if candidates else "ollama/qwen2.5:0.5b"
+                    )
+
+                _provider, _model = (
+                    chosen_model_for_feedback.split("/", 1)
+                    if chosen_model_for_feedback and "/" in chosen_model_for_feedback
+                    else ("", chosen_model_for_feedback or "")
+                )
+                _generation_kind = classify_generation(state.generated_code or "").value
+                _qa_result = (
+                    state.execution_context.context.get("qa")
+                    if hasattr(state, "execution_context") and state.execution_context
+                    else None
+                )
+
+                hook = EvolutionFeedbackHook()
+                await hook.apply(
+                    bandit=getattr(self.orchestrator, "bandit", None),
+                    signal=EvolutionSignal(
+                        provider=_provider,
+                        model=_model,
+                        semaphore_health=get_semaphore_tracker().health_report(),
+                        execution_metrics=getattr(state, "execution_metrics", None),
+                        generation_kind=_generation_kind,
+                        qa_result=_qa_result,
+                    ),
+                    execution_id=state.task_id,
+                )
+            except Exception as e:
+                logger.debug("[PIPELINE] EvolutionFeedbackHook skip: %s", e)
 
             state.current_stage = PipelineStage.COMPLETE.name
             # FIX BUG #5: _save_script em thread pool
@@ -446,8 +501,19 @@ class PipelineEngine:
         raise RuntimeError("Nenhum dos nós da DAG produziu código válido.")
 
     def _validation_stage(self, state: PipelineState) -> None:
+        """
+        Validação de código com pipeline completo de normalização.
+
+        Pipeline determinístico:
+        1. Normalização (extração, sanitização, ruff format, ruff check, AST parse)
+        2. Validação de segurança
+        3. Atualização do estado com código validado
+
+        Contrato: Todo código gerado por LLM deve passar por normalização
+        antes de validação, pontuação ou persistência.
+        """
         state.current_stage = PipelineStage.VALIDATION.name
-        logger.info("🛡️ [PIPELINE] Validation stage")
+        logger.info("🛡️ [PIPELINE] Validation stage com pipeline de normalização")
 
         code = state.generated_code or ""
         code = self._extract_fenced_code(code)
@@ -496,15 +562,37 @@ class PipelineEngine:
             state.syntax_valid = True
             return
 
-        if lang is None:
-            # Só roda validação Python se for código Python nativo
-            result = self.validator.validate(code)
+        # =====================================================================
+        # ETAPA 1: NORMALIZAÇÃO CONFORME CONTRATO PYTHONNORMALIZER
+        # =====================================================================
+        if lang is None or lang == "py":
+            logger.info(
+                "[VALIDATION] Iniciando pipeline de normalização para código Python"
+            )
+            normalized_code, syntax_valid, norm_result = normalize_before_repair(code)
+
+            if not syntax_valid:
+                logger.warning(
+                    f"[VALIDATION] Código inválido após normalização: {norm_result.syntax_error}"
+                )
+                state.errors.extend(
+                    [f"Normalização falhou: {norm_result.syntax_error}"]
+                )
+                raise ValueError(f"Normalização falhou: {norm_result.syntax_error}")
+
+            # Validação final com ValidationEngine
+            logger.info("[VALIDATION] Código normalizado com sucesso, validando...")
+            result = self.validator.validate(normalized_code)
+
             if not result.valid:
                 state.errors.extend(result.errors)
-                logger.warning("[VALIDATION] Falhou: %s", result.errors)
+                logger.warning("[VALIDATION] Validação falhou: %s", result.errors)
                 raise ValueError(result.errors)
+
+            # Código validado e pronto para uso
             state.generated_code = result.code
             state.syntax_valid = True
+            logger.info("[VALIDATION] Código aprovado: normalização + validação OK")
         else:
             logger.info(
                 "[VALIDATION] Código %s detectado — pulando validação Python AST (%d chars)",

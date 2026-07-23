@@ -6,7 +6,7 @@ Fase 1: usa lista fechada de nós conhecidos como CRITIC.
 Fase 3: a lista será substituída por consulta ao SkillRegistry.
 """
 
-from iaglobal.core.agent_roles import AgentRole
+from iaglobal.agents.agent_roles import AgentRole
 
 
 _CRITIC_NODE_IDS = frozenset(
@@ -17,6 +17,7 @@ _CRITIC_NODE_IDS = frozenset(
         "no_validator_retry",
         "no_reflexion",
         "no_reviewer",
+        "critic_batch",  # <--- Adicione este ID aqui
     }
 )
 

@@ -9,7 +9,7 @@
 
 | Componente | Status | URL | Porta |
 |------------|--------|-----|-------|
-| **SearXNG** | ✅ ONLINE | http://localhost:4000 | 4000 → 8080 |
+| **SearXNG** | ✅ ONLINE | http://localhost:8005 | 8005 (host) |
 | **Docker Compose** | ✅ Ativo | - | - |
 | **Integração Python** | ✅ Funcional | - | - |
 | **Circuit Breaker** | ✅ Pronto | - | - |
@@ -24,9 +24,12 @@
 
 **Configuração:**
 - **Image:** `searxng/searxng:latest`
-- **Port:** 4000 (host) → 8080 (container)
+- **Network:** `host` (necessário para tráfego HTTPS/443)
+- **Porta interna:** 8005
 - **Environment:**
-  - `SEARXNG_BASE_URL=http://localhost:4000`
+  - `SEARXNG_BASE_URL=http://localhost:8005`
+  - `SEARXNG_PORT=8005`
+  - `SEARXNG_BIND_ADDRESS=0.0.0.0`
   - `SEARXNG_SECRET_KEY=iaglobal_searxng_secret_2026`
 - **Volumes:** `./searxng:/etc/searxng:rw`
 - **Healthcheck:** 30s interval, 10s timeout
@@ -52,7 +55,7 @@
 ### Teste 1: Endpoint JSON
 
 ```bash
-curl "http://localhost:4000/search?q=flask+rest+api&format=json"
+curl "http://localhost:8005/search?q=flask+rest+api&format=json"
 ```
 
 **Resultado:**
@@ -251,7 +254,7 @@ docker logs iaglobal_searxng -f
 **Testes manuais:**
 ```bash
 # Teste direto
-curl "http://localhost:4000/search?q=test&format=json"
+curl "http://localhost:8005/search?q=test&format=json"
 
 # Teste Python
 python -c "from iaglobal.graphs.nodes._search_sources import searxng_search; print(searxng_search('flask'))"

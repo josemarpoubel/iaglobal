@@ -571,6 +571,20 @@ class CoderAgent(AgentBase):
                 files[nome] = codigo
             if not files:
                 files["output.py"] = codigo
+
+            stripped = codigo.strip()
+            if (
+                stripped.endswith("class ")
+                or stripped.endswith("def ")
+                or stripped.endswith("class :")
+                or stripped.endswith("def :")
+            ):
+                logger.warning(
+                    "[CODER] Código gerado parece truncado em bloco incompleto | len=%d | suffix=%s",
+                    len(stripped),
+                    stripped[-80:],
+                )
+
             artifact = CodeArtifact(
                 code=codigo, files=files, model_used="local_tools", score=quality
             )

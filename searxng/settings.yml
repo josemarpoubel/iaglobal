@@ -1,9 +1,5 @@
-# SearXNG Configuration
-# Docs: https://docs.searxng.org/admin/settings/settings.html#use-default-settings
-
 use_default_settings: true
 
-# General settings
 general:
   debug: false
   instance_name: "iaglobal-search"
@@ -11,18 +7,18 @@ general:
   contact_url: false
   enable_metrics: true
 
-# Search settings
 search:
-  safe_search: 0  # 0=Off, 1=Moderate, 2=Strict
+  safe_search: 0
   autocomplete: "google"
   default_lang: "en"
   formats:
     - html
     - json
 
-# Server settings
 server:
   secret_key: "iaglobal_searxng_secret_2026"
+  port: 8005
+  bind_address: "0.0.0.0"
   limiter: false
   image_proxy: false
   method: "GET"
@@ -32,99 +28,40 @@ server:
     X-Robots-Tag: noindex, nofollow
     Referrer-Policy: no-referrer
 
-# Engines configuration
 engines:
-  # ═══════════════════════════════════════════════════════════════
-  # Search Engines (Primary)
-  # ═══════════════════════════════════════════════════════════════
-  
   - name: google
     engine: google
     shortcut: go
     disabled: false
-    
   - name: bing
     engine: bing
     shortcut: bi
     disabled: false
-    
   - name: duckduckgo
     engine: duckduckgo
     shortcut: ddg
     disabled: false
-    
-  # ═══════════════════════════════════════════════════════════════
-  # Knowledge & Reference
-  # ═══════════════════════════════════════════════════════════════
-  
   - name: wikipedia
     engine: wikipedia
     shortcut: wp
     disabled: false
-    
   - name: wikidata
     engine: wikidata
     shortcut: wd
     disabled: false
-    
-  - name: dictionary.com
-    engine: dictionary.com
-    shortcut: dic
-    disabled: false
-    
-  # ═══════════════════════════════════════════════════════════════
-  # Development & Tech
-  # ═══════════════════════════════════════════════════════════════
-  
   - name: github
     engine: github
     shortcut: gh
     disabled: false
-    
   - name: stackoverflow
     engine: stackoverflow
     shortcut: so
     disabled: false
-    
-  - name: npm
-    engine: npm
-    shortcut: npm
-    disabled: false
-    
-  - name: pypi
-    engine: pypi
-    shortcut: py
-    disabled: false
-    
-  # ═══════════════════════════════════════════════════════════════
-  # News & Media
-  # ═══════════════════════════════════════════════════════════════
-  
   - name: google news
     engine: google_news
     shortcut: gn
     disabled: false
-    
-  - name: arxiv
-    engine: arxiv
-    shortcut: arx
-    disabled: false
-    
-  # ═══════════════════════════════════════════════════════════════
-  # Files & Torrents (Optional)
-  # ═══════════════════════════════════════════════════════════════
-  
-  - name: torrentz
-    engine: torrentz
-    shortcut: tor
-    disabled: true  # Disabled by default
-    
-  - name: nyaa
-    engine: nyaa
-    shortcut: ny
-    disabled: true  # Disabled by default
 
-# UI Configuration
 ui:
   static_use_hash: true
   default_theme: simple
@@ -140,16 +77,10 @@ ui:
   theme_args:
     simple_style: auto
 
-# Outgoing requests
 outgoing:
-  useragent_suffix: "iaglobal-search/1.0"
+  request_timeout: 15.0
+  max_request_timeout: 25.0
+  useragent_suffix: ""
   pool_connections: 100
   pool_maxsize: 50
   enable_http2: true
-  
-# Rate limiting (optional)
-# limiter:
-#   botdetection:
-#     link_token: true
-#   rate_limit:
-#     enabled: false

@@ -3751,7 +3751,7 @@ ESTIMATED_TOKENS_PER_EXAMPLE = 300
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│           SearXNG Instance (localhost:4000)                 │
+│           SearXNG Instance (localhost:8005)                 │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │  /search?q={query}&format=json&language=en           │   │
 │  │ → JSON: { results: [ {title, url, content, engine} ]}│   │
@@ -3790,7 +3790,7 @@ def _searxng_ttl() -> float:
 def searxng_search(query: str) -> str:
     import urllib.parse as _up
     
-    base = _searxng_base_url()  # http://localhost:4000
+    base = _searxng_base_url()  # http://localhost:8005
     q = _up.quote(query)
     
     # URL formatada

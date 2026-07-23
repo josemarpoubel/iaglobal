@@ -278,7 +278,9 @@ class DataBridge:
                     "cache",
                     "sessions",
                     "data",
-                ]  # ajustar conforme tabelas reais
+                    "memory",
+                    "error_registry",
+                ]
                 if table_name not in allowed_tables:
                     logger.error(f"Tabela {table_name} não permitida")
                     return

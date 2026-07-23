@@ -22,7 +22,7 @@ import asyncio
 import ast
 from typing import Dict, Any, List, Optional
 
-from iaglobal.validation.engine import ValidationEngine
+from iaglobal.validation.validation_engine import ValidationEngine
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal.providers.provider_router import async_route_generate
 from iaglobal.utils.logger import logger
@@ -287,17 +287,34 @@ class CriticAgent(AgentBase):
         compliance = self.compliance_checker.full_audit(
             codigo, self._extrair_imports(codigo), 0.5
         )
-        if not compliance["approved"]:
-            logger.warning(
-                "[CRITIC] Compliance violado — bloqueando cloud: %s",
-                compliance["violations"],
-            )
+        if not isinstance(compliance, dict) or not compliance.get("approved", False):
+            # Extrair violações ou motivo da falha
+            if isinstance(compliance, dict):
+                violations = compliance.get("violations", [])
+                compliance_reason = compliance.get("reason", "approved=False")
+            else:
+                violations = []
+                compliance_reason = str(compliance) if compliance else "compliance=None"
+
+            # Log diferenciado: violações reais vs. falha genérica
+            if violations:
+                logger.warning(
+                    "[CRITIC] Compliance violado — bloqueando cloud: %s | reason=%s",
+                    violations,
+                    compliance_reason,
+                )
+            else:
+                logger.warning(
+                    "[CRITIC] Compliance check falhou — bloqueando cloud (sem violações): %s",
+                    compliance_reason,
+                )
+
             # Registrar handoff por compliance violation
-            self._registrar_compliance_handoff(task, codigo, compliance["violations"])
+            self._registrar_compliance_handoff(task, codigo, violations)
             # Retornar scores degradados — nao escala
             self._critic_degraded = True
             self._degraded_count += 1
-            return self._fallback_scores(compliance["violations"])
+            return self._fallback_scores(violations)
 
         cloud_candidates = [
             "groq/llama-3.3-70b-versatile",
@@ -731,15 +748,6 @@ Critérios:
         except (json.JSONDecodeError, ValueError, TypeError):
             pass
         return {}
-
-    def _fallback_scores(self) -> Dict[str, Any]:
-        return {
-            "correctness": 50.0,
-            "completeness": 50.0,
-            "security": 50.0,
-            "spec_match": 50.0,
-            "summary": "Fallback: avaliação indisponível",
-        }
 
     # =========================================================================
     # AVALIAÇÃO EM LOTE (BATCH)

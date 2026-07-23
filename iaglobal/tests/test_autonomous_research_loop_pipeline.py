@@ -134,7 +134,7 @@ class TestAutonomousResearchPipeline:
         }
 
         # Validar schema de hipóteses
-        from iaglobal.validation.engine import FeedbackEngine
+        from iaglobal.validation.validation_engine import FeedbackEngine
 
         validator = FeedbackEngine()
         for hyp in hypotheses_template["hypotheses"]:

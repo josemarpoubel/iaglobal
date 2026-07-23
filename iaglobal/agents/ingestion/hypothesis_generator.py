@@ -9,7 +9,7 @@ Usa o critic_agent (ou outro agente LLM) para propor 3 hipóteses testáveis via
 
 Integra com:
 - PaperParser (entrada: PaperMetadata)
-- validation/engine.py (validação de schema)
+- validation/validation_engine.py (validação de schema)
 - memory/data/json/{paper_id}.json (saída)
 """
 
@@ -345,7 +345,7 @@ REGRAS:
 
     def validate_hypotheses(self, hypotheses: List[Hypothesis]) -> List[bool]:
         """Valida schema de cada hipótese."""
-        from iaglobal.validation.engine import FeedbackEngine
+        from iaglobal.validation.validation_engine import FeedbackEngine
 
         validator = FeedbackEngine()
         results = []

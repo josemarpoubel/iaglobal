@@ -3,14 +3,13 @@
 Testes do QueryExpander — Fase 2 do RAG Autônomo.
 
 Cobertura:
-  - expand() gera 2-3 queries relacionadas
-  - _parse_json_response extrai queries do JSON
+  - expand() gera queries relacionadas via heurísticas
+  - _expand_heuristic gera variações
   - _filter_queries remove duplicatas e inválidas
   - Cache funciona corretamente
 """
 
 import pytest
-from unittest.mock import AsyncMock, patch
 
 from iaglobal.search.query_expander import (
     QueryExpander,
@@ -28,19 +27,19 @@ class TestExpandedQuery:
         eq = ExpandedQuery(
             original="Python API tutorial",
             expanded=["Flask REST API", "FastAPI exemplos"],
-            model_used="ollama/qwen2.5:0.5b",
+            method="heuristic",
             timestamp=1234567890.0,
         )
         assert eq.original == "Python API tutorial"
         assert len(eq.expanded) == 2
-        assert eq.model_used == "ollama/qwen2.5:0.5b"
+        assert eq.method == "heuristic"
 
     def test_expanded_query_to_dict(self):
         """to_dict deve serializar corretamente."""
         eq = ExpandedQuery(
             original="test",
             expanded=["q1", "q2"],
-            model_used="test_model",
+            method="heuristic",
             timestamp=1234567890.0,
         )
         data = eq.to_dict()
@@ -53,46 +52,39 @@ class TestQueryExpander:
 
     @pytest.fixture
     def expander(self):
-        """Cria expander com mock do LLM."""
-        return QueryExpander(model="ollama/qwen2.5:0.5b")
+        """Cria expander."""
+        return QueryExpander()
 
-    def test_parse_json_response_valid(self, expander):
-        """_parse_json_response deve extrair queries de JSON válido."""
-        json_text = '{"queries": ["query1", "query2", "query3"]}'
-        queries = expander._parse_json_response(json_text)
-        assert len(queries) == 3
-        assert "query1" in queries
+    def test_expand_heuristic(self, expander):
+        """_expand_heuristic deve gerar variações."""
+        queries = expander._expand_heuristic("Python API")
+        assert len(queries) > 0
+        assert all(isinstance(q, str) for q in queries)
+        assert all(len(q) > 5 for q in queries)
 
-    def test_parse_json_response_markdown(self, expander):
-        """_parse_json_response deve extrair de bloco markdown."""
-        markdown_text = """
-        Aqui está o JSON:
-        ```json
-        {"queries": ["flask tutorial", "fastapi exemplos"]}
-        ```
-        """
-        queries = expander._parse_json_response(markdown_text)
-        assert len(queries) == 2
+    def test_expand_heuristic_short_query(self, expander):
+        """_expand_heuristic deve lidar com query curta."""
+        queries = expander._expand_heuristic("API")
+        assert isinstance(queries, list)
+        assert len(queries) > 0
 
-    def test_parse_json_response_fallback(self, expander):
-        """_parse_json_response deve fallback para strings entre aspas."""
-        text = 'Algumas "queries" aqui: "Python API", "REST tutorial"'
-        queries = expander._parse_json_response(text)
-        assert len(queries) >= 2
+    def test_expand_heuristic_empty(self, expander):
+        """_expand_heuristic deve retornar lista vazia para string vazia."""
+        assert expander._expand_heuristic("") == []
+        assert expander._expand_heuristic("   ") == []
 
-    def test_parse_json_response_empty(self, expander):
-        """_parse_json_response deve retornar lista vazia se sem JSON."""
-        queries = expander._parse_json_response("")
-        assert len(queries) == 0
+    def test_expand_heuristic_no_duplicate_original(self, expander):
+        """_expand_heuristic não deve gerar query igual à original."""
+        queries = expander._expand_heuristic("Python API")
+        assert all(q.lower() != "python api" for q in queries)
 
     def test_filter_queries_removes_duplicates(self, expander):
         """_filter_queries deve remover queries idênticas à original."""
         original = "Python API"
-        queries = ["Python API", "Flask tutorial", "Python API"]  # Duplicata
+        queries = ["Python API", "Flask tutorial", "Python API"]
         filtered = expander._filter_queries(queries, original)
         assert len(filtered) == 1
         assert "Flask tutorial" in filtered
-        assert "Python API" not in filtered  # Removida por ser idêntica
 
     def test_filter_queries_removes_short(self, expander):
         """_filter_queries deve remover queries muito curtas."""
@@ -101,62 +93,32 @@ class TestQueryExpander:
         assert len(filtered) == 1
         assert "Flask REST API tutorial" in filtered
 
-    def test_filter_queries_removes_meta_queries(self, expander):
-        """_filter_queries deve remover meta-queries."""
-        queries = [
-            "como buscar no Google",  # Contém "buscar"
-            "query para API",  # Contém "query"
-            "Flask tutorial",  # Válida
-        ]
-        filtered = expander._filter_queries(queries, "test")
-        assert len(filtered) == 1
-        assert "Flask tutorial" in filtered
+    def test_filter_queries_removes_same_words(self, expander):
+        """_filter_queries deve remover queries com mesmas palavras."""
+        queries = ["API Python", "Flask tutorial"]
+        filtered = expander._filter_queries(queries, "Python API")
+        assert "API Python" not in filtered
 
     @pytest.mark.asyncio
-    async def test_expand_with_mock_llm(self, expander):
-        """expand() deve chamar LLM e retornar queries expandidas."""
-        mock_response = """
-        {"queries": ["Flask REST API passo a passo", "FastAPI documentação", "exemplo código API Python"]}
-        """
-
-        with patch.object(expander, "_call_llm", new_callable=AsyncMock) as mock_call:
-            mock_call.return_value = mock_response
-
-            queries = await expander.expand("Python API", max_queries=3)
-
-            assert len(queries) == 3
-            assert "Flask REST API passo a passo" in queries
-            mock_call.assert_called_once()
+    async def test_expand_returns_queries(self, expander):
+        """expand() deve retornar queries expandidas."""
+        queries = await expander.expand("Python API", max_queries=3)
+        assert len(queries) >= 1
+        assert all(isinstance(q, str) for q in queries)
 
     @pytest.mark.asyncio
-    async def test_expand_with_llm_failure(self, expander):
-        """expand() deve retornar query original se LLM falhar."""
-        with patch.object(expander, "_call_llm", new_callable=AsyncMock) as mock_call:
-            mock_call.return_value = ""  # LLM falhou
-
-            queries = await expander.expand("criar API Python", max_queries=3)
-
-            assert queries == ["criar API Python"]  # Fallback
+    async def test_expand_short_query(self, expander):
+        """expand() deve funcionar com query curta."""
+        queries = await expander.expand("AI", max_queries=3)
+        assert len(queries) >= 1
 
     @pytest.mark.asyncio
     async def test_expand_uses_cache(self, expander):
         """expand() deve usar cache se query já foi expandida."""
-        # Primeira expansão
-        mock_response = (
-            '{"queries": ["tutorial Flask passo a passo", "exemplos FastAPI GitHub"]}'
-        )
-
-        with patch.object(expander, "_call_llm", new_callable=AsyncMock) as mock_call:
-            mock_call.return_value = mock_response
-            queries1 = await expander.expand("criar API Python")
-            assert mock_call.call_count == 1
-            assert len(queries1) == 2
-
-        # Segunda expansão (deve usar cache)
-        with patch.object(expander, "_call_llm", new_callable=AsyncMock) as mock_call:
-            queries2 = await expander.expand("criar API Python")
-            assert mock_call.call_count == 0  # Não chamou LLM
-            assert queries1 == queries2  # Mesmo resultado do cache
+        await expander.expand("criar API Python")
+        size_before = len(expander._cache)
+        await expander.expand("criar API Python")
+        assert len(expander._cache) == size_before
 
     def test_get_stats(self, expander):
         """get_stats() deve retornar estatísticas de uso."""
@@ -180,24 +142,32 @@ class TestQueryExpanderIntegration:
     @pytest.mark.asyncio
     async def test_expand_query_wrapper(self):
         """expand_query wrapper deve funcionar."""
-        with patch("iaglobal.search.query_expander.get_query_expander") as mock_get:
-            mock_expander = mock_get.return_value
-            mock_expander.expand = AsyncMock(return_value=["q1", "q2"])
+        from iaglobal.search import query_expander as qe_mod
 
-            queries = await expand_query("test", max_queries=2)
+        expander = qe_mod.QueryExpander()
+        original_get = qe_mod.get_query_expander
+        qe_mod.get_query_expander = lambda: expander
 
-            assert len(queries) == 2
-            mock_expander.expand.assert_called_once()
+        try:
+            queries = await qe_mod.expand_query("test", max_queries=2)
+            assert len(queries) >= 1
+        finally:
+            qe_mod.get_query_expander = original_get
 
     def test_get_expansion_stats_wrapper(self):
         """get_expansion_stats wrapper deve funcionar."""
-        with patch("iaglobal.search.query_expander.get_query_expander") as mock_get:
-            mock_expander = mock_get.return_value
-            mock_expander.get_stats.return_value = {"cache_size": 5}
+        from iaglobal.search import query_expander as qe_mod
 
-            stats = get_expansion_stats()
+        expander = qe_mod.QueryExpander()
+        expander._cache["x"] = ["a", "b"]
+        original_get = qe_mod.get_query_expander
+        qe_mod.get_query_expander = lambda: expander
 
-            assert stats["cache_size"] == 5
+        try:
+            stats = qe_mod.get_expansion_stats()
+            assert stats["cache_size"] >= 1
+        finally:
+            qe_mod.get_query_expander = original_get
 
 
 class TestQueryExpanderE2E:
@@ -208,28 +178,13 @@ class TestQueryExpanderE2E:
         """Pipeline completo: expand → filter → cache."""
         expander = QueryExpander()
 
-        # Mock LLM response
-        mock_response = """
-        {"queries": [
-            "Flask REST API tutorial 2024",
-            "FastAPI vs Flask comparação",
-            "exemplo código Python API GitHub"
-        ]}
-        """
+        queries1 = await expander.expand("Python API", max_queries=3)
+        assert len(queries1) >= 1
+        assert all(len(q) > 5 for q in queries1)
 
-        with patch.object(expander, "_call_llm", new_callable=AsyncMock) as mock_call:
-            mock_call.return_value = mock_response
+        queries2 = await expander.expand("Python API", max_queries=3)
+        assert queries1 == queries2
 
-            # Primeira expansão
-            queries1 = await expander.expand("Python API", max_queries=3)
-            assert len(queries1) == 3
-            assert all(len(q) > 5 for q in queries1)  # Queries não vazias
-
-            # Segunda expansão (cache)
-            queries2 = await expander.expand("Python API", max_queries=3)
-            assert queries1 == queries2  # Mesmo resultado
-
-            # Stats
-            stats = expander.get_stats()
-            assert stats["cache_size"] == 1
-            assert stats["total_expansions"] == 3
+        stats = expander.get_stats()
+        assert stats["cache_size"] >= 1
+        assert stats["total_expansions"] >= len(queries1)

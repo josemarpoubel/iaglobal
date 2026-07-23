@@ -36,7 +36,17 @@ from iaglobal.graphs.comms.acetylcholine_bus import (
 from iaglobal.sandbox.sandbox_expansion import sandbox_expansion
 from iaglobal.graphs.contracts.node_contract import MissingContextError
 from iaglobal.graphs.recovery import RecoveryPolicy, RecoveryDecision, RecoveryResult
+from iaglobal.graphs.skip_reason import REASON_LABELS
 from iaglobal.obsidian.omnimind import omni_mind
+from iaglobal.observability.execution_events import (
+    get_event_bus as get_exec_event_bus,
+    emit as emit_exec_event,
+    NODE_STARTED,
+    NODE_FINISHED,
+    PROVIDER_SELECTED,
+    FALLBACK as EVENT_FALLBACK,
+    RETRY as EVENT_RETRY,
+)
 
 
 class ExecutionGraph:
@@ -59,6 +69,8 @@ class ExecutionGraph:
         self._recovery_in_flight: Set[Tuple[str, str]] = set()
         self._background_tasks: Set["asyncio.Task"] = set()
         self._bus_handlers_registered = False
+        self.skip_reasons: Dict[str, str] = {}
+        self._report = None
         try:
             from iaglobal.obsidian.epigenetic_registry import EpigeneticRegistry
 
@@ -177,6 +189,16 @@ class ExecutionGraph:
                 "error": f"Node '{node.name}' já está em execução (lock)",
                 "result_text": "",
             }
+
+        exec_id_node = str(input_data.get("metadata", {}).get("execution_id", ""))
+        emit_exec_event(
+            NODE_STARTED,
+            exec_id_node,
+            node.name,
+            strategy=node.strategy,
+            model_hint=node.model_hint or "",
+            model_type=node.model_type,
+        )
 
         start = time.time()
         raw_task = str(
@@ -427,6 +449,16 @@ class ExecutionGraph:
             "[TRACE] node=%s duration=%.1fms", node.name, trace.get("duration_ms", 0)
         )
 
+        emit_exec_event(
+            NODE_FINISHED,
+            exec_id_node,
+            node.name,
+            success=success,
+            latency=latency,
+            error=last_error,
+            result_length=len(result_text or ""),
+        )
+
         return {
             "output": result_raw if result_raw is not None else result_text,
             "latency": latency,
@@ -473,6 +505,7 @@ class ExecutionGraph:
                 "status": "ABORTED",
                 "success": False,
             }
+            self.skip_reasons[dep_name] = "aborted_by_sanity_barrier"
 
             # Atualização assíncrona no DB
             tasks.append(
@@ -678,10 +711,14 @@ class ExecutionGraph:
             ready_nodes = []
             for name, node in self.nodes.items():
                 if name in executed or name in self.results:
+                    if name not in self.skip_reasons:
+                        self.skip_reasons[name] = "already_executed"
                     continue
                 if not all(
                     dep in executed or dep in self.results for dep in node.depends_on
                 ):
+                    if name not in self.skip_reasons:
+                        self.skip_reasons[name] = "dependency_not_met"
                     continue
 
                 # Checagem de status assíncrona
@@ -870,6 +907,24 @@ class ExecutionGraph:
 
         while len(executed) < len(self.nodes):
             # Escalonamento: Filtra nós prontos
+            # Track non-ready nodes
+            for name in self.nodes:
+                if node_status.get(name) != "PENDING" and name not in self.skip_reasons:
+                    self.skip_reasons[name] = node_status.get(name, "unknown")
+                elif node_status.get(name) == "PENDING":
+                    node_ = self.nodes.get(name)
+                    unmet = (
+                        [
+                            d
+                            for d in (node_.depends_on or [])
+                            if node_status.get(d) != "COMPLETED"
+                        ]
+                        if node_
+                        else []
+                    )
+                    if unmet and name not in self.skip_reasons:
+                        self.skip_reasons[name] = "dependency_not_met"
+
             ready = [
                 name
                 for name, node in self.nodes.items()
@@ -924,6 +979,7 @@ class ExecutionGraph:
                         # Atualiza status local dos dependentes abortados
                         for dep in self._find_dependents(name):
                             node_status[dep] = "ABORTED"
+                            self.skip_reasons[dep] = "aborted_by_sanity_barrier"
                             executed.add(dep)
                 else:
                     self.results[name] = result

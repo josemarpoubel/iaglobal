@@ -253,9 +253,7 @@ def audit_representations(
     phase_counts = Counter()
     for nodes in PHASES.values():
         phase_counts.update(nodes)
-    duplicate_phase_nodes = sorted(
-        n for n, count in phase_counts.items() if count > 1
-    )
+    duplicate_phase_nodes = sorted(n for n, count in phase_counts.items() if count > 1)
 
     result: dict = {
         "pipeline_count": len(pipeline_nodes),
@@ -276,7 +274,11 @@ def audit_representations(
     dangling = []
     for node, deps in NODE_DEPENDENCIES.items():
         for dep in deps:
-            if dep not in topology_nodes and dep not in pipeline_nodes and dep not in builder_nodes:
+            if (
+                dep not in topology_nodes
+                and dep not in pipeline_nodes
+                and dep not in builder_nodes
+            ):
                 dangling.append((node, dep))
     result["dangling_deps"] = dangling
 

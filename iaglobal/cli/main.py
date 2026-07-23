@@ -1,8 +1,10 @@
 # iaglobal/cli/main.py
 
+import os
 import sys
 import logging
 import asyncio
+import subprocess
 
 
 from iaglobal.utils.logger import start_session_log, stop_session_log
@@ -53,6 +55,37 @@ async def run_cli():
             pass
         print(f"\n📝 Log detalhado em: {log_path}")
         stop_session_log()
+
+
+def _ensure_searxng():
+    docker_compose = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "docker-compose.search.yml",
+    )
+    if not os.path.exists(docker_compose):
+        return
+    try:
+        import urllib.request
+
+        req = urllib.request.Request(
+            "http://localhost:8005",
+            method="GET",
+            headers={"User-Agent": "iaglobal/1.0"},
+        )
+        urllib.request.urlopen(req, timeout=3)
+        logger.debug("[SEARXNG] Já está rodando.")
+        return
+    except Exception:
+        logger.info("[SEARXNG] Não detectado. Iniciando container...")
+    try:
+        subprocess.run(
+            ["docker", "compose", "-f", docker_compose, "up", "-d"],
+            capture_output=True,
+            timeout=30,
+        )
+        logger.info("[SEARXNG] Container iniciado.")
+    except Exception as e:
+        logger.warning("[SEARXNG] Falha ao iniciar: %s", e)
 
 
 async def _run_cli_impl():
@@ -203,6 +236,8 @@ async def _run_cli_impl():
     elif args.command == "run" and args.prompt:
         task = " ".join(args.prompt)
         print(f"🛰️ [IAGLOBAL] Processando tarefa: {task}...")
+
+        await asyncio.to_thread(_ensure_searxng)
 
         # Aguarda a pipeline async
         result = await orch.pipeline.execute(task, force=args.force)
@@ -421,6 +456,8 @@ async def _run_cli_impl():
 
         print(f"🛰️ [IAGLOBAL] Processando tarefa...\n")
 
+        await asyncio.to_thread(_ensure_searxng)
+
         # Ponto de execução assíncrono principal
         result = await orch.pipeline.execute(
             prompt_text, force=getattr(args, "force", False)
@@ -434,6 +471,8 @@ async def _run_cli_impl():
     # ── Modo Interativo ──
     if getattr(args, "interactive", False):
         from iaglobal.cli.output import OutputRenderer
+
+        await asyncio.to_thread(_ensure_searxng)
 
         print("\nIAGlobal Interactive Mode | Digite 'exit' para sair\n")
         while True:

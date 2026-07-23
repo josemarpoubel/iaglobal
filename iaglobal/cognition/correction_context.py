@@ -54,7 +54,12 @@ class CorrectionContext:
             f"\nCódigo atual (com erro):\n```python\n{self.original_code}\n```"
         )
         lines.append(f"\nReescreva o código corrigindo APENAS o erro apontado acima.")
-        lines.append(f"Responda APENAS com o código corrigido em bloco ```python.")
+        lines.append(f"IMPORTANTE:")
+        lines.append(f"  - Responda SOMENTE com código Python válido")
+        lines.append(f"  - NÃO use markdown (```)")
+        lines.append(f"  - NÃO escreva explicações")
+        lines.append(f"  - Comece com import, class, def, ou outro código válido")
+        lines.append(f"  - O código será parseado por ast.parse() imediatamente")
         return "\n".join(lines)
 
     def to_failure_record(self, provider: str = "") -> Dict[str, Any]:

@@ -177,6 +177,90 @@ class PlannerAgent(AgentBase):
 
         return texto_sanitizado
 
+    def _sanitizar_json(self, texto: str) -> str:
+        """
+        Sanitiza JSON para parse usando maquina de estados.
+
+        Problema que resolve:
+          JSON invalido: {"desc": "abc
+          def"}  <- newline dentro de string
+
+          JSON valido: {
+            "desc": "abc"  <- newline entre tokens (OK)
+          }
+
+        Estrategia:
+          1. Rastreia se esta DENTRO ou FORA de string
+          2. Dentro de string: escapa newlines/tabs/carriage returns
+          3. Fora de string: preserva formatacao (newlines sao validos)
+          4. Escapa caracteres de controle U+0000-U+001F (exceto os ja tratados)
+
+        Args:
+            texto: String contendo JSON potencialmente mal-formado
+
+        Returns:
+            Texto sanitizado pronto para json.loads()
+        """
+        resultado = []
+        dentro_string = False
+        escape_prox = False
+        chars_alterados = 0
+
+        i = 0
+        while i < len(texto):
+            char = texto[i]
+            char_code = ord(char)
+
+            # Detecta se e caractere de escape
+            if char == "\\" and not escape_prox:
+                escape_prox = True
+                resultado.append(char)
+                i += 1
+                continue
+
+            # Se estava em escape, reseta flag
+            if escape_prox:
+                escape_prox = False
+                resultado.append(char)
+                i += 1
+                continue
+
+            # Detecta entrada/saida de string
+            if char == '"':
+                dentro_string = not dentro_string
+                resultado.append(char)
+                i += 1
+                continue
+
+            # Se esta DENTRO de string, precisa escapar caracteres problematicos
+            if dentro_string:
+                if char_code == 0x0A:  # \n dentro de string
+                    resultado.append("\\n")
+                    chars_alterados += 1
+                elif char_code == 0x0D:  # \r dentro de string
+                    resultado.append("\\r")
+                    chars_alterados += 1
+                elif char_code == 0x09:  # \t dentro de string
+                    resultado.append("\\t")
+                    chars_alterados += 1
+                elif char_code < 0x20:  # Outros caracteres de controle
+                    resultado.append(f"\\u{char_code:04x}")
+                    chars_alterados += 1
+                else:
+                    resultado.append(char)
+            else:
+                # FORA de string: preserva tudo (incluindo newlines de formatacao)
+                resultado.append(char)
+
+            i += 1
+
+        logger.info(
+            "[SANITIZE] JSON sanitizado: %d caracteres escapados",
+            chars_alterados,
+        )
+
+        return "".join(resultado)
+
     def _enriquecer_plano(self, plano: Dict[str, Any]) -> Dict[str, Any]:
         """
         Injeta e força metadados estruturais para garantir que a autocorreção em runtime
@@ -444,16 +528,123 @@ EXEMPLO DE RETORNO EXATO DE MARCAÇÃO ESPERADO (SIGA ESTA ARQUITETURA):
                 return self._fallback_plan(task_text)
 
             # =================================================
-            # PARSE DEFENSIVO ANTI-QUEBRA
+            # DETECÇÃO DE MÚLTIPLOS DOCUMENTOS JSON
             # =================================================
+            # Verifica se há múltiplos objetos JSON (ex: {} {})
+            texto_trimmed = texto_limpo.strip()
+            json_objects = []
+            decoder = json.JSONDecoder()
+            pos = 0
+
+            while pos < len(texto_trimmed):
+                # Pula whitespace
+                while pos < len(texto_trimmed) and texto_trimmed[pos].isspace():
+                    pos += 1
+
+                if pos >= len(texto_trimmed):
+                    break
+
+                try:
+                    # Tenta parsear um objeto JSON
+                    obj, end_pos = decoder.raw_decode(texto_trimmed, pos)
+                    json_objects.append(obj)
+                    pos += end_pos
+                except json.JSONDecodeError:
+                    # Não conseguiu parsear, para
+                    break
+
+            # Se encontrou exatamente um objeto, usa ele diretamente
+            if len(json_objects) == 1:
+                texto_limpo = json.dumps(json_objects[0])
+            # Se encontrou múltiplos objetos, usa scoring para selecionar o melhor
+            elif len(json_objects) > 1:
+                logger.warning(
+                    "[PLANNER] Múltiplos documentos JSON detectados (%d) — aplicando scoring",
+                    len(json_objects),
+                )
+
+                # Scoring de candidatos
+                def score_plan_candidate(obj: Any) -> int:
+                    """Score heuristic para selecionar melhor plano entre múltiplos JSON."""
+                    score = 0
+                    if not isinstance(obj, dict):
+                        return score
+
+                    # Subtarefas é o campo mais importante
+                    if "subtarefas" in obj:
+                        score += 50
+                        subtarefas = obj.get("subtarefas")
+                        if isinstance(subtarefas, list):
+                            score += min(
+                                len(subtarefas) * 10, 30
+                            )  # Bônus por quantidade
+                            if len(subtarefas) > 0 and isinstance(subtarefas[0], dict):
+                                score += 10  # Estrutura rica
+                        else:
+                            score -= 20  # Subtarefas não é lista
+                    else:
+                        score -= 50  # Penaliza fortemente quem não tem subtarefas
+
+                    # Campos secundários
+                    if obj.get("objetivo"):
+                        score += 10
+                    if obj.get("etapas"):
+                        score += 10
+                    if obj.get("complexidade"):
+                        score += 5
+                    if obj.get("estrategia_validacao"):
+                        score += 5
+
+                    return score
+
+                # Seleciona melhor candidato
+                best_candidate = max(json_objects, key=score_plan_candidate)
+                best_score = score_plan_candidate(best_candidate)
+
+                logger.info(
+                    "[PLANNER] Selecionado candidato com score=%d (entre %d opções)",
+                    best_score,
+                    len(json_objects),
+                )
+
+                # Log de debugging
+                if best_score < 50:
+                    logger.warning(
+                        "[PLANNER] Melhor candidato tem score baixo (%d) — plano pode ser incompleto",
+                        best_score,
+                    )
+
+                texto_limpo = json.dumps(best_candidate)
+
+            # =================================================
+            # PARSE DEFENSIVO ANTI-QUEBRA — FLUXO EM ETAPAS
+            # =================================================
+            # Etapa 1: Tentar parse direto (JSON já válido)
             try:
                 plano = json.loads(texto_limpo)
-            except json.JSONDecodeError as je:
-                logger.error(
-                    f"JSON inválido do planner: {je} | Texto que quebrou: {texto_limpo[:100]}..."
-                )
-                # Se falhar o parse da nuvem, aciona o fallback resiliente local para não parar o pipeline
-                return self._fallback_plan(task_text)
+                logger.debug("[PLANNER] JSON parseado direto sem sanitização")
+            except json.JSONDecodeError:
+                # Etapa 2: Sanitizar apenas o necessário
+                texto_sanitizado = self._sanitizar_json(texto_limpo)
+
+                # Etapa 3: Tentar parse com texto sanitizado
+                try:
+                    plano = json.loads(texto_sanitizado)
+                    logger.debug("[PLANNER] JSON parseado após sanitização")
+                except json.JSONDecodeError as je:
+                    error_type = (
+                        "multiple_json_documents"
+                        if len(json_objects) > 1
+                        else "invalid_json"
+                    )
+                    logger.error(
+                        f"JSON inválido do planner: {je} | "
+                        f"Tipo: {error_type} | "
+                        f"Texto original: {texto_limpo[:100]}... | "
+                        f"Texto sanitizado: {texto_sanitizado[:100]}..."
+                    )
+                    # Etapa 4: Fallback se tudo falhar
+                    return self._fallback_plan(task_text)
 
             # =================================================
             # VALIDAÇÃO MÍNIMA DA ÁRVORE DO PLANO

@@ -17,6 +17,7 @@ from typing import Dict, List, Optional, Any
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.utils.life_signal_collector import instrument
+from iaglobal.observability.semaphore_tracker import get_semaphore_tracker
 
 # Logger dedicado à membrana: roteia pelo logger "iaglobal" para herdar o
 # nível INFO corrigido em logger.py (observable no CLI), independente do
@@ -170,27 +171,49 @@ class BanditPolicy:
         )
 
     async def _get_model_semaphore(self, model_name: str) -> asyncio.Semaphore:
-        """Obtém ou cria semáforo para o modelo específico."""
+        """Obtém ou cria semáforo para o modelo específico.
+
+        A concorrência respeita max_concurrent_requests do provider_config.py
+        para modelos locais (Juiz=1, Operário=3, Sentinela=5). Modelos cloud
+        usam concorrência 1 para evitar 429 rate limit.
+        """
         async with self.SEMAPHORE_LOCK:
             if model_name not in self.MODEL_SEMAPHORES:
-                # Modelos cloud (Groq, NVIDIA) têm concorrência 1
-                # Modelos locais (Ollama) podem ter concorrência maior
                 is_cloud = any(
                     provider in model_name
                     for provider in ["groq/", "nvidia/", "openrouter/", "gemini/"]
                 )
-                concurrency = (
-                    self.CLOUD_MODEL_CONCURRENCY
-                    if is_cloud
-                    else self.LOCAL_MODEL_CONCURRENCY
-                )
+                if is_cloud:
+                    concurrency = self.CLOUD_MODEL_CONCURRENCY
+                else:
+                    concurrency = self._resolve_local_concurrency(model_name)
                 self.MODEL_SEMAPHORES[model_name] = asyncio.Semaphore(concurrency)
                 self.logger.info(
                     f"🔒 Semáforo criado para {model_name} (concorrência={concurrency})"
                 )
             return self.MODEL_SEMAPHORES[model_name]
 
-    async def acquire_model(self, model_name: str, node_id: str = "") -> bool:
+    def _resolve_local_concurrency(self, model_name: str) -> int:
+        """Resolve a concorrência para um modelo local baseado no papel cognitivo."""
+        raw = model_name.replace("ollama/", "", 1)
+        try:
+            from iaglobal.providers.provider_config import (
+                COGNITIVE_MODELS,
+                CognitiveRole,
+            )
+
+            for role, cfg in COGNITIVE_MODELS.items():
+                if cfg["model_id"] == raw:
+                    return cfg.get(
+                        "max_concurrent_requests", self.LOCAL_MODEL_CONCURRENCY
+                    )
+        except Exception:
+            pass
+        return self.LOCAL_MODEL_CONCURRENCY
+
+    async def acquire_model(
+        self, model_name: str, node_id: str = "", execution_id: str = ""
+    ) -> bool:
         """
         Adquire semáforo para usar o modelo.
         Retorna True se conseguiu adquirir, False se timeout.
@@ -202,6 +225,10 @@ class BanditPolicy:
         Em caso de timeout no semáforo, libera automaticamente o token do
         LocalModelGate (se consumido) para evitar vazamento.
         """
+        _st = get_semaphore_tracker()
+        _st.record_acquire_start(model_name, node_id, execution_id=execution_id)
+        _acquire_start = time.time()
+
         semaphore = await self._get_model_semaphore(model_name)
         _gate_token_consumed = False
         try:
@@ -215,39 +242,67 @@ class BanditPolicy:
                 from iaglobal.execution.token_bucket import LocalModelGate
 
                 gate = await LocalModelGate.get_instance()
-                if not await gate.try_acquire(node_id):
+                if not await gate.try_acquire(node_id, model_name=model_name):
                     self.logger.info(
                         "🔒 %s rejeitado pelo LocalModelGate (synthetic_success fallback)",
                         model_name,
                     )
+                    _st.record_gate_rejected(
+                        model_name, node_id, execution_id=execution_id
+                    )
                     return False
                 _gate_token_consumed = True
 
-            # Timeout curto: 3s para cloud, 1s para local
-            timeout = 3.0 if is_cloud else 1.0
+            # Timeout de aquisição: cloud é rápido (3s), local precisa de
+            # margem para fila — cada modelo tem latência diferente:
+            # GLM4 (Juiz, 1.2B)  ~90s cold / ~15-50s warm
+            # LFM  (Sentinela)   ~10-30s
+            # Qwen (Operário)    ~3-10s
+            if is_cloud:
+                timeout = 3.0
+            elif "glm4" in model_name.lower() or "glm" in model_name.lower():
+                timeout = 180.0
+            elif "lfm" in model_name.lower():
+                timeout = 60.0
+            else:
+                timeout = 30.0
 
             await asyncio.wait_for(semaphore.acquire(), timeout=timeout)
             self._model_in_use[model_name] = True
-            self.logger.debug(f"🔒 {model_name} adquirido (timeout={timeout}s)")
+            _wait_ms = (time.time() - _acquire_start) * 1000
+            _st.record_acquired(
+                model_name, node_id, _wait_ms, execution_id=execution_id
+            )
+            self.logger.debug(
+                f"🔒 {model_name} adquirido (timeout={timeout}s, wait={_wait_ms:.0f}ms)"
+            )
             return True
         except asyncio.TimeoutError:
+            _wait_ms = (time.time() - _acquire_start) * 1000
+            _st.record_timeout(model_name, node_id, _wait_ms, execution_id=execution_id)
             # Libera token do gate local se foi consumido antes do semáforo
             if _gate_token_consumed:
                 try:
                     from iaglobal.execution.token_bucket import LocalModelGate
 
                     gate = await LocalModelGate.get_instance()
-                    await gate.release(node_id)
+                    await gate.release(node_id, model_name=model_name)
                 except Exception:
                     pass
-            self.logger.debug(f"⏰ Timeout ({timeout}s) aguardando {model_name}")
+            self.logger.debug(
+                f"⏰ Timeout ({timeout}s, wait={_wait_ms:.0f}ms) aguardando {model_name}"
+            )
             return False
 
-    def release_model(self, model_name: str) -> None:
+    def release_model(
+        self, model_name: str, node_id: str = "", execution_id: str = ""
+    ) -> None:
         """Libera o semáforo do modelo após uso."""
         if model_name in self.MODEL_SEMAPHORES:
             self.MODEL_SEMAPHORES[model_name].release()
             self._model_in_use[model_name] = False
+            _st = get_semaphore_tracker()
+            _st.record_released(model_name, node_id, execution_id=execution_id)
             self.logger.debug(f"🔓 {model_name} liberado")
 
     def _apply_epigenetic_adjustments(self) -> None:
@@ -724,6 +779,7 @@ class BanditPolicy:
         context: Optional[dict] = None,
         task_type: str = "general",
         timeout: float = 600.0,
+        execution_id: str = "",
     ) -> str:
         """
         Método completo de geração via Bandit:
@@ -817,28 +873,36 @@ class BanditPolicy:
                         c for c in candidates if c.split("/", 1)[0] in _LOCAL_PROVIDERS
                     ] or ["ollama/qwen2.5:0.5b"]
 
-            # ── Tribunal Cognitivo: TaskRouter resolve tier para node_id ──
+            # ── Tribunal Cognitivo: resolve tier para o agente real ──
+            # Usa effective_agent (delegate_for) quando disponível, pois
+            # node_id pode ser "critic" (fixo da PSC) mas o agente real
+            # que precisa de geração é outro (ex: "coder", "planner").
+            # Primeiro tenta CognitiveRouter.ROUTE_MAP (match exato),
+            # depois TaskRouter (regex patterns).
             try:
                 from iaglobal.providers.task_router import get_task_router
+                from iaglobal.providers.provider_router import CognitiveRouter
 
-                router = get_task_router()
-                tier = router.get_role_for_node(node_id)
-                route = router.route_for_tier(tier)
-                # Prioriza a rota do tier correto
+                _route_node = effective_agent if effective_agent != node_id else node_id
+                route = CognitiveRouter.ROUTE_MAP.get(_route_node)
+                if route:
+                    route = CognitiveRouter.ROUTE_TO_MODEL.get(route, route)
+                    tier_timeout = 600.0
+                else:
+                    router = get_task_router()
+                    tier = router.get_role_for_node(_route_node)
+                    route = router.route_for_tier(tier)
+                    route = CognitiveRouter.ROUTE_TO_MODEL.get(route, route)
+                    tier_timeout = router.get_timeout_for_tier(tier)
                 if route in candidates or any(
                     route.split("_")[0] in c for c in candidates
                 ):
-                    prioritized = [
-                        route if r in candidates else r for r in [route] + candidates
-                    ]
-                    candidates = prioritized
-                # Timeout baseado no tier cognitivo
-                tier_timeout = router.get_timeout_for_tier(tier)
+                    candidates = [route] + [c for c in candidates if c != route]
                 timeout = min(timeout, tier_timeout) if timeout else tier_timeout
                 self.logger.debug(
                     "[TRIBUNAL] node_id=%s tier=%s route=%s timeout=%.1fs",
                     node_id,
-                    tier,
+                    _route_node,
                     route,
                     timeout,
                 )
@@ -861,7 +925,9 @@ class BanditPolicy:
             acquired = False
             for retry_round in range(3):
                 for _candidate in candidates:
-                    acquired = await self.acquire_model(_candidate, node_id)
+                    acquired = await self.acquire_model(
+                        _candidate, node_id, execution_id=execution_id
+                    )
                     if acquired:
                         model_selected = _candidate
                         _sem_acquired = True
@@ -873,7 +939,7 @@ class BanditPolicy:
                 if acquired:
                     break
                 if retry_round < 2:
-                    backoff = 0.1 * (2**retry_round)
+                    backoff = 2.0 * (2**retry_round)
                     self.logger.info(
                         f"⏳ {node_id}: todos os {len(candidates)} candidato(s) "
                         f"ocupados — backoff {backoff:.1f}s "
@@ -886,6 +952,8 @@ class BanditPolicy:
                     f"❌ {node_id}: Não conseguiu adquirir semáforo "
                     f"para nenhum modelo após 3 tentativas"
                 )
+                _st = get_semaphore_tracker()
+                _st.record_starvation(node_id, candidates, 3, execution_id=execution_id)
                 return ""
 
             # 2.5 SearchMiddleware — enriquece prompt com contexto web via RAG
@@ -1022,7 +1090,9 @@ class BanditPolicy:
         finally:
             # 7. Libera semáforo + token bucket APENAS se foi adquirido
             if _sem_acquired and model_selected:
-                self.release_model(model_selected)
+                self.release_model(
+                    model_selected, node_id=effective_agent, execution_id=execution_id
+                )
                 if not any(
                     p in model_selected
                     for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
@@ -1031,7 +1101,7 @@ class BanditPolicy:
                         from iaglobal.execution.token_bucket import LocalModelGate
 
                         gate = await LocalModelGate.get_instance()
-                        await gate.release(effective_agent)
+                        await gate.release(effective_agent, model_name=model_selected)
                     except Exception:
                         pass
             # 8. Telemetria metabólica (IVM) — portão universal de todo acesso a

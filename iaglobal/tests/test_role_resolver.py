@@ -1,4 +1,7 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+
+# test_role_resolver.py
+
 """
 Testes unitários para RoleResolver — Fase 1 da refatoração de papéis.
 
@@ -6,8 +9,12 @@ Nenhuma dependência externa: apenas lógica pura de mapeamento node_id → Agen
 """
 
 import pytest
+import os
+import sys
+import time
 
-from iaglobal.core.agent_roles import AgentRole
+
+from iaglobal.agents.agent_roles import AgentRole
 from iaglobal.core.role_resolver import RoleResolver
 
 
@@ -59,10 +66,12 @@ class TestRoleResolver:
         ):
             assert RoleResolver.resolve(node_id) == AgentRole.LOCAL, node_id
 
-    @pytest.mark.xfail(
-        reason="Phase 1 closed set incomplete; these are known desired CRITIC roles missing from _CRITIC_NODE_IDS.",
-        strict=True,
-    )
-    def test_unregistered_critic_variants_not_yet_in_list(self):
-        for node_id in ("critic_batch",):
-            assert RoleResolver.resolve(node_id) == AgentRole.CRITIC, node_id
+
+def test_unregistered_critic_variants_not_yet_in_list():
+
+    for node_id in ("critic_batch",):
+        assert RoleResolver.resolve(node_id) == AgentRole.CRITIC, node_id
+
+
+if __name__ == "__main__":
+    pytest.main([__file__, "-v", "-x"])
