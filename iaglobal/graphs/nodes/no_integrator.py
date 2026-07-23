@@ -2,7 +2,6 @@
 # iaglobal/graphs/nodes/no_integrator.py
 
 from __future__ import annotations
-import logging
 import time
 import pkgutil
 import importlib
@@ -15,7 +14,8 @@ from iaglobal.evolution.skills.native.skill_registry import (
 from iaglobal.graphs.execution_graph import ExecutionGraph
 from iaglobal.graphs.pipeline_definition import PIPELINE_SKILLS
 
-logger = logging.getLogger("ia-global")
+from iaglobal.utils.logger import get_logger
+logger = get_logger("iaglobal.graphs.nodes.no_integrator")
 
 _default_registry = _global_registry
 _FALLBACK_RUN_FN_CACHE: Dict[str, Callable] = {}

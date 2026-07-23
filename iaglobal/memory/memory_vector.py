@@ -89,6 +89,16 @@ def store(text: str, mtype: str = "fact") -> None:
             (mtype, text.strip(), vec),
         )
         conn.commit()
+    except sqlite3.OperationalError:
+        # Tabela memory pode não existir se init_db() não foi chamado ainda
+        conn.close()
+        init_db()
+        conn = get_vector_db()
+        conn.execute(
+            "INSERT INTO memory (type, content, embedding) VALUES (?, ?, ?)",
+            (mtype, text.strip(), vec),
+        )
+        conn.commit()
     finally:
         conn.close()
 

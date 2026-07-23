@@ -32,7 +32,7 @@ COGNITIVE_MODELS = {
         "fallback_role": CognitiveRole.OPERARIO,
         "timeout_seconds": 60,
         "context_window": 8192,
-        "num_predict": 2048,
+        "num_predict": 8192,
     },
     CognitiveRole.OPERARIO: {
         "model_id": "qwen2.5:0.5b",
@@ -43,7 +43,7 @@ COGNITIVE_MODELS = {
         "fallback_role": None,
         "timeout_seconds": 60,
         "context_window": 8192,
-        "num_predict": 2048,
+        "num_predict": 8192,
     },
     CognitiveRole.SENTINELA: {
         "model_id": "qwen2.5:0.5b",
@@ -54,7 +54,7 @@ COGNITIVE_MODELS = {
         "fallback_role": None,
         "timeout_seconds": 60,
         "context_window": 8192,
-        "num_predict": 2048,
+        "num_predict": 8192,
     },
 }
 

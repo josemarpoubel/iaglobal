@@ -624,27 +624,33 @@ EXEMPLO DE RETORNO EXATO DE MARCAÇÃO ESPERADO (SIGA ESTA ARQUITETURA):
                 plano = json.loads(texto_limpo)
                 logger.debug("[PLANNER] JSON parseado direto sem sanitização")
             except json.JSONDecodeError:
-                # Etapa 2: Sanitizar apenas o necessário
-                texto_sanitizado = self._sanitizar_json(texto_limpo)
-
-                # Etapa 3: Tentar parse com texto sanitizado
+                # Etapa 2: Tentar ast.literal_eval (aceita single quotes de Python repr)
                 try:
-                    plano = json.loads(texto_sanitizado)
-                    logger.debug("[PLANNER] JSON parseado após sanitização")
-                except json.JSONDecodeError as je:
-                    error_type = (
-                        "multiple_json_documents"
-                        if len(json_objects) > 1
-                        else "invalid_json"
-                    )
-                    logger.error(
-                        f"JSON inválido do planner: {je} | "
-                        f"Tipo: {error_type} | "
-                        f"Texto original: {texto_limpo[:100]}... | "
-                        f"Texto sanitizado: {texto_sanitizado[:100]}..."
-                    )
-                    # Etapa 4: Fallback se tudo falhar
-                    return self._fallback_plan(task_text)
+                    import ast
+                    plano = ast.literal_eval(texto_limpo)
+                    logger.debug("[PLANNER] JSON parseado via ast.literal_eval")
+                except (ValueError, SyntaxError):
+                    # Etapa 3: Sanitizar apenas o necessário
+                    texto_sanitizado = self._sanitizar_json(texto_limpo)
+
+                    # Etapa 4: Tentar parse com texto sanitizado
+                    try:
+                        plano = json.loads(texto_sanitizado)
+                        logger.debug("[PLANNER] JSON parseado após sanitização")
+                    except json.JSONDecodeError as je:
+                        error_type = (
+                            "multiple_json_documents"
+                            if len(json_objects) > 1
+                            else "invalid_json"
+                        )
+                        logger.error(
+                            f"JSON inválido do planner: {je} | "
+                            f"Tipo: {error_type} | "
+                            f"Texto original: {texto_limpo[:100]}... | "
+                            f"Texto sanitizado: {texto_sanitizado[:100]}..."
+                        )
+                        # Etapa 5: Fallback se tudo falhar
+                        return self._fallback_plan(task_text)
 
             # =================================================
             # VALIDAÇÃO MÍNIMA DA ÁRVORE DO PLANO

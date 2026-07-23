@@ -3,9 +3,9 @@
 TaskRouter — Sistema nervoso central para mapeamento node_id → nível cognitivo.
 
 Integração com Tribunal Cognitivo:
-- Layer 1 (JUIZ): glm4 → critic, validation, correction
-- Layer 2 (OPERARIO): qwen → coder, generation, execution
-- Layer 3 (SENTINELA): lfm → audit, monitor, validation
+- Layer 1 (JUIZ): crítico → raciocínio profundo
+- Layer 2 (OPERARIO): geração e escrita
+- Layer 3 (SENTINELA): validação rápida
 """
 
 import re
@@ -24,9 +24,9 @@ class TaskRouter:
     existentes sem manutenção manual de dicionário.
     """
 
-    TIER_JUIZ = "glm4"
-    TIER_OPERARIO = "qwen"
-    TIER_SENTINELA = "lfm"
+    TIER_JUIZ = "critic"
+    TIER_OPERARIO = "worker"
+    TIER_SENTINELA = "sentinel"
 
     def __init__(self) -> None:
         self._rules = self._build_rules()
@@ -80,16 +80,16 @@ class TaskRouter:
 
     def get_tier_display(self, tier: str) -> str:
         return {
-            self.TIER_JUIZ: "JUIZ (GLM4-1.2B)",
+            self.TIER_JUIZ: "JUIZ (Qwen2.5-0.5B)",
             self.TIER_OPERARIO: "OPERARIO (Qwen2.5-0.5B)",
-            self.TIER_SENTINELA: "SENTINELA (LFM-230M)",
+            self.TIER_SENTINELA: "SENTINELA (Qwen2.5-0.5B)",
         }.get(tier, "OPERARIO")
 
     def route_for_tier(self, tier: str) -> str:
         return {
-            self.TIER_JUIZ: "ollama_glm4",
+            self.TIER_JUIZ: "ollama",
             self.TIER_OPERARIO: "ollama",
-            self.TIER_SENTINELA: "ollama_lfm",
+            self.TIER_SENTINELA: "ollama",
         }.get(tier, "ollama")
 
     def resolve_model(self, node_id: str, candidates: list[str]) -> list[str]:
@@ -100,10 +100,10 @@ class TaskRouter:
 
     def get_timeout_for_tier(self, tier: str) -> float:
         return {
-            self.TIER_JUIZ: 600.0,  # Juiz: 10 minutos para raciocínio profundo
-            self.TIER_OPERARIO: 60.0,  # Operário: 1 minuto balanceado
-            self.TIER_SENTINELA: 10.0,  # Sentinela: 10 segundos rápido
-        }.get(tier, 60.0)
+            self.TIER_JUIZ: 180.0,
+            self.TIER_OPERARIO: 180.0,
+            self.TIER_SENTINELA: 180.0,
+        }.get(tier, 180.0)
 
     def is_critical_node(self, node_id: str) -> bool:
         return self.get_role_for_node(node_id) == self.TIER_JUIZ

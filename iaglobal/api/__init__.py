@@ -16,15 +16,14 @@ Uso:
 
 import os
 import time
-import logging
 import asyncio
 import concurrent.futures
 
 from typing import Optional, Dict, Any, List
 
-from iaglobal.utils.logger import logger
+from iaglobal.utils.logger import get_logger
 
-logger = logging.getLogger("ia-global")
+logger = get_logger("iaglobal.api")
 
 
 class IAGlobalAPI:

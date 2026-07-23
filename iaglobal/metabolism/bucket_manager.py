@@ -14,9 +14,9 @@ logger = get_logger("iaglobal.metabolism.bucket_manager")
 
 
 _ROLE_TO_ROUTE: dict[CognitiveRole, str] = {
-    CognitiveRole.JUIZ: "ollama_glm4",
+    CognitiveRole.JUIZ: "ollama",
     CognitiveRole.OPERARIO: "ollama",
-    CognitiveRole.SENTINELA: "ollama_lfm",
+    CognitiveRole.SENTINELA: "ollama",
 }
 
 _ROUTE_TO_ROLE: dict[str, CognitiveRole] = {v: k for k, v in _ROLE_TO_ROUTE.items()}
