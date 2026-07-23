@@ -56,6 +56,7 @@ try:
     BUS_AVAILABLE = True
 except ImportError:
     BUS_AVAILABLE = False
+    AcetylcholineBus = None
     AgentMessage = None
 
 logger = get_logger("iaglobal.mcp.unified")
