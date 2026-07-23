@@ -12,6 +12,7 @@ iaglobal/memory/data/ancestry_tree.jsonl
 # Obsidian vault files
 iaglobal/obsidian/**/*.md
 iaglobal/obsidian/**/*.cbor
+iaglobal/obsidian/**/search_index.json
 
 .env
 

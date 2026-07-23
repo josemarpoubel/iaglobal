@@ -555,9 +555,9 @@ class PipelineEngine:
             or ("> " in code and len(code.split("\n")) > 5)
         )
 
-        if is_analysis_task or is_markdown_or_text:
+        if is_analysis_task or is_markdown_or_text or state.intent in (TaskIntent.CHAT, TaskIntent.DOCUMENT):
             logger.info(
-                "[VALIDATION] Tarefa de análise/texto detectada — pulando validação Python AST"
+                "[VALIDATION] Tarefa de análise/texto/chat detectada — pulando validação Python AST"
             )
             state.syntax_valid = True
             return
