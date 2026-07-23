@@ -1,49 +1,9 @@
-# Runtime data (regenerable)
-iaglobal/memory/data/
-
-# Obsidian vault files
-iaglobal/obsidian/**/*.md
-iaglobal/obsidian/**/*.cbor
-iaglobal/obsidian/**/search_index.json
-
+```
+# Environment variables
 .env
+.env.local
+.env.*
 
-# Python artifacts
-__pycache__/
-*.py[cod]
-*$py.class
-*.so
-
-# Virtual environment
-venv/
-
-# Test artifacts
-tests/temp/
-
-# Root-level runtime artifacts (avoid accidental commits)
-*.db
-*.log
-*.pkl
-*.lock
-
-# Epigenetic state (regenerable)
-iaglobal/obsidian/epigenetic/*.cbor
-
-# Generated listings / debris
-iaglobal/dirs.txt
-iaglobal/extensoes.txt
-iaglobal/maiores_py.txt
-iaglobal/tree_*.txt
-*.bak
-
-# Runtime state files
-*.json.lock
-
-# Build artifacts
-iaglobal.egg-info/
-*.egg-info/
-.goosehints
-.opencode.json
-.pytest_cache
-.ruff_cache
-
+# Example environment file
+.env.example
+```
