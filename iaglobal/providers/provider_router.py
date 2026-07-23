@@ -1287,7 +1287,7 @@ async def async_route_generate(
             return await async_route_generate_parallel(
                 prompt, task_type=task_type, node_id=node_id
             )
-        provider = original.split("/")[0]
+        provider = original.split("/")[0] if "/" in original else "ollama"
         logger.info(
             "[ROUTER] async_route_generate model=%s provider=%s task_type=%s",
             original,
