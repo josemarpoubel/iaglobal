@@ -1,0 +1,362 @@
+[
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "<Error: SyntaxError: invalid syntax (<string>, line 3)>"
+    },
+    "timestamp": 1784822510.375715
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822510.5815244
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822510.7438686
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822510.940026
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822511.2484467
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822512.2102885
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822512.6506076
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822513.0608335
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822513.4694984
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822514.0351048
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822515.0481372
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822515.660237
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822516.0852282
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822516.5034752
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822516.960538
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822517.8096893
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822518.211846
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822518.6214988
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822519.063451
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784822519.528762
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "<Error: SyntaxError: invalid syntax (<string>, line 3)>"
+    },
+    "timestamp": 1784838330.2940068
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838330.5400264
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838330.8634353
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838331.0307422
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838331.3139353
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838332.1064339
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838332.5324519
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838332.9893978
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838333.4217246
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838333.8635223
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838334.680737
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838335.0853257
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838335.6616752
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838336.19131
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838336.678804
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838337.7766874
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838338.2005608
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838338.6475883
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838339.067838
+  },
+  {
+    "type": "failed_prompt",
+    "content": "def f(): return 1",
+    "metadata": {
+      "error_type": "Unknown",
+      "response_preview": "[CodeExecutor] C\u00f3dulo bloqueado por seguran\u00e7a: uso de eval/exec/__import__ n\u00e3o permitido."
+    },
+    "timestamp": 1784838339.4698153
+  }
+]

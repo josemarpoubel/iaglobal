@@ -53,9 +53,9 @@
     },
     "ollama/qwen2.5:0.5b": {
       "provider_id": "ollama/qwen2.5:0.5b",
-      "total_uses": 8,
+      "total_uses": 24,
       "successful_uses": 0,
-      "failed_uses": 8,
+      "failed_uses": 24,
       "ivm_history": [
         0.1,
         0.1,
@@ -64,22 +64,34 @@
         0.1,
         0.1,
         0.1,
+        0.1,
+        0.05,
+        0.2602284273926955,
+        0.3471079592567322,
+        0.4006551291379691,
+        0.4309368238021927,
+        0.45664661120030237,
+        0.4764038566893176,
+        0.4921925296364875,
+        0.1,
+        0.1,
+        0.1,
         0.1
       ],
-      "ivm_media_movel": 0.1,
-      "strikes_consecutivos": 8,
+      "ivm_media_movel": 0.20067482557693797,
+      "strikes_consecutivos": 24,
       "ultimo_banimento": null,
-      "latencia_media_ms": 12.344959945158958,
-      "custo_medio_creditos": 0.056953279000000016,
-      "fitness_score": 0.46
+      "latencia_media_ms": 6853.778069592579,
+      "custo_medio_creditos": 0.09202335569231276,
+      "fitness_score": 0.34958588106954336
     }
   },
   "banned_providers": {
     "groq/llama-3.3-70b-versatile": "2026-07-23T23:37:42.715697+00:00",
-    "ollama/qwen2.5:0.5b": "2026-07-24T02:01:53.015881+00:00"
+    "ollama/qwen2.5:0.5b": "2026-07-24T20:25:39.884852+00:00"
   },
   "weights": {
-    "unknown": 1.0076466528254162
+    "unknown": 1.057810487741981
   },
-  "updated_at": "2026-07-23T02:01:53.015881+00:00"
+  "updated_at": "2026-07-23T20:25:39.884852+00:00"
 }

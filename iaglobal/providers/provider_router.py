@@ -450,11 +450,32 @@ def _force_local_model(node_id: str) -> bool:
     return not _is_external_authorized(node_id)
 
 
+def _base_credit_candidates(task_type: str = "general") -> List[Tuple[str, str]]:
+    """Retorna os candidatos base da política sem filtrar por chave de API."""
+    if task_type == "image":
+        return [
+            ("hf_router", "hf_router/stable-diffusion-xl"),
+            ("hf_router", "hf_router/flux-schnell"),
+        ]
+    if task_type == "video":
+        return [
+            ("hf_video", "hf_video/wan2.1"),
+            ("hf_video", "hf_video/ltx"),
+            ("hf_video", "hf_video/hunyuan"),
+        ]
+    return [
+        ("groq", "groq/llama-3.3-70b-versatile"),
+        ("nvidia", "nvidia/mistralai/mistral-large-3-675b-instruct-2512"),
+        ("ollama", "ollama/qwen2.5:0.5b"),
+    ]
+
+
 def _policy_candidates(task_type: str, node_id: str) -> List[Tuple[str, str]]:
     """Candidatos respeitando a membrana seletiva: remove cloud se não autorizado."""
-    cands = CREDIT_CANDIDATES(task_type)
     if _force_local_model(node_id):
-        local = [c for c in cands if c[0] in _LOCAL_PROVIDERS]
+        local = [
+            c for c in _base_credit_candidates(task_type) if c[0] in _LOCAL_PROVIDERS
+        ]
         if local:
             logger.info(
                 "[MEMBRANA] node_id='%s' sem direito a modelo externo — "
@@ -463,8 +484,10 @@ def _policy_candidates(task_type: str, node_id: str) -> List[Tuple[str, str]]:
             )
             record_membrane_decision(node_id, "confined_local", local)
             return local
-    record_membrane_decision(node_id, "authorized_cloud", cands)
-    return cands
+
+    candidates = _base_credit_candidates(task_type)
+    record_membrane_decision(node_id, "authorized_cloud", candidates)
+    return candidates
 
 
 def _provider_has_key(provider: str) -> bool:
@@ -497,22 +520,7 @@ def CREDIT_CANDIDATES(task_type: str = "general"):
     task_type: "general", "image", "video", "code", etc.
     Filtra providers cloud que não têm API key configurada.
     """
-    if task_type == "image":
-        return [
-            ("hf_router", "hf_router/stable-diffusion-xl"),
-            ("hf_router", "hf_router/flux-schnell"),
-        ]
-    if task_type == "video":
-        return [
-            ("hf_video", "hf_video/wan2.1"),
-            ("hf_video", "hf_video/ltx"),
-            ("hf_video", "hf_video/hunyuan"),
-        ]
-    candidates = [
-        ("groq", "groq/llama-3.3-70b-versatile"),
-        ("nvidia", "nvidia/mistralai/mistral-large-3-675b-instruct-2512"),
-        ("ollama", "ollama/qwen2.5:0.5b"),
-    ]
+    candidates = _base_credit_candidates(task_type)
     return [(p, m) for p, m in candidates if _provider_has_key(p)]
 
 

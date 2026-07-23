@@ -44,7 +44,6 @@ redis
 requests
 scikit-learn
 scrapy
-sentence-transformers
 service-identity
 sqlalchemy
 starlette
@@ -58,7 +57,6 @@ autopep8
 ruff
 pytest-asyncio
 torch
-transformers==5.10.2
 numpy==2.4.4
 PyYAML==6.0.3
 tqdm==4.67.3

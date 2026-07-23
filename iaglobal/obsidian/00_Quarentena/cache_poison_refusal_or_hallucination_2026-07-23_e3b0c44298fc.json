@@ -1,0 +1,9 @@
+{
+  "timestamp": "2026-07-23T17:09:16.350330+00:00",
+  "reason": "refusal_or_hallucination",
+  "prompt_snippet": "ollama:ollama/qwen2.5:0.5b:Objetivo:\n- o que é FastAPI?\n\nDomínio:\n- unknown\n\no que é FastAPI?",
+  "response_snippet": "Foi fundada pelo open source Pythonista Elio Cunho. Foi projetado da seguinte forma: \n\n1. FastAPI tem a função de modelar aplicativos web com mais facilidade.\n2. As funções (routes) do FastAPI são mar",
+  "response_length": 935,
+  "model_hint": "",
+  "source": "cache_immune_barrier"
+}

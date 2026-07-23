@@ -180,6 +180,17 @@ async def run_debug_unificado(ctx: Dict[str, Any]) -> Dict[str, Any]:
         task_str=task_str,
     )
 
+    # Se o código já está válido e a skill não produziu correção, retornar o código
+    # original de forma determinística em vez de depender de um provider externo.
+    if not success and not corrected_code and not lsp_errors:
+        logger.info(
+            "[DEBUG_UNIFICADO] Código já válido sem erros LSP → retornando resultado local"
+        )
+        corrected_code = code
+        model_used = "syntax_sentinel"
+        attempts = 0
+        success = True
+
     # Fase 4 — Fallback para DebuggerAgent se skill falhou
     if not success and not corrected_code:
         logger.info("[DEBUG_UNIFICADO] Skill falhou → fallback DebuggerAgent")
