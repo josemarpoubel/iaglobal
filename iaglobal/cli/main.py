@@ -58,7 +58,34 @@ async def run_cli():
 
 
 def _ensure_searxng():
-    logger.debug("[SEARXNG] Usando instância pública (paulgo.io). Nenhum container local necessário.")
+    docker_compose = os.path.join(
+        os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)))),
+        "docker-compose.search.yml",
+    )
+    if not os.path.exists(docker_compose):
+        return
+    try:
+        import urllib.request
+
+        req = urllib.request.Request(
+            "http://localhost:8005",
+            method="GET",
+            headers={"User-Agent": "iaglobal/1.0"},
+        )
+        urllib.request.urlopen(req, timeout=3)
+        logger.debug("[SEARXNG] Já está rodando.")
+        return
+    except Exception:
+        logger.info("[SEARXNG] Não detectado. Iniciando container...")
+    try:
+        subprocess.run(
+            ["docker", "compose", "-f", docker_compose, "up", "-d"],
+            capture_output=True,
+            timeout=30,
+        )
+        logger.info("[SEARXNG] Container iniciado.")
+    except Exception as e:
+        logger.warning("[SEARXNG] Falha ao iniciar: %s", e)
 
 
 async def _run_cli_impl():

@@ -477,7 +477,7 @@ def youcom_search(query: str) -> str:
 # Circuit breaker para SearXNG (cache de offline)
 _searxng_offline_until: float = 0.0
 _searxng_fail_count: int = 0
-_SEARXNG_DEFAULT_URL: str = "https://paulgo.io"
+_SEARXNG_DEFAULT_URL: str = "http://localhost:8005"
 
 
 def _searxng_base_url() -> str:

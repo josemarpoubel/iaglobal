@@ -1,0 +1,33 @@
+# SearXNG — Meta-buscador local (Google + Bing + DuckDuckGo)
+# Docs: https://docs.searxng.org/
+
+services:
+  searxng:
+    image: searxng/searxng:latest
+    container_name: iaglobal_searxng
+    ports:
+      - "8005:8080"
+    environment:
+      - SEARXNG_BASE_URL=http://localhost:8005
+      - SEARXNG_PORT=8080
+      - SEARXNG_SECRET_KEY=iaglobal_searxng_secret_2026
+      - SEARXNG_BIND_ADDRESS=0.0.0.0
+    volumes:
+      - ./searxng:/etc/searxng:rw
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - SETGID
+      - SETUID
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "5m"
+        max-file: "2"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/search?q=test&format=json > /dev/null 2>&1"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 20s

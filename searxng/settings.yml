@@ -1,0 +1,61 @@
+# SearXNG configuration — iaglobal
+# See https://docs.searxng.org/admin/settings/
+
+use_default_settings: true
+
+general:
+  instance_name: "iaglobal SearXNG"
+  debug: false
+  privacypolicy_url: false
+  contact_url: false
+  enable_metrics: false
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  formats:
+    - html
+    - json
+  language: "en-US"
+
+server:
+  secret_key: "iaglobal_searxng_secret_2026"
+  port: 8080
+  bind_address: "0.0.0.0"
+  limiter: false
+  image_proxy: false
+  method: "GET"
+
+ui:
+  static_use_hash: true
+  default_theme: simple
+  default_locale: en
+
+enabled_plugins:
+  - "Hash plugin"
+  - "Self Information"
+  - "Tracker URL removed"
+  - "Ahmia blacklist"
+
+enabled_engines:
+  - duckduckgo
+  - google
+  - bing
+  - wikipedia
+  - wikidata
+  - stackoverflow
+  - github
+  - gitlab
+  - pypi
+  - npm
+  - crates.io
+  - rubygems
+  - docker_hub
+
+outgoing:
+  request_timeout: 5.0
+  max_request_timeout: 10.0
+  useragent_suffix: "iaglobal/1.0"
+  # Proxies:
+  #   http: http://proxy:8080
+  #   https: http://proxy:8080
