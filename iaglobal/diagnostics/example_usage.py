@@ -13,13 +13,14 @@ Demonstra:
 
 import asyncio
 import json
+
 from iaglobal.diagnostics import (
-    error_classifier,
-    repair_engine,
-    ErrorDescriptor,
     ErrorCategory,
     ErrorCause,
+    ErrorDescriptor,
     Severity,
+    error_classifier,
+    repair_engine,
 )
 
 
