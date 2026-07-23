@@ -635,7 +635,7 @@ class PipelineEngine:
         if not code or not code.strip():
             return None
         project_dir = save_result_artifact(state.prompt, {}, code)
-        ext = self._detect_extension(code)
+        ext = self._detect_extension(code, state.intent)
         return project_dir / f"output{ext}"
 
     LANG_EXT = {
@@ -670,7 +670,7 @@ class PipelineEngine:
         "dockerfile": ".dockerfile",
     }
 
-    def _detect_extension(self, code: str) -> str:
+    def _detect_extension(self, code: str, intent: Optional[TaskIntent] = None) -> str:
         if self._detected_lang and self._detected_lang in self.LANG_EXT:
             return self.LANG_EXT[self._detected_lang]
         if "<?php" in code:
@@ -679,6 +679,8 @@ class PipelineEngine:
             return ".asp"
         if "<html" in code.lower() or "<!doctype" in code.lower():
             return ".html"
+        if intent in (TaskIntent.CHAT, TaskIntent.DOCUMENT, TaskIntent.ANALYSIS):
+            return ".txt"
         return ".py"
 
     async def _async_persistence_stage(self, state: PipelineState) -> None:
