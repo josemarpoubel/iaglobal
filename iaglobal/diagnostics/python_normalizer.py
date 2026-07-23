@@ -160,15 +160,12 @@ class PythonNormalizer:
 
         Args:
             ruff_path: Caminho para o executável do ruff. Se None, usa 'ruff' do PATH.
-
-        Raises:
-            FormatterUnavailableError: Se ruff não estiver disponível
         """
         self.ruff_cmd = ruff_path or "ruff"
-        self._verify_ruff_available()
+        self._ruff_available = self._verify_ruff_available()
 
-    def _verify_ruff_available(self) -> None:
-        """Verifica se ruff está disponível."""
+    def _verify_ruff_available(self) -> bool:
+        """Verifica se ruff está disponível. Retorna True se disponível."""
         try:
             subprocess.run(
                 [self.ruff_cmd, "--version"],
@@ -177,11 +174,14 @@ class PythonNormalizer:
                 check=True,
                 timeout=5,
             )
-        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+            return True
+        except (subprocess.CalledProcessError, FileNotFoundError):
             logger.warning(
-                f"Ruff não encontrado ({self.ruff_cmd}). Instale com: pip install ruff"
+                f"Ruff não encontrado ({self.ruff_cmd}). "
+                "Pipeline de normalização continuará sem formatação automática. "
+                "Instale com: pip install ruff"
             )
-            raise
+            return False
 
     def normalize(self, code: str) -> NormalizeResult:
         """
@@ -210,16 +210,24 @@ class PythonNormalizer:
         sanitized = self._extract_and_sanitize(code)
 
         # =====================================================================
-        # ETAPA 2: RUFF FORMAT (Contrato: padronização determinística)
+        # ETAPA 2: RUFF FORMAT — pula se ruff não estiver disponível
         # =====================================================================
-        formatted, format_errors = self._ruff_format(sanitized)
-        format_changed = formatted != sanitized
+        if self._ruff_available:
+            formatted, format_errors = self._ruff_format(sanitized)
+            format_changed = formatted != sanitized
+        else:
+            formatted, format_errors = sanitized, []
+            format_changed = False
 
         # =====================================================================
-        # ETAPA 3: RUFF CHECK --FIX (Contrato: correções automáticas)
+        # ETAPA 3: RUFF CHECK --FIX — pula se ruff não estiver disponível
         # =====================================================================
-        fixed, check_errors = self._ruff_check(formatted)
-        fix_changed = fixed != formatted
+        if self._ruff_available:
+            fixed, check_errors = self._ruff_check(formatted)
+            fix_changed = fixed != formatted
+        else:
+            fixed, check_errors = formatted, []
+            fix_changed = False
 
         # =====================================================================
         # ETAPA 4: VALIDAÇÃO AST (Contrato: código sintaticamente válido)
