@@ -1076,18 +1076,18 @@ iaglobal operava com um único modelo local (`qwen2.5:0.5b` como Operário). A p
 │                    TRIBUNAI COGNITIVO (3 Camadas)                │
 ├──────────────────────────────────────────────────────────────────┤
 │                                                                  │
-│  CognitiveRouter.resolve_route(node_id, task_type) → route_name │
+│  CognitiveRouter.resolve_route(node_id, task_type) → route_name  │
 │                                                                  │
-│  ┌─────────────────────┐  ┌────────────┐  ┌──────────────────┐  │
-│  │ JUIZ (GLM4-1.2B)    │  │ OPERÁRIO   │  │ SENTINELA        │  │
-│  │                     │  │ (Qwen0.5B) │  │ (LFM-230M)       │  │
-│  │ critic, failure_    │  │ coder,     │  │ sandbox_valid,   │  │
-│  │ analysis, system_   │  │ planner,   │  │ lsp_valid, audit,│  │
-│  │ design, req_corr    │  │ pm, etc.   │  │ monitor, etc.    │  │
-│  │ max_conc=1          │  │ max_conc=3 │  │ max_conc=5       │  │
-│  │ timeout=120s        │  │ timeout=60s│  │ timeout=30s      │  │
-│  │ fallback→operário   │  │ (sem fb)   │  │ (sem fb)         │  │
-│  └─────────┬───────────┘  └──────┬─────┘  └────────┬─────────┘  │
+│  ┌─────────────────────┐  ┌────────────┐  ┌──────────────────┐   │
+│  │ JUIZ (GLM4-1.2B)    │  │ OPERÁRIO   │  │ SENTINELA        │   │
+│  │                     │  │ (Qwen0.5B) │  │ (LFM-230M)       │   │
+│  │ critic, failure_    │  │ coder,     │  │ sandbox_valid,   │   │
+│  │ analysis, system_   │  │ planner,   │  │ lsp_valid, audit,│   │
+│  │ design, req_corr    │  │ pm, etc.   │  │ monitor, etc.    │   │
+│  │ max_conc=1          │  │ max_conc=3 │  │ max_conc=5       │   │
+│  │ timeout=120s        │  │ timeout=60s│  │ timeout=30s      │   │
+│  │ fallback→operário   │  │ (sem fb)   │  │ (sem fb)         │   │
+│  └─────────┬───────────┘  └──────┬─────┘  └────────┬─────────┘   │
 │            │                     │                  │            │
 │            └──────────┬──────────┴──────┬───────────┘            │
 │                       ▼                  ▼                       │
@@ -1283,21 +1283,21 @@ O iaglobal implementa um **metabolismo imunológico funcional** que diferencia r
 
 ```
                               ┌──────────────────────┐
-                              │   EvoAgent.handle()   │
-                              │  (córtex consciente)   │
+                              │   EvoAgent.handle()  │
+                              │  (córtex consciente) │
                               └──────────┬───────────┘
                                          │ gera código
                                          ▼
                               ┌──────────────────────┐
-                              │    code_executor      │
-                              │  (ação no mundo real) │
+                              │    code_executor     │
+                              │  (ação no mundo real)│
                               └──────────┬───────────┘
                                          │ falha?
                                 ┌────────┴────────┐
                                 ▼                  ▼
                       ┌──────────────────┐   ┌──────────────┐
                       │ FailureAnalyzer  │   │  sucesso →   │
-                      │  (macrófago)     │   │  Expression   │
+                      │  (macrófago)     │   │  Expression  │
                       └────────┬─────────┘   └──────────────┘
                                │ fingerprint (SHA256 sanitizado)
                                ▼
@@ -1311,7 +1311,7 @@ O iaglobal implementa um **metabolismo imunológico funcional** que diferencia r
                     ┌──────────┴──────────┐
                     ▼                     ▼
              ┌──────────────┐    ┌──────────────────┐
-             │ HIT (inata)  │    │ MISS (adaptativa) │
+             │ HIT (inata)  │    │ MISS (adaptativa)│
              │ ← 36ms       │    └────────┬─────────┘
              │ Vacina       │             │ generate_
              │ aplicada     │             │ correction_plan
@@ -1326,9 +1326,9 @@ O iaglobal implementa um **metabolismo imunológico funcional** que diferencia r
                                   │               │
                                   ▼               ▼
                            ┌──────────────────────────┐
-                           │   register_vaccine()      │
-                           │   → VaccineLedger         │
-                           │   → ImmuneMemoryExchange  │
+                           │   register_vaccine()     │
+                           │   → VaccineLedger        │
+                           │   → ImmuneMemoryExchange │
                            └──────────┬───────────────┘
                                       │ RecoveryMetrics
                                       ▼
