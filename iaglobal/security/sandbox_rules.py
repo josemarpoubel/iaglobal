@@ -1,10 +1,11 @@
 """Sandbox rules enforcement for secure code execution."""
 
 import os
-import logging
 from typing import Set, Optional, Dict
 
-logger = logging.getLogger("ia-global")
+from iaglobal.utils.logger import get_logger
+
+logger = get_logger("iaglobal.security.sandbox_rules")
 
 
 class SandboxRules:

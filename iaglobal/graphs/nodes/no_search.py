@@ -27,6 +27,7 @@ from iaglobal.graphs.nodes._search_sources import (
     duckduckgo_text_search,
     youcom_search,
     yacy_search,
+    searxng_search,
 )
 from iaglobal.graphs.nodes._search_router import run_search_router
 from iaglobal.graphs.nodes._disk_swap import save_search, load_search
@@ -100,6 +101,7 @@ SOURCES: List[Tuple[str, Callable, int]] = [
     ("ddg_text", duckduckgo_text_search, 15),
     ("google_pw", google_playwright_search, 25),
     ("bing_pw", bing_playwright_search, 20),
+    ("searxng", searxng_search, 10),
     ("router", _async_router_wrapper, 20),
     ("duckduckgo", async_search_tool, 15),
     ("ddg_enhanced", ddg_enhanced_search, 15),

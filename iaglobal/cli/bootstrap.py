@@ -8,10 +8,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__fil
 load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 import asyncio
-import logging
 from iaglobal.core.orchestrator import Orchestrator
+from iaglobal.utils.logger import get_logger
 
-logger = logging.getLogger("ia-global")
+logger = get_logger("iaglobal.cli.bootstrap")
 
 
 class Bootstrap:

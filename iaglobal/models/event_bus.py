@@ -1,15 +1,16 @@
 # iaglobal/models/event_bus.py
 
 import uuid
-import logging
 import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Callable, Dict, List, Any, Optional
 
+from iaglobal.utils.logger import get_logger
+
 __all__ = ["bus", "EventType"]
 
-logger = logging.getLogger("ia-global")
+logger = get_logger("iaglobal.models.event_bus")
 
 
 # =========================================================

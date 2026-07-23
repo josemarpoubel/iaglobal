@@ -104,7 +104,7 @@ async def async_generate(
 
     role = get_role_by_model_id(model)
     model_config = get_model_config(role) if role else None
-    num_predict = model_config.get("num_predict", 1024) if model_config else 1024
+    num_predict = model_config.get("num_predict", 8192) if model_config else 8192
     num_ctx = model_config.get("context_window", 4096) if model_config else 4096
     # Optimized parameters for small local models:
     # - temperature=0.1 → deterministic, avoids syntax hallucination

@@ -106,8 +106,8 @@ class SentinelOrchestrator:
             Varre o prompt por palavras-chave (autenticação, tema escuro, etc.)
             e verifica se o código as implementa.
 
-        Fase 2 — LFM-230M (sob demanda):
-            Se a fase 1 encontrar violações, chama o Sentinela (ollama_lfm)
+        Fase 2 — LLM (sob demanda):
+            Se a fase 1 encontrar violações, chama o Sentinela (ollama)
             para confirmar com inferência semântica leve.
         """
         violations, _ = FailureAnalysisAgent.check_requirements(prompt, code)
