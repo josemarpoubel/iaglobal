@@ -133,8 +133,12 @@ class FewShotProvider:
             emb = self._embed_model.encode(text, normalize_embeddings=True)
             emb_list = emb.tolist() if hasattr(emb, "tolist") else emb
         elif self._tfidf is not None:
-            # TF-IDF no cacheia bem (depende do vocabulário)
-            return None
+            # Keep a persisted representation even when the heavyweight
+            # sentence-transformers model is unavailable. Ranking uses a
+            # corpus-fitted TF-IDF matrix separately, so this fallback is
+            # only for warm-cache persistence and latency observability.
+            matrix = self._tfidf.fit_transform([text])
+            emb_list = matrix.toarray()[0].tolist()
         else:
             return None
 
