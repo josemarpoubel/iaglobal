@@ -12,6 +12,7 @@ import asyncio
 from typing import Dict, Any
 
 from iaglobal.agents.multi_coder_agent import MultiCoderAgent
+from iaglobal.core.artifact import GeneratedArtifact, ArtifactKind
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +53,15 @@ async def run_multi_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
         return {
             "output": coder_out,
+            "artifact": (
+                GeneratedArtifact.from_str(coder_out, source="multi_coder.passthrough")
+                if coder_out
+                else GeneratedArtifact(
+                    kind=ArtifactKind.ERROR,
+                    content="",
+                    source="multi_coder.passthrough",
+                )
+            ),
             "multi_coder": {"status": "passthrough"},
             "execution_metrics": {
                 "model": resolved_model,
@@ -98,14 +108,34 @@ async def run_multi_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         is_success = bool(multi_output and failures < 3)
         latency_ms = (time.time() - start_time) * 1000.0
 
+        # Classifica o agregado uma única vez na origem
+        gen_artifact = (
+            GeneratedArtifact.from_str(multi_output, source="multi_coder")
+            if multi_output
+            else GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="multi_coder",
+                metadata={"reason": "empty_output"},
+            )
+        )
+
+        if multi_output and gen_artifact.kind != ArtifactKind.CODE:
+            logger.info(
+                "[MULTI_CODER] Agregado classificado como %s (nao CODE puro) — propagando tipo",
+                gen_artifact.kind,
+            )
+
         # Retorno higienizado cumprindo as Regras 1, 3 e 5 do AGENTS.md (Sem dar dict unpack do ctx na RAM)
         return {
             "output": multi_output,
+            "artifact": gen_artifact,
             "multi_coder": {
                 "status": status,
                 "parts": parts,
                 "total_chars": total_chars,
                 "failures": failures,
+                "artifact_kind": gen_artifact.kind.value,
             },
             "execution_metrics": {
                 "model": resolved_model,
@@ -127,6 +157,12 @@ async def run_multi_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         # REPORTA A FALHA EXPLICITAMENTE PARA O BANDIT POLICY APRENDER COM O COMPORTAMENTO DO MODELO
         return {
             "output": "",
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="multi_coder",
+                metadata={"reason": "exception", "error": str(e)[:200]},
+            ),
             "multi_coder": {
                 "status": "failed",
                 "parts": {},

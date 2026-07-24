@@ -14,6 +14,7 @@ from typing import Dict, Any
 from iaglobal.agents.agent_base import AgentBase
 from iaglobal.memory.memory_error import record_error
 from iaglobal.graphs.comms.acetylcholine_bus import AgentMessage
+from iaglobal.core.artifact import GeneratedArtifact, ArtifactKind
 
 logger = logging.getLogger(__name__)
 
@@ -186,9 +187,13 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
             latency_ms = (time.time() - start_time) * 1000.0
 
+            # Classifica o documento como MARKDOWN/DOCUMENTATION
+            doc_artifact = GeneratedArtifact.from_str(doc, source="documentation")
+
             return {
                 "output": doc,
                 "document": doc,
+                "artifact": doc_artifact,
                 "execution_metrics": {
                     "model": resolved_model,
                     "success": True,
@@ -205,6 +210,12 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "output": "",
             "document": "",
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="documentation",
+                metadata={"reason": "empty_or_short_document"},
+            ),
             "execution_metrics": {
                 "model": resolved_model,
                 "success": False,
@@ -225,6 +236,12 @@ async def run_documentation(ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "output": "",
             "document": "",
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="documentation",
+                metadata={"reason": "exception", "error": str(e)[:200]},
+            ),
             "execution_metrics": {
                 "model": resolved_model,
                 "success": False,

@@ -13,10 +13,10 @@ from .pipelinestate import PipelineState, TaskIntent
 from .result import PipelineResult
 from .stages import PipelineStage
 
-from iaglobal._paths import SCRIPTS_DIR, RESULTS_DIR
 from iaglobal.validation.validation_engine import ValidationEngine
 from iaglobal.validation.js_validator import detect_lang
 from iaglobal.diagnostics.python_normalizer import normalize_before_repair
+from iaglobal.diagnostics.generation_classifier import GenerationClassifier
 from iaglobal.providers.provider_router import CREDIT_CANDIDATES as credit_candidates_fn
 
 from iaglobal.utils.logger import get_logger
@@ -60,18 +60,25 @@ class PipelineEngine:
             # -- Mission Cortex: análise da missão antes de qualquer nó --
             from iaglobal.pipeline.mission import MissionAnalyzer
             from iaglobal.pipeline.context import PipelineExecutionContext
+            from iaglobal.pipeline.capability_resolver import CapabilityResolver
 
             analyzer = MissionAnalyzer()
             mission = analyzer.analyze(prompt)
+            contract = analyzer.derive_contract(prompt)
+            resolver = CapabilityResolver()
+            capability_plan = resolver.resolve(contract)
             exec_ctx = PipelineExecutionContext(mission=mission)
             state.execution_context = exec_ctx
             # Legado: espelho para nós não migrados (remover quando todos virarem providers)
             state.context["mission"] = mission
+            state.context["mission_contract"] = contract
+            state.context["capability_plan"] = capability_plan
             logger.info(
-                "🧠 [MISSION] domain=%s | project=%s | entities=%s",
+                "🧠 [MISSION] domain=%s | project=%s | entities=%s | plan_steps=%d",
                 mission.domain,
                 mission.project_type,
                 mission.entities,
+                len(capability_plan.steps) if capability_plan else 0,
             )
 
             # Inicialização do grafo
@@ -439,11 +446,11 @@ class PipelineEngine:
             )
 
         dag_nodes = [
+            "coder",
+            "multi_coder",
+            "code_executor",
             "result_agent",
             "documentation",
-            "code_executor",
-            "multi_coder",
-            "coder",
         ]
 
         for node_name in dag_nodes:
@@ -452,14 +459,50 @@ class PipelineEngine:
                 output = (
                     node_result.get("output") or node_result.get("final_file") or ""
                 )
+                artifact = node_result.get("artifact")
+
                 if output and len(str(output)) > 10:
-                    state.generated_code = str(output)
+                    # Usa artifact tipado se disponível, senão classifica
+                    if artifact:
+                        from iaglobal.core.artifact import (
+                            GeneratedArtifact,
+                            ArtifactKind,
+                        )
+
+                        if isinstance(artifact, GeneratedArtifact):
+                            _artifact_type = artifact.kind.value
+                            _artifact = artifact
+                        else:
+                            _artifact_type = (
+                                GenerationClassifier().classify(str(output)).type
+                            )
+                            _artifact = None
+                    else:
+                        _artifact_type = (
+                            GenerationClassifier().classify(str(output)).type
+                        )
+                        _artifact = None
+
+                    if _artifact_type != "CODE":
+                        logger.info(
+                            "⛔ [PIPELINE] Nó %s produziu %s (não CODE) — descartando como código",
+                            node_name,
+                            _artifact_type,
+                        )
+                        continue
+
+                    # Se temos artifact tipado, usa ele; senão, usa output como str (compat)
+                    if _artifact:
+                        state.set_artifact(_artifact)
+                    else:
+                        state.generated_code = str(output)
+
                     state.score = node_result.get("score", 50)
                     state.script_path = node_result.get("final_file", "")
                     logger.info(
-                        "✅ [ASYNC PIPELINE] Sucesso no nó %s: %d chars",
+                        "✅ [ASYNC PIPELINE] Sucesso no nó %s: %d chars (type=CODE)",
                         node_name,
-                        len(state.generated_code),
+                        len(state.generated_code or ""),
                     )
                     return
 
@@ -478,8 +521,38 @@ class PipelineEngine:
                 output = (
                     node_result.get("output") or node_result.get("final_file") or ""
                 )
+                artifact = node_result.get("artifact")
+
                 if output and len(str(output)) > 10:
-                    state.generated_code = str(output)
+                    # Usa artifact tipado se disponível
+                    if artifact:
+                        from iaglobal.core.artifact import GeneratedArtifact
+
+                        if isinstance(artifact, GeneratedArtifact):
+                            _art_type = artifact.kind.value
+                            _artifact = artifact
+                        else:
+                            _art_type = (
+                                GenerationClassifier().classify(str(output)).type
+                            )
+                            _artifact = None
+                    else:
+                        _art_type = GenerationClassifier().classify(str(output)).type
+                        _artifact = None
+
+                    if _art_type != "CODE":
+                        logger.info(
+                            "⛔ [PIPELINE] Nó fallback %s produziu %s — descartando",
+                            node_name,
+                            _art_type,
+                        )
+                        continue
+
+                    if _artifact:
+                        state.set_artifact(_artifact)
+                    else:
+                        state.generated_code = str(output)
+
                     state.score = (
                         node_result.get("score", 50)
                         if isinstance(node_result.get("score"), (int, float))
@@ -489,7 +562,7 @@ class PipelineEngine:
                     logger.info(
                         "✅ [ASYNC PIPELINE] Sucesso via '%s' (fallback): %d chars",
                         node_name,
-                        len(state.generated_code),
+                        len(state.generated_code or ""),
                     )
                     return
 
@@ -517,6 +590,24 @@ class PipelineEngine:
 
         code = state.generated_code or ""
         code = self._extract_fenced_code(code)
+
+        # Contrato: apenas CODE passa para validação AST
+        # Se temos artifact tipado, usa ele; senão, classifica
+        if state.generated_artifact:
+            _art_type = state.generated_artifact.kind.value
+        else:
+            _art_type = GenerationClassifier().classify(code).type
+
+        if _art_type not in ("CODE", "HTML"):
+            logger.info(
+                "[VALIDATION] Artefato e %s (nao CODE/HTML) — pulando AST e marcando invalid_syntax",
+                _art_type,
+            )
+            state.syntax_valid = False
+            state.errors.append(
+                f"Conteudo recuperado e {_art_type}, nao codigo executavel — pipeline deve gerar codigo"
+            )
+            return
 
         # Detecta se é código Python ou apenas texto/report
         lang = detect_lang(code)
@@ -555,7 +646,11 @@ class PipelineEngine:
             or ("> " in code and len(code.split("\n")) > 5)
         )
 
-        if is_analysis_task or is_markdown_or_text or state.intent in (TaskIntent.CHAT, TaskIntent.DOCUMENT):
+        if (
+            is_analysis_task
+            or is_markdown_or_text
+            or state.intent in (TaskIntent.CHAT, TaskIntent.DOCUMENT)
+        ):
             logger.info(
                 "[VALIDATION] Tarefa de análise/texto/chat detectada — pulando validação Python AST"
             )
@@ -612,6 +707,7 @@ class PipelineEngine:
                 self._detected_lang = lang
 
     def _extract_fenced_code(self, code: str) -> str:
+        # 1. Remove cercas Markdown (```python ... ```)
         m = re.search(r"```(\w+)?\n(.+?)\n```", code, re.DOTALL)
         if m:
             lang = (m.group(1) or "").lower()
@@ -622,10 +718,14 @@ class PipelineEngine:
                     lang,
                     len(extracted),
                 )
-                if lang in self.LANG_EXT:
-                    self._detected_lang = lang  # FIX BUG #3a: armazena a linguagem
-                return extracted
-        return code
+            if lang in self.LANG_EXT:
+                self._detected_lang = lang  # FIX BUG #3a: armazena a linguagem
+            code = extracted if extracted else code
+        # 2. Remove bullets Unicode/inline e bullets no início de linha
+        code = code.replace("\u2022", " ")
+        code = re.sub(r"^\s*[•*\-\u2022]\s+", "", code, flags=re.MULTILINE)
+        code = re.sub(r"[ \t]+", " ", code)
+        return code.strip()
 
     def _save_script(self, state: PipelineState) -> Optional[Path]:
         """Salva o script em disco via save_result_artifact."""
@@ -635,7 +735,7 @@ class PipelineEngine:
         if not code or not code.strip():
             return None
         project_dir = save_result_artifact(state.prompt, {}, code)
-        ext = self._detect_extension(code, state.intent)
+        ext = self._detect_extension(code, state.intent, state)
         return project_dir / f"output{ext}"
 
     LANG_EXT = {
@@ -670,9 +770,23 @@ class PipelineEngine:
         "dockerfile": ".dockerfile",
     }
 
-    def _detect_extension(self, code: str, intent: Optional[TaskIntent] = None) -> str:
+    def _detect_extension(
+        self,
+        code: str,
+        intent: Optional[TaskIntent] = None,
+        state: Optional[PipelineState] = None,
+    ) -> str:
+        # 1. Respeita a linguagem da missão (prioridade máxima)
+        if state and state.context.get("mission"):
+            mission_lang = getattr(state.context["mission"], "language", None)
+            if mission_lang and mission_lang.lower() in self.LANG_EXT:
+                return self.LANG_EXT[mission_lang.lower()]
+
+        # 2. Fallback para linguagem detectada do bloco de código (fenced)
         if self._detected_lang and self._detected_lang in self.LANG_EXT:
             return self.LANG_EXT[self._detected_lang]
+
+        # 3. Heurísticas de conteúdo
         if "<?php" in code:
             return ".php"
         if "<%" in code or "<%=" in code:

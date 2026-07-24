@@ -14,6 +14,7 @@ from typing import Dict, Any
 from iaglobal.agents.coder_agent import CoderAgent, CodeArtifact
 from iaglobal.memory.memory_error import record_error
 from iaglobal.graphs.comms.acetylcholine_bus import AgentMessage
+from iaglobal.core.artifact import GeneratedArtifact, ArtifactKind
 
 logger = logging.getLogger(__name__)
 _coder = CoderAgent()
@@ -82,6 +83,12 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "output": "",
             "code": "",
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="coder",
+                metadata={"reason": "empty_task_context"},
+            ),
             "execution_metrics": {
                 "model": resolved_model,
                 "success": False,
@@ -99,6 +106,32 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
     ) or memory.get("errors", {}).get("security", "")
 
     try:
+        # ── CapabilityPlan prescritivo: executa steps antes do LLM ──
+        capability_plan = ctx.get("capability_plan")
+        plan_code = ""
+        if capability_plan and not capability_plan.is_empty():
+            from iaglobal.pipeline.plan_executor import PlanExecutor
+
+            executor = PlanExecutor()
+            plan_ctx = {"task": built_prompt or task}
+            artifact_desc = await executor.execute(capability_plan, plan_ctx)
+            plan_code = artifact_desc.code
+            logger.info(
+                "[CODER] PlanExecutor: %d/%d steps resolvidos, %d chars",
+                len(artifact_desc.steps_executed),
+                len(capability_plan.steps),
+                len(plan_code),
+            )
+
+        # Se o plano produziu código suficiente, usa-o como base
+        if plan_code and len(plan_code.strip()) > 50:
+            codigo_base = plan_code
+            logger.info(
+                "[CODER] Usando código do plano como base (%d chars)", len(plan_code)
+            )
+        else:
+            codigo_base = ""
+
         logger.info("[CODER] Disparando inferência para geração autônoma de código...")
 
         # Executa a geração profunda de código (LLM-driven)
@@ -107,6 +140,7 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
             contexto=contexto,
             erros_contexto=erros_contexto,
             security_feedback=security_feedback,
+            codigo_base=codigo_base,
         )
 
         code = artifact.code if isinstance(artifact, CodeArtifact) else str(artifact)
@@ -123,6 +157,12 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
             return {
                 "output": "",
                 "code": "",
+                "artifact": GeneratedArtifact(
+                    kind=ArtifactKind.ERROR,
+                    content="",
+                    source="coder",
+                    metadata={"reason": "empty_or_short_content"},
+                ),
                 "execution_metrics": {
                     "model": resolved_model,
                     "success": False,
@@ -155,10 +195,21 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
         latency_ms = (time.time() - start_time) * 1000.0
 
+        # Classifica o artefato UMA VEZ, na origem (contrato GeneratedArtifact)
+        gen_artifact = GeneratedArtifact.from_str(code, source="coder")
+
+        if gen_artifact.kind != ArtifactKind.CODE:
+            logger.warning(
+                "[CODER] Coder produziu %s (nao CODE), %d chars — propagando tipo",
+                gen_artifact.kind,
+                len(code),
+            )
+
         # Retorno higienizado (Sem dar dict unpack do ctx, cumprindo as Regras 1 e 5 do AGENTS.md)
         return {
             "output": code,
             "code": code,
+            "artifact": gen_artifact,
             "execution_metrics": {
                 "model": resolved_model,
                 "success": True,
@@ -177,6 +228,12 @@ async def run_coder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "output": "",
             "code": "",
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="coder",
+                metadata={"reason": "exception", "error": str(e)[:200]},
+            ),
             "execution_metrics": {
                 "model": resolved_model,
                 "success": False,

@@ -220,7 +220,12 @@ class AgentBase(ABC):
             effective_conf = router.get_effective_confidence(
                 self.agent_name, memory_result.confidence
             )
-            if effective_conf >= CONF_THRESHOLD_MEMORY:
+            # RESPONSE_ELIGIBLE_SOURCES: apenas fontes que produzem respostas completas (não contexto agregado)
+            RESPONSE_ELIGIBLE_SOURCES = {"cache", "obsidian", "metabolic_context"}
+            if (
+                effective_conf >= CONF_THRESHOLD_MEMORY
+                and memory_result.source in RESPONSE_ELIGIBLE_SOURCES
+            ):
                 router.record_memory_resolution(self.agent_name)
                 logger.info(
                     "[%s] Memory hit | source=%s conf_base=%.2f eff=%.2f latency=%.0fms",
