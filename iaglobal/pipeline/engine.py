@@ -60,13 +60,19 @@ class PipelineEngine:
             # -- Mission Cortex: análise da missão antes de qualquer nó --
             from iaglobal.pipeline.mission import MissionAnalyzer
             from iaglobal.pipeline.context import PipelineExecutionContext
-            from iaglobal.pipeline.capability_resolver import CapabilityResolver
+            from iaglobal.pipeline.capability_resolver import (
+                PipelineCapabilityResolver,
+            )
 
             analyzer = MissionAnalyzer()
             mission = analyzer.analyze(prompt)
             contract = analyzer.derive_contract(prompt)
-            resolver = CapabilityResolver()
-            capability_plan = resolver.resolve(contract)
+            resolver = PipelineCapabilityResolver(legacy_fallback=True)
+            capability_plan = await resolver.resolve(
+                contract,
+                mission_text=prompt,
+                mission_id=state.task_id,
+            )
             exec_ctx = PipelineExecutionContext(mission=mission)
             state.execution_context = exec_ctx
             # Legado: espelho para nós não migrados (remover quando todos virarem providers)

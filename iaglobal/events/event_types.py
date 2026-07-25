@@ -1,3 +1,5 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+
 # iaglobal/events/event_types.py
 
 """
@@ -26,6 +28,7 @@ class EventType:
     DEBUG_ITERATION = "debug_iteration"
     REFLEXION_CYCLE = "reflexion_cycle"
 
+    CAPABILITY_SELECTED = "capability_selected"
     PIPELINE_STAGE = "pipeline.stage.completed"
 
     ALL = [
@@ -47,6 +50,7 @@ class EventType:
         RANKING_COMPLETED,
         DEBUG_ITERATION,
         REFLEXION_CYCLE,
+        CAPABILITY_SELECTED,
         PIPELINE_STAGE,
     ]
 
