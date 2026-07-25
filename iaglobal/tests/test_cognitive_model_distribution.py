@@ -17,6 +17,8 @@ from iaglobal.providers.provider_config import (
 )
 from iaglobal.providers.provider_router import (
     CognitiveRouter,
+    GLM4_MODEL_ID,
+    LFM_MODEL_ID,
     QWEN_MODEL_ID,
 )
 from iaglobal.agents.agent_base import AgentBase
@@ -26,7 +28,7 @@ from iaglobal.agents.agent_base import AgentBase
 
 EXPECTED_ROLES = {
     CognitiveRole.JUIZ: {
-        "model_id": "qwen2.5:0.5b",
+        "model_id": "yasserrmd/GLM4.7-Distill-LFM2.5-1.2B:latest",
         "node_example": "critic",
     },
     CognitiveRole.OPERARIO: {
@@ -34,7 +36,7 @@ EXPECTED_ROLES = {
         "node_example": "coder",
     },
     CognitiveRole.SENTINELA: {
-        "model_id": "qwen2.5:0.5b",
+        "model_id": "oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM",
         "node_example": "sandbox_validator",
     },
 }
@@ -79,14 +81,26 @@ def test_all_active_models_returns_three():
 # ── 2. COGNITIVE ROUTER ──────────────────────────────────────────────────────
 
 
-def test_router_has_route():
-    """ROUTE_TO_MODEL deve conter a rota ollama."""
+def test_router_has_three_routes():
+    """ROUTE_TO_MODEL deve conter as 3 rotas cognitivas."""
     assert "ollama" in CognitiveRouter.ROUTE_TO_MODEL
+    assert "ollama_glm4" in CognitiveRouter.ROUTE_TO_MODEL
+    assert "ollama_lfm" in CognitiveRouter.ROUTE_TO_MODEL
 
 
 def test_router_resolves_model_ids():
-    """A rota ollama deve resolver para o model_id correto."""
+    """Cada rota deve resolver para o model_id correto."""
     assert CognitiveRouter.resolve_model_id("ollama") == QWEN_MODEL_ID
+    assert CognitiveRouter.resolve_model_id("ollama_glm4") == GLM4_MODEL_ID
+    assert CognitiveRouter.resolve_model_id("ollama_lfm") == LFM_MODEL_ID
+
+
+def test_glm4_model_id_matches_juiz():
+    assert GLM4_MODEL_ID == get_model_config(CognitiveRole.JUIZ)["model_id"]
+
+
+def test_lfm_model_id_matches_sentinela():
+    assert LFM_MODEL_ID == get_model_config(CognitiveRole.SENTINELA)["model_id"]
 
 
 def test_qwen_model_id_matches_operario():
@@ -94,11 +108,11 @@ def test_qwen_model_id_matches_operario():
 
 
 def test_router_route_map_has_juiz_nodes():
-    """Nós críticos devem rotear para ollama."""
+    """Nós críticos devem rotear para ollama_glm4 (Juiz)."""
     for node in ["critic", "failure_analysis", "system_design"]:
         route = CognitiveRouter.resolve_route(node)
-        assert route == "ollama", (
-            f"{node} deveria rotear para ollama, roteou para {route}"
+        assert route == "ollama_glm4", (
+            f"{node} deveria rotear para ollama_glm4, roteou para {route}"
         )
 
 
@@ -120,7 +134,7 @@ def test_router_route_map_has_operario_nodes():
 
 
 def test_router_route_map_has_sentinela_nodes():
-    """Nós de validação devem rotear para ollama."""
+    """Nós de validação devem rotear para ollama_lfm (Sentinela)."""
     for node in [
         "sandbox_validator",
         "lsp_validator",
@@ -132,8 +146,8 @@ def test_router_route_map_has_sentinela_nodes():
         "evaluator",
     ]:
         route = CognitiveRouter.resolve_route(node)
-        assert route == "ollama", (
-            f"{node} deveria rotear para ollama, roteou para {route}"
+        assert route == "ollama_lfm", (
+            f"{node} deveria rotear para ollama_lfm, roteou para {route}"
         )
 
 
@@ -144,25 +158,37 @@ def test_router_unknown_node_falls_to_ollama():
 
 
 def test_router_validation_heuristic():
-    """Task_type 'validation'/'audit' deve rotear para ollama."""
+    """Task_type 'validation'/'audit' deve rotear para Sentinela."""
     route = CognitiveRouter.resolve_route("some_node", task_type="code_audit")
-    assert route == "ollama"
+    assert route == "ollama_lfm"
 
 
 def test_router_get_route_config_returns_config():
     """get_route_config deve retornar a config do CognitiveRole correto."""
-    config = CognitiveRouter.get_route_config("ollama")
-    assert config is not None
-    assert config["model_id"] == QWEN_MODEL_ID
+    juiz_config = CognitiveRouter.get_route_config("ollama_glm4")
+    assert juiz_config is not None
+    assert juiz_config["model_id"] == GLM4_MODEL_ID
+
+    operario_config = CognitiveRouter.get_route_config("ollama")
+    assert operario_config is not None
+    assert operario_config["model_id"] == QWEN_MODEL_ID
+
+    sentinela_config = CognitiveRouter.get_route_config("ollama_lfm")
+    assert sentinela_config is not None
+    assert sentinela_config["model_id"] == LFM_MODEL_ID
 
 
 # ── 3. AGENTBASE DEFAULT CANDIDATES ──────────────────────────────────────────
 
 
-def test_default_candidates_contains_ollama_model():
-    """AgentBase.DEFAULT_CANDIDATES deve incluir qwen2.5:0.5b."""
+def test_default_candidates_contains_all_three_ollama_models():
+    """AgentBase.DEFAULT_CANDIDATES deve incluir os 3 modelos Ollama."""
     candidates = AgentBase.DEFAULT_CANDIDATES
-    assert "ollama/qwen2.5:0.5b" in candidates
+    for role, expected in EXPECTED_ROLES.items():
+        model_uri = f"ollama/{expected['model_id']}"
+        assert model_uri in candidates, (
+            f"{model_uri} ausente em AgentBase.DEFAULT_CANDIDATES"
+        )
 
 
 def test_default_candidates_no_hardcoded_duplicates():
@@ -196,13 +222,13 @@ async def test_ollama_only_respects_model_param(monkeypatch):
     monkeypatch.setattr(pr, "_enrich_prompt_with_learned_knowledge", fake_enrich)
 
     result = await pr.async_route_generate(
-        model="ollama/qwen2.5:0.5b",
+        model="ollama/yasserrmd/GLM4.7-Distill-LFM2.5-1.2B:latest",
         prompt="test",
         node_id="critic",
     )
     assert result == "fake response"
     assert len(captured) == 1
-    assert "qwen2.5" in captured[0], f"Esperava qwen2.5 no model, obtido: {captured[0]}"
+    assert "GLM4" in captured[0], f"Esperava GLM4 no model, obtido: {captured[0]}"
 
 
 @pytest.mark.asyncio
@@ -293,13 +319,13 @@ async def test_async_route_generate_no_hardcoded_strings(monkeypatch):
     )
 
     result = await pr.async_route_generate(
-        model="ollama/qwen2.5:0.5b",
+        model="ollama/oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM",
         prompt="test",
         node_id="sandbox_validator",
     )
     assert result
-    assert captured and "qwen2.5" in captured[0].lower(), (
-        f"Esperava qwen2.5 no model, obtido: {captured}"
+    assert captured and "lfm2.5" in captured[0].lower(), (
+        f"Esperava lfm2.5 no model, obtido: {captured}"
     )
 
 

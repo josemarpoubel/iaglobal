@@ -213,18 +213,17 @@ def hello():
         assert "Olá, mundo!" in result.fixed
 
     def test_long_lines(self, normalizer):
-        """Linhas longas são quebradas (se ruff disponível) ou código válido."""
+        """Linhas longas são quebradas."""
         code = """
 x = "this is a very long string that should probably be wrapped by the formatter because it exceeds the line length limit"
 """
         result = normalizer.normalize(code)
 
         assert result.syntax_valid
-        lines = result.fixed.split("\n")
-        if len(lines) > 1:
-            assert len(lines[1]) <= 88 or "very long string" in result.fixed
-        else:
-            assert "very long string" in result.fixed
+        # Ruff deve quebrar linhas longas
+        assert (
+            len(result.fixed.split("\n")[1]) <= 88 or "very long string" in result.fixed
+        )
 
     def test_comments_preserved(self, normalizer):
         """Comentários são preservados."""

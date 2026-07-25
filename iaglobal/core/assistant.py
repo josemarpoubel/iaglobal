@@ -4,10 +4,13 @@ import os
 import re
 from typing import Union, List, Dict
 
-from iaglobal.models.task import Task
-from iaglobal.utils.logger import get_logger
+import logging
 
-logger = get_logger("iaglobal.core.assistant")
+from iaglobal.models.task import Task
+
+from iaglobal.utils.logger import logger
+
+logger = logging.getLogger("ia-global")
 
 
 class Assistant:

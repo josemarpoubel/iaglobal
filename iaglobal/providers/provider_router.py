@@ -77,7 +77,21 @@ from iaglobal.providers.provider_config import (
 from iaglobal.metabolism.bucket_manager import BucketManager
 
 
+GLM4_MODEL_ID = get_model_config(CognitiveRole.JUIZ)["model_id"]
+LFM_MODEL_ID = get_model_config(CognitiveRole.SENTINELA)["model_id"]
 QWEN_MODEL_ID = get_model_config(CognitiveRole.OPERARIO)["model_id"]
+
+
+async def _ollama_glm4_async(prompt: str, **kwargs) -> str:
+    """Wrapper que roteia para o modelo Juiz (GLM4-1.2B)."""
+    kwargs.pop("model", None)
+    return await ollama_async_generate(prompt, model=GLM4_MODEL_ID, **kwargs)
+
+
+async def _ollama_lfm_async(prompt: str, **kwargs) -> str:
+    """Wrapper que roteia para o modelo Sentinela (LFM-230M)."""
+    kwargs.pop("model", None)
+    return await ollama_async_generate(prompt, model=LFM_MODEL_ID, **kwargs)
 
 
 class CognitiveRouter:
@@ -89,11 +103,13 @@ class CognitiveRouter:
     """
 
     ROUTE_MAP: dict[str, str] = {
-        "critic": "ollama",
-        "failure_analysis": "ollama",
-        "arbitrar_geracao": "ollama",
-        "pipeline.requirement_correction": "ollama",
-        "system_design": "ollama",
+        # Layer 1 — Juiz (GLM4-1.2B): raciocínio profundo
+        "critic": "ollama_glm4",
+        "failure_analysis": "ollama_glm4",
+        "arbitrar_geracao": "ollama_glm4",
+        "pipeline.requirement_correction": "ollama_glm4",
+        "system_design": "ollama_glm4",
+        # Layer 2 — Operário (Qwen2.5-0.5B): geração e escrita
         "coder": "ollama",
         "multi_coder": "ollama",
         "backend_builder": "ollama",
@@ -111,33 +127,39 @@ class CognitiveRouter:
         "deployment_plan": "ollama",
         "task_breakdown": "ollama",
         "documentation": "ollama",
-        "sandbox_validator": "ollama",
-        "lsp_validator": "ollama",
-        "semantic_validator": "ollama",
-        "fix_validator": "ollama",
-        "security_audit": "ollama",
-        "performance_audit": "ollama",
-        "compliance_audit": "ollama",
-        "system_analysis": "ollama",
-        "metrics": "ollama",
-        "pipeline_updater": "ollama",
-        "evolution_trigger": "ollama",
-        "retrospective": "ollama",
-        "gap_analyzer": "ollama",
-        "evaluator": "ollama",
-        "memory_cleaner": "ollama",
+        # Layer 3 — Sentinela (LFM-230M): validação rápida
+        "sandbox_validator": "ollama_lfm",
+        "lsp_validator": "ollama_lfm",
+        "semantic_validator": "ollama_lfm",
+        "fix_validator": "ollama_lfm",
+        "security_audit": "ollama_lfm",
+        "performance_audit": "ollama_lfm",
+        "compliance_audit": "ollama_lfm",
+        "system_analysis": "ollama_lfm",
+        "metrics": "ollama_lfm",
+        "pipeline_updater": "ollama_lfm",
+        "evolution_trigger": "ollama_lfm",
+        "retrospective": "ollama_lfm",
+        "gap_analyzer": "ollama_lfm",
+        "evaluator": "ollama_lfm",
+        "memory_cleaner": "ollama_lfm",
     }
 
     ROUTE_TO_MODEL: dict[str, str] = {
+        "ollama_glm4": GLM4_MODEL_ID,
         "ollama": QWEN_MODEL_ID,
+        "ollama_lfm": LFM_MODEL_ID,
     }
 
     @classmethod
     def resolve_route(cls, node_id: str, task_type: str = "general") -> str:
-        """Retorna o nome da rota (ollama)."""
+        """Retorna o nome da rota (ollama, ollama_glm4, ollama_lfm)."""
         route = cls.ROUTE_MAP.get(node_id)
         if route:
             return route
+        # Heurística: validação vai para Sentinela, o resto para Operário
+        if "valid" in task_type or "audit" in task_type or "monitor" in task_type:
+            return "ollama_lfm"
         return "ollama"
 
     @classmethod
@@ -174,11 +196,15 @@ class CognitiveRouter:
 # os limites metabólicos e aplicando fallback se necessário.
 
 _ROUTE_TIMEOUT: dict[str, float] = {
-    "ollama": 120.0,
+    "ollama_glm4": 120.0,  # Juiz: cold-load ~59s, margin 2x
+    "ollama": 30.0,  # Operário: cold-load menor
+    "ollama_lfm": 15.0,  # Sentinela: espera curta, depois bypass
 }
 
 _ESTIMATED_TOKENS: dict[str, int] = {
-    "ollama": 8192,
+    "ollama_glm4": 2048,
+    "ollama": 1024,
+    "ollama_lfm": 512,
 }
 
 
@@ -242,6 +268,8 @@ async def cognitive_dispatch(
 # Timeouts por provider (aumentados para evitar falhas prematuras)
 PROVIDER_TIMEOUT = {
     "ollama": 180,
+    "ollama_glm4": 300,
+    "ollama_lfm": 120,
     "groq": 60,
     "openrouter": 90,
     "nvidia": 120,
@@ -284,7 +312,7 @@ PROVIDER_TIMEOUT = {
 }
 
 # Constrói PROVIDERS e ASYNC_PROVIDERS dinamicamente a partir do Registry
-# Aliases não-padrão (hf_router_*) são adicionados explicitamente.
+# Aliases não-padrão (ollama_glm4, ollama_lfm, hf_router_*) são adicionados explicitamente.
 _HF_ROUTER_ALIASES = [
     "hf_router_qwen",
     "hf_router_qwenext",
@@ -318,13 +346,24 @@ _HF_ROUTER_ALIASES = [
 PROVIDERS: dict[str, Callable] = dict(registry.sync)
 ASYNC_PROVIDERS: dict[str, Callable] = dict(registry.async_)
 
-# Aliases sync — hf_router_*
+# Aliases sync — ollama_glm4/lfm + hf_router_*
+if "ollama" in PROVIDERS:
+    _o_sync = PROVIDERS["ollama"]
+    PROVIDERS.setdefault(
+        "ollama_glm4", lambda p, **k: _o_sync(p, model=GLM4_MODEL_ID, **k)
+    )
+    PROVIDERS.setdefault(
+        "ollama_lfm", lambda p, **k: _o_sync(p, model=LFM_MODEL_ID, **k)
+    )
 if "hf_router" in PROVIDERS:
     _hfr_sync = PROVIDERS["hf_router"]
     for _a in _HF_ROUTER_ALIASES:
         PROVIDERS.setdefault(_a, _hfr_sync)
 
-# Aliases async — hf_router_*
+# Aliases async — wrappers + hf_router_*
+if "ollama" in ASYNC_PROVIDERS:
+    ASYNC_PROVIDERS.setdefault("ollama_glm4", _ollama_glm4_async)
+    ASYNC_PROVIDERS.setdefault("ollama_lfm", _ollama_lfm_async)
 if "hf_router" in ASYNC_PROVIDERS:
     _hfra = ASYNC_PROVIDERS["hf_router"]
     for _a in _HF_ROUTER_ALIASES:
@@ -338,7 +377,7 @@ if "hf_router" in ASYNC_PROVIDERS:
 # modelos cloud (Groq/NVIDIA/OpenRouter/Gemini/...) quando são o agente crítico,
 # que aponta correções. Todos os demais usam Ollama local, forçando-os a evoluir
 # com o próprio substrato (Lei da Evolução: adaptar ou perecer).
-_LOCAL_PROVIDERS = {"ollama"}
+_LOCAL_PROVIDERS = {"ollama", "ollama_glm4", "ollama_lfm"}
 
 
 # Sinal estruturado de membrana — INDEPENDENTE de nível de log (observabilidade
@@ -1256,7 +1295,7 @@ async def async_route_generate(
             return await async_route_generate_parallel(
                 prompt, task_type=task_type, node_id=node_id
             )
-        provider = original.split("/")[0] if "/" in original else "ollama"
+        provider = original.split("/")[0]
         logger.info(
             "[ROUTER] async_route_generate model=%s provider=%s task_type=%s",
             original,

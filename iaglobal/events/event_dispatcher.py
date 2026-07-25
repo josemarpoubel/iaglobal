@@ -1,11 +1,12 @@
 # iaglobal/events/event_dispatcher.py
 
 import asyncio
+import logging
 from typing import Callable, Dict, List, Any, Coroutine, Union
 
-from iaglobal.utils.logger import get_logger
+from iaglobal.utils.logger import logger
 
-logger = get_logger("iaglobal.events.event_dispatcher")
+logger = logging.getLogger("ia-global")
 
 # Tipo que aceita funções normais ou corrotinas
 HandlerType = Union[Callable[[dict], Any], Callable[[dict], Coroutine[Any, Any, Any]]]

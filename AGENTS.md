@@ -50,6 +50,151 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 | CLI history | `iaglobal history --list` / `iaglobal history <id> --explain` |
 | Run evolution lab | `OLLAMA_BASE_URL=http://localhost:11434 evolution-lab` |
 | Set SEARXNG_URL | `export SEARXNG_URL=http://localhost:8005` (default) |
+| MCP unified server (stdio) | `python -m iaglobal.mcp.server --mode stdio` (use this; legacy `iaglobal.api.mcp_server` is deprecated) |
+| Two-phase bootstrap proof | `python iaglobal/tests/test_verify_mcp.py` — exige 1/1/1 markers |
+| Install git hooks (smoke gate) | `bash scripts/install-hooks.sh` (rode uma vez por clone) |
+| Architectural decision records | `docs/adr/000*.md` (Status, Context, Decision, Consequences) |
+
+## MCS — MCP Coordenation & Anti-Revert
+
+> O incidente de **agentes revertendo alterações um do outro em silêncio** quebrou o projeto. Esta seção codifica a regra para que isso não aconteça de novo.
+
+### Regra 0 — Não reverter trabalho alheio em curso
+
+Antes de qualquer `git restore`, `git checkout -- <file>`, `git reset` ou operação destrutiva, verifique:
+
+```bash
+git status -s
+git log -1 --format='%H %an: %s'
+git diff --stat
+```
+
+Se **qualquer arquivo mostra trabalho não-commitado** que não seja seu, **NÃO TOQUE**. Pergunte primeiro.
+
+### Sinalização de trabalho em curso
+
+Para iniciar uma sessão de trabalho que toca arquivos sensíveis (`iaglobal/cli/bootstrap.py`, `iaglobal/mcp/server.py`, `iaglobal/api/__init__.py`, `run_mcp.sh`):
+
+1. **Reservar via branch dedicada**:
+   ```bash
+   git checkout -b wip/<nome>-<YYYYMMDD>  # ex: wip/bootstrap-two-phase-20260724
+   ```
+2. **Nunca** trabalhar diretamente sobre `main` sem branch.
+3. Manter o WIP commitado em **commits granulares** a cada 15-30 minutos de trabalho:
+   ```bash
+   git add -p           # stage só hunks intencionais
+   git commit -m "wip: <descrição focada>"
+   ```
+
+### Smoke gate obrigatório
+
+Antes de qualquer commit que toque arquivos de bootstrap/MCP, **todos** devem rodar:
+
+```bash
+python iaglobal/tests/test_verify_mcp.py
+```
+
+A asserção **deve passar** com exit 0. Em particular:
+- `phase1_complete == 1`
+- `phase2_complete == 1`
+- `orchestrator_init_logged == 1`
+- Latência de ferramentas de leitura ≤ 1.5s; bootstrap ≤ 30s.
+
+Se falhar, há regressão de singleton task ou caminho de bootstrap — **não commitar**.
+
+### Convenção de nomenclatura para branches em curso
+
+| Prefixo | Significado |
+|---------|-------------|
+| `wip/...` | trabalho pessoal em andamento, não-PR |
+| `feat/...` | feature pronta para PR |
+| `fix/...` | bug fix pronto para PR |
+| `hotfix/...` | correção urgente production |
+
+### Quando reverter é aceitável
+
+Reverter é aceitável **apenas** quando:
+- O trabalho é **inteiramente seu** e você optou por refazer.
+- O outro agente já **mergeou via PR ou explicitamente desistiu** (`git log`, branch apagada).
+- Há aprovação registrada via issue/comentário.
+
+**Nunca** reverter porque "parece que vai contra o que eu queria" — abra issue/PR em vez disso.
+
+## Bootstrap Two-Phase Contract
+
+> Phase1 deve ser **sub-segundo** para que MCP/FastAPI/etc. respondam ao handshake. Phase2 é pesada (~13s) e roda em background como **uma única Task singleton**.
+
+### Helpers obrigatórios em `iaglobal/mcp/server.py`
+
+```python
+async def _ensure_phase1() -> None:
+    """Idempotente. Await Phase1 (~50ms), agenda Phase2 em background."""
+    from iaglobal.cli.bootstrap import bootstrap as _bootstrap
+    await _bootstrap.ensure_phase1()
+
+async def _ensure_full() -> "Orchestrator":
+    """Idempotente. Await Phase2 e sincroniza IAGlobalAPI."""
+    from iaglobal.cli.bootstrap import bootstrap as _bootstrap
+    orch = await _bootstrap.initialize()
+    api = _get_api()
+    if not api._initialized and orch is not None:
+        api._orchestrator = orch
+        api._initialized = True
+    return orch
+
+def _ready() -> bool: ...                    # True se Phase2 concluiu
+def _boot_snapshot() -> dict: ...            # progresso: phase1/2, elapsed, steps
+```
+
+### Padrão de uso em tools MCP
+
+```python
+@mcp.tool()
+async def minha_tool() -> str:
+    await _ensure_phase1()
+    snap = _boot_snapshot()
+    if not snap["phase2_done"]:
+        return "BOOTING: descrição amigável do estado atual"
+    await _ensure_full()
+    return _get_api().minha_leitura_pesada()
+```
+
+**Nunca** chame `_get_api().orca_sei()` direto sem `_ensure_full()` — `IAGlobalAPI.orchestrator` lança `RuntimeError` se `_initialized=False`.
+
+### Singleton lock
+
+| Estado | Quem agenda | Quem re-agenda |
+|--------|-------------|-----------------|
+| Phase1 pendente | `ensure_phase1` (no-op após primeira) | ninguém |
+| Phase2 pendente | `_schedule_phase2` em background | ninguém |
+| Phase2 concluída | feito | ninguém (NÃO re-agendar — bug que re-rodava Phase2 antes fixado) |
+
+A asserção `if self._phase2_task is None:` (não `is None or done`) é o que garante **execução única**.
+
+## MCP Server Entrypoint Contract
+
+| Use este | ~~Não use mais~~ |
+|----------|-------------------|
+| `python -m iaglobal.mcp.server --mode stdio` | `python -m iaglobal.api.mcp_server` (DEPRECATED) |
+| `python -m iaglobal.mcp.server --mode both` | — (mata SSE 8100 + HTTP 8101 + stdio) |
+| `python -m iaglobal.mcp.server --mode http` | atende `/health`, `/metrics`, `/audit`, `/fix` |
+
+**Quem usa `run_mcp.sh`**: o script já aponta para o unified (`iaglobal.mcp.server --mode stdio`). Se alguém editá-lo de volta para `iaglobal.api.mcp_server`, **reverter**.
+
+### Ferramentas canonicas no unified
+
+| Tool | Categoria | Phase dep |
+|------|-----------|-----------|
+| `metabolic_audit`, `get_ivm` | metabólica | nenhuma |
+| `run_task` | execução | Phase2 (via `_ensure_full`) |
+| `get_status`, `get_system_health`, `get_bandit_scores` | leitura | lazy (BOOTING se Phase2) |
+| `get_provider_metrics`, `get_model_metrics` | leitura | nenhuma (lê singletons) |
+| `get_insights`, `list_scripts`, `get_history`, `get_execution_history` | leitura | lazy |
+| `evolution_status`, `evolve_strategy`, `evolution_dashboard` | runtime | Phase1+ |
+| `web_search`, `web_fetch`, `read_file`, `write_file`, `list_dir`, `execute_code` | utilitários | nenhuma |
+| `reflexion_fix`, `reflexion_loop`, `get_error_history` | auto-cura | Phase1+ |
+
+Adicionar uma nova tool ao **unified** (não ao deprecated): seguir o padrão lazy.
 
 ## Before You Commit
 
@@ -57,6 +202,10 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 2. Run `python -m iaglobal.auditoria_arquitetural` to detect orphaned functions or naming collisions.
 3. Verify no file lost the lineage marker header.
 4. If you touched pipeline nodes, run `python -m pytest iaglobal/tests/test_topology_contract.py -v`.
+5. **Se tocou bootstrap, mcp/server, api/__init__ ou run_mcp.sh**: rode `python iaglobal/tests/test_verify_mcp.py`. Exit ≠ 0 = regressão de singleton/duplicação. Não commitar.
+6. **Se criou branch `wip/...`**: ao terminar, faça merge ou descarte explicitamente — branches WIP abandonadas são vetor de reverts acidentais.
+7. **Em novo clone**: rode `bash scripts/install-hooks.sh` para que o smoke gate rode automaticamente em todo commit que toque arquivos sensíveis.
+8. **Decisões arquiteturais relevantes**: registre em `docs/adr/NNNN-slug.md` (ver ADR 0001 e 0002 para tom/estrutura).
 
 ## 🧬 Testing Standards
 

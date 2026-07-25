@@ -37,11 +37,14 @@ from iaglobal.evolution.evolution_replay import EvolutionReplay, CORE_NODE_NAMES
 from iaglobal.evolution.skills.native.skill_registry import skill_registry
 from iaglobal.memory.memory_storage import init_storage
 
-from iaglobal.utils.logger import get_logger
+import logging
 
-logger = get_logger("iaglobal.cli.evolution_lab")
+from iaglobal.utils.logger import logger
+
+logger = logging.getLogger("ia-global")
 
 # ── Helpers ──────────────────────────────────────────────────────────────
+from iaglobal.utils.logger import logger
 
 CORE = [
     ("prompt_intake", "prompt_intake", "general"),

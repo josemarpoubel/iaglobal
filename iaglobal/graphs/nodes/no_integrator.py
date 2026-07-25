@@ -15,6 +15,7 @@ from iaglobal.graphs.execution_graph import ExecutionGraph
 from iaglobal.graphs.pipeline_definition import PIPELINE_SKILLS
 
 from iaglobal.utils.logger import get_logger
+
 logger = get_logger("iaglobal.graphs.nodes.no_integrator")
 
 _default_registry = _global_registry

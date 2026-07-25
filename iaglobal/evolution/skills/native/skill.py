@@ -1531,10 +1531,19 @@ def _get_skill_python_autocomplete():
     return skill_python_autocomplete
 
 
+def _get_skill_pdf_generator():
+    from iaglobal.evolution.skills.native.skill_pdf_generator import (
+        skill_pdf_generator,
+    )
+
+    return skill_pdf_generator
+
+
 _BUILTIN_SKILLS_LAZY = [
     *_BUILTIN_SKILLS,
     _get_skill_debug_unificado,
     _get_skill_python_autocomplete,
+    _get_skill_pdf_generator,
 ]
 
 

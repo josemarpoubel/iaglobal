@@ -16,14 +16,15 @@ Uso:
 
 import os
 import time
+import logging
 import asyncio
 import concurrent.futures
 
 from typing import Optional, Dict, Any, List
 
-from iaglobal.utils.logger import get_logger
+from iaglobal.utils.logger import logger
 
-logger = get_logger("iaglobal.api")
+logger = logging.getLogger("ia-global")
 
 
 class IAGlobalAPI:
@@ -98,6 +99,8 @@ class IAGlobalAPI:
 
     @property
     def orchestrator(self):
+        if self._orchestrator is not None:
+            return self._orchestrator
         if not self._initialized:
             raise RuntimeError(
                 "IAGlobalAPI não inicializado. Chame initialize() ou "

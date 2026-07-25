@@ -26,9 +26,11 @@ from iaglobal.graphs.node import Node
 from iaglobal.memory.memory_error import record_error
 import iaglobal.graphs.topology as topology
 
-from iaglobal.utils.logger import get_logger
+import logging
 
-logger = get_logger("iaglobal.graphs.builder")
+from iaglobal.utils.logger import logger
+
+logger = logging.getLogger("ia-global")
 
 # List of node names in canonical order (7 phases from ROADMAP)
 # Updated per leiame.md: context_weaver + mini_evaluator + critic reordering

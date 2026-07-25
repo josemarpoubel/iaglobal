@@ -112,6 +112,37 @@ def _get_api() -> IAGlobalAPI:
     return _api
 
 
+async def _ensure_phase1() -> None:
+    """Idempotente. Aguarda Phase1 (~50ms) e agenda Phase2 em background."""
+    from iaglobal.cli.bootstrap import bootstrap as _bootstrap
+
+    await _bootstrap.ensure_phase1()
+
+
+async def _ensure_full() -> "Orchestrator":
+    """Idempotente. Aguarda Phase2 completo e sincroniza IAGlobalAPI."""
+    from iaglobal.cli.bootstrap import bootstrap as _bootstrap
+
+    orch = await _bootstrap.initialize()
+    api = _get_api()
+    if not api._initialized and orch is not None:
+        api._orchestrator = orch
+        api._initialized = True
+    return orch
+
+
+def _boot_snapshot() -> dict:
+    from iaglobal.cli.bootstrap import bootstrap as _bootstrap
+
+    return _bootstrap.snapshot()
+
+
+def _ready() -> bool:
+    from iaglobal.cli.bootstrap import bootstrap as _bootstrap
+
+    return _bootstrap._phase2_done
+
+
 def _get_invariants() -> MetabolicInvariants:
     global _invariants
     if _invariants is None:
@@ -208,7 +239,7 @@ DNA: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a
             Relatório formatado da execução
         """
         api = _get_api()
-        await api.initialize_async()
+        await _ensure_full()
         result = api.run_task(prompt)
 
         lines = []
@@ -231,13 +262,34 @@ DNA: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a
 
     @mcp.tool()
     async def get_status() -> str:
-        """Retorna status do sistema iaglobal (DAG, evolução, memória)."""
-        api = _get_api()
-        await api.initialize_async()
-        status = api.get_status()
+        """Retorna status do sistema iaglobal (DAG, evolução, memória).
 
+        Lazy: responde imediatamente em BOOTING se Phase2 ainda corre.
+        """
+        await _ensure_phase1()
+
+        snap = _boot_snapshot()
+        if not snap["phase2_done"]:
+            steps = (
+                ", ".join(
+                    f"{k}={v}"
+                    for k, v in snap["phase2_steps"].items()
+                    if v == "running"
+                )
+                or "—"
+            )
+            return (
+                f"⚡ IAGlobal {snap['current_phase'] or 'phase1'}\n"
+                f"  phase1_done: {snap['phase1_done']}\n"
+                f"  phase2_running: {snap['phase2_running']}\n"
+                f"  steps running: {steps}\n"
+                f"  phase2_elapsed: {snap['phase2_elapsed_seconds']}s"
+            )
+
+        await _ensure_full()
+        status = _get_api().get_status()
         if not status:
-            return "⚠️ Sistema em inicialização ou sem resposta"
+            return "⚠️ Status vazio (orchestrator initialized mas sem snapshot)"
 
         def get_val(path: list, default="N/A"):
             curr = status
@@ -271,11 +323,245 @@ DNA: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a
 
     @mcp.tool()
     async def get_history(limit: int = 10) -> list[dict]:
-        """Retorna histórico de execuções recentes."""
-        api = _get_api()
-        await api.initialize_async()
-        history = api.get_history(limit=limit)
-        return history.get("history", [])
+        """Retorna histórico de execuções recentes. Lazy: [] durante BOOTING."""
+        await _ensure_phase1()
+        if not _ready():
+            return []
+        try:
+            from iaglobal.events import store as decision_store
+
+            events = decision_store.query(limit=limit) or []
+        except Exception:
+            events = []
+        if not events:
+            try:
+                from iaglobal.memory.db_manager import db
+
+                events = db.get_insights(limit=limit) or []
+            except Exception:
+                events = []
+        return events
+
+    # --------------------------------------------------------------------------
+    # TOOLS OBSERVABILIDADE (lazy: snapshot/dados de I/O leve durante BOOTING)
+    # --------------------------------------------------------------------------
+
+    @mcp.tool()
+    async def get_insights(
+        agent: str = "", limit: int = 10, min_score: float = 0.0
+    ) -> str:
+        """Recupera aprendizados armazenados pelos agentes."""
+        await _ensure_phase1()
+        if not _ready():
+            return "BOOTING: insights indisponíveis até Phase2."
+        records = _get_api().get_insights(
+            agent=agent if agent else None,
+            limit=limit,
+            min_score=min_score if min_score > 0 else None,
+        )
+        if not records:
+            return "Nenhum insight encontrado."
+
+        lines = [f"📚 {len(records)} insights", "=" * 40, ""]
+        for r in records:
+            score_bar = "█" * max(1, int(r["score"] / 5)) + "░" * max(
+                0, 20 - int(r["score"] / 5)
+            )
+            lines.append(f"  [{r['agent']}] score={r['score']:.0f} {score_bar}")
+            lines.append(f"  {r['content'][:120]}")
+            lines.append(f"  task_id={r['task_id']} | {r['timestamp']}")
+            lines.append("")
+        return "\n".join(lines)
+
+    @mcp.tool()
+    async def list_scripts() -> str:
+        """Lista scripts Python gerados e persistidos pelo sistema."""
+        await _ensure_phase1()
+        if not _ready():
+            return "BOOTING: listagem de scripts indisponível até Phase2."
+        scripts = _get_api().list_scripts()
+        if not scripts:
+            return "Nenhum script gerado ainda."
+
+        from datetime import datetime
+
+        lines = [f"📁 {len(scripts)} scripts gerados", "=" * 40, ""]
+        for s in scripts:
+            modified = datetime.fromtimestamp(s["modified"]).strftime("%H:%M:%S")
+            size_kb = s["size"] / 1024
+            lines.append(f"  {s['name']:<60} {size_kb:>6.1f}KB  {modified}")
+        return "\n".join(lines)
+
+    @mcp.tool()
+    async def get_provider_metrics() -> str:
+        """Métricas por provedor (read-only, não precisa de Phase2)."""
+        from iaglobal.providers.provider_metrics import metrics
+
+        stats = metrics.get_provider_stats()
+        if not stats:
+            return "Nenhuma metrica de provedor registrada ainda."
+
+        lines = ["📊 Metricas por Provedor", "=" * 50, ""]
+        lines.append(
+            f"  {'Provedor':<20} {'Chamadas':>9} {'Sucesso':>8} {'Lat.Media':>9} {'Custo':>8} {'Tokens':>8}"
+        )
+        lines.append(
+            f"  {'─' * 20} {'─' * 9} {'─' * 8} {'─' * 9} {'─' * 8} {'─' * 8}"
+        )
+        for prov, data in sorted(
+            stats.items(), key=lambda x: x[1].get("calls", 0), reverse=True
+        ):
+            calls = data.get("calls", 0)
+            sr = data.get("success_rate", 0)
+            lat = data.get("avg_latency", 0)
+            cost = data.get("total_cost", 0)
+            tokens = data.get("avg_tokens", 0)
+            lines.append(
+                f"  {prov:<20} {calls:>9} {sr:>7.1%} {lat:>8.0f}ms ${cost:<6.4f} {tokens:>8}"
+            )
+        return "\n".join(lines)
+
+    @mcp.tool()
+    async def get_model_metrics(min_calls: int = 1) -> str:
+        """Métricas por modelo (read-only)."""
+        from iaglobal.providers.provider_metrics import metrics
+
+        stats = metrics.get_model_stats()
+        if not stats:
+            return "Nenhuma metrica de modelo registrada ainda."
+        filtered = {k: v for k, v in stats.items() if v.get("calls", 0) >= min_calls}
+        if not filtered:
+            return f"Nenhum modelo com {min_calls}+ chamadas."
+
+        lines = ["📊 Metricas por Modelo", "=" * 55, ""]
+        lines.append(
+            f"  {'Modelo':<35} {'Chamadas':>9} {'Sucesso':>8} {'Lat.Media':>9} {'Tokens':>8}"
+        )
+        lines.append(
+            f"  {'─' * 35} {'─' * 9} {'─' * 8} {'─' * 9} {'─' * 8}"
+        )
+        for model, data in sorted(
+            filtered.items(), key=lambda x: x[1].get("calls", 0), reverse=True
+        ):
+            calls = data.get("calls", 0)
+            sr = data.get("success_rate", 0)
+            lat = data.get("avg_latency", 0)
+            tokens = data.get("avg_tokens", 0)
+            lines.append(
+                f"  {model:<35} {calls:>9} {sr:>7.1%} {lat:>8.0f}ms {tokens:>8}"
+            )
+        return "\n".join(lines)
+
+    @mcp.tool()
+    async def get_bandit_scores() -> str:
+        """Exibe scores do BanditPolicy. Lazy: espera Phase2."""
+        await _ensure_phase1()
+        if not _ready():
+            return "BOOTING: BanditPolicy ainda não carregado (Phase2 em andamento)."
+        await _ensure_full()
+        try:
+            orch = _get_api().orchestrator
+            bandit = orch.bandit
+            credit = bandit.credit_engine
+        except Exception:
+            return "BanditPolicy nao disponivel (orchestrator nao inicializado)."
+
+        if not credit.stats:
+            return "Nenhum score de bandit registrado ainda."
+
+        lines = ["🎲 BanditPolicy — Scores por Modelo", "=" * 50, ""]
+        lines.append(
+            f"  {'Modelo':<35} {'Sucesso':>8} {'Falhas':>8} {'Score':>7} {'Latencia':>9}"
+        )
+        lines.append(f"  {'─' * 35} {'─' * 8} {'─' * 8} {'─' * 7} {'─' * 9}")
+        for key, data in sorted(
+            credit.stats.items(), key=lambda x: x[1].get("success", 0), reverse=True
+        ):
+            node, model, strategy = key
+            suc = data.get("success", 0)
+            fail = data.get("fail", 0)
+            total = suc + fail
+            score = suc / total if total > 0 else 0
+            lat = data.get("latency", 0)
+            avg_lat = lat / total if total > 0 else 0
+            lines.append(
+                f"  {model:<35} {suc:>8} {fail:>8} {score:>6.2f} {avg_lat:>8.0f}ms"
+            )
+        return "\n".join(lines)
+
+    @mcp.tool()
+    async def get_execution_history(limit: int = 10) -> str:
+        """Histórico das últimas execuções do pipeline."""
+        await _ensure_phase1()
+        if not _ready():
+            return "BOOTING: DecisionEventStore ainda não carregado."
+        try:
+            from iaglobal.events import store as decision_store
+
+            events = decision_store.query(limit=limit)
+        except Exception:
+            return "DecisionEventStore nao disponivel."
+        if not events:
+            return "Nenhum evento de execucao registrado."
+
+        lines = ["📜 Historico de Execucoes", "=" * 50, ""]
+        for ev in events:
+            step = ev.get("step", "?")
+            action = ev.get("action", "")
+            selected = ev.get("selected", "")
+            result = ev.get("result", "")
+            ts = ev.get("timestamp", "")[11:19] if ev.get("timestamp") else ""
+            line = f"  [{ts}] {step:<18}"
+            if action:
+                line += f" {action:<20}"
+            if selected:
+                line += f" → {selected}"
+            if result:
+                line += f" = {result}"
+            lines.append(line)
+        return "\n".join(lines)
+
+    @mcp.tool()
+    async def get_system_health(max_age_seconds: int = 3600) -> str:
+        """Saúde do sistema via LifeSignals. Lazy: BOOTING se nenhum sinal."""
+        await _ensure_phase1()
+        try:
+            from iaglobal.utils.life_signal_collector import collector
+        except Exception:
+            return "LifeSignalCollector nao disponivel."
+
+        report = collector.get_report()
+        if report["total_functions"] == 0:
+            snap = _boot_snapshot()
+            return (
+                "🚧 IAGlobal em bootstrap\n"
+                f"  phase1_done: {snap['phase1_done']}\n"
+                f"  phase2_running: {snap['phase2_running']}\n"
+                f"  phase2_elapsed: {snap['phase2_elapsed_seconds']}s\n"
+                "  Life signals ainda não emitidos (instrumentação será visível após primeira execução)."
+            )
+
+        lines = ["🩺 Saúde do Sistema — Life Signals", "=" * 50, ""]
+        lines.append(f"Funções monitoradas: {report['total_functions']}")
+        lines.append(f"Total de sinais: {report['total_signals']}")
+        lines.append("")
+        alive = hibernating = dead = 0
+        for func, data in sorted(report["functions"].items()):
+            status = data["status"]
+            if "ALIVE" in status:
+                icon, alive = "✅", alive + 1
+            elif "HIBERNATING" in status:
+                icon, hibernating = hibernating + 1
+            else:
+                icon, dead = dead + 1
+            lines.append(f"  {icon} {func}")
+            lines.append(f"      {status}")
+            if data.get("last_seen_iso"):
+                lines.append(f"      Último sinal: {data['last_seen_iso']}")
+        lines.append("")
+        lines.append("── Resumo ──")
+        lines.append(f"  ALIVE: {alive} | HIBERNATING: {hibernating} | DEAD: {dead}")
+        return "\n".join(lines)
 
     # --------------------------------------------------------------------------
     # TOOLS WEB
@@ -810,6 +1096,14 @@ async def run_server(host: str = "127.0.0.1", port: int = 8100, sse: bool = True
         return
 
     logger.info(f"🔮 Iniciando MCP Unified Server em {host}:{port}")
+
+    await _ensure_phase1()
+    snap = _boot_snapshot()
+    logger.info(
+        "⚡ MCP pronto para handshake (phase1=%s, phase2_running=%s)",
+        snap["phase1_done"],
+        snap["phase2_running"],
+    )
 
     # Setup integração bus
     await _setup_bus_integration()

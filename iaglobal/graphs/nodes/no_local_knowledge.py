@@ -24,44 +24,9 @@ _stm = ShortTermMemory()
 _MIN_KNOWLEDGE_CHARS = 200
 
 
-def _query_local(task: str, task_type: str = "general") -> List[Dict[str, Any]]:
-    """Função auxiliar isolada para execução segura e concorrente em thread pool.
-
-    Args:
-        task: Tarefa a ser pesquisada
-        task_type: Tipo da tarefa (ex: "code", "document", "analysis")
-    """
+def _query_local(task: str) -> List[Dict[str, Any]]:
+    """Função auxiliar isolada para execução segura e concorrente em thread pool."""
     results = []
-
-    # Determina se é tarefa de código
-    is_code_task = task_type in (
-        "code",
-        "python",
-        "javascript",
-        "html",
-        "css",
-        "sql",
-    ) or any(
-        lang in task.lower()
-        for lang in [
-            "code",
-            "código",
-            "python",
-            "javascript",
-            "java",
-            "rust",
-            "go",
-            "ruby",
-            "c++",
-            "c#",
-            "typescript",
-            "html",
-            "css",
-            "sql",
-            "bash",
-            "shell",
-        ]
-    )
 
     # 1. Consulta ao knowledge.json
     try:
@@ -75,7 +40,6 @@ def _query_local(task: str, task_type: str = "general") -> List[Dict[str, Any]]:
                             "source": "knowledge.json",
                             "content": content,
                             "relevance": 1.0,
-                            "kind": "DOCUMENTATION",  # knowledge.json é documentação
                         }
                     )
     except Exception as err:
@@ -88,45 +52,23 @@ def _query_local(task: str, task_type: str = "general") -> List[Dict[str, Any]]:
             if isinstance(m, dict):
                 content = m.get("content", "")[:500]
                 if len(content) > 30:
-                    # Tenta inferir kind do conteúdo
-                    from iaglobal.core.artifact import GeneratedArtifact
-
-                    artifact = GeneratedArtifact.from_str(content, source="ltm")
                     results.append(
-                        {
-                            "source": "ltm",
-                            "content": content,
-                            "relevance": 0.9,
-                            "kind": artifact.kind.value,
-                        }
+                        {"source": "ltm", "content": content, "relevance": 0.9}
                     )
     except Exception as err:
         logger.debug("[LOCAL_KNOWLEDGE] Falha ao ler LTM: %s", err)
 
-    # 3. Consulta ao banco de vetores em CBOR2 (segregado por kind)
+    # 3. Consulta ao banco de vetores em CBOR2
     try:
         from iaglobal.memory.memory_vector import MemoryVector
-        from iaglobal.core.artifact import ArtifactKind
 
         _mem_vec = MemoryVector()
-
-        # Busca por kind específico
-        if is_code_task:
-            vec_results = _mem_vec.search_code(task, top_k=3) or []
-        else:
-            vec_results = _mem_vec.search_documentation(task, top_k=3) or []
-
+        vec_results = _mem_vec.search(task, top_k=3) or []
         for m in vec_results:
             content = m if isinstance(m, str) else m.get("content", "")
-            kind = m.get("kind", "TEXT") if isinstance(m, dict) else "TEXT"
             if content and len(str(content)) > 30:
                 results.append(
-                    {
-                        "source": "cbor2",
-                        "content": str(content)[:500],
-                        "relevance": 0.8,
-                        "kind": kind,
-                    }
+                    {"source": "cbor2", "content": str(content)[:500], "relevance": 0.8}
                 )
     except Exception as err:
         logger.debug("[LOCAL_KNOWLEDGE] Falha ao ler banco CBOR2: %s", err)
@@ -137,14 +79,7 @@ def _query_local(task: str, task_type: str = "general") -> List[Dict[str, Any]]:
         for m in recent:
             content = str(m)[:500]
             if len(content) > 30:
-                results.append(
-                    {
-                        "source": "stm",
-                        "content": content,
-                        "relevance": 0.7,
-                        "kind": "TEXT",  # STM é texto genérico
-                    }
-                )
+                results.append({"source": "stm", "content": content, "relevance": 0.7})
     except Exception as err:
         logger.debug("[LOCAL_KNOWLEDGE] Falha ao ler STM: %s", err)
 
@@ -180,17 +115,14 @@ async def run_local_knowledge(ctx: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     try:
-        # Obtém task_type do contexto (default: "general")
-        task_type = str(ctx.get("input", {}).get("task_type", "general"))
-
         # Desvia a computação e leituras síncronas de arquivos e DB para uma thread pool isolada
-        results = await asyncio.to_thread(_query_local, task, task_type)
+        results = await asyncio.to_thread(_query_local, task)
         total_chars = sum(len(r["content"]) for r in results) if results else 0
         latency_ms = (time.time() - start_time) * 1000.0
 
         if results:
-            # Remove bullets: apenas concatena o conteúdo (sem formatação)
-            combined = "\n\n".join(r["content"] for r in results)
+            lines = [f"• [{r['source']}] {r['content']}" for r in results]
+            combined = "\n\n".join(lines)
 
             logger.info(
                 "[LOCAL_KNOWLEDGE] Sucesso! %d entradas recuperadas (%d caracteres lidos).",

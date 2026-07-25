@@ -110,9 +110,7 @@ class JointOptimizationLoop:
         )
         efficiency = max(0.0, 1.0 - min(avg_latency / 10.0, 1.0))
         cooperation = 0.5  # default neutro — stats não têm métricas de cooperação
-        return round(
-            productivity * 0.4 + efficiency * 0.4 + cooperation * 0.2, 4
-        )
+        return round(productivity * 0.4 + efficiency * 0.4 + cooperation * 0.2, 4)
 
     async def get_node_ivm(self, node: str) -> float:
         async with self._lock:

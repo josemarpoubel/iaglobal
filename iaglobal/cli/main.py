@@ -2,13 +2,14 @@
 
 import os
 import sys
+import logging
 import asyncio
 import subprocess
 
 
-from iaglobal.utils.logger import start_session_log, stop_session_log, get_logger
+from iaglobal.utils.logger import start_session_log, stop_session_log
 
-logger = get_logger("iaglobal.cli.main")
+logger = logging.getLogger("ia-global")
 
 
 async def run_cli():

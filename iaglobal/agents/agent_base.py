@@ -154,7 +154,11 @@ def get_evo_registry() -> Dict[str, Any]:
 
 class AgentBase(ABC):
     DEFAULT_CANDIDATES = [
+        "groq/llama-3.3-70b-versatile",
+        "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
         "ollama/qwen2.5:0.5b",
+        "ollama/yasserrmd/GLM4.7-Distill-LFM2.5-1.2B:latest",
+        "ollama/oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM",
     ]
 
     def __init__(self, agent_name: str, bandit: Optional[BanditPolicy] = None):
@@ -220,12 +224,7 @@ class AgentBase(ABC):
             effective_conf = router.get_effective_confidence(
                 self.agent_name, memory_result.confidence
             )
-            # RESPONSE_ELIGIBLE_SOURCES: apenas fontes que produzem respostas completas (não contexto agregado)
-            RESPONSE_ELIGIBLE_SOURCES = {"cache", "obsidian", "metabolic_context"}
-            if (
-                effective_conf >= CONF_THRESHOLD_MEMORY
-                and memory_result.source in RESPONSE_ELIGIBLE_SOURCES
-            ):
+            if effective_conf >= CONF_THRESHOLD_MEMORY:
                 router.record_memory_resolution(self.agent_name)
                 logger.info(
                     "[%s] Memory hit | source=%s conf_base=%.2f eff=%.2f latency=%.0fms",
