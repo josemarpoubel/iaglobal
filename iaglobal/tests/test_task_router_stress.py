@@ -3,8 +3,8 @@
 Stress Test — Tribunal Cognitivo: TaskRouter + Token Buckets
 
 Valida:
-  - TaskRouter mapeia 121 nós corretamente para 3 tiers (glm4, qwen, lfm)
-  - Token buckets por tier respeitam capacidades (glm4=2, qwen=6, lfm=8)
+  - TaskRouter mapeia 121 nós corretamente para 3 tiers (reviewer, coder, sentinel)
+  - Token buckets por tier respeitam capacidades (reviewer=4, coder=6, sentinel=8)
   - Alertas de congestão são disparados quando bucket atinge limite
   - JOLMetricsCollector registra alertas em JSONL
   - Homeostase: pipeline degrada gracefully sob congestão
@@ -61,8 +61,8 @@ def jol_collector_instance():
 class TestTaskRouterMapping:
     """Valida mapeamento de 121 nós para 3 tiers."""
 
-    def test_critic_nodes_map_to_glm4(self, task_router_instance):
-        """Nós críticos devem mapear para tier glm4."""
+    def test_critic_nodes_map_to_reviewer(self, task_router_instance):
+        """Nós críticos devem mapear para tier reviewer."""
         router = task_router_instance
         critical_nodes = [
             "no_critic",
@@ -75,10 +75,10 @@ class TestTaskRouterMapping:
         ]
         for node_id in critical_nodes:
             tier = router.get_role_for_node(node_id)
-            assert tier == "glm4", f"{node_id} should map to glm4, got {tier}"
+            assert tier == "reviewer", f"{node_id} should map to reviewer, got {tier}"
 
-    def test_coder_nodes_map_to_qwen(self, task_router_instance):
-        """Nós coder/dev devem mapear para tier qwen."""
+    def test_coder_nodes_map_to_coder(self, task_router_instance):
+        """Nós coder/dev devem mapear para tier coder."""
         router = task_router_instance
         coder_nodes = [
             "no_coder",
@@ -90,10 +90,10 @@ class TestTaskRouterMapping:
         ]
         for node_id in coder_nodes:
             tier = router.get_role_for_node(node_id)
-            assert tier == "qwen", f"{node_id} should map to qwen, got {tier}"
+            assert tier == "coder", f"{node_id} should map to coder, got {tier}"
 
-    def test_sentinel_nodes_map_to_lfm(self, task_router_instance):
-        """Nós sentinela/audit devem mapear para tier lfm."""
+    def test_sentinel_nodes_map_to_sentinel(self, task_router_instance):
+        """Nós sentinela/audit devem mapear para tier sentinel."""
         router = task_router_instance
         sentinel_nodes = [
             "no_sentinel_audit",
@@ -107,66 +107,62 @@ class TestTaskRouterMapping:
         ]
         for node_id in sentinel_nodes:
             tier = router.get_role_for_node(node_id)
-            assert tier == "lfm", f"{node_id} should map to lfm, got {tier}"
+            assert tier == "sentinel", f"{node_id} should map to sentinel, got {tier}"
 
     def test_timeout_per_tier(self, task_router_instance):
         """Cada tier tem timeout apropriado."""
         router = task_router_instance
         assert (
-            router.get_timeout_for_tier("glm4") == 600.0
-        )  # Juiz: 10 min para raciocínio profundo
-        assert router.get_timeout_for_tier("qwen") == 60.0  # Operário: balanceado
-        assert router.get_timeout_for_tier("lfm") == 10.0  # Sentinela: rápido
+            router.get_timeout_for_tier("reviewer") == 600.0
+        )
+        assert router.get_timeout_for_tier("coder") == 60.0
+        assert router.get_timeout_for_tier("sentinel") == 10.0
 
-    def test_unknown_node_falls_back_to_qwen(self, task_router_instance):
-        """Nó desconhecido deve fallback para qwen (tier padrão)."""
+    def test_unknown_node_falls_back_to_coder(self, task_router_instance):
+        """Nó desconhecido deve fallback para coder (tier padrão)."""
         router = task_router_instance
         tier = router.get_role_for_node("unknown_node_xyz")
-        assert tier == "qwen", f"Unknown node should fallback to qwen, got {tier}"
+        assert tier == "coder", f"Unknown node should fallback to coder, got {tier}"
 
 
 class TestTokenBucketStress:
     """Stress test dos buckets por tier."""
 
     @pytest.mark.asyncio
-    async def test_glm4_bucket_capacity(self, token_gate_instance):
-        """Bucket glm4 deve aceitar 4 aquisições consecutivas (capacity=4)."""
+    async def test_reviewer_bucket_capacity(self, token_gate_instance):
+        """Bucket reviewer deve aceitar 4 aquisições consecutivas (capacity=4)."""
         gate = token_gate_instance
-        # no_critic → tier glm4 (capacity=4)
         results = []
         for i in range(5):
             allowed = await gate.try_acquire("no_critic")
             results.append(allowed)
 
-        # Primeiros 4 devem passar, 5º deve falhar
-        assert results[0] == True, "First glm4 acquire should pass"
-        assert results[1] == True, "Second glm4 acquire should pass"
-        assert results[2] == True, "Third glm4 acquire should pass"
-        assert results[3] == True, "Fourth glm4 acquire should pass"
-        assert results[4] == False, "Fifth glm4 acquire should fail (bucket empty)"
+        assert results[0] == True, "First reviewer acquire should pass"
+        assert results[1] == True, "Second reviewer acquire should pass"
+        assert results[2] == True, "Third reviewer acquire should pass"
+        assert results[3] == True, "Fourth reviewer acquire should pass"
+        assert results[4] == False, "Fifth reviewer acquire should fail (bucket empty)"
 
     @pytest.mark.asyncio
-    async def test_qwen_bucket_capacity(self, token_gate_instance):
-        """Bucket qwen deve aceitar 6 aquisições consecutivas (capacity=6)."""
+    async def test_coder_bucket_capacity(self, token_gate_instance):
+        """Bucket coder deve aceitar 6 aquisições consecutivas (capacity=6)."""
         gate = token_gate_instance
         results = []
         for i in range(7):
             allowed = await gate.try_acquire("no_coder")
             results.append(allowed)
 
-        # Primeiros 6 devem passar, 7º deve falhar
         assert sum(results) == 6, f"Expected 6 successes, got {sum(results)}"
 
     @pytest.mark.asyncio
-    async def test_lfm_bucket_capacity(self, token_gate_instance):
-        """Bucket lfm deve aceitar 8 aquisições consecutivas (capacity=8)."""
+    async def test_sentinel_bucket_capacity(self, token_gate_instance):
+        """Bucket sentinel deve aceitar 8 aquisições consecutivas (capacity=8)."""
         gate = token_gate_instance
         results = []
         for i in range(9):
             allowed = await gate.try_acquire("no_sentinel_audit")
             results.append(allowed)
 
-        # Primeiros 8 devem passar, 9º deve falhar
         assert sum(results) == 8, f"Expected 8 successes, got {sum(results)}"
 
     @pytest.mark.asyncio
@@ -194,28 +190,23 @@ class TestCongestionAlerts:
         """Alerta de congestão deve ser disparado quando bucket atinge limite."""
         gate = token_gate_instance
 
-        # Enche bucket glm4 (capacidade 4) até disparar alerta
         alerts_received = []
 
         def capture_alert(msg):
             alerts_received.append((msg.message_type, msg.content))
 
-        # Subscrição no evento via bus singleton
         from iaglobal.graphs.comms.acetylcholine_bus import bus
 
         bus.subscribe("tier_congestion_alert", capture_alert)
 
-        # Dispara aquisições até gerar rejeições suficientes para alerta
         for i in range(7):
             await gate.try_acquire("no_critic")
-            await asyncio.sleep(0.1)  # Aguarda evento ser processado
+            await asyncio.sleep(0.1)
 
-        # Verifica se alerta foi disparado (pode demorar um pouco)
         await asyncio.sleep(0.5)
 
-        # bucket glm4 capacity=4, alerta dispara após >=70% rejeições => >=3 rejeições
-        assert gate._alerts_fired.get("glm4", 0) >= 1, (
-            "Congestion alert should be fired for glm4"
+        assert gate._alerts_fired.get("reviewer", 0) >= 1, (
+            "Congestion alert should be fired for reviewer"
         )
 
     @pytest.mark.asyncio
@@ -225,19 +216,15 @@ class TestCongestionAlerts:
         """Alertas de congestão devem ser registrados em JSONL."""
         gate = token_gate_instance
 
-        # Enche bucket para disparar alerta
         for i in range(5):
             await gate.try_acquire("no_critic")
             await asyncio.sleep(0.1)
 
-        # Aguarda escrita assíncrona
         await asyncio.sleep(1.0)
 
-        # Verifica arquivo JSONL
         if CONGESTION_FILE.exists():
             lines = CONGESTION_FILE.read_text(encoding="utf-8").strip().splitlines()
             if len(lines) > 0:
-                # Parse do primeiro alerta
                 alert = json.loads(lines[0])
                 assert "tier" in alert
                 assert "timestamp" in alert
@@ -255,59 +242,49 @@ class TestConcurrentLoad:
         router = task_router_instance
         gate = token_gate_instance
 
-        # 27 tasks por tier = 81 total
         tasks_per_tier = 27
 
-        results = {"glm4": [], "qwen": [], "lfm": []}
+        results = {"reviewer": [], "coder": [], "sentinel": []}
 
         async def acquire_for_tier(tier: str, task_id: int):
             node_mapping = {
-                "glm4": "no_critic",
-                "qwen": "no_coder",
-                "lfm": "no_sentinel_audit",
+                "reviewer": "no_critic",
+                "coder": "no_coder",
+                "sentinel": "no_sentinel_audit",
             }
             node_id = node_mapping[tier]
             allowed = await gate.try_acquire(node_id)
             return (tier, task_id, allowed)
 
-        # Cria coroutines para todas as tasks
         coroutines = []
-        for tier in ["glm4", "qwen", "lfm"]:
+        for tier in ["reviewer", "coder", "sentinel"]:
             for i in range(tasks_per_tier):
                 coroutines.append(acquire_for_tier(tier, i))
 
-        # Executa todas tarefas concorrentemente
         all_results = await asyncio.gather(*coroutines)
 
-        # Agrega resultados por tier
         for tier, task_id, allowed in all_results:
             results[tier].append(allowed)
 
-        # Verifica distribuição
-        glm4_successes = sum(results["glm4"])
-        qwen_successes = sum(results["qwen"])
-        lfm_successes = sum(results["lfm"])
+        reviewer_successes = sum(results["reviewer"])
+        coder_successes = sum(results["coder"])
+        sentinel_successes = sum(results["sentinel"])
 
         logger.info(
-            f"Concurrent load: glm4={glm4_successes}/27, qwen={qwen_successes}/27, lfm={lfm_successes}/27"
+            f"Concurrent load: reviewer={reviewer_successes}/27, coder={coder_successes}/27, sentinel={sentinel_successes}/27"
         )
 
-        # Buckets não devem permitir mais que capacity
-        # Nota: Como é singleton, buckets podem estar vazios de testes anteriores
-        # Então testamos que NÃO excede capacity
-        assert glm4_successes <= 4, (
-            f"glm4 should have max 4 successes, got {glm4_successes}"
+        assert reviewer_successes <= 4, (
+            f"reviewer should have max 4 successes, got {reviewer_successes}"
         )
-        assert qwen_successes <= 6, (
-            f"qwen should have max 6 successes, got {qwen_successes}"
+        assert coder_successes <= 6, (
+            f"coder should have max 6 successes, got {coder_successes}"
         )
-        assert lfm_successes <= 8, (
-            f"lfm should have max 8 successes, got {lfm_successes}"
+        assert sentinel_successes <= 8, (
+            f"sentinel should have max 8 successes, got {sentinel_successes}"
         )
 
-        # Teste principal: buckets limitam concorrência corretamente
-        # (não garantimos sucessos mínimos porque singleton pode estar esgotado)
-        logger.info(f"Bucket limits validated: glm4<={2}, qwen<={6}, lfm<={8}")
+        logger.info(f"Bucket limits validated: reviewer<=4, coder<=6, sentinel<=8")
 
     @pytest.mark.asyncio
     async def test_concurrent_load_triggers_alerts(
@@ -316,7 +293,6 @@ class TestConcurrentLoad:
         """Carga concorrente deve disparar alertas de congestão."""
         gate = token_gate_instance
 
-        # Dispara 20 tarefas concorrentes no mesmo tier (qwen, capacity=6)
         async def stress_task():
             await gate.try_acquire("no_coder")
             await asyncio.sleep(0.01)
@@ -324,12 +300,10 @@ class TestConcurrentLoad:
         tasks = [stress_task() for _ in range(20)]
         await asyncio.gather(*tasks)
 
-        # Aguarda processamento de eventos
         await asyncio.sleep(0.5)
 
-        # Verifica se alerta foi disparado para qwen
-        assert gate._alerts_fired.get("qwen", 0) >= 1, (
-            "qwen alert should be fired under concurrent load"
+        assert gate._alerts_fired.get("coder", 0) >= 1, (
+            "coder alert should be fired under concurrent load"
         )
 
 
@@ -341,17 +315,14 @@ class TestHomeostaticDegradation:
         """Gate deve rastrear contagem de rejeições por tier."""
         gate = token_gate_instance
 
-        # Salva estado inicial (pode ter rejeições de testes anteriores)
-        initial_glm4 = gate._rejected_counts.get("glm4", 0)
+        initial = gate._rejected_counts.get("reviewer", 0)
 
-        # Gera mais rejeições
         for i in range(5):
             await gate.try_acquire("no_critic")
 
-        # Deve ter aumentado rejeições
-        final_glm4 = gate._rejected_counts.get("glm4", 0)
-        assert final_glm4 >= initial_glm4, (
-            f"Should track rejections for glm4: {initial_glm4} → {final_glm4}"
+        final = gate._rejected_counts.get("reviewer", 0)
+        assert final >= initial, (
+            f"Should track rejections for reviewer: {initial} → {final}"
         )
 
     @pytest.mark.asyncio
@@ -359,19 +330,16 @@ class TestHomeostaticDegradation:
         """Gate deve fornecer métricas de operação."""
         gate = token_gate_instance
 
-        # Verifica se buckets existem
-        assert "glm4" in gate.buckets
-        assert "qwen" in gate.buckets
-        assert "lfm" in gate.buckets
+        assert "reviewer" in gate.buckets
+        assert "coder" in gate.buckets
+        assert "sentinel" in gate.buckets
 
-        # Verifica capacidades
-        assert gate.buckets["glm4"].capacity == 4
-        assert gate.buckets["qwen"].capacity == 6
-        assert gate.buckets["lfm"].capacity == 8
+        assert gate.buckets["reviewer"].capacity == 4
+        assert gate.buckets["coder"].capacity == 6
+        assert gate.buckets["sentinel"].capacity == 8
 
 
 if __name__ == "__main__":
-    # Execução manual para debug
     import sys
 
     async def run_manual():
@@ -383,17 +351,15 @@ if __name__ == "__main__":
         print("STRESS TEST MANUAL — Tribunal Cognitivo")
         print("=" * 60)
 
-        # Teste rápido de mapeamento
         print("\n1. TaskRouter Mapping:")
         for node in ["no_critic", "no_coder", "no_sentinel_audit"]:
-            tier = router.get_tier_for_node(node)
-            model = router.resolve_model(node_id=node)
-            print(f"   {node} → {tier} ({model})")
+            tier = router.get_role_for_node(node)
+            route = router.route_for_tier(tier)
+            print(f"   {node} → {tier} ({route})")
 
-        # Teste rápido de bucket
         print("\n2. Token Bucket Capacity:")
         for node, expected in [
-            ("no_critic", 2),
+            ("no_critic", 4),
             ("no_coder", 6),
             ("no_sentinel_audit", 8),
         ]:

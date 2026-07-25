@@ -100,42 +100,33 @@ class SentinelOrchestrator:
         )
 
     async def _analyze_requirements(self, prompt: str, code: str) -> list[dict]:
-        """Híbrido: keyword scan → LFM confirmation.
-
-        Fase 1 — check_requirements() (zero custo de inferência):
-            Varre o prompt por palavras-chave (autenticação, tema escuro, etc.)
-            e verifica se o código as implementa.
-
-        Fase 2 — LFM-230M (sob demanda):
-            Se a fase 1 encontrar violações, chama o Sentinela (ollama_lfm)
-            para confirmar com inferência semântica leve.
-        """
         violations, _ = FailureAnalysisAgent.check_requirements(prompt, code)
         if not violations:
             return []
 
-        # Fase 2: Confirmação semântica via LFM-230M
         confirmed = []
-        lfm_prompt = LFM_CONFIRM_PROMPT.format(request=prompt[:2000], code=code[:3000])
+        confirm_prompt = LFM_CONFIRM_PROMPT.format(
+            request=prompt[:2000], code=code[:3000]
+        )
 
         try:
-            lfm_result = await asyncio.wait_for(
+            result = await asyncio.wait_for(
                 cognitive_dispatch(
                     node_id="sentinel",
-                    prompt=lfm_prompt,
+                    prompt=confirm_prompt,
                     task_type="validation",
                 ),
                 timeout=30.0,
             )
         except (asyncio.TimeoutError, Exception) as exc:
             logger.warning(
-                "[SENTINEL] LFM timeout/erro (%s) — mantendo %d violações keyword",
+                "[SENTINEL] timeout/erro (%s) — mantendo %d violações keyword",
                 exc,
                 len(violations),
             )
             return violations
 
-        if not lfm_result or '"compliant": true' in lfm_result:
+        if not result or '"compliant": true' in result:
             return []
 
         for v in violations:
@@ -143,7 +134,7 @@ class SentinelOrchestrator:
             req = v.get("requirement", "")
             chk = v.get("check", "")
             if any(
-                term in lfm_result.lower()
+                term in result.lower()
                 for term in [req.lower(), chk.lower(), cat.lower()]
             ):
                 confirmed.append(v)

@@ -346,7 +346,9 @@ async def _run_test():
             results.append((label, call_latency_ms, "OK"))
 
         if sum(new_markers.values()) > 0:
-            print(f"      novos markers bootstrap (esperado se Phase2 terminasse): {new_markers}")
+            print(
+                f"      novos markers bootstrap (esperado se Phase2 terminasse): {new_markers}"
+            )
 
         if len(notifications_log) > 0:
             print(f"      {len(notifications_log)} notification(s) seen")

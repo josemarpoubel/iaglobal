@@ -4,17 +4,7 @@ TokenBucket — Rate limiter adaptativo com priorização por IVM.
 
 Protege o modelo local (qwen2.5:0.5b) contra thrashing de CPU em
 hardware limitado (4 núcleos, sem GPU). Substitui o Semaphore fixo
-por um sistema de cadência dinâmica:
-
-  - Burst quando ocioso (até N tokens acumulados)
-  - Cadência estrita sob carga (rate controlado por latência)
-  - Priorização: agentes de baixo IVM são rejeitados sob pressão
-  - Circuit breaker: latência > 1000ms → só agentes críticos passam
-
-ETAPA 4 (ROADMAP_2): LocalModelGate com buckets independentes por tier
-cognitivo (JUIZ/glm4=2, OPERARIO/qwen=6, SENTINELA/lfm=8). Integra com
-TaskRouter para classificar node_id → tier e publica sinalização de
-congestão no AcetylcholineBus para degradação adaptativa proativa.
+por um sistema de cadência dinâmica.
 """
 
 import asyncio
@@ -30,20 +20,7 @@ logger = get_logger("iaglobal.token_bucket")
 class LocalModelGate:
     """Portão adaptativo para acesso ao modelo local com buckets por tier.
 
-    Implementa o Etapa 4 do ROADMAP_2: buckets independentes por tier
-    cognitivo (GLM4=2, Qwen=6, LFM=8). Integra com TaskRouter para classificar
-    node_id → tier e publica sinalização de congestão no AcetylcholineBus para
-    degradação adaptativa proativa.
-
-    Mapeia node_id para tier baseado no mapeamento semântico:
-    - Prefixo "no_critic*" / "critic" → tier "glm4" (Juiz)
-    - Prefixo "no_coder*" / "coder" / o padrão geral → tier "qwen" (Operário)
-    - Prefixo "no_sentinel*" / "sentinel" → tier "lfm" (Sentinela)
-
-    Evento de congestão: se as rejeições do bucket > 70%, publica
-    't congestion' com métricas por tier (utilization_, rejections_) no
-    barramento, permitindo ao PipelineEngine reduzir a complexidade por
-    tier automaticamente.
+    Mapeia node_id para tier cognitivo via TaskRouter.
     """
 
     _instance: ClassVar["LocalModelGate | None"] = None
@@ -72,14 +49,10 @@ class LocalModelGate:
         "evolution": 0.65,
     }
 
-    # Capacidades por tier do ROADMAP_2
-    # glm4=4 porque 2 slots são insuficientes com 20+ agentes concorrentes:
-    # cada inferência local leva 30-60s, então 2 slots geram fila de 18+
-    # agentes que estouram timeout e entram em retry espiral.
     BUCKET_CAPACITY: ClassVar[dict[str, int]] = {
-        "glm4": 4,  # Juiz: processamento crítico, 4 em lote
-        "qwen": 6,  # Operário: fluxo principal, throughput moderado
-        "lfm": 8,  # Sentinela: monitor+validation rápido, paralelismo máximo
+        "reviewer": 4,
+        "coder": 6,
+        "sentinel": 8,
     }
 
     def __init__(self) -> None:
@@ -103,8 +76,8 @@ class LocalModelGate:
             )
 
         # Métricas de operação por tier
-        self._rejected_counts: Dict[str, int] = {"glm4": 0, "qwen": 0, "lfm": 0}
-        self._alerts_fired: Dict[str, int] = {"glm4": 0, "qwen": 0, "lfm": 0}
+        self._rejected_counts: Dict[str, int] = {"reviewer": 0, "coder": 0, "sentinel": 0}
+        self._alerts_fired: Dict[str, int] = {"reviewer": 0, "coder": 0, "sentinel": 0}
         self._event: asyncio.Event = asyncio.Event()
 
     @classmethod
@@ -140,11 +113,7 @@ class LocalModelGate:
         return 0.35  # default baixo — fail-safe
 
     async def release(self, node_id: str, model_name: str = "") -> None:
-        """Libera slot no bucket do tier do node_id.
-
-        Se model_name for fornecido, o tier é derivado do modelo em vez do
-        node_id, mantendo consistência com try_acquire().
-        """
+        """Libera slot no bucket do tier do node_id."""
         tier = (
             self._tier_from_model(model_name)
             if model_name
@@ -156,20 +125,10 @@ class LocalModelGate:
 
     @staticmethod
     def _tier_from_model(model_name: str) -> str:
-        """Deriva o tier cognitivo a partir do nome do modelo."""
-        if "glm4" in model_name:
-            return "glm4"
-        if "lfm" in model_name:
-            return "lfm"
-        return "qwen"
+        return "coder"
 
     async def try_acquire(self, node_id: str, model_name: str = "") -> bool:
-        """Tenta adquirir um slot no bucket do tier do node_id.
-
-        Se model_name for fornecido, o tier é derivado do modelo (e não do
-        node_id), permitindo que um agente critic use o bucket qwen quando
-        estiver requisitando o modelo qwen (fallback).
-        """
+        """Tenta adquirir um slot no bucket do tier do node_id."""
         tier = (
             self._tier_from_model(model_name)
             if model_name
@@ -184,11 +143,7 @@ class LocalModelGate:
         # o BucketManager.TokenBucket controla concorrência por capacidade.
         _ = self.get_priority(node_id)
 
-        # Timeout dependente do tier cognitivo:
-        # - glm4 (Juiz): inferência de 30-60s, precisa de fila longa
-        # - qwen (Operário): throughput médio, fila moderada
-        # - lfm (Sentinela): rápido, fila curta
-        tier_timeout: dict[str, float] = {"glm4": 30.0, "qwen": 10.0, "lfm": 5.0}
+        tier_timeout: dict[str, float] = {"reviewer": 30.0, "coder": 10.0, "sentinel": 5.0}
         _timeout = tier_timeout.get(tier, 5.0)
 
         acquired = await bucket.acquire(
@@ -284,7 +239,7 @@ class LocalModelGate:
 
         for tier, bucket in self.buckets.items():
             # Define floor mínimo por tier
-            _floors = {"glm4": 0.5, "qwen": 1.0, "lfm": 0.5}
+            _floors = {"reviewer": 0.5, "coder": 1.0, "sentinel": 0.5}
             floor = _floors.get(tier, 0.3)
 
             # Rastreia reduções consecutivas para evitar estrangulamento

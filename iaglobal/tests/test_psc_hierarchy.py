@@ -446,7 +446,7 @@ def test_effective_agent_in_bandit_generate(monkeypatch, bandit_module):
 
     async def _fake_gate(*args, **kwargs):
         gate = await orig_get_instance(*args, **kwargs)
-        gate._rejected_counts = {"glm4": 0, "qwen": 0, "lfm": 0}
+        gate._rejected_counts = {"reviewer": 0, "coder": 0, "sentinel": 0}
         for tier, bucket in gate.buckets.items():
             bucket.tokens = bucket.capacity
         return gate

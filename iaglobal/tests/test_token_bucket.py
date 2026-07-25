@@ -121,14 +121,13 @@ class TestLocalModelGate:
     async def test_buckets_created_per_tier(self):
         """Verifica se todos os 3 tiers têm buckets."""
         gate = LocalModelGate()
-        assert "glm4" in gate.buckets
-        assert "qwen" in gate.buckets
-        assert "lfm" in gate.buckets
+        assert "reviewer" in gate.buckets
+        assert "coder" in gate.buckets
+        assert "sentinel" in gate.buckets
 
-        # Capacidades corretas
-        assert gate.buckets["glm4"].capacity == 4
-        assert gate.buckets["qwen"].capacity == 6
-        assert gate.buckets["lfm"].capacity == 8
+        assert gate.buckets["reviewer"].capacity == 4
+        assert gate.buckets["coder"].capacity == 6
+        assert gate.buckets["sentinel"].capacity == 8
 
     @pytest.mark.asyncio
     async def test_get_metrics_returns_dict(self):
@@ -136,9 +135,9 @@ class TestLocalModelGate:
         gate = LocalModelGate()
         metrics = gate.get_metrics()
 
-        assert "glm4" in metrics
-        assert "qwen" in metrics
-        assert "lfm" in metrics
+        assert "reviewer" in metrics
+        assert "coder" in metrics
+        assert "sentinel" in metrics
 
         for tier in metrics:
             assert "tokens" in metrics[tier]

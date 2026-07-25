@@ -405,9 +405,7 @@ DNA: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a
         lines.append(
             f"  {'Provedor':<20} {'Chamadas':>9} {'Sucesso':>8} {'Lat.Media':>9} {'Custo':>8} {'Tokens':>8}"
         )
-        lines.append(
-            f"  {'─' * 20} {'─' * 9} {'─' * 8} {'─' * 9} {'─' * 8} {'─' * 8}"
-        )
+        lines.append(f"  {'─' * 20} {'─' * 9} {'─' * 8} {'─' * 9} {'─' * 8} {'─' * 8}")
         for prov, data in sorted(
             stats.items(), key=lambda x: x[1].get("calls", 0), reverse=True
         ):
@@ -437,9 +435,7 @@ DNA: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a
         lines.append(
             f"  {'Modelo':<35} {'Chamadas':>9} {'Sucesso':>8} {'Lat.Media':>9} {'Tokens':>8}"
         )
-        lines.append(
-            f"  {'─' * 35} {'─' * 9} {'─' * 8} {'─' * 9} {'─' * 8}"
-        )
+        lines.append(f"  {'─' * 35} {'─' * 9} {'─' * 8} {'─' * 9} {'─' * 8}")
         for model, data in sorted(
             filtered.items(), key=lambda x: x[1].get("calls", 0), reverse=True
         ):

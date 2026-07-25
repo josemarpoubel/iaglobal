@@ -14,6 +14,7 @@ class ArtifactKind(str, Enum):
     JSON = "json"
     TEXT = "text"
     EMPTY = "empty"
+    PLAN = "plan"
     UNKNOWN = "unknown"
 
 
@@ -21,10 +22,12 @@ class ArtifactKind(str, Enum):
 class GeneratedArtifact:
     content: str
     kind: ArtifactKind = ArtifactKind.UNKNOWN
+    source: str = ""
+    confidence: float = 0.0
     metadata: Dict[str, Any] = field(default_factory=dict)
 
     @classmethod
-    def from_str(cls, text: str) -> "GeneratedArtifact":
+    def from_str(cls, text: str, **kwargs: object) -> "GeneratedArtifact":
         if not text or not text.strip():
             return cls(content="", kind=ArtifactKind.EMPTY)
 
@@ -42,12 +45,40 @@ class GeneratedArtifact:
             return cls(content=text, kind=ArtifactKind.HTML)
 
         code_indicators = (
-            "def ", "class ", "import ", "from ", "async def ", "await ",
-            "function ", "const ", "let ", "var ", "export ", "public ",
-            "private ", "protected ", "static ", "interface ", "type ",
-            "SELECT ", "INSERT ", "CREATE ", "ALTER ", "DROP ",
-            "print(", "print ", "return ", "if ", "for ", "while ",
-            "try:", "except", "with ", "lambda ", "yield ", "raise ",
+            "def ",
+            "class ",
+            "import ",
+            "from ",
+            "async def ",
+            "await ",
+            "function ",
+            "const ",
+            "let ",
+            "var ",
+            "export ",
+            "public ",
+            "private ",
+            "protected ",
+            "static ",
+            "interface ",
+            "type ",
+            "SELECT ",
+            "INSERT ",
+            "CREATE ",
+            "ALTER ",
+            "DROP ",
+            "print(",
+            "print ",
+            "return ",
+            "if ",
+            "for ",
+            "while ",
+            "try:",
+            "except",
+            "with ",
+            "lambda ",
+            "yield ",
+            "raise ",
         )
         if any(stripped.startswith(kw) for kw in code_indicators):
             return cls(content=text, kind=ArtifactKind.CODE)

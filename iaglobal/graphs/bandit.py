@@ -260,10 +260,6 @@ class BanditPolicy:
             # Qwen (Operário)    ~3-10s
             if is_cloud:
                 timeout = 3.0
-            elif "glm4" in model_name.lower() or "glm" in model_name.lower():
-                timeout = 180.0
-            elif "lfm" in model_name.lower():
-                timeout = 60.0
             else:
                 timeout = 30.0
 

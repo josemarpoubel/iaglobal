@@ -27,7 +27,7 @@ INTERVENTIONS = JOL_DATA_DIR / "jol_interventions.jsonl"
 CORRECTIONS = JOL_DATA_DIR / "jol_corrections.jsonl"
 CONGESTION = JOL_DATA_DIR / "jol_congestion.jsonl"
 
-TIERS = ["glm4", "qwen", "lfm"]
+TIERS = ["reviewer", "coder", "sentinel"]
 
 
 def _stream(path: Path):

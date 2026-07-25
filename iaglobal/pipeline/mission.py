@@ -15,6 +15,17 @@ from typing import List, Optional
 
 from iaglobal.pipeline.context.protocol import MissionContext as _MissionCtx
 
+from dataclasses import dataclass, field
+
+
+@dataclass
+class MissionContract:
+    artifact: str = "unknown"
+    requires_ui: bool = False
+    requires_persistence: bool = False
+    requires_api: bool = False
+    required_features: list[str] = field(default_factory=list)
+
 
 def _new_mission(**kwargs) -> _MissionCtx:
     """Cria MissionContext (frozen) com parâmetros compatíveis."""
@@ -276,6 +287,80 @@ class MissionAnalyzer:
             constraints=constraints,
             priorities=priorities,
             confidence=0.85 if domain != "unknown" else 0.3,
+        )
+
+    def derive_contract(
+        self, prompt: str, mission: Optional[_MissionCtx] = None
+    ) -> MissionContract:
+        clean = self._normalize(prompt)
+
+        features: list[str] = []
+        artifact = "unknown"
+
+        if mission:
+            domain = mission.domain
+            project_type = mission.project_type
+        else:
+            domain = self._detect_domain(clean)
+            project_type = self._detect_project_type(clean)
+
+        artifact_map = {
+            "web_application": "web_app",
+            "api_service": "api",
+            "cli_tool": "cli_tool",
+            "mobile_app": "mobile_app",
+            "library": "library",
+            "document": "document",
+            "data_pipeline": "data_pipeline",
+            "game": "game",
+        }
+        artifact = artifact_map.get(project_type, "unknown")
+
+        _FEATURE_KEYWORDS: dict[str, list[str]] = {
+            "ui": [
+                "interface",
+                "frontend",
+                "tela",
+                "pagina",
+                "web",
+                "html",
+                "css",
+                "gui",
+                "dashboard",
+            ],
+            "persistence": [
+                "banco",
+                "database",
+                "sql",
+                "sqlite",
+                "postgres",
+                "mysql",
+                "arquivo",
+                "csv",
+                "armazenar",
+                "salvar",
+                "persistir",
+            ],
+            "api": ["api", "rest", "endpoint", "webservice", "backend"],
+            "pdf_generation": ["pdf", "relatorio", "report", "documento"],
+            "dark_theme": ["dark", "escuro", "tema escuro"],
+            "form_input": ["formulario", "form", "input", "cadastro"],
+            "infinite_scroll": ["scroll", "rolagem", "paginar"],
+            "authentication": ["login", "auth", "autenticacao", "senha", "usuario"],
+            "search": ["busca", "search", "pesquisa", "filtro"],
+        }
+        for feature, keywords in _FEATURE_KEYWORDS.items():
+            if self._score_keywords(clean, keywords) > 0:
+                features.append(feature)
+                if feature == "ui" and project_type in ("unknown", "cli_tool"):
+                    artifact = "web_app"
+
+        return MissionContract(
+            artifact=artifact if artifact != "unknown" else "python_script",
+            requires_ui="ui" in features or project_type == "web_application",
+            requires_persistence="persistence" in features,
+            requires_api="api" in features or project_type == "api_service",
+            required_features=features,
         )
 
     def _detect_domain(self, text: str) -> str:

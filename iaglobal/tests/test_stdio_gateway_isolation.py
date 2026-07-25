@@ -90,5 +90,7 @@ def test_present_modules_baseline_snapshot():
     Sempre passa — apenas produz evidência para o próximo passo.
     """
     found = _probe_present_modules()
-    print(f"\n[baseline] módulos do gateway atualmente importados por iaglobal.mcp.server: {found}")
+    print(
+        f"\n[baseline] módulos do gateway atualmente importados por iaglobal.mcp.server: {found}"
+    )
     assert found is not None

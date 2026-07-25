@@ -18,10 +18,11 @@ Estrutura de saída (dict):
   "observation_window": {...},
   "sentinel_precision": float,        # Coeficiente de Precisão do Sentinela
   "noise_ratio": float,
-  "tier_opportunity_cost": {          # Custo de Oportunidade por Tier
-     "glm4": {"idle_pct":..., "rejection_pct":...},
-     "qwen": {...}, "lfm": {...}
-  },
+   "tier_opportunity_cost": {          # Custo de Oportunidade por Tier
+      "reviewer": {"idle_pct":..., "rejection_pct":...},
+      "coder": {"idle_pct":..., "rejection_pct":...},
+      "sentinel": {"idle_pct":..., "rejection_pct":...},
+   },
   "suggested_thresholds": {...}       # prontos para Collection.yaml
 }
 """
@@ -42,8 +43,7 @@ INTERVENTIONS_FILE = JOL_DATA_DIR / "jol_interventions.jsonl"
 CORRECTIONS_FILE = JOL_DATA_DIR / "jol_corrections.jsonl"
 CONGESTION_FILE = JOL_DATA_DIR / "jol_congestion.jsonl"
 
-# Tiers cognitivos monitorados pelo LocalModelGate (ROADMAP_2)
-TIERS = ["glm4", "qwen", "lfm"]
+TIERS = ["reviewer", "coder", "sentinel"]
 
 
 def _parse_ts(ts: str) -> Optional[datetime]:
@@ -164,7 +164,7 @@ def analyze(
         window_seconds = (last_ts - first_ts).total_seconds()
     window_minutes = max(window_seconds / 60.0, 1.0)
 
-    tier_capacity = {"glm4": 2, "qwen": 6, "lfm": 8}
+    tier_capacity = {"reviewer": 4, "coder": 6, "sentinel": 8}
     tier_opportunity: Dict[str, Dict[str, float]] = {}
     # Lê dados reais de congestão do LocalModelGate (não proxy)
     tier_rejections: Dict[str, int] = {t: 0 for t in TIERS}
@@ -180,7 +180,6 @@ def analyze(
         # Throughput máximo teórico do tier na janela (1 req/min por slot)
         max_throughput = cap * window_minutes
         # Proxy de utilização: intervenções como fração do throughput máximo
-        # (assume que intervenções concentram-se no tier sentinela/lfm)
         util_proxy = min(1.0, total_interventions / max(max_throughput, 1.0))
         idle_pct = round((1.0 - util_proxy) * 100.0, 1)
         # rejection_pct REAL: rejeições observadas / (rejeições + capacidade*janela)
@@ -200,20 +199,18 @@ def analyze(
             else "sem congestão observada na janela",
         }
 
-    # ── Thresholds Sugeridos (baseados em evidência) ──
     suggested = {
-        "glm4": {
-            # Tier crítico: tolerância maior a rejeições (não mata o Juiz)
+        "reviewer": {
             "rejection_limit_multiplier": 1.5,
             "warning_usage_pct": 75.0,
             "fill_rate_floor": 0.5,
         },
-        "qwen": {
+        "coder": {
             "rejection_limit_multiplier": 1.2,
             "warning_usage_pct": 65.0,
             "fill_rate_floor": 0.3,
         },
-        "lfm": {
+        "sentinel": {
             "rejection_limit_multiplier": 1.8,
             "warning_usage_pct": 80.0,
             "fill_rate_floor": 0.2,

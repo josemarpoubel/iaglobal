@@ -88,9 +88,7 @@ class Bootstrap:
             "fast_path_count": self._fast_path_count,
             "phase1_duration_seconds": phase1_duration,
             "phase2_duration_seconds": phase2_duration,
-            "phase2_task_count": 0
-            if self._phase2_task is None
-            else 1,
+            "phase2_task_count": 0 if self._phase2_task is None else 1,
             "time_to_ready_seconds": time_to_ready,
             "ready_at_iso": self._ready_at_iso,
         }
@@ -137,7 +135,6 @@ class Bootstrap:
 
         self._phase1_started_at = time.time()
         try:
-
             try:
                 from iaglobal.core.structure import ensure_structure
 
@@ -148,12 +145,16 @@ class Bootstrap:
                 raise SystemExit("Sistema não pode continuar sem permissões de pasta.")
 
             try:
-                from iaglobal.utils.life_signal_collector import collector as life_collector
+                from iaglobal.utils.life_signal_collector import (
+                    collector as life_collector,
+                )
                 from iaglobal import _paths
 
                 life_signal_file = _paths.DATA_DIR / "life_signals.json"
                 life_collector.install(life_signal_file)
-                logger.info("[BOOTSTRAP] LifeSignalCollector ativo — %s", life_signal_file)
+                logger.info(
+                    "[BOOTSTRAP] LifeSignalCollector ativo — %s", life_signal_file
+                )
             except Exception as e:
                 logger.debug("[BOOTSTRAP] LifeSignalCollector skip: %s", e)
 
@@ -198,7 +199,9 @@ class Bootstrap:
                 self.orchestrator = Orchestrator()
                 logger.info("🛠️ [BOOTSTRAP] Orchestrator instanciado (Phase1).")
             except Exception as e:
-                logger.exception("💥 [BOOTSTRAP] Falha ao instanciar Orchestrator: %s", e)
+                logger.exception(
+                    "💥 [BOOTSTRAP] Falha ao instanciar Orchestrator: %s", e
+                )
                 raise
 
         finally:

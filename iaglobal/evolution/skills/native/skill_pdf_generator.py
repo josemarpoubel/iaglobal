@@ -3,10 +3,11 @@
 Skill nativa para geração de PDF com jsPDF (client-side).
 Gera app web completo: HTML + CSS (dark theme) + JS (jsPDF infinite canvas + markdown parsing).
 """
+
 from typing import Dict, Any
 
 # Template HTML completo com jsPDF via CDN
-JSPDF_HTML_TEMPLATE = '''<!DOCTYPE html>
+JSPDF_HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
@@ -394,7 +395,8 @@ JSPDF_HTML_TEMPLATE = '''<!DOCTYPE html>
     </script>
 </body>
 </html>
-'''
+"""
+
 
 async def run_pdf_generator(ctx: Dict[str, Any]) -> Dict[str, Any]:
     """
@@ -404,14 +406,23 @@ async def run_pdf_generator(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     # Detecta se a task pede PDF/web/jsPDF
     task_lower = task.lower()
-    pdf_keywords = ["pdf", "jspdf", "página infinita", "infinite canvas", "gerar pdf", "criar pdf", "dark theme", "tema escuro"]
+    pdf_keywords = [
+        "pdf",
+        "jspdf",
+        "página infinita",
+        "infinite canvas",
+        "gerar pdf",
+        "criar pdf",
+        "dark theme",
+        "tema escuro",
+    ]
 
     if not any(kw in task_lower for kw in pdf_keywords):
         return {
             "success": False,
             "code": "",
             "error": "Task não é sobre geração de PDF com jsPDF",
-            "metadata": {"skill": "pdf_generator"}
+            "metadata": {"skill": "pdf_generator"},
         }
 
     # Retorna o template HTML completo
@@ -421,9 +432,10 @@ async def run_pdf_generator(ctx: Dict[str, Any]) -> Dict[str, Any]:
         "metadata": {
             "skill": "pdf_generator",
             "type": "html",
-            "description": "App web completo: HTML + CSS dark theme + jsPDF (infinite canvas + markdown parsing + page numbers)"
-        }
+            "description": "App web completo: HTML + CSS dark theme + jsPDF (infinite canvas + markdown parsing + page numbers)",
+        },
     }
+
 
 # Registra skill no registry global (chamado no import)
 def register_skill():
@@ -438,7 +450,15 @@ def register_skill():
         constraints=["html", "javascript", "jspdf", "markdown", "dark-theme"],
         execution_policy="SINGLE_RUN",
         version="v1",
-        tags=["pdf", "jspdf", "html", "javascript", "dark-theme", "markdown", "infinite-canvas"],
+        tags=[
+            "pdf",
+            "jspdf",
+            "html",
+            "javascript",
+            "dark-theme",
+            "markdown",
+            "infinite-canvas",
+        ],
         template_type="deterministic",
         template_prompt=None,
     )
@@ -447,14 +467,16 @@ def register_skill():
     PDF_SKILL.run_fn = run_pdf_generator
 
     from iaglobal.evolution.skills.native.skill_registry import skill_registry
+
     skill_registry.register(PDF_SKILL)
     print("[SKILL] pdf_generator registrada no SkillRegistry")
+
 
 # Auto-registra ao importar
 register_skill()
 
 
-
 # Export for lazy loader
 from iaglobal.evolution.skills.native.skill_registry import skill_registry
+
 skill_pdf_generator = skill_registry.get("pdf_generator")
