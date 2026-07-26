@@ -47,7 +47,11 @@ PEC_SYSTEM_PROMPT = (
     "insuficiente, submeta o resultado ao CriticAgent. Confie na autoridade "
     "do Critico para decidir sobre escalonamento para o BanditPolicy.\n"
     f"9. {INSTRUCAO_DEPENDENCIAS}\n"
-    f"10. {INSTRUCAO_COT}"
+    f"10. {INSTRUCAO_COT}\n"
+    "11. GERE APENAS CODIGO PURO. Nao inclua HTML, CSS, blocos markdown, "
+    "ou texto explicativo. Retorne o codigo-fonte diretamente, sem tags "
+    "de formatacao. Se o codigo gerado estiver dentro de uma pagina HTML, "
+    "extraia-o e retorne apenas o codigo."
 )
 
 

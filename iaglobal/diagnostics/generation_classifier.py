@@ -48,13 +48,6 @@ class GenerationClassifier:
             r"let \w+ =",
             r"var \w+ =",
             r"if __name__ ==",
-            r"<!DOCTYPE html>",
-            r"<html",
-            r"<head",
-            r"<body",
-            r"<div",
-            r"<script",
-            r"<style",
             r"console\.log\(",
             r"console\.error\(",
             r"console\.warn\(",
@@ -138,7 +131,17 @@ class GenerationClassifier:
                 markers=markers_found,
             )
 
-        # 2. Verificar se é HTML
+        # 2. Verificar se é CODE (antes de HTML — modelo pequeno pode
+        #    envelopar código em scaffold HTML; o código é o conteúdo primário)
+        if self._looks_like_code(text, text_lower):
+            markers_found.append("code")
+            return ArtifactClassification(
+                type="CODE",
+                confidence=0.80,
+                markers=markers_found,
+            )
+
+        # 3. Verificar se é HTML
         if self._looks_like_html(text):
             markers_found.append("html")
             return ArtifactClassification(
@@ -147,7 +150,7 @@ class GenerationClassifier:
                 markers=markers_found,
             )
 
-        # 3. Verificar se é MARKDOWN
+        # 4. Verificar se é MARKDOWN
         if self._looks_like_markdown(text):
             markers_found.append("markdown")
             return ArtifactClassification(
@@ -156,21 +159,12 @@ class GenerationClassifier:
                 markers=markers_found,
             )
 
-        # 4. Verificar se é SEARCH_RESULT
+        # 5. Verificar se é SEARCH_RESULT
         if self._looks_like_search_result(text, text_lower):
             markers_found.append("search")
             return ArtifactClassification(
                 type="SEARCH_RESULT",
                 confidence=0.90,
-                markers=markers_found,
-            )
-
-        # 5. Verificar se é CODE
-        if self._looks_like_code(text, text_lower):
-            markers_found.append("code")
-            return ArtifactClassification(
-                type="CODE",
-                confidence=0.80,
                 markers=markers_found,
             )
 
