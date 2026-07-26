@@ -907,7 +907,12 @@ class BanditPolicy:
                 if route in candidates or any(
                     route.split("_")[0] in c for c in candidates
                 ):
-                    candidates = [route] + [c for c in candidates if c != route]
+                    prefixed = (
+                        route if "/" in route else f"ollama/{route}"
+                    )
+                    candidates = [prefixed] + [
+                        c for c in candidates if c != route and c != prefixed
+                    ]
                 timeout = min(timeout, tier_timeout) if timeout else tier_timeout
                 self.logger.debug(
                     "[TRIBUNAL] node_id=%s tier=%s route=%s timeout=%.1fs",
