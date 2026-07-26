@@ -5,3 +5,4 @@ from .domain_event import DomainEvent
 from .event_id import EventId
 from .event_store import store
 from .event_dispatcher import dispatcher
+from .result_event import CapabilityResultEvent

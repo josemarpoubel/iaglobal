@@ -29,6 +29,7 @@ class EventType:
     REFLEXION_CYCLE = "reflexion_cycle"
 
     CAPABILITY_SELECTED = "capability_selected"
+    CAPABILITY_RESULT = "capability_result"
     PIPELINE_STAGE = "pipeline.stage.completed"
 
     ALL = [
@@ -51,6 +52,7 @@ class EventType:
         DEBUG_ITERATION,
         REFLEXION_CYCLE,
         CAPABILITY_SELECTED,
+        CAPABILITY_RESULT,
         PIPELINE_STAGE,
     ]
 
