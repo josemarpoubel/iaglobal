@@ -53,6 +53,23 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
         "artifact"
     )
 
+    # Collect builder outputs — always; used both for aggregation and saving
+    _BUILDER_KEYS: tuple[tuple[str, str], ...] = (
+        ("frontend_builder", "Frontend"),
+        ("backend_builder", "Backend"),
+        ("database_builder", "Database"),
+        ("api_builder", "API"),
+    )
+    files: dict[str, str] = {}
+    builder_has_content = False
+    for key, _label in _BUILDER_KEYS:
+        src_data = memory.get(key, {})
+        if isinstance(src_data, dict):
+            src_out = src_data.get("output", "")
+            if src_out and len(src_out) > 20:
+                files[f"{key}.py"] = src_out
+                builder_has_content = True
+
     is_code_task = any(
         lang in task.lower()
         for lang in [
@@ -73,7 +90,24 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "bash",
         ]
     )
-    if is_code_task and coder_output:
+
+    # When builders produced real code, aggregate as the primary output
+    if builder_has_content:
+        parts: list[str] = []
+        for key, label in _BUILDER_KEYS:
+            src_data = memory.get(key, {})
+            if isinstance(src_data, dict):
+                content = src_data.get("output", "")
+                if content and len(content) > 20:
+                    parts.append(f"# === {label} ===\n{content}")
+        output = "\n\n\n".join(parts)
+        chosen_artifact = GeneratedArtifact(
+            kind=ArtifactKind.CODE,
+            content=output,
+            source="result_agent.aggregated",
+            metadata={"files": list(files.keys())},
+        )
+    elif is_code_task and coder_output:
         output = coder_output
         chosen_artifact = coder_artifact or GeneratedArtifact.from_str(
             coder_output, source="result_agent.coder"
@@ -94,19 +128,6 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 )
             )
         )
-
-    files = {}
-    for src in [
-        "frontend_builder",
-        "backend_builder",
-        "database_builder",
-        "api_builder",
-    ]:
-        src_data = memory.get(src, {})
-        if isinstance(src_data, dict):
-            src_out = src_data.get("output", "")
-            if src_out and len(src_out) > 20:
-                files[f"{src}.py"] = src_out
 
     project_dir = None
     final_path = None
