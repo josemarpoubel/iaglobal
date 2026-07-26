@@ -415,3 +415,27 @@ selected = bandit.select(domain="technology", requirement=capability.id, candida
 - `iaglobal/memory/` — STM/LTM (base para Experience Memory)
 - `iaglobal/knowledge/` — contratos implementados (capability, technology, package, example, benchmark)
 - `iaglobal/tests/test_knowledge_contracts.py` — 33 invariantes validados (sem executor, sem LLM)
+
+---
+
+## Nota histórica (incidência revisada em 2026-07-25)
+
+O commit `866a034 feat(events): introduce capability decision telemetry contract`
+introduziu `iaglobal/knowledge/engine.py` e `iaglobal/knowledge/resolver/capability_resolver.py`
+**antes** deste pacote estar versionado: as outras 16 fontes (`contracts.py`,
+`capability.py`, `technology.py`, `constraints/*`, `validator/*`, `package.py`,
+`example.py`, `benchmark.py`, `adapters/*`) ainda estavam untracked, então
+um `git checkout 866a034` isolado quebra com `ModuleNotFoundError` em
+`iaglobal.knowledge.capability`.
+
+Razão de não ter sido corrigido por reescrita de histórico: `866a034`
+já fazia parte de cadeia pública que viesse a ser referenciada por
+outros commits (e de fato foi — `5365304`, `9eb6ef2`). Reescrever
+`866a034` via `rebase -i` ou `commit --amend` invalidaria 3 commits
+posteriores sem necessidade real (porque `HEAD` resolve).
+
+A partir do commit `3077179 feat(knowledge): add Knowledge Intelligence
+layer (ADR 0003)`, o histórico completo funciona em qualquer checkout
+recente (`HEAD` e `HEAD~1..HEAD~5` resolvem; apenas `866a034..5365303`
+em isolado precisa do pacote — situação típica de migrações
+incrementais).
