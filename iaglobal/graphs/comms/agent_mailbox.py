@@ -398,11 +398,54 @@ class MailboxManager:
             logger.info("[MAILBOX] %s criado", agent_name)
         return self._mailboxes[agent_name]
 
+    def _genesis_tribunal_check(
+        self, signed_message: Dict[str, Any], sender: str, receiver: str | None
+    ) -> bool:
+        """Valida assinatura genesis no tribunal de roteamento."""
+        metadata = signed_message.get("metadata", {})
+        if not metadata:
+            logger.error(
+                "[TRIBUNAL/GENESIS] 🚫 %s → %s: METADATA AUSENTE — mensagem rejeitada",
+                sender, receiver or "broadcast",
+            )
+            return False
+
+        genesis_marker = metadata.get("genesis_marker", "AUSENTE")
+        origin_id = metadata.get("origin_id", "desconhecido")
+        timestamp = metadata.get("timestamp", 0)
+        signature = metadata.get("lineage_signature", "")
+
+        if genesis_marker != GENESIS_HASH_OFFICIAL[:16]:
+            logger.error(
+                "[TRIBUNAL/GENESIS] 🚫 %s → %s: GENESIS MARKER INVALIDO "
+                "(recebido=%s esperado=%s)",
+                sender, receiver or "broadcast",
+                genesis_marker, GENESIS_HASH_OFFICIAL[:16],
+            )
+            return False
+
+        expected_input = f"{origin_id}:{GENESIS_HASH_OFFICIAL}:{timestamp}"
+        expected_sig = hashlib.sha3_512(expected_input.encode()).hexdigest()
+        if signature != expected_sig:
+            logger.error(
+                "[TRIBUNAL/GENESIS] 🚫 %s → %s: ASSINATURA INVALIDA "
+                "(origin_id=%s)",
+                sender, receiver or "broadcast",
+                origin_id,
+            )
+            return False
+
+        logger.info(
+            "[TRIBUNAL/GENESIS] ✅ %s → %s: autenticado (marker=%s origin=%s)",
+            sender, receiver or "broadcast",
+            genesis_marker, origin_id[:12],
+        )
+        return True
+
     def route_message(self, message: Dict[str, Any]):
-        """Roteia mensagem internamente."""
+        """Roteia mensagem internamente com validação genesis do tribunal."""
         sender = message.get("sender", "orchestrator")
         if sender not in ["orchestrator", "system", "SynapseMonitor"]:
-            # Membrana: somente senders conhecidos + compliance aprovado
             if not self.is_compliance_approved(sender):
                 logger.error(
                     "[SECURITY] 🚨 %s bloqueado: compliance nao aprovado", sender
@@ -416,6 +459,10 @@ class MailboxManager:
             )
 
             receiver = message.get("receiver")
+            # Genesis Tribunal: toda mensagem passa pelo crivo do DNA
+            if not self._genesis_tribunal_check(signed_message, sender, receiver):
+                return  # rejeitada — não entrega
+
             if receiver:
                 try:
                     mailbox = self.get_or_create(receiver)
