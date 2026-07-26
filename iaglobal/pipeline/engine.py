@@ -58,11 +58,27 @@ class PipelineEngine:
                 raise RuntimeError("🚨 [PIPELINE] Prompt vazio ou inválido.")
 
             # -- Mission Cortex: análise da missão antes de qualquer nó --
+            from iaglobal.events.event_id import EventId
             from iaglobal.pipeline.mission import MissionAnalyzer
             from iaglobal.pipeline.context import PipelineExecutionContext
             from iaglobal.pipeline.capability_resolver import (
                 PipelineCapabilityResolver,
             )
+            from iaglobal.events.event_types import EventType
+            from iaglobal.models.event_bus import bus
+
+            # Etapa 6: captura o EventId do CAPABILITY_SELECTED para
+            # alimentar o predecessor_event_id do CAPABILITY_RESULT.
+            # Subscribe é local — unsubscribe após resolver.resolve
+            # para não vazar o handler entre pipelines.
+            captured_decision_ids: list[EventId] = []
+
+            def _capture_decision_id(event):
+                if getattr(event, "data", None) and "id" in event.data:
+                    captured_decision_ids.append(EventId(event.data["id"]))
+                return None
+
+            bus.subscribe(EventType.CAPABILITY_SELECTED, _capture_decision_id)
 
             analyzer = MissionAnalyzer()
             mission = analyzer.analyze(prompt)
@@ -73,6 +89,11 @@ class PipelineEngine:
                 mission_text=prompt,
                 mission_id=state.task_id,
             )
+            bus.unsubscribe(EventType.CAPABILITY_SELECTED, _capture_decision_id)
+            if captured_decision_ids:
+                # Último (mais recente) EventId é o que governa esta run.
+                state.decision_event_id = captured_decision_ids[-1]
+
             exec_ctx = PipelineExecutionContext(mission=mission)
             state.execution_context = exec_ctx
             # Legado: espelho para nós não migrados (remover quando todos virarem providers)
@@ -232,6 +253,12 @@ class PipelineEngine:
             # FIX BUG #5: _save_script em thread pool
             script_path = await asyncio.to_thread(self._save_script, state)
 
+            # Etapa 6: emitir CAPABILITY_RESULT fechando a linha causal
+            # da decisão registrada em state.decision_event_id. Erros
+            # de emissão são silenciosos (logger) para não propagar
+            # exceção no fim do pipeline bem-sucedido.
+            await self._emit_capability_result(state, success=True)
+
             return PipelineResult(
                 success=True,
                 response=state.generated_code,
@@ -243,6 +270,16 @@ class PipelineEngine:
         except Exception as e:
             logger.exception("💥 [ASYNC PIPELINE] Failure: %s", e)
             state.current_stage = PipelineStage.FAILED.name
+            # Etapa 6: mesmo no caminho de falha, tentar emitir o
+            # CAPABILITY_RESULT (success=False) — feedback aprendemos
+            # com o que falhou também.
+            try:
+                await self._emit_capability_result(state, success=False)
+            except Exception as emit_err:  # noqa: BLE001 — nunca propagar
+                logger.debug(
+                    "[CAPABILITY_RESULT] Falha ao emitir resultado de erro: %s",
+                    emit_err,
+                )
             return PipelineResult(
                 success=False,
                 error=str(e),
@@ -828,6 +865,85 @@ class PipelineEngine:
             },
         )
         logger.info("✅ tudo ok, aprendi mais uma lição!")
+
+    async def _emit_capability_result(
+        self,
+        state: PipelineState,
+        success: bool,
+    ) -> None:
+        """Emite ``CAPABILITY_RESULT`` com linhagem explícita.
+
+        Pré-requisito: ``state.decision_event_id`` preenchido pelo
+        subscribe local em ``async_execute``. Sem predecessor, não
+        emite (regra do ADR-0004 — todo resultado deriva de decisão).
+        """
+        import time as _time
+        from datetime import datetime, timezone
+        from uuid import uuid4
+
+        if state.decision_event_id is None:
+            return  # sem predecessor → não emite
+
+        from iaglobal.events.event_id import EventId as _EventId
+        from iaglobal.events.event_types import EventType as _EventType
+        from iaglobal.events.result_event import CapabilityResultEvent
+        from iaglobal.models.event_bus import bus as _bus
+
+        capability = "unknown"
+        selected_technology: Optional[str] = None
+        plan = state.context.get("capability_plan")
+        if plan is not None:
+            capability = getattr(plan, "artifact", "unknown") or "unknown"
+            for step in getattr(plan, "steps", []) or []:
+                if step.kind == "tool" and step.name.startswith("tool:"):
+                    selected_technology = step.name.split(":", 1)[1]
+                    break
+
+        artifact_kind = "unknown"
+        if getattr(state, "generated_artifact", None) is not None:
+            try:
+                artifact_kind = state.generated_artifact.kind.value
+            except Exception:  # noqa: BLE001
+                pass
+
+        validation_status = "passed" if state.syntax_valid else "failed"
+        try:
+            latency_ms = max(
+                0.0,
+                (_time.time() - float(state.started_at)) * 1000.0,
+            )
+        except Exception:  # noqa: BLE001
+            latency_ms = 0.0
+
+        event = CapabilityResultEvent(
+            id=_EventId(value=str(uuid4())[:8]),
+            event_type=_EventType.CAPABILITY_RESULT,
+            mission_id=state.task_id,
+            created_at=datetime.now(timezone.utc),
+            decision_event_id=state.decision_event_id,
+            capability=capability,
+            selected_technology=selected_technology,
+            success=success,
+            artifact_kind=artifact_kind,
+            validation_status=validation_status,
+            quality_score=float(getattr(state, "score", 0.0) or 0.0),
+            repair_count=int(getattr(state, "retries", 0) or 0),
+            latency_ms=latency_ms,
+            evidence={
+                "errors": list(getattr(state, "errors", []) or []),
+            },
+        )
+        _bus.publish(
+            event.event_type,
+            data=event.to_dict(),
+            source="PipelineEngine",
+        )
+        logger.info(
+            "📤 [CAPABILITY_RESULT] id=%s → decision_event_id=%s success=%s",
+            str(event.id),
+            str(event.decision_event_id),
+            success,
+        )
 
     async def _async_metabolism_stage(self, state: PipelineState) -> None:
         """Promove/rejeita candidatos de skills via ciclo de metilação."""

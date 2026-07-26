@@ -1,10 +1,12 @@
 from __future__ import annotations
 
+import time
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
 from iaglobal.core.artifact import ArtifactKind, GeneratedArtifact
+from iaglobal.events.event_id import EventId
 
 
 class TaskIntent(str, Enum):
@@ -54,6 +56,15 @@ class PipelineState:
     execution_report: Optional[Dict[str, Any]] = None
 
     chosen_model: Optional[str] = None
+
+    # Lineage (ADR-0004 / Etapa 6): ``decision_event_id`` is the EventId of
+    # the most recent CAPABILITY_SELECTED emitted by the resolver during
+    # this pipeline run. ``started_at`` is the wall-clock at state
+    # construction; ``CAPABILITY_RESULT`` uses the delta to populate
+    # ``latency_ms``. Both default to ``None`` / ``0.0`` because
+    # construction sites construct without args after dataclass.
+    started_at: float = field(default_factory=time.time)
+    decision_event_id: Optional[EventId] = None
 
     @property
     def generated_code(self) -> Optional[str]:
