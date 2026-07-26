@@ -34,6 +34,11 @@ def _get_bandit() -> "BanditPolicy":
     Auto-injeta CreditAssignmentEngine se ainda não configurado,
     garantindo que qualquer chamador (nodes, agents, scripts) tenha
     métricas registradas mesmo sem passar pelo Orchestrator.initialize().
+
+    Auto-anexa o ``BanditFeedbackObserver`` (Etapa 7 do ADR-0004) — o
+    observer subscreve CAPABILITY_RESULT no bus e credita o Bandit
+    com base no desfecho. Idempotente: o flag ``_feedback_attached``
+    impede múltiplas instâncias.
     """
     global _bandit_instance
     if _bandit_instance is None:
@@ -44,6 +49,15 @@ def _get_bandit() -> "BanditPolicy":
             from iaglobal.graphs.credit import CreditAssignmentEngine
 
             _bandit_instance.credit_engine = CreditAssignmentEngine()
+        except Exception:
+            pass
+    # Auto-wire: BanditFeedbackObserver (Etapa 7 do ADR-0004)
+    if not getattr(_bandit_instance, "_feedback_attached", False):
+        try:
+            from iaglobal.graphs.bandit_feedback import BanditFeedbackObserver
+
+            BanditFeedbackObserver(_bandit_instance)
+            _bandit_instance._feedback_attached = True
         except Exception:
             pass
     return _bandit_instance
