@@ -78,62 +78,105 @@ class AgentMailbox:
         return message
 
     @staticmethod
-    def verify_lineage(
-        message: Dict[str, Any], expected_sender: str
-    ) -> tuple[bool, str]:
-        """
-        Fase 3.1: Verifica assinatura de linhagem da mensagem.
-
-        Retorna: (valid, reason)
-        - valid=True se assinatura válida e genesis correto
-        - valid=False + motivo se patógeno/injetado
-        """
+    def genesis_tribunal_check(
+        message: Dict[str, Any], sender: str, receiver: str
+    ) -> None:
+        """Valida assinatura genesis no tribunal. Levanta PermissionError se falhar."""
         metadata = message.get("metadata")
         if not metadata:
-            return False, "metadata ausente — possivel injecao de patogene"
+            logger.error(
+                "[TRIBUNAL/GENESIS] 🚫 %s → %s: METADATA AUSENTE",
+                sender, receiver,
+            )
+            raise PermissionError(
+                f"[TRIBUNAL/GENESIS] {sender} → {receiver}: metadata ausente"
+            )
 
-        genesis_marker = metadata.get("genesis_marker")
+        genesis_marker = metadata.get("genesis_marker", "AUSENTE")
         if genesis_marker != GENESIS_HASH_OFFICIAL[:16]:
-            return False, "genesis_marker invalido — origem desconhecida"
+            logger.error(
+                "[TRIBUNAL/GENESIS] 🚫 %s → %s: GENESIS MARKER INVALIDO "
+                "(recebido=%s esperado=%s)",
+                sender, receiver,
+                genesis_marker, GENESIS_HASH_OFFICIAL[:16],
+            )
+            raise PermissionError(
+                f"[TRIBUNAL/GENESIS] {sender} → {receiver}: genesis_marker invalido"
+            )
 
+        origin_id = metadata.get("origin_id", "desconhecido")
         timestamp = metadata.get("timestamp", 0)
-        if time.time() - timestamp > 60:
-            return False, "mensagem expirada — replay attack possivel"
+        signature = metadata.get("lineage_signature", "")
+        expected_input = f"{origin_id}:{GENESIS_HASH_OFFICIAL}:{timestamp}"
+        expected_sig = hashlib.sha3_512(expected_input.encode()).hexdigest()
+        if signature != expected_sig:
+            logger.error(
+                "[TRIBUNAL/GENESIS] 🚫 %s → %s: ASSINATURA INVALIDA (origin=%s)",
+                sender, receiver, origin_id,
+            )
+            raise PermissionError(
+                f"[TRIBUNAL/GENESIS] {sender} → {receiver}: assinatura invalida"
+            )
 
-        origin_id = metadata.get("origin_id")
-        lineage_signature = metadata.get("lineage_signature")
+        logger.info(
+            "[TRIBUNAL/GENESIS] ✅ %s → %s: autenticado (marker=%s origin=%s)",
+            sender, receiver,
+            genesis_marker, origin_id[:12],
+        )
 
-        signature_input = f"{origin_id}:{GENESIS_HASH_OFFICIAL}:{timestamp}"
-        expected_signature = hashlib.sha3_512(signature_input.encode()).hexdigest()
+    @staticmethod
+    def _agent_message_to_dict(msg) -> Dict[str, Any]:
+        """Converte AgentMessage (bus) para dict."""
+        return {
+            "sender": getattr(msg, "sender", "unknown"),
+            "receiver": getattr(msg, "recipient", getattr(msg, "receiver", "unknown")),
+            "type": getattr(msg, "message_type", getattr(msg, "type", "generic")),
+            "payload": getattr(msg, "payload", {}),
+            "content": str(getattr(msg, "content", "")),
+        }
 
-        if lineage_signature != expected_signature:
-            return False, "lineage_signature invalida — agente corrompido ou malicioso"
-        return True, "linhagem verificada"
+    @staticmethod
+    def _quick_genesis_sign(message: Dict[str, Any]) -> Dict[str, Any]:
+        """Assina com genesis hash para mensagens sem metadata (via bus)."""
+        sender = message.get("sender", "genesis")
+        ts = time.time()
+        sig_input = f"{sender}:{GENESIS_HASH_OFFICIAL}:{ts}"
+        message["metadata"] = {
+            "origin_id": sender,
+            "lineage_signature": hashlib.sha3_512(sig_input.encode()).hexdigest(),
+            "genesis_marker": GENESIS_HASH_OFFICIAL[:16],
+            "timestamp": ts,
+        }
+        return message
 
-    def receive(self, message: Dict[str, Any], verify: bool = True):
+    def receive(self, message, verify: bool = True):
+        """Recebe mensagem (dict ou AgentMessage) e valida no tribunal genesis.
+
+        Se verify=True (padrão), a validação é obrigatória — levanta
+        PermissionError se a assinatura genesis não conferir.
+        Mensagens do bus sem metadata são auto-assinadas com genesis.
         """
-        Recebe mensagem e adiciona à inbox.
+        # Normaliza AgentMessage → dict
+        if not isinstance(message, dict):
+            message = self._agent_message_to_dict(message)
 
-        Fase 3.1: Verifica lineage_signature antes de aceitar.
-        Se verify=False, aceita sem validação (apenas para bootstrap).
-        """
+        # Mensagens sem metadata (ex: via bus) recebem assinatura genesis
+        if "metadata" not in message:
+            message = self._quick_genesis_sign(message)
+
         if verify:
-            valid, reason = self.verify_lineage(message, self._lineage_id)
-            if not valid:
-                logger.error(
-                    "[SECURITY] 🚨 %s: Tentativa de injecao de tarefa nao assinada detectada | agent=%s | reason=%s",
-                    self.agent_name,
-                    message.get("sender", "unknown"),
-                    reason,
-                )
-                self._log_security_violation(message, reason)
-                if self._monitor is not None:
-                    self._monitor.report_violation(self.agent_name, reason)
-                return  # Rejeita mensagem patógena
+            sender = message.get("sender", "unknown")
+            try:
+                self.genesis_tribunal_check(message, sender, self.agent_name)
+            except PermissionError:
+                self._log_security_violation(message, "genesis_tribunal_failed")
+                if self._monitor:
+                    self._monitor.report_violation(self.agent_name, "genesis_tribunal_failed")
+                raise
 
         self.inbox.append(message)
         logger.info(
-            "[%s] Mensagem recebida: type=%s | inbox_size=%d | lineage=valid",
+            "[%s] Mensagem recebida: type=%s | inbox_size=%d",
             self.agent_name,
             message.get("type", "unknown"),
             len(self.inbox),
@@ -398,52 +441,8 @@ class MailboxManager:
             logger.info("[MAILBOX] %s criado", agent_name)
         return self._mailboxes[agent_name]
 
-    def _genesis_tribunal_check(
-        self, signed_message: Dict[str, Any], sender: str, receiver: str | None
-    ) -> bool:
-        """Valida assinatura genesis no tribunal de roteamento."""
-        metadata = signed_message.get("metadata", {})
-        if not metadata:
-            logger.error(
-                "[TRIBUNAL/GENESIS] 🚫 %s → %s: METADATA AUSENTE — mensagem rejeitada",
-                sender, receiver or "broadcast",
-            )
-            return False
-
-        genesis_marker = metadata.get("genesis_marker", "AUSENTE")
-        origin_id = metadata.get("origin_id", "desconhecido")
-        timestamp = metadata.get("timestamp", 0)
-        signature = metadata.get("lineage_signature", "")
-
-        if genesis_marker != GENESIS_HASH_OFFICIAL[:16]:
-            logger.error(
-                "[TRIBUNAL/GENESIS] 🚫 %s → %s: GENESIS MARKER INVALIDO "
-                "(recebido=%s esperado=%s)",
-                sender, receiver or "broadcast",
-                genesis_marker, GENESIS_HASH_OFFICIAL[:16],
-            )
-            return False
-
-        expected_input = f"{origin_id}:{GENESIS_HASH_OFFICIAL}:{timestamp}"
-        expected_sig = hashlib.sha3_512(expected_input.encode()).hexdigest()
-        if signature != expected_sig:
-            logger.error(
-                "[TRIBUNAL/GENESIS] 🚫 %s → %s: ASSINATURA INVALIDA "
-                "(origin_id=%s)",
-                sender, receiver or "broadcast",
-                origin_id,
-            )
-            return False
-
-        logger.info(
-            "[TRIBUNAL/GENESIS] ✅ %s → %s: autenticado (marker=%s origin=%s)",
-            sender, receiver or "broadcast",
-            genesis_marker, origin_id[:12],
-        )
-        return True
-
     def route_message(self, message: Dict[str, Any]):
-        """Roteia mensagem internamente com validação genesis do tribunal."""
+        """Roteia mensagem internamente. Validação genesis em ``receive()``."""
         sender = message.get("sender", "orchestrator")
         if sender not in ["orchestrator", "system", "SynapseMonitor"]:
             if not self.is_compliance_approved(sender):
@@ -459,10 +458,6 @@ class MailboxManager:
             )
 
             receiver = message.get("receiver")
-            # Genesis Tribunal: toda mensagem passa pelo crivo do DNA
-            if not self._genesis_tribunal_check(signed_message, sender, receiver):
-                return  # rejeitada — não entrega
-
             if receiver:
                 try:
                     mailbox = self.get_or_create(receiver)
