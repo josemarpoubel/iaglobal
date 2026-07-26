@@ -8,11 +8,54 @@ legacy only) publishes a CapabilityDecisionEvent with the correct trace.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
+
 import pytest
 
 from iaglobal.events import CapabilityDecisionEvent
+from iaglobal.events.event_id import EventId
 from iaglobal.events.event_types import EventType
 from iaglobal.models.event_bus import bus
+
+
+def _event(
+    *,
+    mission_id: str = "m1",
+    capability: str = "c1",
+    selected_technology: str | None = "t1",
+    validation_confidence: float = 0.8,
+    effective_score: float = 0.9,
+    bandit_score: float = 0.0,
+    reason: tuple[str, ...] = ("ok",),
+    fallback_used: bool = False,
+    candidate_count: int = 2,
+    filtered_count: int = 1,
+    selected_provider: str | None = None,
+    predecessor_event_id: EventId | None = None,
+    evidence: dict | None = None,
+    id: EventId | None = None,
+    event_type: str | None = None,
+    created_at: datetime | None = None,
+):
+    """Helper to construct a CapabilityDecisionEvent with sensible defaults."""
+    return CapabilityDecisionEvent(
+        id=id or EventId("evt_test"),
+        event_type=event_type or EventType.CAPABILITY_SELECTED,
+        mission_id=mission_id,
+        created_at=created_at or datetime(2026, 7, 25, tzinfo=timezone.utc),
+        capability=capability,
+        selected_technology=selected_technology,
+        validation_confidence=validation_confidence,
+        effective_score=effective_score,
+        bandit_score=bandit_score,
+        reason=reason,
+        fallback_used=fallback_used,
+        candidate_count=candidate_count,
+        filtered_count=filtered_count,
+        selected_provider=selected_provider,
+        predecessor_event_id=predecessor_event_id,
+        evidence=evidence or {},
+    )
 
 
 # ── Event dataclass ──────────────────────────────────────────────────────
@@ -25,31 +68,17 @@ class TestCapabilityDecisionEvent:
 
     def test_event_dataclass_frozen(self):
         """CapabilityDecisionEvent is immutable."""
-        e = CapabilityDecisionEvent(
-            mission_id="m1",
-            capability="c1",
-            selected_technology="t1",
-            validation_confidence=0.8,
-            effective_score=0.9,
-            bandit_score=0.0,
-            reason=("ok",),
-            fallback_used=False,
-            candidate_count=2,
-            filtered_count=1,
-        )
+        e = _event()
         with pytest.raises(AttributeError):
             e.selected_technology = "t2"  # type: ignore[misc]
 
     def test_to_dict_includes_all_fields(self):
-        e = CapabilityDecisionEvent(
-            mission_id="m1",
+        e = _event(
             capability="data_analysis",
             selected_technology="pandas",
             validation_confidence=0.85,
             effective_score=0.93,
-            bandit_score=0.0,
             reason=("installed", "validated"),
-            fallback_used=False,
             candidate_count=3,
             filtered_count=2,
         )
@@ -57,22 +86,15 @@ class TestCapabilityDecisionEvent:
         assert d["capability"] == "data_analysis"
         assert d["selected_technology"] == "pandas"
         assert d["fallback_used"] is False
-        assert "timestamp" in d
+        assert "created_at" in d        # DomainEvent lineage marker
+        assert d["id"] == "evt_test"     # EventId.value serialization
         assert len(d["reason"]) == 2
+        assert "decision_confidence" in d
 
-    def test_event_type_property(self):
-        e = CapabilityDecisionEvent(
-            mission_id="m1",
-            capability="c",
-            selected_technology=None,
-            validation_confidence=0.0,
-            effective_score=0.0,
-            bandit_score=0.0,
-            reason=("legacy fallback",),
-            fallback_used=True,
-            candidate_count=0,
-            filtered_count=0,
-        )
+    def test_event_type_field(self):
+        """event_type is a field (inherited from DomainEvent) and resets
+        to whatever the publisher set."""
+        e = _event(capability="c", candidate_count=0, filtered_count=0)
         assert e.event_type == EventType.CAPABILITY_SELECTED
 
 
@@ -277,4 +299,4 @@ class TestMultipleResolutions:
 
         assert len(received) == 2
         assert received[0]["capability"] == received[1]["capability"]
-        assert received[0]["timestamp"] != received[1]["timestamp"]
+        assert received[0]["created_at"] != received[1]["created_at"]

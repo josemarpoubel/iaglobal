@@ -4,9 +4,10 @@
 
 from dataclasses import dataclass, field, asdict
 from datetime import datetime, timezone
-from types import MappingProxyType
-from typing import Any, Dict, List, Mapping, Optional
+from typing import Any, Dict, List, Optional
 
+from iaglobal.events.domain_event import DomainEvent
+from iaglobal.events.event_id import EventId
 from iaglobal.events.event_types import EventType
 from iaglobal.utils.logger import logger
 
@@ -72,26 +73,17 @@ class DecisionLock:
 
 
 @dataclass(frozen=True)
-class CapabilityDecisionEvent:
-    """Emitted when the CapabilityResolver picks a technology.
+class CapabilityDecisionEvent(DomainEvent):
+    """``CAPABILITY_SELECTED`` — emitted when the CapabilityResolver picks a technology.
 
-    Carries the full decision trace so downstream consumers (EventStore,
-    CausalEngine, Bandit feedback, episodic memory) can reconstruct *why*
-    a technology was chosen for a given capability.
-
-    Spec-aligned fields (``mission_id``, ``selected_provider``,
-    ``selected_technology``, ``fallback_used``, ``timestamp``) coexist
-    with the evidence-projection (``validation_confidence``,
-    ``effective_score``, ``bandit_score``, ``reason``, ``evidence``,
-    ``candidate_count``, ``filtered_count``,
-    ``decision_confidence``).
-
-    The ``evidence`` field is internally a :class:`MappingProxyType`
-    so the contract is *truly* immutable — not only is the dataclass
-    frozen, but the underlying mapping cannot be mutated either.
+    ADR 0004: herda identidade, ``mission_id``, ``created_at`` e
+    ``evidence`` congelado de :class:`DomainEvent`. Carrega o traço
+    completo da decisão (capability, scores, reason, fallback) para que
+    consumidores downstream (EventStore, CausalEngine, Bandit feedback,
+    episodic memory) possam reconstruir **por que** uma tecnologia foi
+    escolhida.
     """
 
-    mission_id: str
     capability: str
     selected_technology: str | None
     validation_confidence: float
@@ -102,21 +94,11 @@ class CapabilityDecisionEvent:
     candidate_count: int
     filtered_count: int
     selected_provider: str | None = None
-    evidence: Mapping[str, Any] = field(default_factory=dict)
-    timestamp: str = field(
-        default_factory=lambda: datetime.now(timezone.utc).isoformat()
-    )
+    predecessor_event_id: EventId | None = None
 
     def __post_init__(self) -> None:
-        # Freeze the evidence mapping so consumers cannot silently mutate
-        # the decision trace after emission. ``frozen=True`` on the
-        # dataclass only protects the *slots* — inner dicts are still
-        # mutable unless we wrap them.
-        object.__setattr__(self, "evidence", MappingProxyType(dict(self.evidence)))
-
-    @property
-    def event_type(self) -> str:
-        return EventType.CAPABILITY_SELECTED
+        # ``DomainEvent.__post_init__`` congela ``evidence``.
+        super().__post_init__()
 
     @property
     def decision_confidence(self) -> float:
@@ -135,13 +117,9 @@ class CapabilityDecisionEvent:
         )
 
     def to_dict(self) -> Dict[str, Any]:
-        # Manual field-by-field copy — ``asdict()`` deep-copies via
-        # pickle and MappingProxyType is not picklable. ``reason``
-        # stays as ``tuple`` so the serialized form preserves the
-        # dataclass type contract; downstream JSON encoding will
-        # naturally promote it to array.
-        return {
-            "mission_id": self.mission_id,
+        # ``event_type`` vem do parent como string EventType.CAPABILITY_SELECTED.
+        data = super().to_dict()
+        data.update({
             "capability": self.capability,
             "selected_technology": self.selected_technology,
             "validation_confidence": self.validation_confidence,
@@ -152,7 +130,11 @@ class CapabilityDecisionEvent:
             "candidate_count": self.candidate_count,
             "filtered_count": self.filtered_count,
             "selected_provider": self.selected_provider,
-            "evidence": dict(self.evidence),
-            "timestamp": self.timestamp,
+            "predecessor_event_id": (
+                str(self.predecessor_event_id)
+                if self.predecessor_event_id is not None
+                else None
+            ),
             "decision_confidence": self.decision_confidence,
-        }
+        })
+        return data

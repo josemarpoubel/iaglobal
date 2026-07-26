@@ -257,11 +257,19 @@ class PipelineCapabilityResolver:
         contract: MissionContract,
     ) -> None:
         """Publish a ``CapabilityDecisionEvent`` for a legacy fallback path."""
+        from datetime import datetime, timezone
+        from uuid import uuid4
+
         from iaglobal.events.decision_event import CapabilityDecisionEvent
+        from iaglobal.events.event_id import EventId
+        from iaglobal.events.event_types import EventType
         from iaglobal.models.event_bus import bus
 
         event = CapabilityDecisionEvent(
+            id=EventId(value=str(uuid4())[:8]),
+            event_type=EventType.CAPABILITY_SELECTED,
             mission_id=mission_id,
+            created_at=datetime.now(timezone.utc),
             capability=contract.artifact,
             selected_technology=None,
             validation_confidence=0.0,

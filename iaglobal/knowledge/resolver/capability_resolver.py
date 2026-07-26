@@ -158,12 +158,20 @@ class CapabilityResolver:
         :class:`DecisionEventStore`. Imports are local to keep this resolver
         free of upstream layers at construction time.
         """
+        from datetime import datetime, timezone
+        from uuid import uuid4
+
         from iaglobal.events.decision_event import CapabilityDecisionEvent
+        from iaglobal.events.event_id import EventId
+        from iaglobal.events.event_types import EventType
         from iaglobal.models.event_bus import bus
 
         ev = resolution.evidence
         event = CapabilityDecisionEvent(
+            id=EventId(value=str(uuid4())[:8]),
+            event_type=EventType.CAPABILITY_SELECTED,
             mission_id=mission_id,
+            created_at=datetime.now(timezone.utc),
             capability=resolution.capability,
             selected_technology=resolution.selected.name
             if resolution.selected

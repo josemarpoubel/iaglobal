@@ -195,10 +195,17 @@ def test_event_evidence_is_read_only_mapping():
     guarantees that consumers cannot silently mutate the trace after
     emission.
     """
+    from datetime import datetime, timezone
+
+    from iaglobal.events import CapabilityDecisionEvent
+    from iaglobal.events.event_id import EventId
     from types import MappingProxyType
 
     e = CapabilityDecisionEvent(
+        id=EventId("evt_immutable"),
+        event_type="capability_selected",
         mission_id="m1",
+        created_at=datetime(2026, 7, 25, tzinfo=timezone.utc),
         capability="c",
         selected_technology="t",
         validation_confidence=0.5,
@@ -221,8 +228,16 @@ def test_event_decision_confidence_is_aggregate():
     """``decision_confidence`` is the spec-aligned aggregate (40%
     validation + 30% effective + 30% bandit), not a single raw signal.
     """
+    from datetime import datetime, timezone
+
+    from iaglobal.events import CapabilityDecisionEvent
+    from iaglobal.events.event_id import EventId
+
     e = CapabilityDecisionEvent(
+        id=EventId("evt_aggregate"),
+        event_type="capability_selected",
         mission_id="m1",
+        created_at=datetime(2026, 7, 25, tzinfo=timezone.utc),
         capability="c",
         selected_technology="t",
         validation_confidence=0.8,
