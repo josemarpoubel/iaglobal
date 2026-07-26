@@ -493,6 +493,10 @@ class PipelineEngine:
             "multi_coder",
             "code_executor",
             "result_agent",
+            "backend_builder",
+            "frontend_builder",
+            "database_builder",
+            "api_builder",
             "documentation",
         ]
 
