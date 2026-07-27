@@ -157,7 +157,7 @@ class PipelineEngine:
             try:
                 await asyncio.to_thread(self.orchestrator.evolver.set_task, prompt)
             except Exception as e:
-                logger.debug("Aviso: Evolver não pôde definir tarefa: %s", e)
+                logger.info("Aviso: Evolver não pôde definir tarefa: %s", e)
 
             logger.info("🚀 [ASYNC PIPELINE] Starting: %s", state.task_id)
 
@@ -228,8 +228,8 @@ class PipelineEngine:
                 )
                 _generation_kind = classify_generation(state.generated_code or "").value
                 _qa_result = (
-                    state.execution_context.context.get("qa")
-                    if hasattr(state, "execution_context") and state.execution_context
+                    state.context.get("qa")
+                    if hasattr(state, "context") and state.context
                     else None
                 )
 
@@ -247,7 +247,7 @@ class PipelineEngine:
                     execution_id=state.task_id,
                 )
             except Exception as e:
-                logger.debug("[PIPELINE] EvolutionFeedbackHook skip: %s", e)
+                logger.info("[PIPELINE] EvolutionFeedbackHook skip: %s", e)
 
             state.current_stage = PipelineStage.COMPLETE.name
             # FIX BUG #5: _save_script em thread pool
@@ -276,7 +276,7 @@ class PipelineEngine:
             try:
                 await self._emit_capability_result(state, success=False)
             except Exception as emit_err:  # noqa: BLE001 — nunca propagar
-                logger.debug(
+                logger.info(
                     "[CAPABILITY_RESULT] Falha ao emitir resultado de erro: %s",
                     emit_err,
                 )
@@ -370,9 +370,10 @@ class PipelineEngine:
                         result["total_chars"],
                     )
         except Exception as e:
-            logger.debug("[INGEST] Auto-detecção: %s", e)
+            logger.info("[INGEST] Auto-detecção: %s", e)
 
         prompt = state.prompt
+        # 1. Classificação heurística por palavra-chave
         state.intent = (
             TaskIntent.CODE
             if any(
@@ -390,7 +391,10 @@ class PipelineEngine:
                 )
             )
             else TaskIntent.HTML
-            if any(k in prompt.lower() for k in ("html", "página", "site", "frontend"))
+            if any(
+                k in prompt.lower()
+                for k in ("html", "página", "site", "frontend", "app")
+            )
             else TaskIntent.JSON
             if any(k in prompt.lower() for k in ("json", "retorne apenas"))
             else TaskIntent.CHAT
@@ -400,6 +404,15 @@ class PipelineEngine:
             )
             else TaskIntent.GENERAL
         )
+        # 2. Sobreposição pelo contrato semântico da missão (mais preciso que heurística)
+        contract = state.context.get("mission_contract")
+        if contract and hasattr(contract, "artifact"):
+            if contract.artifact == "web_app":
+                state.intent = TaskIntent.HTML
+                logger.info("[INTENT] Contrato=%s → HTML", contract.artifact)
+            elif contract.artifact in ("cli_tool", "python_script", "library"):
+                state.intent = TaskIntent.CODE
+                logger.info("[INTENT] Contrato=%s → CODE", contract.artifact)
         if ingested_context:
             prompt = f"{state.prompt}\n\n[ARQUIVOS INGERIDOS]\n{ingested_context}"
 
@@ -530,9 +543,9 @@ class PipelineEngine:
                         )
                         _artifact = None
 
-                    if _artifact_type != "CODE":
+                    if _artifact_type.upper() not in ("CODE", "HTML"):
                         logger.info(
-                            "⛔ [PIPELINE] Nó %s produziu %s (não CODE) — descartando como código",
+                            "⛔ [PIPELINE] Nó %s produziu %s (não CODE/HTML) — descartando como código",
                             node_name,
                             _artifact_type,
                         )
@@ -587,7 +600,7 @@ class PipelineEngine:
                         _art_type = GenerationClassifier().classify(str(output)).type
                         _artifact = None
 
-                    if _art_type != "CODE":
+                    if _art_type.upper() not in ("CODE", "HTML"):
                         logger.info(
                             "⛔ [PIPELINE] Nó fallback %s produziu %s — descartando",
                             node_name,
@@ -645,7 +658,7 @@ class PipelineEngine:
         else:
             _art_type = GenerationClassifier().classify(code).type
 
-        if _art_type not in ("CODE", "HTML"):
+        if _art_type.upper() not in ("CODE", "HTML"):
             logger.info(
                 "[VALIDATION] Artefato e %s (nao CODE/HTML) — pulando AST e marcando invalid_syntax",
                 _art_type,
@@ -774,6 +787,17 @@ class PipelineEngine:
         code = re.sub(r"[ \t]+", " ", code)
         return code.strip()
 
+    def _get_preferred_ext(self, state: PipelineState) -> str:
+        contract = state.context.get("mission_contract")
+        if contract and hasattr(contract, "artifact"):
+            if contract.artifact == "web_app":
+                return ".html"
+            if contract.artifact == "api":
+                return ".py"
+        if state.intent == TaskIntent.HTML:
+            return ".html"
+        return ""
+
     def _save_script(self, state: PipelineState) -> Optional[Path]:
         """Salva o script em disco via save_result_artifact."""
         from iaglobal._paths import save_result_artifact
@@ -781,7 +805,8 @@ class PipelineEngine:
         code = state.generated_code
         if not code or not code.strip():
             return None
-        project_dir = save_result_artifact(state.prompt, {}, code)
+        preferred_ext = self._get_preferred_ext(state)
+        project_dir = save_result_artifact(state.prompt, {}, code, preferred_ext)
         ext = self._detect_extension(code, state.intent, state)
         return project_dir / f"output{ext}"
 
@@ -823,6 +848,15 @@ class PipelineEngine:
         intent: Optional[TaskIntent] = None,
         state: Optional[PipelineState] = None,
     ) -> str:
+        # 0. Contrato da missão vence heurísticas de conteúdo
+        if state and state.context.get("mission_contract"):
+            contract = state.context["mission_contract"]
+            if hasattr(contract, "artifact"):
+                if contract.artifact == "web_app":
+                    return ".html"
+                if contract.artifact == "api":
+                    return ".py"
+
         # 1. Respeita a linguagem da missão (prioridade máxima)
         if state and state.context.get("mission"):
             mission_lang = getattr(state.context["mission"], "language", None)
@@ -1020,4 +1054,4 @@ class PipelineEngine:
             await asyncio.to_thread(_learn_sync)
             logger.info("[LEARN] STM/LTM/cache atualizados: %s", state.prompt[:60])
         except Exception as e:
-            logger.debug("[LEARN] Erro: %s", e)
+            logger.info("[LEARN] Erro: %s", e)
