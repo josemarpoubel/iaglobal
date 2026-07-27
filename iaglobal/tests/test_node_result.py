@@ -71,3 +71,32 @@ class TestNormalizeNodeResult:
     def test_artifact_empty_content_warning(self):
         r = normalize_node_result({"success": True, "artifacts": [{"content": ""}]})
         assert any("sem conteúdo" in w for w in r.warnings)
+
+
+def test_all_results_write_go_through_normalize():
+    """Garantia Fase 2: toda escrita em self.results[] passa por normalize_node_result.
+    Varredura estática do source do execution_graph."""
+    import ast
+    import inspect
+    from iaglobal.graphs.execution_graph import ExecutionGraph
+
+    source = inspect.getsource(ExecutionGraph)
+    tree = ast.parse(source)
+
+    assignments: list[int] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Assign):
+            for target in node.targets:
+                if isinstance(target, ast.Subscript) and isinstance(target.value, ast.Attribute):
+                    if (
+                        isinstance(target.value.value, ast.Name)
+                        and target.value.value.id == "self"
+                        and target.value.attr == "results"
+                    ):
+                        assignments.append(node.lineno)
+
+    for lineno in assignments:
+        line = source.split("\n")[lineno - 1].strip()
+        assert "normalize_node_result" in line or "NodeResult" in line, (
+            f"Linha {lineno}: self.results[] deve passar por normalize_node_result\n  {line}"
+        )

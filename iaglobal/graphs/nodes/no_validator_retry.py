@@ -17,6 +17,9 @@ from typing import Dict, Any, List, Optional
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.security.ast_gateway import ASTGateway
+from iaglobal.graphs.artifact_resolver import get_best_artifact, ResolvedArtifact
+from iaglobal.core.artifact import ArtifactKind
+from iaglobal.core.node_result import NodeResult
 
 logger = get_logger("iaglobal.graphs.nodes.validator_retry")
 
@@ -206,26 +209,46 @@ def _fix_unclosed_quotes(code: str) -> str:
     return "".join(result)
 
 
-async def run_validator_retry(ctx: Dict[str, Any]) -> Dict[str, Any]:
+async def run_validator_retry(ctx: Dict[str, Any]) -> NodeResult:
     start = time.time()
     memory = ctx.get("memory", {})
 
-    code = _extrair_codigo(memory, ctx)
+    artifact: ResolvedArtifact = get_best_artifact(memory)
+    code = artifact.content
+
     if not code:
         logger.warning("[VALIDATOR_RETRY] Nenhum código encontrado para validar.")
-        return {
-            "output": "",
-            "code_valid": True,
-            "retries": 0,
-            "execution_metrics": {
+        return NodeResult(
+            success=True,
+            output="",
+            metadata={
+                "code_valid": True,
+                "retries": 0,
                 "model": "validator_retry",
-                "success": True,
-                "latency": (time.time() - start) * 1000.0,
+                "latency_ms": (time.time() - start) * 1000.0,
                 "cost": 0.0,
             },
-        }
+        )
+
+    if artifact.kind == ArtifactKind.HTML:
+        logger.info(
+            "[VALIDATOR_RETRY] Código HTML detectado (kind=HTML) — pulando validação Python AST"
+        )
+        return NodeResult(
+            success=True,
+            output=code,
+            metadata={
+                "code_valid": True,
+                "retries": 0,
+                "syntax_error": None,
+                "model": "validator_retry",
+                "latency_ms": (time.time() - start) * 1000.0,
+                "cost": 0.0,
+            },
+        )
 
     # Sanitize LLM output before validation
+    cleaned = code.strip()
     code = _sanitize_llm_output(code)
 
     attempt = 1
@@ -244,18 +267,18 @@ async def run_validator_retry(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 attempt,
                 len(corrected_code),
             )
-            return {
-                "output": corrected_code,
-                "code_valid": True,
-                "retries": attempt - 1,
-                "syntax_error": None,
-                "execution_metrics": {
+            return NodeResult(
+                success=True,
+                output=corrected_code,
+                metadata={
+                    "code_valid": True,
+                    "retries": attempt - 1,
+                    "syntax_error": None,
                     "model": "validator_retry",
-                    "success": True,
-                    "latency": (time.time() - start) * 1000.0,
+                    "latency_ms": (time.time() - start) * 1000.0,
                     "cost": 0.0,
                 },
-            }
+            )
 
         last_error = result.errors[0] if result.errors else "unknown"
 
@@ -426,20 +449,19 @@ async def run_validator_retry(ctx: Dict[str, Any]) -> Dict[str, Any]:
     except Exception as e:
         logger.debug("[VALIDATOR_RETRY] Falha ao persistir código: %s", e)
 
-    return {
-        "output": corrected_code,
-        "code_valid": False,
-        "retries": attempt - 1,
-        "syntax_error": last_error,
-        "execution_metrics": {
-            "model": "validator_retry",
-            "success": False,
-            "latency": latency_ms,
-            "cost": 0.0,
-            "error": last_error,
+    return NodeResult(
+        success=False,
+        output=corrected_code,
+        errors=[last_error] if last_error else [],
+        metadata={
+            "code_valid": False,
             "retries": attempt - 1,
+            "syntax_error": last_error,
+            "model": "validator_retry",
+            "latency_ms": latency_ms,
+            "cost": 0.0,
         },
-    }
+    )
 
 
 def _extrair_codigo(memory: Dict[str, Any], ctx: Dict[str, Any]) -> str:
