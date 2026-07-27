@@ -89,6 +89,12 @@ class SkillExecutor:
         if "workdir" in ctx:
             contract_ctx["workdir"] = ctx["workdir"]
 
+        # SEMPRE passa memory por referência para que bridge functions
+        # (ex: _coder_run_fn) consigam reconstruir o contexto completo do nó.
+        # NÃO usar deepcopy — memory contém instâncias vivas (ex: _agent_bus,
+        # _mailbox_manager) que não são deep-copyáveis e perderiam identidade.
+        contract_ctx["memory"] = memory
+
         if "execution_result" in skill.inputs:
             contract_ctx["execution_result"] = copy.deepcopy(memory)
 

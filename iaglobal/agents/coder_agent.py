@@ -441,6 +441,7 @@ class CoderAgent(AgentBase):
         erros_contexto: str = "",
         security_feedback: str = "",
         search_results: str = "",
+        codigo_base: str = "",
     ) -> CodeArtifact:
         task_str = task.text if hasattr(task, "text") else str(task)
         task_hash = hashlib.sha3_512(task_str.encode()).hexdigest()[:16]
@@ -451,7 +452,7 @@ class CoderAgent(AgentBase):
             return cached
 
         logger.info("[CODER] Processando com recursos locais | estilo=%s", self.estilo)
-        codigo = ""
+        codigo = codigo_base if codigo_base else ""
 
         # Layer 1: ToolLibrary — componente reutilizavel
         try:

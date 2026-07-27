@@ -13,7 +13,7 @@ from iaglobal.evolution.skills.native.skill import Skill
 from iaglobal.evolution.skills.native.skill import ExecutionPolicy
 from iaglobal.evolution.skills.utils.run_fn_factory import make_dynamic_run_fn
 from iaglobal.evolution.skills.utils.dynamic_registry import dynamic_registry
-from iaglobal.memory.fusion_engine import KnowledgeGraph
+from iaglobal.memory.memory_fusion_engine import KnowledgeGraph
 from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.agents.skill_generator_agent")

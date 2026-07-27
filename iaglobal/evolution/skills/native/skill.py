@@ -148,6 +148,68 @@ async def _search_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
     return await run_search({"input": {"task": context.get("task", "")}})
 
 
+async def _knowledge_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Bridge skill → no_knowledge.run_knowledge — persiste contexto no knowledge.json."""
+    from iaglobal.graphs.nodes.no_knowledge import run_knowledge
+
+    ctx = {
+        "input": {"task": _safe_get(context, "task", "input.task")},
+        "memory": context.get("memory", {}),
+    }
+    return await run_knowledge(ctx)
+
+
+async def _coder_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Bridge skill → no_coder.run_coder — código com template e PEC ativos."""
+    from iaglobal.graphs.nodes.no_coder import run_coder
+
+    ctx = {
+        "input": {"task": _safe_get(context, "task", "input.task")},
+        "memory": context.get("memory", {}),
+        "context": context.get("context", {}),
+        "mission_contract": context.get("mission_contract"),
+    }
+    return await run_coder(ctx)
+
+
+async def _multi_coder_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Bridge skill → no_multi_coder.run_multi_coder se existir."""
+    try:
+        from iaglobal.graphs.nodes.no_multi_coder import run_multi_coder
+
+        ctx = {
+            "input": {"task": _safe_get(context, "task", "input.task")},
+            "memory": context.get("memory", {}),
+        }
+        return await run_multi_coder(ctx)
+    except Exception:
+        # Fallback: delega para o coder como multi_coder
+        return await _coder_run_fn(context)
+
+
+async def _knowledge_writer_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Bridge skill → no_knowledge_writer.run_knowledge_writer — persiste knowledge.json."""
+    from iaglobal.graphs.nodes.no_knowledge_writer import run_knowledge_writer
+
+    ctx = {
+        "input": {"task": _safe_get(context, "task", "input.task")},
+        "memory": context.get("memory", {}),
+    }
+    return await run_knowledge_writer(ctx)
+
+
+async def _prompt_builder_run_fn(context: Dict[str, Any]) -> Dict[str, Any]:
+    """Bridge skill → no_prompt_builder.run_prompt_builder — template artifact_kind-aware."""
+    from iaglobal.graphs.nodes.no_prompt_builder import run_prompt_builder
+
+    ctx = {
+        "input": {"task": _safe_get(context, "task", "input.task")},
+        "memory": context.get("memory", {}),
+        "mission_contract": context.get("mission_contract"),
+    }
+    return await run_prompt_builder(ctx)
+
+
 def _safe_get(context: Dict[str, Any], *keys: str, default: str = "") -> str:
     """Extrai valor aninhado do contexto com fallback seguro."""
     for key in keys:
@@ -586,6 +648,7 @@ SKILL_CODER = Skill(
     tags=["core", "coding"],
     template_type="llm",
     template_prompt=_get_template("coder"),
+    run_fn=_coder_run_fn,
 )
 
 SKILL_CRITIC = Skill(
@@ -1090,6 +1153,7 @@ SKILL_KNOWLEDGE = Skill(
     execution_policy=ExecutionPolicy.ALWAYS,
     version="v1",
     tags=["infra", "memory", "transversal"],
+    run_fn=_knowledge_run_fn,
 )
 
 # ================================================================
@@ -1359,6 +1423,7 @@ SKILL_MULTI_CODER = Skill(
     outputs=["multi_coded"],
     execution_policy=ExecutionPolicy.SINGLE_RUN,
     tags=["pipeline", "construction"],
+    run_fn=_multi_coder_run_fn,
 )
 
 SKILL_PROMPT_BUILDER = Skill(
@@ -1369,6 +1434,7 @@ SKILL_PROMPT_BUILDER = Skill(
     outputs=["built_prompt"],
     execution_policy=ExecutionPolicy.SINGLE_RUN,
     tags=["pipeline", "definition"],
+    run_fn=_prompt_builder_run_fn,
 )
 
 SKILL_PROMPT_IMPROVER = Skill(
@@ -1399,6 +1465,7 @@ SKILL_KNOWLEDGE_WRITER = Skill(
     outputs=["knowledge_entry"],
     execution_policy=ExecutionPolicy.SINGLE_RUN,
     tags=["knowledge", "persistence"],
+    run_fn=_knowledge_writer_run_fn,
 )
 
 SKILL_MULTI_AGENT = Skill(
