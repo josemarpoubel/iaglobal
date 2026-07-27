@@ -34,6 +34,23 @@ class NodeResult:
     metrics: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
 
+    def get(self, key: str, default: Any = None) -> Any:
+        if key == "output":
+            return self.output
+        if key == "success":
+            return self.success
+        if key == "artifact":
+            return self.artifacts[0] if self.artifacts else None
+        if key in ("metrics", "execution_metrics"):
+            return dict(self.metrics)
+        if key == "metadata":
+            return dict(self.metadata)
+        if key == "warnings":
+            return list(self.warnings)
+        if key == "errors":
+            return list(self.errors)
+        return self.metadata.get(key, self.metrics.get(key, default))
+
     def to_dict(self) -> dict[str, Any]:
         d: dict[str, Any] = {
             "success": self.success,

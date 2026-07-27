@@ -20,6 +20,7 @@ from iaglobal.diagnostics.generation_classifier import GenerationClassifier
 from iaglobal.providers.provider_router import CREDIT_CANDIDATES as credit_candidates_fn
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.core.node_result import NodeResult
 
 logger = get_logger("iaglobal")
 
@@ -489,11 +490,14 @@ class PipelineEngine:
 
         raw_results = graph_result.get("raw_results", {})
 
-        # Propaga resultado do QA para state.context, onde o
-        # EvolutionFeedbackHook o lê logo após esta etapa.
         qa_entry = raw_results.get("qa")
-        if qa_entry and isinstance(qa_entry, dict):
-            qa_payload = qa_entry.get("qa")
+        if qa_entry:
+            if isinstance(qa_entry, dict):
+                qa_payload = qa_entry.get("qa")
+            elif hasattr(qa_entry, "metadata"):
+                qa_payload = qa_entry.metadata.get("qa")
+            else:
+                qa_payload = None
             if qa_payload is not None:
                 state.context["qa"] = qa_payload
 
@@ -523,7 +527,7 @@ class PipelineEngine:
 
         for node_name in dag_nodes:
             node_result = raw_results.get(node_name)
-            if isinstance(node_result, dict):
+            if isinstance(node_result, (dict, NodeResult)):
                 output = (
                     node_result.get("output") or node_result.get("final_file") or ""
                 )
@@ -585,7 +589,7 @@ class PipelineEngine:
             return
 
         for node_name, node_result in raw_results.items():
-            if isinstance(node_result, dict):
+            if isinstance(node_result, (dict, NodeResult)):
                 output = (
                     node_result.get("output") or node_result.get("final_file") or ""
                 )

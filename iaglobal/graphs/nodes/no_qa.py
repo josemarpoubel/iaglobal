@@ -11,21 +11,17 @@ import logging
 from typing import Dict, Any
 
 from iaglobal.agents.critic_agent import CriticAgent
+from iaglobal.core.node_result import NodeResult
 
 logger = logging.getLogger(__name__)
 
 
-async def run_qa(ctx: Dict[str, Any]) -> Dict[str, Any]:
-    """
-    Executa a auditoria de QA de forma assíncrona e não-bloqueante.
-    Mapeia latência, custos e sucesso analítico para o JointOptimizationLoop.
-    """
+async def run_qa(ctx: Dict[str, Any]) -> NodeResult:
     start_time = time.time()
     resolved_model = "qa_critic_agent_llm"
 
     logger.info("[QA] Iniciando ciclo de Quality Assurance no código gerado...")
 
-    # Coleta os dados de forma resiliente do contexto ou da memória do Coder
     task = ctx.get("task", "") or str(ctx.get("input", {}).get("task", ""))
     prompt = ctx.get("prompt", "") or ctx.get("memory", {}).get(
         "prompt_builder", {}
@@ -35,14 +31,11 @@ async def run_qa(ctx: Dict[str, Any]) -> Dict[str, Any]:
     output = coder_data.get("output", "") if isinstance(coder_data, dict) else ""
 
     try:
-        # Chamada direta ao CriticAgent com pré-processamento local
-        # (LocalSummarizer dentro de avaliar() comprime o output antes do LLM)
         agent = CriticAgent()
         result = await agent.avaliar(task, prompt, output)
 
         latency_ms = (time.time() - start_time) * 1000.0
 
-        # Valida o contrato do Critic antes de registrar sucesso
         is_success = isinstance(result, dict) and "approved" in result
         if is_success:
             logger.info("[QA] Avaliação concluída. approved=%s", result.get("approved"))
@@ -52,26 +45,24 @@ async def run_qa(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 list(result.keys()) if isinstance(result, dict) else None,
             )
 
-        # Retorno higienizado cumprindo estritamente as Regras 1, 3 e 5 do AGENTS.md
-        return {
-            "output": result.get("feedback", "QA finalizado"),
-            "qa": result
-            if is_success
-            else {
-                "approved": False,
-                "structured": False,
-                "error": "critic_missing_verdict",
-                "critic_result": result,
-            },
-            "execution_metrics": {
-                "model": resolved_model,
-                "success": is_success,
-                "latency": latency_ms,
-                "cost": ctx.get(
-                    "estimated_cost", 0.004
-                ),  # Custo de inferência estimado para o QA
-            },
+        qa_verdict = result if is_success else {
+            "approved": False,
+            "structured": False,
+            "error": "critic_missing_verdict",
+            "critic_result": result,
         }
+
+        return NodeResult(
+            success=is_success,
+            output=result.get("feedback", "QA finalizado") if isinstance(result, dict) else str(result),
+            metadata={
+                "qa": qa_verdict,
+                "score": (result.get("score", 0) if isinstance(result, dict) else 0),
+                "model": resolved_model,
+                "latency_ms": latency_ms,
+                "cost": ctx.get("estimated_cost", 0.004),
+            },
+        )
 
     except Exception as e:
         latency_ms = (time.time() - start_time) * 1000.0
@@ -79,14 +70,14 @@ async def run_qa(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "[QA] Falha crítica durante o ciclo de Quality Assurance: %s", e
         )
 
-        # REPORTA A FALHA EXPLICITAMENTE PARA O BANDIT POLICY APRENDER COM O COMPORTAMENTO DO MODELO
-        return {
-            "output": "Falha no processo de QA",
-            "qa": {"approved": False, "score": 0, "error": str(e)},
-            "execution_metrics": {
+        return NodeResult(
+            success=False,
+            output="Falha no processo de QA",
+            errors=[str(e)],
+            metadata={
+                "qa": {"approved": False, "score": 0, "error": str(e)},
                 "model": resolved_model,
-                "success": False,
-                "latency": latency_ms,
+                "latency_ms": latency_ms,
                 "cost": 0.0,
             },
-        }
+        )
