@@ -489,6 +489,14 @@ class PipelineEngine:
 
         raw_results = graph_result.get("raw_results", {})
 
+        # Propaga resultado do QA para state.context, onde o
+        # EvolutionFeedbackHook o lê logo após esta etapa.
+        qa_entry = raw_results.get("qa")
+        if qa_entry and isinstance(qa_entry, dict):
+            qa_payload = qa_entry.get("qa")
+            if qa_payload is not None:
+                state.context["qa"] = qa_payload
+
         if not raw_results:
             logger.warning(
                 "[PIPELINE] raw_results vazio. Chaves disponíveis: %s",
