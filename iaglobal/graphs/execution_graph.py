@@ -500,12 +500,12 @@ class ExecutionGraph:
             )
 
             # Atualização em memória
-            self.results[dep_name] = {
+            self.results[dep_name] = normalize_node_result({
                 "error": f"Abortado pela Sanity Barrier: falha em '{failed_node_name}'",
                 "node": dep_name,
                 "status": "ABORTED",
                 "success": False,
-            }
+            })
             self.skip_reasons[dep_name] = "aborted_by_sanity_barrier"
 
             # Atualização assíncrona no DB
@@ -696,11 +696,11 @@ class ExecutionGraph:
         checkpoint = await asyncio.to_thread(checkpoint_db.get_checkpoint, execution_id)
         if checkpoint:
             for node_name, state in checkpoint.items():
-                self.results[node_name] = {
+                self.results[node_name] = normalize_node_result({
                     "output": state.get("result_data"),
                     "status": "COMPLETED",
                     "success": True,
-                }
+                })
                 executed.add(node_name)
                 await asyncio.to_thread(
                     exec_registry.complete_node, execution_id, node_name
@@ -983,7 +983,7 @@ class ExecutionGraph:
                             self.skip_reasons[dep] = "aborted_by_sanity_barrier"
                             executed.add(dep)
                 else:
-                    self.results[name] = result
+                    self.results[name] = normalize_node_result(result)
                     node_status[name] = "COMPLETED"
                     await asyncio.to_thread(
                         checkpoint_db.update_node_status,
