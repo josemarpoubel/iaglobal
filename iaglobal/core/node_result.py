@@ -1,9 +1,25 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+"""
+NodeResult é o contrato interno de retorno de todos os nós do pipeline.
+
+to_dict() existe apenas para persistência, logs e compatibilidade externa.
+NUNCA usar como transporte interno entre componentes do pipeline.
+"""
 
 from dataclasses import dataclass, field
 from typing import Any, Optional
 
 from iaglobal.core.artifact import GeneratedArtifact
+
+
+def _normalize_bool(value: Any) -> bool:
+    if isinstance(value, bool):
+        return value
+    if value is None:
+        return False
+    if isinstance(value, str):
+        return value.lower() in {"true", "1", "yes", "ok"}
+    return bool(value)
 
 
 @dataclass(slots=True)
@@ -41,30 +57,38 @@ class NodeResult:
         return d
 
 
-def normalize_node_result(raw: Any) -> NodeResult:
+def normalize_node_result(raw: Any, warnings: Optional[list[str]] = None) -> NodeResult:
     if isinstance(raw, NodeResult):
         return raw
 
-    if isinstance(raw, dict):
-        artifacts_raw = raw.get("artifacts") or []
-        artifacts = [
-            a if isinstance(a, GeneratedArtifact) else GeneratedArtifact(
-                content=a.get("content", "") if isinstance(a, dict) else str(a),
-                metadata={},
-            )
-            for a in artifacts_raw
-        ]
-
-        return NodeResult(
-            success=bool(raw.get("success", False)),
-            output=str(raw["output"]) if "output" in raw and raw["output"] is not None else None,
-            artifacts=artifacts,
-            warnings=list(raw.get("warnings") or []),
-            errors=list(raw.get("errors") or []),
-            metrics=dict(raw.get("metrics") or raw.get("execution_metrics") or {}),
-            metadata=dict(raw.get("metadata") or {}),
+    if not isinstance(raw, dict):
+        raise TypeError(
+            f"Expected NodeResult or dict, got {type(raw).__name__}: {raw!r}"
         )
 
-    raise TypeError(
-        f"Expected NodeResult or dict, got {type(raw).__name__}: {raw!r}"
+    acc_warnings = list(warnings) if warnings else []
+
+    artifacts_raw = raw.get("artifacts") or []
+    artifacts: list[GeneratedArtifact] = []
+    for a in artifacts_raw:
+        if isinstance(a, GeneratedArtifact):
+            artifacts.append(a)
+        elif isinstance(a, dict):
+            content = a.get("content", "")
+            if not content:
+                acc_warnings.append(
+                    "Artifact sem conteúdo recebido durante normalização"
+                )
+            artifacts.append(GeneratedArtifact(content=content, metadata={}))
+        else:
+            artifacts.append(GeneratedArtifact(content=str(a), metadata={}))
+
+    return NodeResult(
+        success=_normalize_bool(raw.get("success")),
+        output=str(raw["output"]) if "output" in raw and raw["output"] is not None else None,
+        artifacts=artifacts,
+        warnings=acc_warnings + list(raw.get("warnings") or []),
+        errors=list(raw.get("errors") or []),
+        metrics=dict(raw.get("metrics") or raw.get("execution_metrics") or {}),
+        metadata=dict(raw.get("metadata") or {}),
     )

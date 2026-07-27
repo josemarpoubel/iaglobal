@@ -11,6 +11,7 @@ from typing import Dict, Any, Optional, Set, Tuple
 
 from iaglobal.utils.logger import logger
 from iaglobal.utils.hash_utils import LineageID
+from iaglobal.core.node_result import normalize_node_result
 
 from .node import Node
 
@@ -854,7 +855,7 @@ class ExecutionGraph:
                         error_message=error_msg,
                     )
                 else:
-                    self.results[name] = result
+                    self.results[name] = normalize_node_result(result)
                     await asyncio.to_thread(
                         checkpoint_db.update_node_status,
                         execution_id,
@@ -894,11 +895,11 @@ class ExecutionGraph:
         checkpoint = await asyncio.to_thread(checkpoint_db.get_checkpoint, execution_id)
         if checkpoint:
             for name, state in checkpoint.items():
-                self.results[name] = {
+                self.results[name] = normalize_node_result({
                     "output": state.get("result_data"),
                     "status": "COMPLETED",
                     "success": True,
-                }
+                })
                 node_status[name] = "COMPLETED"
                 executed.add(name)
                 await asyncio.to_thread(exec_registry.complete, execution_id, name)
