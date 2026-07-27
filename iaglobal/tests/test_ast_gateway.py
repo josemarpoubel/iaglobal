@@ -147,6 +147,57 @@ class TestASTGatewaySecurity:
         result = gw.validate("x = 42")
         assert result.valid is True
 
+    # ── Attribute access rules ──────────────────────────────────────────
+
+    def test_allowed_execute_attribute(self):
+        """.execute() em objeto genérico NÃO deve ser bloqueado."""
+        gw = _gateway()
+        result = gw.parse("graph.execute()")
+        assert result.valid is True
+
+    def test_allowed_execute_on_executor(self):
+        """executor.execute() também deve passar."""
+        gw = _gateway()
+        result = gw.parse("executor.execute()")
+        assert result.valid is True
+
+    def test_blocked_system_attribute(self):
+        """os.system() continua bloqueado."""
+        gw = _gateway()
+        result = gw.parse("os.system('ls')")
+        assert result.valid is False
+        assert any("UNSAFE_CALL" in m.get("type", "") for m in result.metadata)
+
+    def test_blocked_popen_attribute_lower(self):
+        """.popen() (lowercase) continua bloqueado."""
+        gw = _gateway()
+        result = gw.parse("obj.popen()")
+        assert result.valid is False
+
+    def test_blocked_popen_attribute_upper(self):
+        """.Popen() (case-insensitive) também bloqueado."""
+        gw = _gateway()
+        result = gw.parse("subprocess.Popen(['ls'])")
+        assert result.valid is False
+
+    def test_blocked_eval_direct_still_blocked(self):
+        """eval() como Name (direto) continua bloqueado."""
+        gw = _gateway()
+        result = gw.parse("eval('1+1')")
+        assert result.valid is False
+
+    def test_blocked_exec_direct_still_blocked(self):
+        """exec() como Name (direto) continua bloqueado."""
+        gw = _gateway()
+        result = gw.parse("exec('x=1')")
+        assert result.valid is False
+
+    def test_blocked_spawn_attribute(self):
+        """.spawn() continua bloqueado."""
+        gw = _gateway()
+        result = gw.parse("something.spawn()")
+        assert result.valid is False
+
 
 class TestASTGatewayEdgeCases:
     def test_large_code(self):
