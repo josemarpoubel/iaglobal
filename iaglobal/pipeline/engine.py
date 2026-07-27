@@ -804,6 +804,25 @@ class PipelineEngine:
                 return ".py"
         if state.intent == TaskIntent.HTML:
             return ".html"
+
+        # Fallback: usar ArtifactKind do artefato gerado, que tem
+        # classificação mais precisa que heurísticas de conteúdo.
+        # O coder já classifica o código via GeneratedArtifact.from_str()
+        # antes de retornar — usar esse resultado evita que detectores
+        # secundários (ex: _detect_extension em _paths.py linha 300)
+        # classifiquem incorretamente como .json quando o código
+        # começa com "{" (scaffold JSON em volta de HTML).
+        artifact = state.generated_artifact
+        if artifact is not None:
+            from iaglobal.core.artifact import ArtifactKind
+
+            kind = artifact.kind
+            if kind == ArtifactKind.HTML:
+                return ".html"
+            if kind == ArtifactKind.JSON:
+                return ".json"
+            if kind == ArtifactKind.MARKDOWN:
+                return ".md"
         return ""
 
     def _save_script(self, state: PipelineState) -> Optional[Path]:
