@@ -13,6 +13,7 @@ from iaglobal.core.result_adapter import (
     extract_metric,
     is_skipped,
     extract_one,
+    extract_field,
 )
 
 
@@ -145,6 +146,32 @@ class TestIsSkipped:
 
     def test_null_default_false(self):
         assert is_skipped({}) is False
+
+
+class TestExtractField:
+    def test_node_result_attribute(self):
+        nr = NodeResult(success=True, output="code")
+        assert extract_field(nr, "success") is True
+        assert extract_field(nr, "output") == "code"
+
+    def test_node_result_metadata_fallback(self):
+        nr = NodeResult(success=True, metadata={"detected_domain": "web"})
+        assert extract_field(nr, "detected_domain") == "web"
+
+    def test_node_result_metrics_fallback(self):
+        nr = NodeResult(success=True, metrics={"latency": 1.5})
+        assert extract_field(nr, "latency") == 1.5
+
+    def test_node_result_default_when_absent(self):
+        nr = NodeResult(success=True)
+        assert extract_field(nr, "code", "fallback") == "fallback"
+
+    def test_dict_legacy(self):
+        d = {"success": True, "output": "x", "custom": "y"}
+        assert extract_field(d, "success") is True
+        assert extract_field(d, "output") == "x"
+        assert extract_field(d, "custom") == "y"
+        assert extract_field(d, "missing", 42) == 42
 
 
 class TestExtractOne:

@@ -101,6 +101,31 @@ def is_skipped(value: Any) -> bool:
     return False
 
 
+def extract_field(value: Any, key: str, default: Any = None) -> Any:
+    """Lê um campo arbitrário de dict legado ou NodeResult.
+
+    Prioridade:
+    1. atributo direto do NodeResult
+    2. NodeResult.metadata
+    3. NodeResult.metrics
+    4. chave do dict legado
+    5. default
+    """
+    if isinstance(value, NodeResult):
+        if hasattr(value, key):
+            attr = getattr(value, key)
+            if attr is not None:
+                return attr
+        if key in value.metadata:
+            return value.metadata[key]
+        if key in value.metrics:
+            return value.metrics[key]
+        return default
+    if isinstance(value, dict):
+        return value.get(key, default)
+    return default
+
+
 def extract_one(memory: Dict[str, Any], key: str, default: Any = None) -> Any:
     """Lê de ctx['memory'][key] de maneira compatível com dict | NodeResult."""
     if not isinstance(memory, dict):
