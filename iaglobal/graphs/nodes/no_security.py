@@ -64,6 +64,7 @@ async def run_security(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
         # Retorno higienizado cumprindo as Regras 1, 3 e 5 do AGENTS.md (Sem dar dict unpack do ctx na RAM)
         return {
+            "success": True,
             "output": result.get("output", "Auditoria de segurança concluída")
             if isinstance(result, dict)
             else str(result),
@@ -84,6 +85,7 @@ async def run_security(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
         # REPORTA A FALHA EXPLICITAMENTE PARA O BANDIT POLICY APRENDER COM O COMPORTAMENTO DO MODELO
         return {
+            "success": False,
             "output": "Falha no processo de auditoria de segurança",
             "security": {"error": str(e), "success": False},
             "execution_metrics": {
