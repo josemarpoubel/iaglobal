@@ -70,10 +70,10 @@ class OutputRenderer:
                     "tester",
                 ):
                     nr = raw.get(name, {})
-                    if isinstance(nr, dict):
-                        out = nr.get("output")
+                    if isinstance(nr, (dict,)) or hasattr(nr, "get"):
+                        out = nr.get("output") if hasattr(nr, "get") else getattr(nr, "output", "")
                         if hasattr(out, "code") and out.code:
-                            p = nr.get("path")
+                            p = nr.get("path") if hasattr(nr, "get") else getattr(nr, "metadata", {}).get("path")
                             if p:
                                 print(f"\n✅ Seu script ficou pronto na pasta {p}")
                             else:

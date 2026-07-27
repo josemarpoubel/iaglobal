@@ -47,7 +47,7 @@ class SkillExecutor:
         memory = ctx.get("memory", {})
 
         for node_name, node_result in memory.items():
-            if not isinstance(node_result, dict):
+            if not isinstance(node_result, dict) and not hasattr(node_result, "get"):
                 continue
             output = node_result.get("output")
             if output is not None:
