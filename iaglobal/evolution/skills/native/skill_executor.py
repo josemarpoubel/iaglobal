@@ -78,9 +78,13 @@ class SkillExecutor:
                             if out_name not in contract_ctx:
                                 contract_ctx[out_name] = output_text
 
-            for key, value in node_result.items():
-                if key in skill.inputs and key not in ("output",):
-                    contract_ctx[key] = copy.deepcopy(value)
+            # NodeResult não tem .items() (apenas .get()). Só itera quando
+            # for dict — para NodeResult, o bloco acima (linhas 52-79) já
+            # popula contract_ctx via output/metadata.
+            if isinstance(node_result, dict):
+                for key, value in node_result.items():
+                    if key in skill.inputs and key not in ("output",):
+                        contract_ctx[key] = copy.deepcopy(value)
 
         for key in skill.inputs:
             if key in ctx:
