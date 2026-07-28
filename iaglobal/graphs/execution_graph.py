@@ -771,12 +771,27 @@ class ExecutionGraph:
                 )
 
                 if is_failed:
-                    error_msg = (
-                        str(result.get("error", "Execution Failed"))
-                        if isinstance(result, dict)
-                        else str(result)
-                    )
-                    logger.warning("[GRAPH] Nó '%s' falhou: %s", name, error_msg)
+                    if isinstance(result, dict):
+                        error = result.get("error")
+                        error_msg = str(error) if error else "Execution Failed"
+                    else:
+                        s = str(result)
+                        error_msg = s if s else "Execution Failed"
+
+                    if is_exception:
+                        # exc_info=result captura traceback da exceção
+                        # retornada por asyncio.gather(return_exceptions=True).
+                        # Não usar logger.exception() — não estamos em except ativo.
+                        logger.error(
+                            "[GRAPH] Nó '%s' falhou: %s",
+                            name,
+                            error_msg,
+                            exc_info=result
+                            if isinstance(result, BaseException)
+                            else None,
+                        )
+                    else:
+                        logger.error("[GRAPH] Nó '%s' falhou: %s", name, error_msg)
 
                     if isinstance(result, MissingContextError):
                         recovery = await self._recovery.handle_missing_context(
