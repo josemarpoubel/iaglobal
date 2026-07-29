@@ -11,6 +11,7 @@ import logging
 import asyncio
 from typing import Dict, Any
 
+from iaglobal.core.result_adapter import extract_output
 from iaglobal.agents.reflexion_agent import ReflexionAgent
 
 logger = logging.getLogger(__name__)

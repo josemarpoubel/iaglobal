@@ -86,7 +86,8 @@ class AgentMailbox:
         if not metadata:
             logger.error(
                 "[TRIBUNAL/GENESIS] 🚫 %s → %s: METADATA AUSENTE",
-                sender, receiver,
+                sender,
+                receiver,
             )
             raise PermissionError(
                 f"[TRIBUNAL/GENESIS] {sender} → {receiver}: metadata ausente"
@@ -97,8 +98,10 @@ class AgentMailbox:
             logger.error(
                 "[TRIBUNAL/GENESIS] 🚫 %s → %s: GENESIS MARKER INVALIDO "
                 "(recebido=%s esperado=%s)",
-                sender, receiver,
-                genesis_marker, GENESIS_HASH_OFFICIAL[:16],
+                sender,
+                receiver,
+                genesis_marker,
+                GENESIS_HASH_OFFICIAL[:16],
             )
             raise PermissionError(
                 f"[TRIBUNAL/GENESIS] {sender} → {receiver}: genesis_marker invalido"
@@ -112,7 +115,9 @@ class AgentMailbox:
         if signature != expected_sig:
             logger.error(
                 "[TRIBUNAL/GENESIS] 🚫 %s → %s: ASSINATURA INVALIDA (origin=%s)",
-                sender, receiver, origin_id,
+                sender,
+                receiver,
+                origin_id,
             )
             raise PermissionError(
                 f"[TRIBUNAL/GENESIS] {sender} → {receiver}: assinatura invalida"
@@ -120,8 +125,10 @@ class AgentMailbox:
 
         logger.info(
             "[TRIBUNAL/GENESIS] ✅ %s → %s: autenticado (marker=%s origin=%s)",
-            sender, receiver,
-            genesis_marker, origin_id[:12],
+            sender,
+            receiver,
+            genesis_marker,
+            origin_id[:12],
         )
 
     @staticmethod
@@ -171,7 +178,9 @@ class AgentMailbox:
             except PermissionError:
                 self._log_security_violation(message, "genesis_tribunal_failed")
                 if self._monitor:
-                    self._monitor.report_violation(self.agent_name, "genesis_tribunal_failed")
+                    self._monitor.report_violation(
+                        self.agent_name, "genesis_tribunal_failed"
+                    )
                 raise
 
         self.inbox.append(message)

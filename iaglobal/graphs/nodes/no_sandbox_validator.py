@@ -12,6 +12,7 @@ import asyncio
 from typing import Dict, Any
 
 from iaglobal.agents.semantic_validator import SemanticValidatorAgent
+from iaglobal.core.result_adapter import extract_output
 
 logger = logging.getLogger(__name__)
 
@@ -29,8 +30,8 @@ async def run_sandbox_validator(ctx: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     # Coleta os dados de entrada de forma resiliente
-    coder_data = ctx.get("coder", {}) or ctx.get("memory", {}).get("coder", {})
-    code = coder_data.get("output", "") if isinstance(coder_data, dict) else ""
+    coder_data = ctx.get("coder") or ctx.get("memory", {}).get("coder")
+    code = extract_output(coder_data)
     task = ctx.get("task", "") or str(ctx.get("input", {}).get("task", ""))
 
     try:

@@ -11,6 +11,7 @@ import logging
 import asyncio
 from typing import Dict, Any
 
+from iaglobal.core.result_adapter import extract_output
 from iaglobal.agents.performance_audit_agent import PerformanceAuditAgent
 
 logger = logging.getLogger(__name__)

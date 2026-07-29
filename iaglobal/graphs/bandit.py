@@ -907,9 +907,7 @@ class BanditPolicy:
                 if route in candidates or any(
                     route.split("_")[0] in c for c in candidates
                 ):
-                    prefixed = (
-                        route if "/" in route else f"ollama/{route}"
-                    )
+                    prefixed = route if "/" in route else f"ollama/{route}"
                     candidates = [prefixed] + [
                         c for c in candidates if c != route and c != prefixed
                     ]

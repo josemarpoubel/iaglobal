@@ -43,8 +43,14 @@ def resolve_artifact(
     4. Fallback final: string vazia + ArtifactKind.UNKNOWN
     """
     # Caso 0: NodeResult — usa contrato tipado diretamente
-    if hasattr(node_result, "output") and hasattr(node_result, "success") and hasattr(node_result, "artifacts"):
-        if node_result.artifacts and isinstance(node_result.artifacts[0], GeneratedArtifact):
+    if (
+        hasattr(node_result, "output")
+        and hasattr(node_result, "success")
+        and hasattr(node_result, "artifacts")
+    ):
+        if node_result.artifacts and isinstance(
+            node_result.artifacts[0], GeneratedArtifact
+        ):
             artifact = node_result.artifacts[0]
             _confidence = artifact.confidence if artifact.confidence > 0 else 1.0
             logger.debug(

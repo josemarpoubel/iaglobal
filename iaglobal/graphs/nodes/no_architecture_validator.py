@@ -9,6 +9,7 @@ import logging
 import asyncio
 from typing import Dict, Any
 
+from iaglobal.core.result_adapter import extract_output
 from iaglobal.agents.semantic_validator import SemanticValidatorAgent
 
 logger = logging.getLogger(__name__)

@@ -4,6 +4,7 @@ from typing import Dict, Any
 import logging
 
 from iaglobal.agents.semantic_validator import SemanticValidatorAgent
+from iaglobal.core.result_adapter import extract_output
 
 logger = logging.getLogger(__name__)
 

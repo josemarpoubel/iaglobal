@@ -102,12 +102,15 @@ def normalize_node_result(raw: Any, warnings: Optional[list[str]] = None) -> Nod
 
     return NodeResult(
         success=_normalize_bool(raw.get("success")),
-        output=str(raw["output"]) if "output" in raw and raw["output"] is not None else None,
+        output=str(raw["output"])
+        if "output" in raw and raw["output"] is not None
+        else None,
         artifacts=artifacts,
         warnings=acc_warnings + list(raw.get("warnings") or []),
-        errors=list(raw.get("errors") or (
-            [str(raw["error"])] if "error" in raw and raw["error"] else []
-        )),
+        errors=list(
+            raw.get("errors")
+            or ([str(raw["error"])] if "error" in raw and raw["error"] else [])
+        ),
         metrics=dict(raw.get("metrics") or raw.get("execution_metrics") or {}),
         metadata=dict(raw.get("metadata") or {}),
     )

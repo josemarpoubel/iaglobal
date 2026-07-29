@@ -12,6 +12,7 @@ from typing import Dict, Any
 
 from iaglobal.agents.critic_agent import CriticAgent
 from iaglobal.core.node_result import NodeResult
+from iaglobal.core.result_adapter import extract_output
 
 logger = logging.getLogger(__name__)
 
@@ -27,8 +28,8 @@ async def run_qa(ctx: Dict[str, Any]) -> NodeResult:
         "prompt_builder", {}
     ).get("built_prompt", "")
 
-    coder_data = ctx.get("coder", {}) or ctx.get("memory", {}).get("coder", {})
-    output = coder_data.get("output", "") if isinstance(coder_data, dict) else ""
+    coder_data = ctx.get("coder") or ctx.get("memory", {}).get("coder")
+    output = extract_output(coder_data)
 
     try:
         agent = CriticAgent()
@@ -38,26 +39,37 @@ async def run_qa(ctx: Dict[str, Any]) -> NodeResult:
 
         is_success = isinstance(result, dict) and "approved" in result
         if is_success:
-            logger.info("[QA] Avaliação concluída. approved=%s", result.get("approved"))
+            logger.info(
+                "[QA] Avaliação concluída. approved=%s",
+                result.get("approved"),
+            )
         else:
             logger.warning(
-                "[QA] Critic retornou resposta sem campo 'approved'. keys=%s",
+                '[QA] Critic retornou resposta sem campo "approved". keys=%s',
                 list(result.keys()) if isinstance(result, dict) else None,
             )
 
-        qa_verdict = result if is_success else {
-            "approved": False,
-            "structured": False,
-            "error": "critic_missing_verdict",
+        qa_verdict = {
+            "approved": result.get("approved", False)
+            if isinstance(result, dict)
+            else False,
+            "structured": isinstance(result, dict),
+            "error": "" if is_success else "critic_missing_verdict",
             "critic_result": result,
         }
 
+        feedback_output = (
+            result.get("feedback", "QA finalizado")
+            if isinstance(result, dict)
+            else str(result)
+        )
+
         return NodeResult(
             success=is_success,
-            output=result.get("feedback", "QA finalizado") if isinstance(result, dict) else str(result),
+            output=feedback_output,
             metadata={
                 "qa": qa_verdict,
-                "score": (result.get("score", 0) if isinstance(result, dict) else 0),
+                "score": result.get("score", 0) if isinstance(result, dict) else 0,
                 "model": resolved_model,
                 "latency_ms": latency_ms,
                 "cost": ctx.get("estimated_cost", 0.004),
@@ -67,7 +79,8 @@ async def run_qa(ctx: Dict[str, Any]) -> NodeResult:
     except Exception as e:
         latency_ms = (time.time() - start_time) * 1000.0
         logger.exception(
-            "[QA] Falha crítica durante o ciclo de Quality Assurance: %s", e
+            "[QA] Falha crítica durante o ciclo de Quality Assurance: %s",
+            e,
         )
 
         return NodeResult(
