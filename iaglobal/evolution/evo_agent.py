@@ -165,6 +165,37 @@ class Expression:
 # ─────────────────────────────────────────────────────────────────────────────
 
 
+def _classify_nutrition_source(enriched_prompt: str) -> str:
+    """Infere a origem REAL do contexto injetado pelo SearchMiddleware.
+
+    O SearchMiddleware NUNCA consulta o SearXNG — o pipeline web dele usa
+    DuckDuckGo (`ddgs`) + RAG local + cache Obsidian. Logo, nenhum contexto
+    produzido por ele pode ser rotulado como 'searxng'; esse rótulo fica
+    reservado ao provider real (`_search_sources.searxng_search`).
+
+    Origens possíveis:
+        - "none"   — sem contexto injetado (enrich retornou o prompt original)
+        - "memory" — hit de cache Obsidian ou RAG local
+        - "ddg"    — busca web via DuckDuckGo (SearchMiddleware)
+    """
+    if not enriched_prompt or "[CONTEXTO]" not in enriched_prompt:
+        return "none"
+    if "## Web" in enriched_prompt or "## Referências" in enriched_prompt:
+        return "ddg"
+    if "## Obsidian" in enriched_prompt or "## Memoria Local" in enriched_prompt:
+        return "memory"
+    # Sem marcador explícito (ex.: síntese agregando snippets web/RAG) —
+    # o componente web do SearchMiddleware é a origem dominante.
+    return "ddg"
+
+
+def _count_nutrition_results(enriched_prompt: str) -> int:
+    """Conta padrões descobertos no contexto injetado (linhas de resultado)."""
+    if not enriched_prompt or "[CONTEXTO]" not in enriched_prompt:
+        return 0
+    return sum(1 for line in enriched_prompt.split("\n") if line.strip().startswith("- "))
+
+
 class EvoAgent:
     """
     Organismo computacional auto-evolutivo nativo do iaglobal.
@@ -420,8 +451,11 @@ class EvoAgent:
 
         Interface com SearchMiddleware que decide:
         - Usar cache (Obsidian/MemoryFirstRouter)
-        - Buscar no SearXNG (se necessário)
+        - Buscar na web (DuckDuckGo via SearchMiddleware)
         - Sintetizar contexto
+
+        IMPORTANTE: o SearchMiddleware NÃO usa SearXNG. A origem real do
+        contexto é inferida do conteúdo injetado (`_classify_nutrition_source`).
 
         Registra no log metabólico para auditoria evolutiva.
 
@@ -433,7 +467,8 @@ class EvoAgent:
                 - query: query original
                 - content: resultados formatados
                 - timestamp: quando ocorreu
-                - source: "searxng" ou "memory_cache"
+                - source: "ddg", "memory" ou "none"
+                - results_count: nº de padrões descobertos
                 - evolution_impact: se gerou skill nova
         """
         logger.info(
@@ -455,20 +490,17 @@ class EvoAgent:
                 },
             )
 
-            # Extrai contexto web do prompt enriquecido
-            has_web_context = (
-                "[CONTEXTO WEB]" in enriched_prompt or "[CONTEXTO]" in enriched_prompt
-            )
-
-            # Determina fonte
-            source = "memory_cache" if not has_web_context else "searxng"
+            # Origem REAL do contexto (nunca 'searxng' — SearchMiddleware
+            # usa DuckDuckGo/RAG/Obsidian, não o meta-buscador local).
+            source = _classify_nutrition_source(enriched_prompt)
 
             result = {
                 "query": query,
                 "content": enriched_prompt,
                 "timestamp": time.strftime("%Y-%m-%d %H:%M:%S"),
                 "source": source,
-                "evolution_impact": has_web_context,  # Se tem contexto novo, pode evoluir
+                "results_count": _count_nutrition_results(enriched_prompt),
+                "evolution_impact": source != "none",
             }
 
             logger.info(
@@ -1172,7 +1204,7 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
                 "content": web_result["content"],
                 "source": web_result["source"],
                 "timestamp": web_result["timestamp"],
-                "results_count": 1 if web_result["source"] == "searxng" else 0,
+                "results_count": web_result.get("results_count", 0),
             }
             logger.info(
                 "[%s] Nutrição externa assimilada | source=%s",

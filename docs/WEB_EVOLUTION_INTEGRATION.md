@@ -913,28 +913,29 @@ async def search_web(self, query: str) -> dict:
         context={"evolution_mode": True}
     )
     
-    # SearchMiddleware internally:
+    # SearchMiddleware internamente (NÃO usa SearXNG):
     # 1. Verifica MemoryFirstRouter (cache exato) → conf 0.95
     # 2. Verifica STM/LTM + Obsidian → conf 0.80
     # 3. Verifica SearchMemory → conf 0.75
-    # 4. Se nada → SearXNG search (fallback)
+    # 4. Se nada → busca web via DuckDuckGo (ddgs) + RAG local
     
-    has_web_context = "[CONTEXTO WEB]" in enriched_prompt
-    source = "memory_cache" if not has_web_context else "searxng"
+    # Origem REAL inferida do conteúdo injetado (ADR-0006):
+    source = _classify_nutrition_source(enriched_prompt)  # "ddg" | "memory" | "none"
     
     return {
         "query": query,
         "content": enriched_prompt,
         "source": source,
-        "evolution_impact": has_web_context
+        "results_count": _count_nutrition_results(enriched_prompt),
+        "evolution_impact": source != "none"
     }
 Vantagens da Integração em 2º Plano:
 Vantagem	Descrição
-✅ Zero acoplamento	EvoAgent não sabe se é cache ou SearXNG
+✅ Zero acoplamento	EvoAgent não sabe se é cache ou web (SearchMiddleware abstrai)
 ✅ Cache automático	SearchMiddleware gerencia cache transparentemente
 ✅ Evolução contínua	Skills criadas a partir de qualquer fonte
-✅ Eficiência	1ª busca: SearXNG (lento), 2ª+: cache (rápido)
-✅ Observabilidade	Log mostra source="searxng" ou "memory_cache"
+✅ Eficiência	1ª busca: web (DuckDuckGo), 2ª+: cache (rápido)
+✅ Observabilidade	Log mostra source="ddg", "memory" ou "none"
 📊 Exemplo Real de Execução
 Tarefa: "crie dashboard React com dark mode 2026"
 🧬 [evo-web-tester] [Metabolismo] Buscando nutrientes: crie dashboard React...
@@ -943,9 +944,9 @@ Tarefa: "crie dashboard React com dark mode 2026"
 ├─ MemoryFirstRouter.check() → conf=0.45 (abaixo de 0.85)
 ├─ SearchMemory.get() → cache miss
 ├─ _needs_web_search() → TRUE (detecta "React", "2026")
-└─ searxng_search() → 26 resultados encontrados
+└─ DuckDuckGo (ddgs) → 26 resultados encontrados
 
-✅ [evo-web-tester] Nutrição externa completa | source=searxng | impact=True
+✅ [evo-web-tester] Nutrição externa completa | source=ddg | impact=True
 
 [evo-web-tester] Metilação com contexto web | query=crie dashboard... | results=5
 [evo-web-tester] Contexto web injetado na metilação
@@ -959,9 +960,9 @@ Próxima Tarefa Idêntica:
 
 [SearchMiddleware Internals]
 ├─ MemoryFirstRouter.check() → conf=0.95 (acima de 0.85)
-└─ ✅ CACHE HIT! (sem busca no SearXNG)
+└─ ✅ CACHE HIT! (sem busca web — contexto do Obsidian)
 
-✅ [evo-web-tester] Nutrição externa completa | source=memory_cache | impact=False
+✅ [evo-web-tester] Nutrição externa completa | source=memory | impact=True
 
 [evo-web-tester] Metilação (sem contexto web novo)
 ✅ Expression generated | urgency=normal | elapsed=203.5ms (8x mais rápido!)
@@ -981,13 +982,13 @@ Próxima Tarefa Idêntica:
                      │
                      ▼
 ┌─────────────────────────────────────────────────────────────┐
-│  3. NUTRIÇÃO EXTERNA (SearXNG em 2º plano)                  │
+│  3. NUTRIÇÃO EXTERNA (web via SearchMiddleware)             │
 │     search_web() → SearchMiddleware.enrich()                │
 │     SearchMiddleware decide:                                │
-│       - Cache hit? → memory_cache (rápido)                  │
-│       - Cache miss? → SearXNG (lento, mas evolui)           │
+│       - Cache hit? → memory (rápido)                        │
+│       - Cache miss? → web (DuckDuckGo) + RAG local          │
 │                                                             │
-│     Result: source="searxng", evolution_impact=True         │
+│     Result: source="ddg" ou "memory", evolution_impact=True │
 └────────────────────┬────────────────────────────────────────┘
                      │
                      ▼
