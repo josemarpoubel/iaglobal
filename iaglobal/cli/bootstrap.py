@@ -17,6 +17,32 @@ from iaglobal.utils.logger import get_logger
 logger = get_logger("iaglobal.cli.bootstrap")
 
 
+def _discover_pipeline_agents() -> list:
+    """Descobre os agentes do pipeline a partir dos módulos `iaglobal.graphs.nodes.no_*`.
+
+    Cada arquivo `no_<agent>.py` exporta `run_<agent>` (AGENTS.md §1). O nome
+    do agente (sem o prefixo `no_`) é o que cpu_affinity usa como agent_id —
+    assim bandit.begin_generation("critic") encontra o agent_id já registrado
+    com budget e core atribuído.
+    """
+    import os as _os
+
+    nodes_dir = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "graphs", "nodes")
+    nodes_dir = _os.path.abspath(nodes_dir)
+    agents: list = []
+    if not _os.path.isdir(nodes_dir):
+        return agents
+    for fname in sorted(_os.listdir(nodes_dir)):
+        if (
+            fname.startswith("no_")
+            and fname.endswith(".py")
+            and fname != "__init__.py"
+            and not fname.startswith("_")
+        ):
+            agents.append(fname[3:-3])
+    return agents
+
+
 def datetime_iso_now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
@@ -320,6 +346,40 @@ class Bootstrap:
                 logger.debug("[CPU] Affinity skip: %s", e)
 
         await self._phase2_step("cpu_affinity", _cpu_affinity)
+        async def _cpu_affinity_register_agents() -> None:
+            """Registra os agentes do pipeline no cpu_affinity (map_balanced).
+
+            Sem isto, o budget permanece como regra morta: os agentes so existem
+            no manager depois que bandit.begin_generation() os cria lazily, sem
+            entrada em _budgets e sem distribuicao per-core. Aqui descobrimos os
+            `no_*.py` agents e aplicamos map_balanced() para que:
+              - cada agente receba um core logico via hash deterministico;
+              - o teto de geracoes LLM (gate) saiba o orcamento agregado;
+              - dispersion_report / rebalance / boost operem sobre os agentes reais.
+            """
+            try:
+                from iaglobal.execution.cpu_affinity import cpu_affinity
+
+                agents = _discover_pipeline_agents()
+                if not agents:
+                    logger.debug("[CPU] Nenhum agente de pipeline descoberto")
+                    return
+                await cpu_affinity.map_balanced(agents)
+                cores = cpu_affinity._total_cores
+                logger.info(
+                    "[CPU] %d agentes registrados em %d cores (ate %d geracoes "
+                    "locais concorrentes: 25%%/agente x %d cores)",
+                    len(agents),
+                    cores,
+                    cores * 4,
+                    cores,
+                )
+                await cpu_affinity.set_priority_boost(["critic"], boost_percent=50)
+            except Exception as e:
+                logger.debug("[CPU] register_agents skip: %s", e)
+
+        await self._phase2_step("cpu_affinity_register", _cpu_affinity_register_agents)
+
 
         async def _batch_writer() -> None:
             from iaglobal.storage.batch_writer import batch_writer

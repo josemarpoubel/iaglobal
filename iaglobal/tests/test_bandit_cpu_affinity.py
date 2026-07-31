@@ -90,6 +90,34 @@ async def test_teto_default_aceita_geracao_unica(cpu_manager, monkeypatch):
 
 
 @pytest.mark.asyncio
+async def test_teto_default_usa_todos_os_cores(cpu_manager, monkeypatch):
+    monkeypatch.delenv("CPU_GENERATION_CEILING", raising=False)
+    # Teto default = TODOS os núcleos da máquina (não metade, não 1 núcleo)
+    assert cpu_manager._generation_ceiling() == float(cpu_manager._total_cores)
+    # Com budget 25% por agente, cabem 4×cores gerações locais concorrentes
+    assert cpu_manager._generation_ceiling() / 0.25 == cpu_manager._total_cores * 4
+
+
+@pytest.mark.asyncio
+async def test_utilizacao_alocada_pct_relativa_a_maquina(cpu_manager):
+    await cpu_manager.map_balanced(["critic", "coder", "tester", "planner"])
+    rep = await cpu_manager.dispersion_report()
+    assert rep["capacidade_total_core_equivalentes"] == cpu_manager._total_cores
+    assert rep["total_budget_alocado"] == 1.0
+    assert rep["utilizacao_alocada_pct"] == pytest.approx(100.0 / cpu_manager._total_cores)
+
+
+def test_local_model_concurrency_escala_com_cores(bandit_module):
+    import os
+
+    cores = os.cpu_count() or 4
+    expected = max(2, cores // 2)
+    assert bandit_module.BanditPolicy.LOCAL_MODEL_CONCURRENCY == expected
+    # Em qualquer máquina >= 2 cores, o valor fica entre 2 e o total de cores
+    assert 2 <= bandit_module.BanditPolicy.LOCAL_MODEL_CONCURRENCY <= cores
+
+
+@pytest.mark.asyncio
 async def test_carga_agregada_soma_budgets_dos_slots(cpu_manager, monkeypatch):
     # Teto 0.45: comporta critic (0.25) + planner (0.20), mas não um terceiro
     monkeypatch.setenv("CPU_GENERATION_CEILING", "0.45")

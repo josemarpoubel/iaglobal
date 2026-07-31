@@ -10,6 +10,7 @@ Multi-Armed Bandit para seleção de provedores LLM com:
 
 import asyncio
 import hashlib
+import os
 import random
 import time
 from collections import defaultdict
@@ -74,7 +75,11 @@ class BanditPolicy:
 
     # Configuração de concorrência máxima por tipo de modelo
     CLOUD_MODEL_CONCURRENCY = 1  # Groq, NVIDIA, etc — 1 por vez para evitar 429
-    LOCAL_MODEL_CONCURRENCY = 4  # Ollama local pode lidar com mais
+    # Local: escala com os cores detectados (max(2, cores // 2)) — em uma
+    # máquina de 8 cores → 4; em 48 cores → 24. Ollama paraleliza inference
+    # em todos os cores disponíveis, então o gate global do cpu_affinity é
+    # quem limita a saturação real.
+    LOCAL_MODEL_CONCURRENCY = max(2, (os.cpu_count() or 4) // 2)
 
     def __init__(
         self,

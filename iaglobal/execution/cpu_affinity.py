@@ -252,9 +252,11 @@ class CpuAffinityManager:
                 assignment[agent] = core
 
         logger.info(
-            "[CPU] Distribuição balanceada: %d agentes, %.0f%% budget cada, %d cores",
+            "[CPU] Distribuição balanceada: %d agentes, %.0f%% de 1 núcleo cada, "
+            "%d núcleos (capacidade %d core-equivalentes)",
             len(agents),
             budget * 100,
+            self._total_cores,
             self._total_cores,
         )
         return assignment
@@ -300,6 +302,7 @@ class CpuAffinityManager:
 
             return {
                 "total_cores": self._total_cores,
+                "capacidade_total_core_equivalentes": self._total_cores,
                 "agents_mapped": total_agents,
                 "max_load": max_load,
                 "min_load": min_load,
@@ -313,6 +316,11 @@ class CpuAffinityManager:
                 "budgets": budgets,
                 "agentes_em_sobrevivencia": agentes_em_sobrevivencia,
                 "total_budget_alocado": round(sum(budgets.values()), 3)
+                if budgets
+                else 0,
+                "utilizacao_alocada_pct": round(
+                    sum(budgets.values()) / self._total_cores * 100.0, 1
+                )
                 if budgets
                 else 0,
             }
@@ -833,10 +841,13 @@ class CpuAffinityManager:
         """Teto de gerações ativas em core-equivalentes.
 
         Cada slot ativo consome a fração `cpu_budget` do agente sobre um
-        núcleo. O teto padrão é metade dos núcleos (ajustável via env
-        `CPU_GENERATION_CEILING`). Modos metabólicos alteram o teto:
-        ADRENALINE libera todos os núcleos; DEEP_SLEEP restringe a 1
-        geração (0.25 core-equivalente).
+        núcleo (0.25 = 25% de 1 núcleo). O teto padrão é TODOS os núcleos
+        da máquina (dinâmico via os.cpu_count()) — ajustável via env
+        `CPU_GENERATION_CEILING`. Assim a concorrência de gerações LLM
+        escala com nproc: com budget 0.25 cabem `cores / 0.25 = 4 × cores`
+        gerações simultâneas. Modos metabólicos alteram o teto: ADRENALINE
+        libera todos os núcleos; DEEP_SLEEP restringe a 1 geração
+        (0.25 core-equivalente).
         """
         if self._metabolic_state == "ADRENALINE":
             return float(self._total_cores)
@@ -848,7 +859,7 @@ class CpuAffinityManager:
                 return float(raw)
             except ValueError:
                 pass
-        return max(CPU_CEILING_DEFAULT_MIN, self._total_cores * 0.5)
+        return max(CPU_CEILING_DEFAULT_MIN, float(self._total_cores))
 
     async def begin_generation(self, agent_id: str) -> bool:
         """Reserva um slot de geração LLM ativa (gate global de CPU).
@@ -866,13 +877,17 @@ class CpuAffinityManager:
                 return False
             budget = metrics.cpu_budget or BUDGET_PADRAO
             ceiling = self._generation_ceiling()
-            load = sum(m.cpu_budget for m in self._agents.values() if m.generations_ativas > 0)
+            load = sum(
+                m.cpu_budget for m in self._agents.values() if m.generations_ativas > 0
+            )
             if load + budget > ceiling:
                 return False
             metrics.generations_ativas += 1
             return True
 
-    async def end_generation(self, agent_id: str, sucesso: bool, uso_cpu: float = 0.0) -> None:
+    async def end_generation(
+        self, agent_id: str, sucesso: bool, uso_cpu: float = 0.0
+    ) -> None:
         """Encerra um slot de geração ativa e registra a tarefa no agente.
 
         O uso de CPU reportado (quando > 0) é federado ao IVMAxiom via
