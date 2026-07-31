@@ -15,6 +15,7 @@ from iaglobal.tools.search import async_search_tool
 from iaglobal.tools.web_brain import WebBrain
 from iaglobal.agents.search_agent import SearchAgent
 from iaglobal.graphs.nodes._search_wikipedia import _wikipedia_async
+from iaglobal.graphs.nodes import _search_sources as _search_sources_mod
 from iaglobal.graphs.nodes._search_sources import (
     google_playwright_search,
     bing_playwright_search,
@@ -75,9 +76,7 @@ async def _try_source(name: str, fn: Callable, task: str, timeout: int = 12) -> 
             )
             return result_str
     except asyncio.TimeoutError:
-        logger.debug(
-            "[SEARCH] Timeout atingido para a fonte: %s (limite de %ds)", name, timeout
-        )
+        logger.debug("[SEARCH] Timeout atingido para a fonte: %s (limite de %ds)", name, timeout)
     except Exception as e:
         logger.debug("[SEARCH] Falha controlada na fonte %s: %s", name, e)
     return ""
@@ -86,6 +85,12 @@ async def _try_source(name: str, fn: Callable, task: str, timeout: int = 12) -> 
 # Wrappers nomeados para evitar lambdas anônimas e permitir inspeção estática correta
 async def _async_router_wrapper(task: str):
     return await run_search_router(task)
+
+
+def _searxng_source(task: str) -> str:
+    # Lookup lazy via módulo para permitir interceptação determinística em
+    # testes (mock.patch.object(_search_sources, "searxng_search")).
+    return _search_sources_mod.searxng_search(task)
 
 
 async def _async_search_agent_wrapper(task: str):
@@ -98,6 +103,7 @@ async def _async_web_brain_wrapper(task: str):
 
 SOURCES: List[Tuple[str, Callable, int]] = [
     ("ddg_text", duckduckgo_text_search, 15),
+    ("searxng", _searxng_source, 15),
     ("google_pw", google_playwright_search, 25),
     ("bing_pw", bing_playwright_search, 20),
     ("router", _async_router_wrapper, 20),
@@ -134,9 +140,7 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
     task = str(ctx.get("input", {}).get("task", ""))
 
     if not task or len(task) < 5:
-        await asyncio.to_thread(
-            record_error, SOURCE, "Empty task string", {"task": task}
-        )
+        await asyncio.to_thread(record_error, SOURCE, "Empty task string", {"task": task})
         latency_ms = (time.time() - start_time) * 1000.0
         return {
             "output": "",
@@ -194,9 +198,7 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
             batch = active_sources[batch_start : batch_start + _BATCH_SIZE]
 
             # Agenda a execução concorrente do lote atual
-            tasks = [
-                _try_source(name, fn, task, timeout) for name, fn, timeout in batch
-            ]
+            tasks = [_try_source(name, fn, task, timeout) for name, fn, timeout in batch]
             results = await asyncio.gather(*tasks, return_exceptions=True)
 
             for (name, _, _), result in zip(batch, results):
@@ -268,9 +270,7 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 timeout=60.0,
             )
             if len(fallback_text) > 50:
-                logger.info(
-                    "[SEARCH] Fallback LLM gerou %d caracteres", len(fallback_text)
-                )
+                logger.info("[SEARCH] Fallback LLM gerou %d caracteres", len(fallback_text))
                 return {
                     "output": fallback_text,
                     "search_results": fallback_text,
