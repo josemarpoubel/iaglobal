@@ -34,6 +34,51 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 | `providers/` | external model transport | business logic |
 | `graphs/` | DAG, topology, nodes, execution | direct OS calls |
 
+## 💾 Persistence Authority — `_paths.py` is Mandatory
+
+**Single source of truth for disk persistence:** `iaglobal/_paths.py`.
+
+Every artifact, project directory, counter file, lock file, log file, database
+path, or directory that needs to live under `iaglobal/memory/data/` MUST go
+through helpers exported by `iaglobal/_paths.py` (e.g. `save_result_artifact`,
+`next_project_dir`, `RESULTS_DIR`, `DATA_ROOT`, `LOGS_DIR`, `db_path()`).
+
+### Rationale
+
+`iaglobal/memory/data/result/` is the canonical landing zone for pipeline
+artifacts. The pipeline (`iaglobal/pipeline/engine.py`), the orchestrator, and
+the result node (`iaglobal/graphs/nodes/no_result_agent.py`) MUST NOT open
+files at `iaglobal/memory/data/...` paths directly. They MUST import the path
+helpers from `_paths.py` and use them.
+
+Direct `open()` / `Path(...) / "..."` writes against `memory/data/` bypass
+the project's sequential numbering (`project01`, `project02`, ...), the
+locking semantics (`_RESULT_LOCK_FILE`), the cleanup invariants, and the
+per-test isolation contract (`tests_temp_dir` fixture).
+
+### How to add a new persisted artifact
+
+1. Add a helper in `iaglobal/_paths.py` that returns the `Path` (or accepts
+   content and returns where it was written).
+2. Import the helper in the caller:
+   ```python
+   from iaglobal._paths import save_result_artifact  # or the new helper
+   ```
+3. If the helper takes a new parameter, extend it the same way the contract
+   is documented — never bypass it by writing to the filesystem directly.
+4. Add a regression test in `iaglobal/tests/test_save_result_artifact.py`
+   (or a sibling test file) that uses the `tests_temp_dir` fixture and
+   asserts the artifact lands in `tests_temp_dir`, not in `memory/data/`.
+
+### Violations
+
+Direct disk writes against `iaglobal/memory/data/` from outside `_paths.py`
+will be rejected by code review and may be flagged by the auditor. The
+historical incident that motivated this rule was `pipeline/engine.py:840`
+calling `save_result_artifact(state.prompt, {}, code, preferred_ext)` while
+`_paths.py` only accepted 3 args — the fix is tracked in
+`tests/test_save_result_artifact.py::test_engine_save_script_com_preferred_ext_compativel`.
+
 ## Commands
 
 | Purpose | Command |

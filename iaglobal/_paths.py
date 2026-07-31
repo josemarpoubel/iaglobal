@@ -353,8 +353,23 @@ def _safe_relative_path(base_dir: Path, user_path: str) -> Path:
     return full
 
 
-def save_result_artifact(task: str, files: dict, code: str = "") -> Path:
-    """Salva arquivos gerados no próximo diretório de projeto sequencial."""
+def save_result_artifact(
+    task: str,
+    files: dict,
+    code: str = "",
+    preferred_ext: str = "",
+) -> Path:
+    """Salva arquivos gerados no próximo diretório de projeto sequencial.
+
+    Args:
+        task: descrição da tarefa que gerou o artefato.
+        files: dict {caminho_relativo: conteúdo} para gravar arquivos extras.
+        code: código-fonte a persistir como ``output<ext>`` quando ``files``
+            estiver vazio.
+        preferred_ext: extensão solicitada pelo caller (ex: ".py", ".txt").
+            Quando vazia, preserva o comportamento histórico baseado em
+            ``_detect_extension(code, task)``.
+    """
     project_dir = next_project_dir()
     metadata = {
         "task": task,
@@ -370,7 +385,7 @@ def save_result_artifact(task: str, files: dict, code: str = "") -> Path:
         with open(full_path, "w") as f:
             f.write(content)
     if code and not files:
-        ext = _detect_extension(code, task)
+        ext = preferred_ext or _detect_extension(code, task)
         output_name = f"output{ext}"
         output_path = project_dir / output_name
         with open(output_path, "w", encoding="utf-8") as f:
