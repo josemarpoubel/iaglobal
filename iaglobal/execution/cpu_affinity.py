@@ -42,6 +42,14 @@ FITNESS_DECAY = 0.95  # decaimento temporal do fitness a cada ciclo
 FLUSH_INTERVAL = 5.0  # intervalo (s) entre persists em lote do fitness
 FLUSH_MAX_BATCH = 50  # max registros no buffer antes de flush forçado
 
+# ── Teto de gerações LLM ativas (gate global de CPU) ──────────────────────
+# O BanditPolicy usa estes valores para complementar o semáforo por modelo
+# com um limite GLOBAL de gerações concorrentes (core-equivalentes).
+CPU_CEILING_ADRENALINE = None  # usado em ADRENALINE = total de núcleos
+CPU_CEILING_DEEP_SLEEP = 0.25  # 1 geração ativa (homeostase de repouso)
+CPU_CEILING_DEFAULT_MIN = 2.0  # piso padrão em core-equivalentes
+CPU_CEILING_ENV = "CPU_GENERATION_CEILING"
+
 
 # =========================================================================
 # DATACLASSES DE METADADOS
@@ -62,6 +70,7 @@ class AgentCpuMetrics:
     fitness_score: float = 0.5
     ivm_atual: float = 0.5
     em_modo_sobrevivencia: bool = False
+    generations_ativas: int = 0  # gerações LLM concorrentes (gate de CPU)
     ultimo_ajuste: float = field(default_factory=time.time)
 
     @property
@@ -99,6 +108,7 @@ class AgentCpuMetrics:
             "produtividade": round(self.produtividade, 3),
             "eficiencia_energetica": round(self.eficiencia_energetica, 3),
             "em_modo_sobrevivencia": self.em_modo_sobrevivencia,
+            "generations_ativas": self.generations_ativas,
         }
 
 
@@ -814,6 +824,70 @@ class CpuAffinityManager:
     async def get_all_metrics(self) -> Dict[str, dict]:
         async with self.lock:
             return {aid: m.to_dict() for aid, m in self._agents.items()}
+
+    # ==============================================================
+    # GATE DE GERAÇÃO LLM — coordenação com o BanditPolicy
+    # ==============================================================
+
+    def _generation_ceiling(self) -> float:
+        """Teto de gerações ativas em core-equivalentes.
+
+        Cada slot ativo consome a fração `cpu_budget` do agente sobre um
+        núcleo. O teto padrão é metade dos núcleos (ajustável via env
+        `CPU_GENERATION_CEILING`). Modos metabólicos alteram o teto:
+        ADRENALINE libera todos os núcleos; DEEP_SLEEP restringe a 1
+        geração (0.25 core-equivalente).
+        """
+        if self._metabolic_state == "ADRENALINE":
+            return float(self._total_cores)
+        if self._metabolic_state == "DEEP_SLEEP":
+            return CPU_CEILING_DEEP_SLEEP
+        raw = os.environ.get(CPU_CEILING_ENV, "")
+        if raw:
+            try:
+                return float(raw)
+            except ValueError:
+                pass
+        return max(CPU_CEILING_DEFAULT_MIN, self._total_cores * 0.5)
+
+    async def begin_generation(self, agent_id: str) -> bool:
+        """Reserva um slot de geração LLM ativa (gate global de CPU).
+
+        Complementa o semáforo por modelo do BanditPolicy: enquanto o
+        semáforo limita a concorrência POR MODELO, este gate limita a
+        concorrência GLOBAL de gerações respeitando os budgets metabólicos.
+        Rejeita (False) se a carga agregada de slots ativos já satura o teto
+        ou se o agente está em modo de sobrevivência — o chamador deve
+        degradar (synthetic_success), sem nunca estourar o event loop.
+        """
+        async with self.lock:
+            metrics = self._get_or_create_metrics(agent_id)
+            if metrics.em_modo_sobrevivencia:
+                return False
+            budget = metrics.cpu_budget or BUDGET_PADRAO
+            ceiling = self._generation_ceiling()
+            load = sum(m.cpu_budget for m in self._agents.values() if m.generations_ativas > 0)
+            if load + budget > ceiling:
+                return False
+            metrics.generations_ativas += 1
+            return True
+
+    async def end_generation(self, agent_id: str, sucesso: bool, uso_cpu: float = 0.0) -> None:
+        """Encerra um slot de geração ativa e registra a tarefa no agente.
+
+        O uso de CPU reportado (quando > 0) é federado ao IVMAxiom via
+        `reportar_uso_cpu` — mantendo o sinal de CPU vivo para o IVM canônico.
+        """
+        async with self.lock:
+            metrics = self._get_or_create_metrics(agent_id)
+            metrics.generations_ativas = max(0, metrics.generations_ativas - 1)
+        await self.registrar_tarefa(agent_id, sucesso)
+        if uso_cpu > 0:
+            await self.reportar_uso_cpu(agent_id, uso_cpu)
+
+    async def active_generation_count(self) -> int:
+        async with self.lock:
+            return sum(1 for m in self._agents.values() if m.generations_ativas > 0)
 
 
 # =========================================================================
