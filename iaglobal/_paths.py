@@ -54,6 +54,25 @@ SEARCH_SWAP_DIR = CACHE_DIR / "search_swap"
 LOG_DIR = DATA_ROOT / "logs"
 SCRIPTS_DIR = DATA_ROOT / "script"
 TEMP_DIR = DATA_ROOT / "temp"
+# Diretório canônico para artefatos persistentes da suíte de testes.
+# Tests que precisam acumular estado entre execuções (regressões, snapshots,
+# caches de validação) devem gravar aqui, NÃO na raiz do repo nem em
+# memory/data/result/, memory/data/jol/, memory/data/cache/, etc.
+TESTS_DATA_DIR = DATA_ROOT / "temp" / "tests"
+
+
+def tests_data_subdir(name: str) -> Path:
+    """Retorna (e cria) um subdiretório canônico sob ``TESTS_DATA_DIR``.
+
+    Args:
+        name: nome do subdiretório (ex: ``"ga_genome"``, ``"jol_congestion"``).
+
+    Returns:
+        Path absoluto do subdiretório, já criado.
+    """
+    sub = TESTS_DATA_DIR / name
+    sub.mkdir(parents=True, exist_ok=True)
+    return sub
 
 # =========================================================
 # RESULT OUTPUT (projetos numerados sequencialmente)
