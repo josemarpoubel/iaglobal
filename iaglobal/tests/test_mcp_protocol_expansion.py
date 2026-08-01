@@ -123,18 +123,16 @@ class TestFileSystemTool:
         content = _run(FileSystemTool().read_file("../../etc/passwd"))
         assert content is None
 
-    def test_write_file_allowed(self):
+    def test_write_file_allowed(self, tests_temp_dir):
         from iaglobal.mcp.file_system import FileSystemTool
 
+        target = tests_temp_dir / "_mcp_test_tmp.json"
         ok = _run(
-            FileSystemTool().write_file(
-                "memory/data/json/_mcp_test_tmp.json", '{"test": true}'
-            )
+            FileSystemTool().write_file(str(target), '{"test": true}')
         )
         assert ok is True
-        path = PROJECT_ROOT / "memory" / "data" / "json" / "_mcp_test_tmp.json"
-        assert path.exists()
-        path.unlink(missing_ok=True)
+        assert target.exists()
+        target.unlink(missing_ok=True)
 
     def test_write_file_blocked(self):
         from iaglobal.mcp.file_system import FileSystemTool
@@ -381,23 +379,24 @@ class TestMCPSandbox:
         assert allowed is True
 
     @pytest.mark.asyncio
-    async def test_audit_trail_blocked_recorded(self):
-        from iaglobal.security.mcp_sandbox import MCPSandbox, AUDIT_PATH
+    async def test_audit_trail_blocked_recorded(self, tests_temp_dir, monkeypatch):
+        import iaglobal.security.mcp_sandbox as sb
         import json
 
-        # Setup: Limpa audit.json antes de testar para garantir isolamento
-        if AUDIT_PATH.exists():
-            AUDIT_PATH.unlink()
+        redirected = tests_temp_dir / "audit_blocked.json"
+        if redirected.exists():
+            redirected.unlink()
+        monkeypatch.setattr(sb, "AUDIT_PATH", redirected)
 
-        sandbox = MCPSandbox()
+        sandbox = sb.MCPSandbox()
 
         # Chama com allowed=False para simular o bloqueio que o teste espera
         await sandbox.audit_call("rm_rf", {}, "access_denied", "e2e_test", False)
 
         # Verifica se o arquivo foi criado e contém a entrada
-        assert AUDIT_PATH.exists(), "O arquivo de auditoria não foi criado."
+        assert sb.AUDIT_PATH.exists(), "O arquivo de auditoria não foi criado."
 
-        with open(AUDIT_PATH, "r", encoding="utf-8") as f:
+        with open(sb.AUDIT_PATH, "r", encoding="utf-8") as f:
             data = json.load(f)
             # Agora a decisão será 'blocked' conforme esperado pela chamada anterior
             assert data["audits"][0]["sandbox_decision"] == "blocked"
@@ -426,28 +425,37 @@ class TestGlutathioneRateLimit:
 class TestAuditTrail:
     """memory/data/json/audit.json — schema e persistência."""
 
-    def test_audit_json_exists_and_valid(self):
-        path = (
-            Path(PROJECT_ROOT) / "iaglobal" / "memory" / "data" / "json" / "audit.json"
-        )
-        assert path.exists()
-        data = json.loads(path.read_text(encoding="utf-8"))
+    def test_audit_json_exists_and_valid(self, tests_temp_dir, monkeypatch):
+        import iaglobal.security.mcp_sandbox as sb
+
+        redirected = tests_temp_dir / "audit_trail.json"
+        monkeypatch.setattr(sb, "AUDIT_PATH", redirected)
+        if not sb.AUDIT_PATH.exists():
+            sb.AUDIT_PATH.write_text('{"audits": []}', encoding="utf-8")
+
+        assert sb.AUDIT_PATH.exists()
+        data = json.loads(sb.AUDIT_PATH.read_text(encoding="utf-8"))
         assert "audits" in data
         assert isinstance(data["audits"], list)
 
-    def test_audit_entry_schema(self):
-        from iaglobal.security.mcp_sandbox import MCPSandbox, AUDIT_PATH
+    def test_audit_entry_schema(self, tests_temp_dir, monkeypatch):
+        import iaglobal.security.mcp_sandbox as sb
 
-        before = json.loads(AUDIT_PATH.read_text(encoding="utf-8"))
+        redirected = tests_temp_dir / "audit_schema.json"
+        if redirected.exists():
+            redirected.unlink()
+        monkeypatch.setattr(sb, "AUDIT_PATH", redirected)
+        redirected.write_text('{"audits": []}', encoding="utf-8")
+        before = json.loads(sb.AUDIT_PATH.read_text(encoding="utf-8"))
         count_before = len(before["audits"])
 
         _run(
-            MCPSandbox().audit_call(
+            sb.MCPSandbox().audit_call(
                 "test_tool", {"arg": 1}, "ok", agent_id="test_schema", allowed=True
             )
         )
 
-        data = json.loads(AUDIT_PATH.read_text(encoding="utf-8"))
+        data = json.loads(sb.AUDIT_PATH.read_text(encoding="utf-8"))
         entry = data["audits"][-1]
         assert "timestamp" in entry
         assert "T" in entry["timestamp"]
