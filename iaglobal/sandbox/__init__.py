@@ -1,1 +1,4 @@
-from iaglobal.sandbox.sandbox_expansion import SandboxExpansion, sandbox_expansion
+from iaglobal.sandbox.sandbox_expansion import (
+    SandboxExpansion as SandboxExpansion,
+    sandbox_expansion as sandbox_expansion,
+)

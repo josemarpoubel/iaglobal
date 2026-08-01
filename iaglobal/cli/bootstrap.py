@@ -1,18 +1,17 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
-import os
-from dotenv import load_dotenv
-
-from iaglobal._paths import PROJECT_ROOT
-
-load_dotenv(PROJECT_ROOT / ".env")
-
 import asyncio
+import os
 import time
 from datetime import datetime, timezone
 from typing import Any, Dict, Optional
 
+from dotenv import load_dotenv
+
+from iaglobal._paths import PROJECT_ROOT
 from iaglobal.core.orchestrator import Orchestrator
 from iaglobal.utils.logger import get_logger
+
+load_dotenv(PROJECT_ROOT / ".env")
 
 logger = get_logger("iaglobal.cli.bootstrap")
 
@@ -27,7 +26,9 @@ def _discover_pipeline_agents() -> list:
     """
     import os as _os
 
-    nodes_dir = _os.path.join(_os.path.dirname(_os.path.abspath(__file__)), "..", "graphs", "nodes")
+    nodes_dir = _os.path.join(
+        _os.path.dirname(_os.path.abspath(__file__)), "..", "graphs", "nodes"
+    )
     nodes_dir = _os.path.abspath(nodes_dir)
     agents: list = []
     if not _os.path.isdir(nodes_dir):
@@ -89,7 +90,7 @@ class Bootstrap:
         self._phase2_progress = {}
 
     def metrics(self) -> Dict[str, Any]:
-        now = time.time()
+        time.time()
         phase1_duration = (
             round(self._phase1_completed_at - self._phase1_started_at, 3)
             if self._phase1_started_at is not None
@@ -346,6 +347,7 @@ class Bootstrap:
                 logger.debug("[CPU] Affinity skip: %s", e)
 
         await self._phase2_step("cpu_affinity", _cpu_affinity)
+
         async def _cpu_affinity_register_agents() -> None:
             """Registra os agentes do pipeline no cpu_affinity (map_balanced).
 
@@ -379,7 +381,6 @@ class Bootstrap:
                 logger.debug("[CPU] register_agents skip: %s", e)
 
         await self._phase2_step("cpu_affinity_register", _cpu_affinity_register_agents)
-
 
         async def _batch_writer() -> None:
             from iaglobal.storage.batch_writer import batch_writer

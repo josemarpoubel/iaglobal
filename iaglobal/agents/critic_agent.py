@@ -29,14 +29,13 @@ from iaglobal.utils.logger import logger
 from iaglobal.evolution.watchdog import watchdog
 from iaglobal.obsidian.compliance import ComplianceChecker
 from iaglobal.security.ast_gateway import ASTGateway
-
-# Gateway singleton para AST parsing
-_ast_gateway = ASTGateway()
-
 from iaglobal.utils.life_signal_collector import instrument
 from iaglobal.core.few_shot_provider import few_shot_provider
 from iaglobal.agents.agent_base import _get_memory_router
 from iaglobal.cognition.memory_first_router import CONF_THRESHOLD_MEMORY
+
+# Gateway singleton para AST parsing
+_ast_gateway = ASTGateway()
 
 
 # ── Singleton (padrão análogo a _get_bandit() em bandit.py) ──
