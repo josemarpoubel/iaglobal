@@ -28,9 +28,24 @@ from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.stress_test_fase31")
 
-ANCESTRY_TREE = Path(
-    "/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/ancestry_tree.jsonl"
-)
+ANCESTRY_TREE: Path = None  # noqa: E305 — setado via _init_ancestry_tree()
+
+
+@pytest.fixture(autouse=True)
+def _init_ancestry_tree(tests_temp_dir, monkeypatch):
+    """Inicializa ANCESTRY_TREE em tests_temp_dir (evita hard-coded path).
+
+    Usa ``monkeypatch.setattr`` no escopo do módulo para que
+    ``ANCESTRY_TREE`` no corpo da função de teste aponte para o path
+    redirecionado (e seja revertido no final).
+    """
+    import iaglobal.tests.integration.test_stress_fase31 as _self
+
+    redirected = tests_temp_dir / "ancestry_tree.jsonl"
+    if not redirected.exists():
+        redirected.write_text("", encoding="utf-8")
+    monkeypatch.setattr(_self, "ANCESTRY_TREE", redirected)
+    yield
 
 
 @pytest.fixture

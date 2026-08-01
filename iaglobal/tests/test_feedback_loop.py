@@ -97,9 +97,15 @@ class TestFeedbackLoop:
     """Testes do FeedbackLoop."""
 
     @pytest.fixture(autouse=True)
-    def reset_singleton(self, tmp_path):
+    def reset_singleton(self, tmp_path, tests_temp_dir, monkeypatch):
         """Reseta singleton, cache e arquivo de índice entre testes."""
         from iaglobal.search import feedback_loop
+
+        feedback_loop_dir = tests_temp_dir / "feedback_loop"
+        feedback_loop_dir.mkdir(parents=True, exist_ok=True)
+        index_file = feedback_loop_dir / "feedback_index.json"
+        monkeypatch.setattr(feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir)
+        monkeypatch.setattr(feedback_loop.FeedbackLoop, "INDEX_FILE", index_file)
 
         # Limpar singleton e cache
         feedback_loop._feedback = None
@@ -114,14 +120,11 @@ class TestFeedbackLoop:
             "effectiveness_score": 0.0,
         }
 
-        # Remover arquivo de índice default se existir
-        default_index = Path("obsidian/04_Synapses/feedback_loop/feedback_index.json")
-        if default_index.exists():
-            default_index.unlink()
+        if index_file.exists():
+            index_file.unlink()
 
         yield
 
-        # Limpar após teste
         feedback_loop._feedback = None
         feedback_loop.FeedbackLoop._cache = []
         feedback_loop.FeedbackLoop._index = {}
@@ -134,9 +137,8 @@ class TestFeedbackLoop:
             "effectiveness_score": 0.0,
         }
 
-        # Remover arquivo de índice default novamente
-        if default_index.exists():
-            default_index.unlink()
+        if index_file.exists():
+            index_file.unlink()
 
     @pytest.fixture
     def temp_obsidian(self, tmp_path):
@@ -433,9 +435,15 @@ class TestFeedbackLoopIntegration:
     """Testes de integração."""
 
     @pytest.fixture(autouse=True)
-    def reset_singleton(self, tmp_path):
+    def reset_singleton(self, tmp_path, tests_temp_dir, monkeypatch):
         """Reseta singleton, cache e arquivo de índice entre testes."""
         from iaglobal.search import feedback_loop
+
+        feedback_loop_dir = tests_temp_dir / "feedback_loop"
+        feedback_loop_dir.mkdir(parents=True, exist_ok=True)
+        index_file = feedback_loop_dir / "feedback_index.json"
+        monkeypatch.setattr(feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir)
+        monkeypatch.setattr(feedback_loop.FeedbackLoop, "INDEX_FILE", index_file)
 
         feedback_loop._feedback = None
         feedback_loop.FeedbackLoop._cache = []
@@ -449,10 +457,8 @@ class TestFeedbackLoopIntegration:
             "effectiveness_score": 0.0,
         }
 
-        # Remover arquivo default
-        default_index = Path("obsidian/04_Synapses/feedback_loop/feedback_index.json")
-        if default_index.exists():
-            default_index.unlink()
+        if index_file.exists():
+            index_file.unlink()
 
         yield
 
@@ -468,8 +474,8 @@ class TestFeedbackLoopIntegration:
             "effectiveness_score": 0.0,
         }
 
-        if default_index.exists():
-            default_index.unlink()
+        if index_file.exists():
+            index_file.unlink()
 
     @pytest.fixture
     def temp_obsidian(self, tmp_path):
@@ -530,9 +536,15 @@ class TestFeedbackLoopE2E:
     """Testes end-to-end."""
 
     @pytest.fixture(autouse=True)
-    def reset_singleton(self, tmp_path):
+    def reset_singleton(self, tmp_path, tests_temp_dir, monkeypatch):
         """Reseta singleton, cache e arquivo de índice entre testes."""
         from iaglobal.search import feedback_loop
+
+        feedback_loop_dir = tests_temp_dir / "feedback_loop"
+        feedback_loop_dir.mkdir(parents=True, exist_ok=True)
+        index_file = feedback_loop_dir / "feedback_index.json"
+        monkeypatch.setattr(feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir)
+        monkeypatch.setattr(feedback_loop.FeedbackLoop, "INDEX_FILE", index_file)
 
         feedback_loop._feedback = None
         feedback_loop.FeedbackLoop._cache = []
@@ -546,10 +558,8 @@ class TestFeedbackLoopE2E:
             "effectiveness_score": 0.0,
         }
 
-        # Remover arquivo default
-        default_index = Path("obsidian/04_Synapses/feedback_loop/feedback_index.json")
-        if default_index.exists():
-            default_index.unlink()
+        if index_file.exists():
+            index_file.unlink()
 
         yield
 
@@ -565,8 +575,8 @@ class TestFeedbackLoopE2E:
             "effectiveness_score": 0.0,
         }
 
-        if default_index.exists():
-            default_index.unlink()
+        if index_file.exists():
+            index_file.unlink()
 
     @pytest.fixture
     def temp_obsidian(self, tmp_path):
