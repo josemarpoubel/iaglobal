@@ -75,10 +75,9 @@ class EvolutionRecoveryEngine:
         # 4. Registra as memórias como "herança" para o novo clone (async)
         for mem in agent_memories:
             mem["agent_id"] = new_agent_id
-            new_file = (
-                self.epigenetic_path
-                / f"{hashlib.sha3_512(f'{new_agent_id}:{mem['task_hash']}:{mem['error_type']}'.encode()).hexdigest()[:16]}.cbor"
-            )
+            digest_key = f"{new_agent_id}:{mem.get('task_hash')}:{mem.get('error_type')}"
+            digest = hashlib.sha3_512(digest_key.encode()).hexdigest()[:16]
+            new_file = self.epigenetic_path / f"{digest}.cbor"
             await asyncio.to_thread(self._write_cbor, new_file, mem)
 
         logger.info(
@@ -91,7 +90,7 @@ class EvolutionRecoveryEngine:
             if data.get("agent_id") == agent_id:
                 await asyncio.to_thread(file.unlink)
 
-        logger.info(f"🗑️ [APOPTOSIS] Memórias originais removidas. Apoptose completa.")
+        logger.info("🗑️ [APOPTOSIS] Memórias originais removidas. Apoptose completa.")
         return new_agent_id
 
     @staticmethod

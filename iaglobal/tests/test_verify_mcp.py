@@ -17,17 +17,13 @@ Uso:
 """
 
 import asyncio
+import importlib.util
 import json
 import os
 import time
 from pathlib import Path
 
-try:
-    import pytest
-
-    PYTEST_AVAILABLE = True
-except ImportError:
-    PYTEST_AVAILABLE = False
+PYTEST_AVAILABLE = importlib.util.find_spec("pytest") is not None
 
 
 REPO_ROOT = Path(__file__).resolve().parent.parent.parent
@@ -273,7 +269,7 @@ async def _run_test():
     init_latency_ms = (time.perf_counter() - t0) * 1000
     if resp is None:
         print(f"  ✗ TIMEOUT @ {init_latency_ms:.0f}ms")
-        print(f"\n=== STDERR (last 60) ===")
+        print("\n=== STDERR (last 60) ===")
         for line in stderr_log[-60:]:
             print(line[:200])
         results.append(("initialize", init_latency_ms, "TIMEOUT"))
@@ -332,7 +328,7 @@ async def _run_test():
         elif "error" in resp:
             err_msg = resp["error"].get("message", "?")
             print(f"  ✗ ERROR ({call_latency_ms:.0f}ms): {err_msg}")
-            results.append((label, call_latency_ms, f"ERROR"))
+            results.append((label, call_latency_ms, "ERROR"))
         else:
             content = (resp.get("result") or {}).get("content", [])
             head = ""
@@ -377,7 +373,7 @@ async def _run_test():
             )
 
     print(f"\n{'=' * 60}")
-    print(f"Latency Summary")
+    print("Latency Summary")
     print(f"{'=' * 60}")
     width = max(len(l) for l, _, _ in results)
     for label, lat, status in sorted(results, key=lambda r: r[1]):
@@ -387,7 +383,7 @@ async def _run_test():
         print(f"  {marker} {label:<{width}} {lat:>9.0f} ms  {status[:40]}")
 
     phases = _count_phases_completed()
-    print(f"\nBootstrap markers (cada um deve aparecer exatamente 1 vez):")
+    print("\nBootstrap markers (cada um deve aparecer exatamente 1 vez):")
     print(f"  phase1_complete:           {phases['phase1_complete']}")
     print(
         f"  phase2_complete:           {phases['phase2_complete']}  (0 se teste termina antes)"

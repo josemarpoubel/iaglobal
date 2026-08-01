@@ -29,6 +29,10 @@ MAX_ERROR_TRUNCATE = 1000
 DEFAULT_MAX_ITERATIONS = 5
 CODE_BLOCK_PATTERN = re.compile(r"```(?:python)?\s*(.*?)```", re.DOTALL)
 
+_HISTORICAL_BLOCK = (
+    "## Historical Errors to Avoid (learn from past mistakes):\n{historical_context}\n"
+)
+
 
 # =============================================================================
 # HELPER FUNCTIONS
@@ -139,7 +143,7 @@ Your task is to fix code that failed during sandbox execution.
 ## Execution Error:
 {traceback_err}
 
-{f"## Historical Errors to Avoid (learn from past mistakes):\n{historical_context}\n" if historical_context else ""}
+{_HISTORICAL_BLOCK.format(historical_context) if historical_context else ""}
 
 ## Your Mission:
 1. Analyze the error traceback carefully
@@ -416,7 +420,7 @@ class ReflexionEngine:
             else:
                 self.failure_count += 1
                 status = "failed"
-                logger.warning(f"⚠️ Final validation failed after reflexion loop")
+                logger.warning("⚠️ Final validation failed after reflexion loop")
 
             # Create structured record
             record = ExecutionRecord(
