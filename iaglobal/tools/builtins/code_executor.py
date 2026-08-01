@@ -16,6 +16,8 @@ import time
 
 from iaglobal.utils.logger import get_logger
 
+from iaglobal.tools.tool_library import tool_library
+
 logger = get_logger("iaglobal.tools.code_executor")
 
 BLOCKED_IMPORTS = {
@@ -173,7 +175,6 @@ except Exception as e:
 
 
 # Registra na ToolLibrary no momento da importação
-from iaglobal.tools.tool_library import tool_library
 
 tool_library.register(
     name="code_executor",

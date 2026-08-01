@@ -7,6 +7,8 @@ from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Callable, Dict, List, Any, Optional
 
+from iaglobal.events.event_types import EventType  # noqa: F401
+
 __all__ = ["bus", "EventType"]
 
 logger = logging.getLogger("ia-global")
@@ -35,7 +37,6 @@ class Event:
 # EVENT TYPES (canonical source: iaglobal/events/event_types.py)
 # =========================================================
 
-from iaglobal.events.event_types import EventType  # noqa: F401
 
 
 # =========================================================

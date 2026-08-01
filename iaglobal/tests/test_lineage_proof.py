@@ -13,6 +13,12 @@ Protocolo: H_lineage = SHA3-512(G0 + Node_UID)
 import hashlib
 import pytest
 
+from iaglobal.graphs.nodes.no_lineage_proof import (
+    generate_node_lineage,
+    validate_batch,
+    run_lineage_proof,
+)
+
 GENESIS_HASH_OFFICIAL = (
     "cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524"
     "f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136"
@@ -36,11 +42,6 @@ def _derive(node_uid: str) -> str:
 # Import do módulo sob teste
 # =====================================================================
 
-from iaglobal.graphs.nodes.no_lineage_proof import (
-    generate_node_lineage,
-    validate_batch,
-    run_lineage_proof,
-)
 
 
 # =====================================================================

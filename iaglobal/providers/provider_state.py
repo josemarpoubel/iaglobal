@@ -11,10 +11,11 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Dict, Optional
 
-logger = logging.getLogger("iaglobal.providers")
-
 from iaglobal._paths import DATA_ROOT
 from iaglobal.utils.logger import logger as util_logger
+
+logger = logging.getLogger("iaglobal.providers")
+
 
 
 # =============================================================================

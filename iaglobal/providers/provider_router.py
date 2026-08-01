@@ -19,6 +19,16 @@ from iaglobal.utils.logger import logger
 from iaglobal.utils.life_signal_collector import instrument
 
 # Import opcional da BanditPolicy Evolutiva (Geração 2)
+from iaglobal.providers.ollama_provider import async_generate as ollama_async_generate
+from iaglobal.providers.contract import registry
+from iaglobal.providers.provider_config import (
+    CognitiveRole,
+    get_model_config,
+    get_role_by_model_id,
+)
+from iaglobal.metabolism.bucket_manager import BucketManager
+from contextvars import ContextVar
+
 try:
     from iaglobal.policy import BanditPolicyEvolutiva
 
@@ -31,8 +41,6 @@ except ImportError:
         "⚠️  BanditPolicyEvolutiva não disponível, usando BanditPolicy clássica"
     )
 
-from iaglobal.providers.ollama_provider import async_generate as ollama_async_generate
-from iaglobal.providers.contract import registry
 
 
 # Bootstrap: importa cada módulo provider para disparar registry.register()
@@ -67,14 +75,7 @@ _bootstrap_providers()
 # ── CognitiveRouter: Tribunal Cognitivo de 3 Camadas ──────────────────────
 # Mapeia tipo de tarefa → rota metabólica, extraindo capacidade do
 # ProviderConfig.  Desacoplado do gerenciamento de buckets (Passo 3).
-from iaglobal.providers.provider_config import (
-    ProviderConfig,
-    CognitiveRole,
-    get_model_config,
-    get_role_by_model_id,
-)
 
-from iaglobal.metabolism.bucket_manager import BucketManager
 
 
 QWEN_MODEL_ID = get_model_config(CognitiveRole.OPERARIO)["model_id"]
@@ -490,7 +491,6 @@ BANDIT_NODE = "model_router"
 # Sinaliza se a resposta servida veio de cache (hit) dentro da task corrente.
 # Usado para NÃO inflacionar a Produtividade (P) e a Eficiência (E) do IVM:
 # servir do cache não é geração real do agente (evita métrica falsa de "bom").
-from contextvars import ContextVar
 
 _SERVED_FROM_CACHE: ContextVar[bool] = ContextVar("served_from_cache", default=False)
 

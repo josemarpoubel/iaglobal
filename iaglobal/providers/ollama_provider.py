@@ -13,6 +13,8 @@ from iaglobal.providers.provider_config import (
 )
 from iaglobal.providers.token_usage import TokenCollector
 
+from iaglobal.providers.contract import registry as _registry
+
 logger = logging.getLogger("iaglobal.providers.ollama")
 
 _loaded_models: set[str] = set()
@@ -58,7 +60,7 @@ async def warmup(model: str | None = None) -> bool:
 
 async def warmup_cognitive_cortex() -> dict[str, bool]:
     """Desperta os modelos locais do Tribunal Cognitivo em paralelo."""
-    from iaglobal.providers.provider_config import get_all_active_models, CognitiveRole
+    from iaglobal.providers.provider_config import get_all_active_models
 
     models_to_wake = get_all_active_models()
     print(f"🧠 Iniciando warmup do córtex cognitivo: {models_to_wake}")
@@ -216,7 +218,6 @@ async def async_generate(
 
 
 # Auto-registro no ProviderRegistry
-from iaglobal.providers.contract import registry as _registry
 
 _registry.register_funcs(
     "ollama",

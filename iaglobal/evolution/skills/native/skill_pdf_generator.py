@@ -7,6 +7,8 @@ Gera app web completo: HTML + CSS (dark theme) + JS (jsPDF infinite canvas + mar
 from typing import Dict, Any
 
 # Template HTML completo com jsPDF via CDN
+from iaglobal.evolution.skills.native.skill_registry import skill_registry
+
 JSPDF_HTML_TEMPLATE = """<!DOCTYPE html>
 <html lang="pt-BR">
 <head>
@@ -440,7 +442,7 @@ async def run_pdf_generator(ctx: Dict[str, Any]) -> Dict[str, Any]:
 # Registra skill no registry global (chamado no import)
 def register_skill():
     from iaglobal.evolution.skills.native.skill_registry import skill_registry
-    from iaglobal.evolution.skills.native.skill import Skill, ExecutionPolicy
+    from iaglobal.evolution.skills.native.skill import Skill
 
     PDF_SKILL = Skill(
         name="pdf_generator",
@@ -477,6 +479,5 @@ register_skill()
 
 
 # Export for lazy loader
-from iaglobal.evolution.skills.native.skill_registry import skill_registry
 
 skill_pdf_generator = skill_registry.get("pdf_generator")

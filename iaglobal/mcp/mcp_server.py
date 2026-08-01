@@ -7,6 +7,13 @@ FastMCP server — expõe tools metabólicas do iaglobal como servidor MCP.
 import logging
 from typing import Any
 
+from iaglobal.mcp.mcp_agent import MCPAgent
+from iaglobal.mcp.search_web import WebSearchTool
+from iaglobal.mcp.file_system import FileSystemTool
+from iaglobal.mcp.code_executor import CodeExecutorTool
+from iaglobal.mcp.placeholder import MCPPlaceholder
+from iaglobal.utils.logger import get_logger
+
 logger = logging.getLogger("iaglobal.mcp")
 
 try:
@@ -15,12 +22,6 @@ except ImportError:
     FastMCP = None
     logger.warning("FastMCP não disponível — instale 'mcp' para ativar o servidor MCP")
 
-from iaglobal.mcp.mcp_agent import MCPAgent
-from iaglobal.mcp.search_web import WebSearchTool
-from iaglobal.mcp.file_system import FileSystemTool
-from iaglobal.mcp.code_executor import CodeExecutorTool
-from iaglobal.mcp.placeholder import MCPPlaceholder
-from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.mcp.server")
 

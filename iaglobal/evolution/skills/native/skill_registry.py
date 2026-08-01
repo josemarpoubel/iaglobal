@@ -12,6 +12,8 @@ from iaglobal.utils.logger import logger
 from .skill import Skill
 
 
+from .skill import register_builtin_skills
+
 @dataclass
 class SkillEntry:
     skill: Skill
@@ -215,6 +217,5 @@ class SkillRegistry:
 skill_registry = SkillRegistry()
 
 # Registro eager das skills built-in (seguro: skill.py não importa skill_registry em módulo)
-from .skill import register_builtin_skills
 
 register_builtin_skills()

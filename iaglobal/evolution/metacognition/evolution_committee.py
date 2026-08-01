@@ -1,20 +1,21 @@
 import time
 
 # iaglobal/evolution/metacognition/evolution_committee.py
+import logging
+from typing import Any, Dict, List
+from iaglobal.evolution.skills.native.skill_registry import skill_registry
+from iaglobal.obsidian.omnimind import omni_mind
+from iaglobal.memory.async_memory import add_ltm, add_stm, add_memory_vector
+
 """Evolution Committee — avalia skills e toma decisões evolutivas.
 Integração tripla: Obsidian(Vault) + Memory(STM/LTM) + SkillRegistry.
 """
-import logging
-from typing import Any, Dict, List
 
-from iaglobal.evolution.skills.native.skill_registry import skill_registry
-from iaglobal.obsidian.omnimind import omni_mind
 
 try:
     from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
 except ImportError:
     GENESIS_HASH_OFFICIAL = None
-from iaglobal.memory.async_memory import add_ltm, add_stm, add_memory_vector
 
 logger = logging.getLogger(__name__)
 

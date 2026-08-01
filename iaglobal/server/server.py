@@ -27,27 +27,28 @@ Tools MCP disponíveis:
 
 import warnings
 
-warnings.warn(
-    "iaglobal/server/server.py está DEPRECADO. Use iaglobal/mcp/server.py",
-    DeprecationWarning,
-    stacklevel=2,
-)
-
 import asyncio
 import time
 from contextlib import asynccontextmanager
 from fastapi import FastAPI, BackgroundTasks, HTTPException
 from pydantic import BaseModel
 from typing import Dict, Any
-
 from iaglobal.evolution.evolutionruntime import (
     EvolutionRuntime,
     DeepEvolutionStrategy,
     FastEvolutionStrategy,
 )
-from iaglobal.evolution.execution_context import make_context, EvolutionExecutionContext
+from iaglobal.evolution.execution_context import make_context
 from iaglobal.evolution.execution_registry import registry
 from iaglobal.evolution.evolution_replay import EvolutionReplay
+
+warnings.warn(
+    "iaglobal/server/server.py está DEPRECADO. Use iaglobal/mcp/server.py",
+    DeprecationWarning,
+    stacklevel=2,
+)
+
+
 
 
 # ------------------------------------------------------------------------------

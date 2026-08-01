@@ -16,12 +16,13 @@ from iaglobal.graphs.pipeline_definition import PIPELINE_SKILLS
 
 from iaglobal.utils.logger import get_logger
 
+from iaglobal.evolution.skills.native.skill import register_builtin_skills
+
 logger = get_logger("iaglobal.graphs.nodes.no_integrator")
 
 _default_registry = _global_registry
 _FALLBACK_RUN_FN_CACHE: Dict[str, Callable] = {}
 
-from iaglobal.evolution.skills.native.skill import register_builtin_skills
 
 register_builtin_skills()
 

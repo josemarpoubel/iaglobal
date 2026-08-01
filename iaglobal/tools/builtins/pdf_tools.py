@@ -4,6 +4,8 @@ from typing import Optional
 
 from iaglobal.utils.logger import get_logger
 
+from iaglobal.tools.tool_library import tool_library
+
 logger = get_logger("iaglobal.tools.pdf")
 
 
@@ -178,7 +180,6 @@ def generate_light_pdf(
     return output_path
 
 
-from iaglobal.tools.tool_library import tool_library
 
 tool_library.register(
     name="generate_dark_pdf",

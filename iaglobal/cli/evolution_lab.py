@@ -41,10 +41,11 @@ import logging
 
 from iaglobal.utils.logger import logger
 
+from iaglobal.utils.logger import logger
+
 logger = logging.getLogger("ia-global")
 
 # ── Helpers ──────────────────────────────────────────────────────────────
-from iaglobal.utils.logger import logger
 
 CORE = [
     ("prompt_intake", "prompt_intake", "general"),

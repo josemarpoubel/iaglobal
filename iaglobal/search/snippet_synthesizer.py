@@ -28,10 +28,11 @@ from typing import Any, Dict, List, Optional
 
 from iaglobal.utils.logger import get_logger
 
+from iaglobal._paths import SYNTHESIS_JSON_DIR
+
 logger = get_logger("iaglobal.search.snippet_synthesizer")
 
 # Diretorio de snapshots (produzido para o sweeper)
-from iaglobal._paths import SYNTHESIS_JSON_DIR
 
 SYNTHESIS_JSON_DIR.mkdir(parents=True, exist_ok=True)
 
