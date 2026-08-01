@@ -8,7 +8,6 @@ import logging
 
 from iaglobal.models.task import Task
 
-from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
 

@@ -28,7 +28,6 @@ import iaglobal.graphs.topology as topology
 
 import logging
 
-from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
 

@@ -39,9 +39,7 @@ from iaglobal.memory.memory_storage import init_storage
 
 import logging
 
-from iaglobal.utils.logger import logger
 
-from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
 
@@ -532,7 +530,7 @@ def _print_patch(patch):
             if before.get("strategy") != after.get("strategy"):
                 print(f"        strategy: {before['strategy']} → {after['strategy']}")
     if patch.strategy_shifts:
-        print(f"    Strategy shifts:")
+        print("    Strategy shifts:")
         for name, (old_s, new_s) in patch.strategy_shifts.items():
             print(f"      {name}: {old_s} → {new_s}")
     print(

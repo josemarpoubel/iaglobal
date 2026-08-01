@@ -20,7 +20,6 @@ from iaglobal.evolution.skills.native.skill_registry import (
 
 import logging
 
-from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
 

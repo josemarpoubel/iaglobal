@@ -4,7 +4,6 @@ import asyncio
 import logging
 from typing import Callable, Dict, List, Any, Coroutine, Union
 
-from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
 
@@ -31,7 +30,7 @@ class DecisionEventDispatcher:
             return
 
         # Log de recepção de evento no roteador
-        logger.debug(f"📥 [DISPATCHER] Evento roteado para processamento assíncrono")
+        logger.debug("📥 [DISPATCHER] Evento roteado para processamento assíncrono")
         coro = self._process_event(event)
         loop.create_task(coro)
 

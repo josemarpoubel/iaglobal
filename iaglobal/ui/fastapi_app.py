@@ -392,32 +392,13 @@ async def ws_progress(websocket: WebSocket, execution_id: str):
             {"type": "status", "status": "connected", "execution_id": execution_id}
         )
         while True:
-            data = await websocket.receive_text()
+            await websocket.receive_text()
     except WebSocketDisconnect:
         ws_manager.disconnect(execution_id, websocket)
     except Exception:
         ws_manager.disconnect(execution_id, websocket)
 
 
-@app.get("/api/agentes")
-async def api_get_task(execution_id: str):
-    """Detalhes de uma execução pelo ID."""
-    try:
-        executions = get_execution_history(limit=200)
-        match = next(
-            (item for item in executions if item.get("id") == execution_id), None
-        )
-        if not match:
-            return JSONResponse(
-                status_code=404, content={"success": False, "error": "Not found"}
-            )
-        return JSONResponse(content={"success": True, **match})
-    except Exception:
-        logger.exception("Failed to fetch task")
-        return JSONResponse(
-            status_code=500,
-            content={"success": False, "error": "Internal server error"},
-        )
 
 
 # =====================================================================
@@ -442,7 +423,7 @@ def run_server(host: str = "0.0.0.0", port: int = 8765):
     logger.info(f"🔌 WebSocket: ws://{host}:{port}/ws")
     logger.info(f"🏥 Health: http://{host}:{port}/health")
     logger.info(f"📁 Results: http://{host}:{port}/result")
-    logger.info(f"💡 Dica: Para acessar via ASGI Gateway, use http://localhost:8000/@/")
+    logger.info("💡 Dica: Para acessar via ASGI Gateway, use http://localhost:8000/@/")
 
     uvicorn.run(app, host=host, port=port)
 

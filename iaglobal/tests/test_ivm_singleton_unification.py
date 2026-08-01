@@ -56,7 +56,7 @@ def test_escritor_e_leitor_compartilham_pool(tests_temp_dir: Path):
     init_ivm_axiom_com_persistencia(db_path=db)
 
 
-def test_agente_via_get_ivm_axiom_popula_pool_observavel(tests_temp_dir: Path):
+def test_agente_via_get_ivm_axiom_escritor_observador_mesmo_objeto(tests_temp_dir: Path):
     """Fluxo real: agente usa get_ivm_axiom() (como agent_base) e observador vê."""
     db = tests_temp_dir / "ivm_test.db"
     init_ivm_axiom_com_persistencia(db_path=db)

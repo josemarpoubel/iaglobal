@@ -9,7 +9,6 @@ from urllib.parse import urlparse
 import aiohttp
 
 from iaglobal._paths import DATA_DIR
-from iaglobal.utils.logger import logger
 from iaglobal.utils.playwright_util import ensure_playwright_browsers
 
 logger = logging.getLogger(__name__)

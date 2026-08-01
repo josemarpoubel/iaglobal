@@ -21,7 +21,6 @@ import asyncio
 
 from typing import Optional, Dict, Any, List
 
-from iaglobal.utils.logger import logger
 
 logger = logging.getLogger("ia-global")
 

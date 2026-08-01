@@ -8,7 +8,6 @@ from typing import Dict, Any
 from iaglobal.evolution.skills.native.skill_executor import SkillExecutor
 from iaglobal.evolution.skills.native.skill_registry import skill_registry
 from iaglobal.evolution.skills.native.skill import Skill, ExecutionPolicy
-from iaglobal.utils.logger import logger
 from iaglobal.immunity.pathogen_analyzer import pathogen_analyzer
 from iaglobal.obsidian.law_compliance_logger import law_compliance_logger
 
