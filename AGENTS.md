@@ -22,7 +22,7 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 - **Node structure.** Each pipeline node lives in its own file `iaglobal/graphs/nodes/no_<name>.py` and exports `async def run_<name>(...)`. `nodes.py` is a dynamic proxy — keep it lightweight.
 - **Telemetry contract.** Every node result that performs heavy work must include the key `"execution_metrics"` (not `__execution_metrics__`). Shape: `{"success": bool, "latency": float, "cost": float, "model": str}`.
 - **Lineage marker.** Every `.py` file must start with `# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136`.
-- **Test artifacts.** All test-generated files go to `iaglobal/tests/temp/`. Use the `tests_temp_dir` fixture. Do not write to project root.
+- **Test artifacts.** All test-generated files go to `iaglobal/memory/data/temp/tests/` (via :data:`iaglobal._paths.TESTS_DATA_DIR`, exposed through the `tests_temp_dir` fixture). Do not write to project root or to other parts of `memory/data/` — only the canonical tests landing zone.
 
 ## Architecture Boundaries
 
@@ -256,7 +256,7 @@ Adicionar uma nova tool ao **unified** (não ao deprecated): seguir o padrão la
 
 ### 📁 Output Directory
 
-**EVERY** file generated during test execution (logs, databases, reports, temporary artifacts) must be written to `tests/temp/`.
+**EVERY** file generated during test execution (logs, databases, reports, temporary artifacts) must be written to `iaglobal/memory/data/temp/tests/` via :data:`iaglobal._paths.TESTS_DATA_DIR` (helper :func:`iaglobal._paths.tests_data_subdir`).
 
 ```python
 from pathlib import Path
@@ -265,11 +265,13 @@ def test_exemplo(tests_temp_dir: Path):
     db_path = tests_temp_dir / "meu_teste.db"
 ```
 
-The `conftest.py` file provides the `tests_temp_dir` fixture, which points to `tests/temp/`. The fixture automatically cleans up files between runs (except for `__pycache__`).
+The `conftest.py` file provides the `tests_temp_dir` fixture, which delegates to `iaglobal._paths.TESTS_DATA_DIR = DATA_ROOT / "temp" / "tests"`. Tests persist artifacts here — this directory is the canonical landing zone for test output, version-controlled and shared across runs.
 
 ### ❌ Prohibited
 
 - Writing files to the project root directory (`./`)
+- Writing to `iaglobal/memory/data/{result, json, cbor2, db, cache, logs, ...}` directly — these are owned by the lib (see 💾 Persistence Authority). Tests must not bypass them.
+- Writing to `iaglobal/tests/temp/` (deprecated — replaced by `memory/data/temp/tests/`).
 - Using `tempfile.mkdtemp()` — prefer `tests_temp_dir`
 - Hardcoding absolute paths (`/home/...`)
 - Using `Path(__file__).parent.parent / "file"` for writing (read-only)
@@ -277,12 +279,12 @@ The `conftest.py` file provides the `tests_temp_dir` fixture, which points to `t
 ### ✅ Allowed
 
 - pytest's native `tmp_path` for ephemeral data (provided it doesn't clutter the project)
-- `tests_temp_dir` for artifacts that need to be inspected after the test
+- `tests_temp_dir` (== `TESTS_DATA_DIR`) for test artifacts
 - `Path(__file__).parent.parent / "iaglobal"` for **reading** source code
 
 ### 🧹 Cleanup
 
-The `_clean_tests_temp` fixture automatically removes files from `tests/temp/` at the end of each test session. To persist an artifact, manually move it out of `tests/temp/`.
+`TESTS_DATA_DIR` is **persistent** — not auto-cleaned between runs. The cleanup happens at the end of the test session via `iaglobal/tests/test_z_clear.py` (the last test in alphabetical order, which only runs if all previous tests passed). Tests should write to scoped subdirectories (`tests_temp_dir / "<test_name>"`) so that re-runs don't read stale state from previous runs. Use `tests_data_subdir("<name>")` for canonical subdirs that should always exist.
 
 ### ⚙️ Configuration
 
