@@ -254,12 +254,14 @@ class TestGARunner:
         assert len(results) == 3
         assert results[-1]["generation"] == runner.population.generation
 
-    def test_load_best_genome_no_file(self):
-        from iaglobal.evolution.ga.ga_runner import GARunner, GENOME_PATH
+    def test_load_best_genome_no_file(self, tests_temp_dir, monkeypatch):
+        import iaglobal.evolution.ga.ga_runner as gr
 
-        if GENOME_PATH.exists():
-            GENOME_PATH.unlink()
-        genome = GARunner.load_best_genome()
+        redirected = tests_temp_dir / "ga_genome.json"
+        monkeypatch.setattr(gr, "GENOME_PATH", redirected)
+        if gr.GENOME_PATH.exists():
+            gr.GENOME_PATH.unlink()
+        genome = gr.GARunner.load_best_genome()
         assert genome["weights"] == [0.25, 0.25, 0.25, 0.25]
         assert genome["fitness"] == 0.0
 
@@ -275,30 +277,34 @@ class TestGARunner:
         runner.task_hook()
         assert runner.population.generation > gen_before
 
-    def test_persist_genome(self):
-        from iaglobal.evolution.ga.ga_runner import GARunner, GENOME_PATH
+    def test_persist_genome(self, tests_temp_dir, monkeypatch):
+        import iaglobal.evolution.ga.ga_runner as gr
 
-        if GENOME_PATH.exists():
-            GENOME_PATH.unlink()
-        runner = GARunner()
+        redirected = tests_temp_dir / "ga_genome.json"
+        monkeypatch.setattr(gr, "GENOME_PATH", redirected)
+        if gr.GENOME_PATH.exists():
+            gr.GENOME_PATH.unlink()
+        runner = gr.GARunner()
         runner.ensure_initialized()
         runner.step()
-        assert GENOME_PATH.exists()
-        data = json.loads(GENOME_PATH.read_text(encoding="utf-8"))
+        assert gr.GENOME_PATH.exists()
+        data = json.loads(gr.GENOME_PATH.read_text(encoding="utf-8"))
         assert "weights" in data
         assert "fitness" in data
         assert "generation" in data
 
-    def test_persist_telemetry(self):
-        from iaglobal.evolution.ga.ga_runner import GARunner, TELEMETRY_PATH
+    def test_persist_telemetry(self, tests_temp_dir, monkeypatch):
+        import iaglobal.evolution.ga.ga_runner as gr
 
-        if TELEMETRY_PATH.exists():
-            TELEMETRY_PATH.unlink()
-        runner = GARunner()
+        redirected = tests_temp_dir / "ga_telemetry.json"
+        monkeypatch.setattr(gr, "TELEMETRY_PATH", redirected)
+        if gr.TELEMETRY_PATH.exists():
+            gr.TELEMETRY_PATH.unlink()
+        runner = gr.GARunner()
         runner.ensure_initialized()
         runner.step()
-        assert TELEMETRY_PATH.exists()
-        data = json.loads(TELEMETRY_PATH.read_text(encoding="utf-8"))
+        assert gr.TELEMETRY_PATH.exists()
+        data = json.loads(gr.TELEMETRY_PATH.read_text(encoding="utf-8"))
         assert "generations" in data
         assert "best_fitness_history" in data
         assert len(data["generations"]) >= 1
@@ -312,17 +318,19 @@ class TestGARunner:
         assert get_flag("ga_weight_p") == 0.4
         assert get_flag("ga_weight_e") == 0.3
 
-    def test_clone_genome_restores_population(self):
-        from iaglobal.evolution.ga.ga_runner import GARunner, GENOME_PATH
+    def test_clone_genome_restores_population(self, tests_temp_dir, monkeypatch):
+        import iaglobal.evolution.ga.ga_runner as gr
 
-        if GENOME_PATH.exists():
-            GENOME_PATH.unlink()
-        runner = GARunner()
+        redirected = tests_temp_dir / "ga_genome.json"
+        monkeypatch.setattr(gr, "GENOME_PATH", redirected)
+        if gr.GENOME_PATH.exists():
+            gr.GENOME_PATH.unlink()
+        runner = gr.GARunner()
         runner.ensure_initialized()
         runner.step()
-        data1 = json.loads(GENOME_PATH.read_text(encoding="utf-8"))
+        data1 = json.loads(gr.GENOME_PATH.read_text(encoding="utf-8"))
 
-        runner2 = GARunner()
+        runner2 = gr.GARunner()
         runner2.ensure_initialized()
         assert runner2.population.generation == data1["generation"]
 

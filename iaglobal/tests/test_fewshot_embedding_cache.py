@@ -6,30 +6,19 @@ import pytest
 import time
 from pathlib import Path
 
-from iaglobal.core.few_shot_provider import (
-    FewShotProvider,
-    EMBEDDING_CACHE_PATH,
-    LRU_CACHE_SIZE,
-)
+import iaglobal.core.few_shot_provider as fsp
 
 
 @pytest.fixture
-def provider_with_cache():
-    """Cria provider com cache vazio."""
-    provider = FewShotProvider(preload=False)
+def provider_with_cache(tests_temp_dir, monkeypatch):
+    """Cria provider com cache isolado em tests_temp_dir."""
+    redirected = tests_temp_dir / "fewshot_embeddings.cbor"
+    monkeypatch.setattr(fsp, "EMBEDDING_CACHE_PATH", redirected)
+    if fsp.EMBEDDING_CACHE_PATH.exists():
+        fsp.EMBEDDING_CACHE_PATH.unlink()
+    provider = fsp.FewShotProvider(preload=False)
     provider._embedding_cache.clear()
     yield provider
-
-
-@pytest.fixture(autouse=True)
-def cleanup_cache_file():
-    """Limpa cache file após cada teste."""
-    yield
-    if EMBEDDING_CACHE_PATH.exists():
-        try:
-            EMBEDDING_CACHE_PATH.unlink()
-        except Exception:
-            pass
 
 
 def test_hash_text_consistency(provider_with_cache):
@@ -52,16 +41,16 @@ def test_hash_text_different_inputs(provider_with_cache):
 
 def test_embedding_cache_lru_eviction(provider_with_cache):
     """Cache LRU evicta entradas antigas quando atinge limite."""
-    for i in range(LRU_CACHE_SIZE + 10):
+    for i in range(fsp.LRU_CACHE_SIZE + 10):
         key = "key_{}".format(i)
-        if len(provider_with_cache._embedding_cache) >= LRU_CACHE_SIZE:
+        if len(provider_with_cache._embedding_cache) >= fsp.LRU_CACHE_SIZE:
             provider_with_cache._embedding_cache.popitem(last=False)
         provider_with_cache._embedding_cache[key] = "value_{}".format(i)
 
-    assert len(provider_with_cache._embedding_cache) <= LRU_CACHE_SIZE
+    assert len(provider_with_cache._embedding_cache) <= fsp.LRU_CACHE_SIZE
     for i in range(10):
         assert "key_{}".format(i) not in provider_with_cache._embedding_cache
-    assert "key_{}".format(LRU_CACHE_SIZE + 9) in provider_with_cache._embedding_cache
+    assert "key_{}".format(fsp.LRU_CACHE_SIZE + 9) in provider_with_cache._embedding_cache
 
 
 def test_save_and_load_embedding_cache(provider_with_cache):
@@ -71,9 +60,9 @@ def test_save_and_load_embedding_cache(provider_with_cache):
 
     provider_with_cache._save_embedding_cache()
 
-    assert EMBEDDING_CACHE_PATH.exists()
+    assert fsp.EMBEDDING_CACHE_PATH.exists()
 
-    provider2 = FewShotProvider(preload=False)
+    provider2 = fsp.FewShotProvider(preload=False)
     provider2._embedding_cache.clear()
     provider2._load_embedding_cache()
 
@@ -100,7 +89,7 @@ def test_preload_embeddings(provider_with_cache):
     elapsed = time.time() - start
 
     assert len(provider_with_cache._embedding_cache) > 0
-    assert EMBEDDING_CACHE_PATH.exists()
+    assert fsp.EMBEDDING_CACHE_PATH.exists()
 
     assert elapsed < 20.0
 
@@ -160,7 +149,7 @@ def dlq_quarantine(tmp_path):
 @pytest.fixture
 def provider_dlq():
     """Provider isolado sem cache pré-existente."""
-    p = FewShotProvider(preload=False)
+    p = fsp.FewShotProvider(preload=False)
     p._example_cache.clear()
     p._negative_examples.clear()
     yield p
