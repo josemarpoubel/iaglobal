@@ -97,7 +97,7 @@ def store(text: str, mtype: str = "fact") -> None:
         from iaglobal.storage.converter import DataBridge
 
         DataBridge.sincronizar_sqlite_para_cbor(
-            os.path.basename(_paths.CORE_DB),
+            os.path.basename(_paths.EMBEDDINGS_DB),
             "memory",
             os.path.basename(_paths.EMBEDDINGS_DB),
         )
