@@ -1,11 +1,13 @@
 # iaglobal/pipeline/engine.py
 
 import asyncio
+import gc
 import logging
 import re
 import time
 import uuid
 
+from functools import wraps
 from pathlib import Path
 from typing import Optional, Dict, Any
 
@@ -25,6 +27,78 @@ from iaglobal.core.node_result import NodeResult
 logger = get_logger("iaglobal")
 
 
+_INSTRUMENT_COUNTERS: Dict[str, int] = {}
+_INSTRUMENT_EVERY_N = 10  # amostragem: loga a cada N invocacoes
+
+
+def _count_live_instances() -> Dict[str, int]:
+    """Conta instancias vivas de classes de memoria. Barato (gc.get_objects)
+    mas nao gratis - chamado via amostragem no decorator abaixo."""
+    counts: Dict[str, int] = {}
+    for obj in gc.get_objects():
+        cls_name = type(obj).__name__
+        if cls_name in ("ShortTermMemory", "LongTermMemory", "SemanticCache"):
+            counts[cls_name] = counts.get(cls_name, 0) + 1
+    return counts
+
+
+def instrument_memory(stage_name: str):
+    """Decorator que loga contagem de instancias de memoria + RSS a cada N calls.
+
+    Nao bloqueia nem altera o fluxo. Falha de instrumentacao e engolida
+    para nao poluir o pipeline real.
+    """
+
+    def decorator(fn):
+        @wraps(fn)
+        async def wrapper(self, *args, **kwargs):
+            _INSTRUMENT_COUNTERS[stage_name] = (
+                _INSTRUMENT_COUNTERS.get(stage_name, 0) + 1
+            )
+            n = _INSTRUMENT_COUNTERS[stage_name]
+            if n % _INSTRUMENT_EVERY_N != 0:
+                return await fn(self, *args, **kwargs)
+            start = time.time()
+            try:
+                result = await fn(self, *args, **kwargs)
+                success = True
+                return result
+            except Exception as exc:
+                success = False
+                raise exc
+            finally:
+                try:
+                    counts = _count_live_instances()
+                    import os
+
+                    rss_kb = 0
+                    try:
+                        with open(f"/proc/{os.getpid()}/status") as f:
+                            for line in f:
+                                if line.startswith("VmRSS:"):
+                                    rss_kb = int(line.split()[1])
+                                    break
+                    except Exception:
+                        pass
+                    elapsed_ms = (time.time() - start) * 1000
+                    logger.info(
+                        "[INSTRUMENT] %s call#%d | %sms | RSS=%dMB | live=%s",
+                        stage_name,
+                        n,
+                        f"{elapsed_ms:.1f}",
+                        rss_kb // 1024,
+                        counts,
+                    )
+                except Exception as instr_err:
+                    logger.debug("[INSTRUMENT] Falha na instrumentacao: %s", instr_err)
+            # unreachable but mypy linter may complain
+            return None
+
+        return wrapper
+
+    return decorator
+
+
 class PipelineEngine:
     def __init__(self, orchestrator):
         self.orchestrator = orchestrator
@@ -39,6 +113,7 @@ class PipelineEngine:
     ) -> PipelineResult:
         return await self.async_execute(prompt, metadata, force)
 
+    @instrument_memory("async_execute")
     async def async_execute(
         self,
         prompt: str,
@@ -909,6 +984,7 @@ class PipelineEngine:
             return ".txt"
         return ".py"
 
+    @instrument_memory("persistence_stage")
     async def _async_persistence_stage(self, state: PipelineState) -> None:
         state.current_stage = PipelineStage.PERSISTENCE.name
         logger.info("📝 archivando aprendizado (async) ...")
@@ -1057,6 +1133,7 @@ class PipelineEngine:
                 "[METABOLISM] Stage skip: %s", e
             )
 
+    @instrument_memory("learn_stage")
     async def _async_learn_stage(self, state: PipelineState) -> None:
         if not state.generated_code or len(state.generated_code) < 20:
             return
