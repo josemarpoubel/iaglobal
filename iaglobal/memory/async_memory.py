@@ -1,12 +1,23 @@
 # iaglobal/memory/async_memory.py
-"""Async wrapper for memory operations - não bloqueia o event loop."""
+"""Async wrapper for memory operations - não bloqueia o event loop.
+
+Banco canonico de STM/LTM: MEMORIES_DB (DB_DIR/memories.db).
+Outros bancos (CORE_DB, MEMORY_SWAP_DIR/stm.db) NAO devem receber tabelas
+stm_entries/ltm_entries -- convergencia aplicada neste modulo para que
+produtores (async_memory, CognitiveProxy, pipeline.engine) e consumidores
+(obsidian.consolidation._processar_staging_db) compartilhem o mesmo banco.
+
+MEMORY_SWAP_DIR permanece usado internamente por ShortTermMemory como
+mecanismo de spill-on-disk (cbor2) quando a RAM ultrapassa o threshold --
+esse uso eh legitimo e nao conflita com a escolha de banco canonico.
+"""
 
 import asyncio
 from typing import Dict, Any, List, Optional
 from iaglobal.memory.term_long import LongTermMemory
 from iaglobal.memory.term_short import ShortTermMemory
 from iaglobal.memory.memory_vector import MemoryVector
-from iaglobal._paths import CORE_DB, MEMORY_SWAP_DIR
+from iaglobal._paths import MEMORIES_DB
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,14 +31,14 @@ _memory_vector: Optional[MemoryVector] = None
 def _get_ltm() -> LongTermMemory:
     global _ltm
     if _ltm is None:
-        _ltm = LongTermMemory(db_path=CORE_DB)
+        _ltm = LongTermMemory(db_path=MEMORIES_DB)
     return _ltm
 
 
 def _get_stm() -> ShortTermMemory:
     global _stm
     if _stm is None:
-        _stm = ShortTermMemory(db_path=MEMORY_SWAP_DIR / "stm.db")
+        _stm = ShortTermMemory(db_path=MEMORIES_DB)
     return _stm
 
 
