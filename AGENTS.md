@@ -444,6 +444,53 @@ All AI model calls must go through `BanditPolicy` for:
 
 ---
 
+## 🧬 Memory Consolidation — Pull, Not Push
+
+`CognitiveProxy` (executor síncrono) escreve em `MEMORIES_DB` (SQLite, tabelas `stm_entries`/`ltm_entries`) sem saber que o Obsidian existe. `REMSleepEngine` (consolidação assíncrona periódica) **puxa** essas entradas como segunda fonte e reaproveita o pipeline de síntese existente — sem dual-write, sem wrapper de substituição.
+
+### Por que pull e não push (3 alternativas descartadas)
+
+| Alternativa | Por que não |
+|-------------|-------------|
+| **Dual-write** (`stm.add()` + `SubconsciousAPI.escrever_curto_prazo()` no mesmo call site) | Toda vez que duas implementações fazem a mesma coisa em paralelo, elas divergem na primeira falha parcial. Dessincronia invisível até a próxima auditoria forense. |
+| **Substituir STM/LTM por wrapper sobre o vault** | STM deve ser rápido e efêmero (hipocampo: write de alta frequência, baixa latência). SQLite serve. Markdown + REMSleep foi desenhado para síntese periódica em lote — não para receber write por interação. |
+| **Documentar a separação e deixar como está** | Sem ponte, o proxy nunca alimenta `ancestry_tree`, `epigenetic_registry` nem o registro de vacinas. Aprendizado vazando pelo ralo permanentemente. |
+
+### Arquitetura
+
+```
+[CognitiveProxy.run()]  ── escreve normal, sem mudança ──►  MEMORIES_DB (SQLite)
+
+
+[REMSleepEngine.iniciar_fase_rem()]  (ciclo periódico, já existente)
+       ├─► lê DLQ (00_Quarentena/)             ← já fazia
+       ├─► lê MEMORIES_DB (stm/ltm do proxy)   ← NOVO: segunda fonte via _processar_staging_db()
+       ├─► sintetiza (NÃO copia 1:1)
+       ├─► escreve em 03_Long_Term/ via SubconsciousAPI
+       └─► atualiza mapa_conexoes (04_Synapses/)
+```
+
+### Comportamento do watermark (`consolidated_at`)
+
+- Marca **"revisado"**, não "promovido" — toda entrada processada recebe o timestamp, tenha gerado insight ou não. Falha não é motivo para re-tentar: `_solicitar_sintese_ia` e `_gravar_longo_prazo` já passam pela `BanditPolicy` com circuit breaker, então falha transitória tende a ser absorvida antes de chegar aqui. Exceção = marca mesmo assim (poison-pill safe — uma entrada corrompida não pode ficar eternamente no topo da fila FIFO).
+- Autofagia separada (`iaglobal learn prune-staging [--days N]`, default 60) apaga apenas entradas que **já foram revisadas** e continuam estagnadas além do horizonte — nunca toca em nada que ainda não teve chance de síntese.
+
+### Concorrência
+
+- `MEMORIES_DB` opera em `journal_mode=WAL` (propriedade do arquivo, herdado por qualquer conexão que abrir depois).
+- `_open_memories_conn()` (REM) seta a pragma defensivamente para garantir o modo mesmo num banco recém-criado sem o proxy ter rodado antes.
+- `_mark_consolidated_batch()` faz **1 commit por lote** (não 1 por linha) — reduz contention contra o write de alta frequência do proxy na mesma tabela.
+- `_autofagia_staging_estagnado()` **NÃO** roda dentro de `iniciar_fase_rem()`. Tem guard obrigatório `dias_limite > 0` (defesa em profundidade: CLI + função) — `dias_limite <= 0` viraria `DELETE WHERE created_at < agora`, apagando todo staging revisado instantaneamente.
+
+### Referências
+
+- `iaglobal/obsidian/consolidation.py` — `_processar_staging_db()`, `_autofagia_staging_estagnado()`, helpers (`_open_memories_conn`, `_fetch_unconsolidated`, `_mark_consolidated_batch`)
+- `iaglobal/memory/term_short.py`, `iaglobal/memory/term_long.py` — `_init_db` ganha `ALTER TABLE ... ADD COLUMN consolidated_at TEXT` idempotente via `PRAGMA table_info` (não via try/except — cheque antes de tentar)
+- `iaglobal/cli/learn.py` — subcomando `prune-staging [--days N]`
+- `iaglobal/_paths.py` — `MEMORIES_DB` (path canônico)
+
+---
+
 # IAGLOBAL — AGENT RULES & ARCHITECTURAL BOUNDARIES
 
 - SYSTEM: Highly Modular & Decentralized

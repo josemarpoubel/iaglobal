@@ -23,11 +23,13 @@ MÓDULO CENTRALIZADO: iaglobal/reflection/claim_detection.py
 import asyncio
 import json
 import logging
-from datetime import datetime, UTC
+import sqlite3
+import cbor2
+from datetime import datetime, UTC, timezone, timedelta
 from pathlib import Path
-from typing import Dict, Optional, Any
+from typing import Dict, List, Optional, Any, Tuple
 
-from iaglobal._paths import PACKAGE_DIR
+from iaglobal._paths import PACKAGE_DIR, MEMORIES_DB
 from iaglobal.utils.life_signal_collector import instrument
 from iaglobal.reflection.claim_detection import (
     detect_architectural_claims,
@@ -35,6 +37,13 @@ from iaglobal.reflection.claim_detection import (
     create_quarantine_report,
 )
 from iaglobal.core.few_shot_provider import few_shot_provider
+
+# Tabelas de staging (MEMORIES_DB) consumidas pela ponte REM. O short-name
+# é usado para gerar filenames no vault (long_term) -- mantemos um map
+# explícito porque rstrip por suffix é frágil (engole caracteres do
+# conjunto em vez do sufixo literal).
+_STAGING_TABLES = ("stm_entries", "ltm_entries")
+_STAGING_SHORT_NAME = {"stm_entries": "stm", "ltm_entries": "ltm"}
 
 logger = logging.getLogger(__name__)
 
@@ -208,6 +217,29 @@ class REMSleepEngine:
         except Exception as e:
             logger.exception("[REMSleep] Falha ao processar DLQ: %s", e)
             resultado["erros"].append(f"dlq_processing: {e}")
+        # =========================================================
+
+        # === NOVO: Segunda fonte de consolidacao (staging MEMORIES_DB) ===
+        # O CognitiveProxy escreve em MEMORIES_DB sem saber do Obsidian.
+        # Esta ponte puxa essas entradas e aplica o mesmo pipeline de
+        # sintese -> grava em 03_Long_Term. Watermark "consolidated_at"
+        # marca "revisado" (sucesso OU falha); autofagia separada
+        # apaga o que ficou estagnado alem do horizonte.
+        try:
+            staging_result = await self._processar_staging_db()
+            resultado["staging_processed"] = staging_result
+            if staging_result.get("watermarked", 0) > 0:
+                logger.info(
+                    "[REMSleep] Staging DB: %d stm + %d ltm processadas, "
+                    "%d sintetizadas, %d marcadas.",
+                    staging_result.get("stm_entries", 0),
+                    staging_result.get("ltm_entries", 0),
+                    staging_result.get("synthesized", 0),
+                    staging_result.get("watermarked", 0),
+                )
+        except Exception as e:
+            logger.exception("[REMSleep] Falha ao processar staging DB: %s", e)
+            resultado["staging_processed"] = {"error": str(e)}
         # =========================================================
 
         experiencias = await self._listar_memorias_curto_prazo()
@@ -433,3 +465,177 @@ Conexões extraídas das memórias consolidadas:
             moc_path.write_text(moc_content, encoding="utf-8")
 
         await asyncio.to_thread(_update_moc)
+
+    # =====================================================================
+    # PONTE: MEMORIES_DB (STAGING) → OBSIDIAN VAULT (LONG_TERM)
+    # =====================================================================
+    # O CognitiveProxy escreve em MEMORIES_DB sem saber do Obsidian.
+    # Esta ponte puxa essas entradas e reaproveita o pipeline de sintese
+    # (_solicitar_sintese_ia + _gravar_longo_prazo) sem duplicar logica.
+    # Watermark "consolidated_at" marca "revisado" -- sucesso OU falha
+    # (poison-pill: uma entrada corrompida nao pode ficar eternamente no
+    # topo da fila FIFO). Autofagia separada apaga o que ficou estagnado
+    # alem do horizonte.
+
+    def _open_memories_conn(self) -> sqlite3.Connection:
+        """Conexao a MEMORIES_DB com WAL defensivo.
+
+        WAL eh propriedade do arquivo (outras conexoes herdam), mas setar
+        a pragma aqui garante o modo mesmo num banco recem-criado sem o
+        proxy ter rodado antes.
+        """
+        conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)
+        conn.execute("PRAGMA journal_mode=WAL")
+        return conn
+
+    def _fetch_unconsolidated(
+        self, table: str, limit: int
+    ) -> List[Tuple[int, bytes, Optional[str]]]:
+        """FIFO por created_at -- nao penaliza entradas por REM ter ficado
+        offline; so limita quanto processa por ciclo."""
+        conn = self._open_memories_conn()
+        try:
+            cur = conn.execute(
+                f"SELECT id, data, created_at FROM {table} "
+                f"WHERE consolidated_at IS NULL ORDER BY created_at ASC LIMIT ?",
+                (limit,),
+            )
+            return cur.fetchall()
+        finally:
+            conn.close()
+
+    def _mark_consolidated_batch(self, table: str, row_ids: List[int]) -> None:
+        """1 commit por lote -- reduz contention contra o write de alta
+        frequencia do proxy."""
+        if not row_ids:
+            return
+        conn = self._open_memories_conn()
+        try:
+            now = datetime.now(timezone.utc).isoformat()
+            conn.executemany(
+                f"UPDATE {table} SET consolidated_at = ? WHERE id = ?",
+                [(now, rid) for rid in row_ids],
+            )
+            conn.commit()
+        finally:
+            conn.close()
+
+    async def _processar_staging_db(self, max_batch: int = 50) -> Dict[str, int]:
+        """Segunda fonte de consolidacao REM: le stm_entries/ltm_entries
+        de MEMORIES_DB e aplica o mesmo pipeline de sintese.
+
+        Watermark incondicional (poison-pill safe): sucesso OU falha,
+        toda entrada processada recebe consolidated_at -- nunca bloqueia
+        a fila FIFO por estar sempre no topo.
+        """
+        stats = {
+            "stm_entries": 0,
+            "ltm_entries": 0,
+            "synthesized": 0,
+            "watermarked": 0,
+            "failed": 0,
+        }
+
+        for table in _STAGING_TABLES:
+            rows = await asyncio.to_thread(
+                self._fetch_unconsolidated, table, max_batch
+            )
+            stats[table] = len(rows)
+
+            watermarked_ids: List[int] = []
+            for row_id, blob, _created_at in rows:
+                synthesized = False
+                try:
+                    entry = cbor2.loads(blob)
+                    conteudo = entry.get("content", "")
+                    if conteudo:
+                        insight = await self._solicitar_sintese_ia(conteudo)
+                        if insight:
+                            arquivo = (
+                                f"stg_{_STAGING_SHORT_NAME[table]}_{row_id}.md"
+                            )
+                            await self._gravar_longo_prazo(arquivo, insight)
+                            synthesized = True
+                except Exception as e:
+                    logger.warning(
+                        "Falha ao consolidar %s#%s (marcado como revisado "
+                        "mesmo assim): %s",
+                        table,
+                        row_id,
+                        e,
+                    )
+                    stats["failed"] += 1
+                finally:
+                    watermarked_ids.append(row_id)
+
+                if synthesized:
+                    stats["synthesized"] += 1
+
+            if watermarked_ids:
+                await asyncio.to_thread(
+                    self._mark_consolidated_batch, table, watermarked_ids
+                )
+                stats["watermarked"] += len(watermarked_ids)
+
+        # Visibilidade agregada: uma falha isolada eh ignoravel; varias
+        # falhas no mesmo ciclo indicam causa comum (banco corrompido,
+        # mudanca de schema, IA fora do ar) que precisa de atencao.
+        if stats["failed"] > 0:
+            total_processed = stats["stm_entries"] + stats["ltm_entries"]
+            logger.warning(
+                "[REMSleep] Staging: %d/%d entries falharam consolidacao "
+                "(poison-pill safe -- todas watermarked, nao bloqueiam fila).",
+                stats["failed"],
+                total_processed,
+            )
+
+        return stats
+
+    async def _autofagia_staging_estagnado(self, dias_limite: int = 60) -> Dict[str, int]:
+        """Ciclo SEPARADO (nao roda em iniciar_fase_rem). Apaga apenas
+        linhas que ja foram revisadas (consolidated_at preenchido) e
+        estao alem do horizonte -- nunca toca no que ainda nao teve
+        chance de sintese.
+
+        Entrada via ``iaglobal learn prune-staging [--days N]``.
+
+        Guard obrigatorio: ``dias_limite > 0``. Valor <= 0 viraria
+        ``DELETE ... WHERE created_at < agora`` -- apaga tudo revisado
+        independente de idade. Defesa em profundidade: o CLI tambem
+        guarda, mas este metodo pode ganhar outro chamador no futuro.
+        """
+        if dias_limite <= 0:
+            raise ValueError(
+                f"dias_limite deve ser positivo, recebido {dias_limite}"
+            )
+        cutoff = (
+            datetime.now(timezone.utc) - timedelta(days=dias_limite)
+        ).isoformat()
+        stats = {"stm_deleted": 0, "ltm_deleted": 0}
+
+        def _run() -> None:
+            conn = self._open_memories_conn()
+            try:
+                for table in _STAGING_TABLES:
+                    cur = conn.execute(
+                        f"DELETE FROM {table} "
+                        f"WHERE consolidated_at IS NOT NULL "
+                        f"AND created_at < ?",
+                        (cutoff,),
+                    )
+                    stats[
+                        "stm_deleted" if table == "stm_entries" else "ltm_deleted"
+                    ] = cur.rowcount
+                conn.commit()
+            finally:
+                conn.close()
+
+        await asyncio.to_thread(_run)
+        logger.info(
+            "[REMSleep] Autofagia staging: %d stm + %d ltm removidos "
+            "(horizonte=%d dias).",
+            stats["stm_deleted"],
+            stats["ltm_deleted"],
+            dias_limite,
+        )
+        return stats
