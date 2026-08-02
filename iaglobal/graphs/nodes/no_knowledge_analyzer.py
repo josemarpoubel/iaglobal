@@ -11,19 +11,17 @@ import asyncio
 from types import MappingProxyType
 from typing import Dict, Any, List, Tuple
 
-from iaglobal.memory.term_long import LongTermMemory
 from iaglobal.memory.memory_vector import (
     store as mem_vector_store,
     init_db as vector_init_db,
 )
+from iaglobal.memory.async_memory import store_ltm_full
 from iaglobal.graphs.nodes._disk_swap import load_all_for_task
-from iaglobal._paths import CORE_DB
 
 logger = logging.getLogger(__name__)
 
 # Inicializa o banco de vetores de forma estática protegida
 vector_init_db()
-_ltm = LongTermMemory(db_path=CORE_DB)
 
 # Padrões de lixo pré-compilados para checagem ultraveloz O(1) de Regex
 _GARBAGE_PATTERNS = frozenset(
@@ -137,7 +135,9 @@ def _sync_analyze_and_curate(task_str: str) -> Tuple[str, List[dict], int]:
 
             # Persiste passivamente na LTM e base vetorial locais o fragmento higienizado
             try:
-                _ltm.store(
+                from iaglobal.memory.async_memory import _get_ltm
+
+                _get_ltm().store(
                     content=f"Curated source [{source_name}] for task: {task_str}\n\n{useful_text}",
                     metadata={"source": "knowledge_analyzer", "relevance": relevance},
                     source="knowledge_analyzer",

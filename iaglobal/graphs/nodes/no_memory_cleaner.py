@@ -11,11 +11,10 @@ import logging
 import asyncio
 from typing import Dict, Any
 
-from iaglobal.memory.term_short import ShortTermMemory
+from iaglobal.memory.async_memory import clear_stm
 from iaglobal.graphs.nodes._disk_swap import cleanup_task
 
 logger = logging.getLogger(__name__)
-_stm = ShortTermMemory()
 
 
 async def run_memory_cleaner(ctx: Dict[str, Any]) -> Dict[str, Any]:
@@ -60,7 +59,7 @@ async def run_memory_cleaner(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
     # Isolamento 1: Limpeza da Short-Term Memory (STM) - I/O SQLite isolado em thread pool
     try:
-        await asyncio.to_thread(_stm.clear)
+        await clear_stm()
         logger.info("[CLEANER] STM limpa com sucesso.")
     except Exception as e:
         logger.warning("[CLEANER] Falha ao limpar STM: %s", e)
