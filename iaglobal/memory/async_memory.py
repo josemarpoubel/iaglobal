@@ -80,6 +80,73 @@ async def get_ltm_stats() -> Dict[str, Any]:
         return {}
 
 
+async def store_ltm_full(
+    content: str,
+    metadata: Optional[Dict[str, Any]] = None,
+    source: str = "internal",
+) -> None:
+    """Async wrapper para LongTermMemory.store(content, metadata, source).
+
+    Compat\u00edvel com a assinatura original de LTM.store() para callers que
+    precisam do par\u00e2metro `source` (ex: no_knowledge_analyzer).
+    """
+    try:
+        ltm = _get_ltm()
+        await asyncio.to_thread(ltm.store, content, metadata, source)
+        logger.info(
+            "[ASYNC_MEMORY] LTM store (full): %s | source=%s",
+            content[:50],
+            source,
+        )
+    except Exception as e:
+        logger.error("[ASYNC_MEMORY] Erro no LTM.store: %s", e)
+
+
+async def clear_stm() -> None:
+    """Async wrapper para ShortTermMemory.clear (limpeza total da STM)."""
+    try:
+        stm = _get_stm()
+        await asyncio.to_thread(stm.clear)
+        logger.info("[ASYNC_MEMORY] STM limpa.")
+    except Exception as e:
+        logger.error("[ASYNC_MEMORY] Erro ao limpar STM: %s", e)
+
+
+async def get_recent_stm(n: int = 10) -> List[Any]:
+    """Async wrapper para ShortTermMemory.get_recent(n)."""
+    try:
+        stm = _get_stm()
+        return await asyncio.to_thread(stm.get_recent, n)
+    except Exception as e:
+        logger.error("[ASYNC_MEMORY] Erro ao ler STM recentes: %s", e)
+        return []
+
+
+class AsyncMemory:
+    """Wrapper OO sobre os singletons de async_memory.
+
+    Delega \u00e0s fun\u00e7\u00f5es de m\u00f3dulo (add_ltm etc.) para preservar a invariante
+    de singleton global: cada inst\u00e2ncia desta classe aponta para os mesmos
+    objetos STM/LTM/MemoryVector compartilhados por todo o processo.
+
+    Existe para satisfazer callers que esperam uma API OO (ex:
+    no_validator_retry.py), sem reintroduzir o anti-padr\u00e3o de criar uma
+    inst\u00e2ncia nova de LTM/STM por request.
+    """
+
+    async def store(self, key: str, value: Dict[str, Any]) -> None:
+        await add_ltm(key, value)
+
+    async def retrieve(self, query: str, top_k: int = 5) -> List[Dict]:
+        return await retrieve_ltm(query, top_k)
+
+    async def add(self, item: str, metadata: Optional[Dict] = None) -> None:
+        await add_stm(item, metadata)
+
+    async def get_recent(self, n: int = 10) -> List[Any]:
+        return await get_recent_stm(n)
+
+
 async def add_memory_vector(text: str, mtype: str = "evolution") -> None:
     """Async wrapper para MemoryVector.add (STM implícito via embeddings)."""
     try:
