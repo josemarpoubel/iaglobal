@@ -1138,15 +1138,16 @@ class PipelineEngine:
         if not state.generated_code or len(state.generated_code) < 20:
             return
         try:
-            from iaglobal._paths import MEMORIES_DB
-            from iaglobal.memory.term_short import ShortTermMemory
-            from iaglobal.memory.term_long import LongTermMemory
-            from iaglobal.memory.semantic_cache import SemanticCache
+            from iaglobal.memory.async_memory import (
+                _get_ltm,
+                _get_stm,
+                _get_memory_vector,
+            )
 
             def _learn_sync():
-                stm = ShortTermMemory(db_path=MEMORIES_DB)
-                ltm = LongTermMemory(db_path=MEMORIES_DB)
-                cache = SemanticCache()
+                stm = _get_stm()
+                ltm = _get_ltm()
+                cache = _get_memory_vector()
                 stm.add(f"Q: {state.prompt}", {"type": "query", "source": "pipeline"})
                 stm.add(
                     f"A: {state.generated_code[:200]}",

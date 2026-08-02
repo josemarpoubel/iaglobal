@@ -879,7 +879,7 @@ class IVMAxiom:
             "persistencia": {
                 "ativa": self._stm is not None,
                 "db_path": str(self.db_path) if self.db_path else None,
-                "stm_status": self._stm.swap_status() if self._stm else None,
+                "stm_status": self._stm_status() if self._stm else None,
             },
         }
 
@@ -912,8 +912,25 @@ class IVMAxiom:
     def obter_status_memoria(self) -> Optional[Dict[str, Any]]:
         """Obtém status da memória de curto prazo."""
         if self._stm:
-            return self._stm.swap_status()
+            return self._stm_status()
         return None
+
+    def _stm_status(self) -> Dict[str, Any]:
+        """Status real da STM apos remocao do mecanismo de swap.
+
+        swap_status() foi removido de ShortTermMemory (codigo morto que
+        gravava .cbor2 orfaos sem nenhum leitor). Reporta o estado vivo
+        da STM: tamanho atual, capacidade, e persistencia.
+        """
+        if not self._stm:
+            return {"ativa": False}
+        return {
+            "ativa": True,
+            "count": self._stm.count(),
+            "max_size": self._stm.max_size,
+            "db_path": str(getattr(self._stm, "db_path", None)) or None,
+            "ttl_seconds": getattr(self._stm, "ttl_seconds", None),
+        }
 
 
 # Singleton global
