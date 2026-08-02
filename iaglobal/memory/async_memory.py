@@ -134,8 +134,26 @@ class AsyncMemory:
     inst\u00e2ncia nova de LTM/STM por request.
     """
 
-    async def store(self, key: str, value: Dict[str, Any]) -> None:
-        await add_ltm(key, value)
+    async def store(
+        self,
+        key: str,
+        value: Dict[str, Any],
+        source: Optional[str] = None,
+    ) -> None:
+        if source is None:
+            await add_ltm(key, value)
+            return
+        # Compoe content descritivo: indexacao semantica em LTM usa `content`
+        # diretamente em _match_score(), e embedding em MemoryVector usa o texto.
+        # Gravar so `key` empobrece a recuperacao futura.
+        try:
+            import json
+
+            payload = json.dumps(value, ensure_ascii=False, default=str)
+        except Exception:
+            payload = str(value)
+        content = f"{key}\n{payload}"
+        await store_ltm_full(content=content, metadata=value, source=source)
 
     async def retrieve(self, query: str, top_k: int = 5) -> List[Dict]:
         return await retrieve_ltm(query, top_k)
