@@ -88,6 +88,11 @@ class ShortTermMemory:
                     created_at TEXT
                 )
             """)
+            cols = [row[1] for row in conn.execute("PRAGMA table_info(stm_entries)")]
+            if "consolidated_at" not in cols:
+                conn.execute(
+                    "ALTER TABLE stm_entries ADD COLUMN consolidated_at TEXT"
+                )
             conn.commit()
 
     def add(self, item: Any, metadata: Optional[Dict] = None) -> None:
