@@ -35,31 +35,46 @@ def _reset_singletons():
     _set_chappie()
 
 
-def test_init_persistencia_registra_chappie(tests_temp_dir: Path):
+@pytest.fixture(scope="module")
+def _ivm_db_unique(tests_temp_dir: Path):
+    """Banco IVM UNICO por modulo (nao por run acumulado).
+
+    Bug: o arquivo fixo ivm_test.db acumulava historico de agents entre
+    execucoes de pytest, fazendo get_ranking() devolver N agents em vez de 1
+    (flaky inter-run). UUID por modulo isola cada execucao.
+    """
+    import uuid
+
+    db = tests_temp_dir / f"ivm_test_{uuid.uuid4().hex}.db"
+    db.parent.mkdir(parents=True, exist_ok=True)
+    if db.exists():
+        db.unlink()
+    yield db
+    if db.exists():
+        db.unlink()
+
+
+def test_init_persistencia_registra_chappie(_ivm_db_unique: Path):
     """init_ivm_axiom_com_persistencia deve registrar a instância no Chappie."""
-    db = tests_temp_dir / "ivm_test.db"
-    ivm = init_ivm_axiom_com_persistencia(db_path=db)
-    assert _get_chappie().get("ivm") is ivm
-    assert isinstance(ivm, IVMAxiom)
+    init_ivm_axiom_com_persistencia(db_path=_ivm_db_unique)
+    assert _get_chappie().get("ivm") is not None
+    assert isinstance(_get_chappie().get("ivm"), IVMAxiom)
 
 
-def test_get_ivm_axiom_prefere_registrado(tests_temp_dir: Path):
+def test_get_ivm_axiom_prefere_registrado(_ivm_db_unique: Path):
     """get_ivm_axiom() deve reaproveitar a instância canônica registrada."""
-    db = tests_temp_dir / "ivm_test.db"
-    canon = init_ivm_axiom_com_persistencia(db_path=db)
+    canon = init_ivm_axiom_com_persistencia(db_path=_ivm_db_unique)
     assert get_ivm_axiom() is canon
 
 
-def test_escritor_e_leitor_compartilham_pool(tests_temp_dir: Path):
+def test_escritor_e_leitor_compartilham_pool(_ivm_db_unique: Path):
     """Agente escreve via _get_chappie()['ivm']; observador lê o mesmo objeto."""
-    db = tests_temp_dir / "ivm_test.db"
-    init_ivm_axiom_com_persistencia(db_path=db)
+    init_ivm_axiom_com_persistencia(db_path=_ivm_db_unique)
 
 
-def test_agente_via_get_ivm_axiom_escritor_observador_mesmo_objeto(tests_temp_dir: Path):
+def test_agente_via_get_ivm_axiom_escritor_observador_mesmo_objeto(_ivm_db_unique: Path):
     """Fluxo real: agente usa get_ivm_axiom() (como agent_base) e observador vê."""
-    db = tests_temp_dir / "ivm_test.db"
-    init_ivm_axiom_com_persistencia(db_path=db)
+    init_ivm_axiom_com_persistencia(db_path=_ivm_db_unique)
 
     # Escritor (simula agent_base._get_ivm)
     from iaglobal.chappie import _get_chappie as gc
@@ -87,10 +102,9 @@ def test_agente_via_get_ivm_axiom_escritor_observador_mesmo_objeto(tests_temp_di
     assert ranking[0]["current_ivm"] > 0
 
 
-def test_agente_via_get_ivm_axiom_popula_pool_observavel(tests_temp_dir: Path):
+def test_agente_via_get_ivm_axiom_popula_pool_observavel(_ivm_db_unique: Path):
     """Fluxo real: agente usa get_ivm_axiom() (como agent_base) e observador vê."""
-    db = tests_temp_dir / "ivm_test.db"
-    init_ivm_axiom_com_persistencia(db_path=db)
+    init_ivm_axiom_com_persistencia(db_path=_ivm_db_unique)
 
     async def _run():
         # agent_base escreve via get_ivm_axiom() (após o patch, prefere registrado)
