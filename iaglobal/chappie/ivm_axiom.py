@@ -1,3 +1,4 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # ============================================================
 # CHAPPIE COMPONENTE 4/4: IVM AXIOM
 # Lei da Compensação Metabólica + Lei do Sucesso
@@ -916,21 +917,28 @@ class IVMAxiom:
         return None
 
     def _stm_status(self) -> Dict[str, Any]:
-        """Status real da STM apos remocao do mecanismo de swap.
+        """Status real da STM, incluindo o estado do spill-to-disk.
 
-        swap_status() foi removido de ShortTermMemory (codigo morto que
-        gravava .cbor2 orfaos sem nenhum leitor). Reporta o estado vivo
-        da STM: tamanho atual, capacidade, e persistencia.
+        spill_status() reporta o RSS do processo vs o threshold de spill e
+        se o cache RAM esta drenado (spilled). As entradas vivem no SQLite
+        (MEMORIES_DB) — o spill apenas tira o cache da RAM, sem perda.
         """
         if not self._stm:
             return {"ativa": False}
-        return {
+        status: Dict[str, Any] = {
             "ativa": True,
             "count": self._stm.count(),
             "max_size": self._stm.max_size,
             "db_path": str(getattr(self._stm, "db_path", None)) or None,
             "ttl_seconds": getattr(self._stm, "ttl_seconds", None),
         }
+        spill = getattr(self._stm, "spill_status", None)
+        if callable(spill):
+            try:
+                status["spill"] = spill()
+            except Exception:
+                pass
+        return status
 
 
 # Singleton global

@@ -1,3 +1,4 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # iaglobal/memory/async_memory.py
 """Async wrapper for memory operations - não bloqueia o event loop.
 
@@ -7,9 +8,12 @@ stm_entries/ltm_entries -- convergencia aplicada neste modulo para que
 produtores (async_memory, CognitiveProxy, pipeline.engine) e consumidores
 (obsidian.consolidation._processar_staging_db) compartilhem o mesmo banco.
 
-MEMORY_SWAP_DIR permanece usado internamente por ShortTermMemory como
-mecanismo de spill-on-disk (cbor2) quando a RAM ultrapassa o threshold --
-esse uso eh legitimo e nao conflita com a escolha de banco canonico.
+Spill-to-disk: ShortTermMemory drena o cache RAM quando o RSS do processo
+cruza STM_SPILL_RSS_FRACTION (default 0.5 da RAM total). As entradas vivem
+no SQLite (ja gravadas no add), entao drenar a RAM nao perde nada e NAO
+escreve arquivos .cbor2 (o mecanismo historico que criava orfaos). Ao ler,
+re-hidrata do SQLite sob demanda. MEMORY_SWAP_DIR nao e mais escrito por
+este modulo — o swap correto e RAM->SQLite, nao arquivos soltos.
 """
 
 import asyncio
