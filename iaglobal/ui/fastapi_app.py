@@ -202,6 +202,13 @@ def AgentDashboard():
 # LIFESPAN (Ciclo de Vida do Organismo)
 # =====================================================================
 
+# Compat reactpy 1.1.0 x FastAPI >= 0.139: reactpy chama add_websocket_route,
+# renomeado para add_api_websocket_route no FastAPI. Shim idempotente.
+if not hasattr(app, "add_websocket_route") and hasattr(
+    app, "add_api_websocket_route"
+):
+    app.add_websocket_route = app.add_api_websocket_route
+
 # Configurar ReactPy PRIMEIRO, antes de qualquer outra rota
 reactpy_configure(app, AgentDashboard, Options(url_prefix="/@"))
 
