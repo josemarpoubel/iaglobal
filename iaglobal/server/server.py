@@ -49,8 +49,6 @@ warnings.warn(
 )
 
 
-
-
 # ------------------------------------------------------------------------------
 # 1. INICIALIZAÇÃO DOS MOTORES CORE
 # ------------------------------------------------------------------------------
@@ -249,7 +247,7 @@ if __name__ == "__main__":
     print(f"⚡ Trigger: http://{host}:{port}/evolution/trigger")
     print(f"📈 Metrics: http://{host}:{port}/evolution/metrics")
     print(
-        f"💡 Dica: Para acessar via ASGI Gateway, use http://localhost:8000/evolution/"
+        "💡 Dica: Para acessar via ASGI Gateway, use http://localhost:8000/evolution/"
     )
 
     uvicorn.run(

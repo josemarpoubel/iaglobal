@@ -110,7 +110,8 @@ class DataBridge:
             if target_path.exists():
                 backup = DataBridge._create_backup(target_path)
 
-            import time, gc
+            import time
+            import gc
 
             gc.collect()
             time.sleep(0.05)

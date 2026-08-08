@@ -9,9 +9,7 @@ from iaglobal.utils.logger import logger
 # 🏗️ MOTOR CORE: EVOLUTION RUNTIME FLEXÍVEL
 # ==============================================================================
 
-import asyncio
 import logging
-from typing import Optional, Dict, Any
 
 # Definimos a variável global no topo do módulo
 _runtime_instance: Optional["EvolutionRuntime"] = None

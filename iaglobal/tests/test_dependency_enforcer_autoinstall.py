@@ -9,6 +9,7 @@ from iaglobal.core.dependency_enforcer import DependencyEnforcer, REQUIREMENTS_P
 
 from subprocess import TimeoutExpired
 
+
 @pytest.fixture
 def enforcer_with_autoinstall():
     """Cria enforcer com auto-install ativado."""
@@ -148,5 +149,3 @@ def test_auto_install_real_package(enforcer_with_autoinstall):
 
     # httpx já deve estar instalado, então não deveria fazer wrap
     assert "httpx" in result.installed_imports or len(result.wrapped_imports) == 0
-
-

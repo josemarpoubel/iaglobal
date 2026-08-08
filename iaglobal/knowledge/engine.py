@@ -3,14 +3,13 @@
 from __future__ import annotations
 
 import logging
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 from iaglobal.knowledge.capability import Capability, CapabilityGraph
 from iaglobal.knowledge.constraints import (
     ConstraintExtractor,
     ConstraintSet,
-    filter_technologies,
 )
 from iaglobal.knowledge.resolver.capability_resolver import (
     CapabilityResolution,

@@ -12,17 +12,13 @@ Valida:
 
 import asyncio
 import json
-import time
 from pathlib import Path
-from typing import Dict, List, Any
-from datetime import datetime, timezone
 
 import pytest
 
-from iaglobal.providers.task_router import TaskRouter, get_task_router
-from iaglobal.execution.token_bucket import LocalModelGate, TokenBucket
+from iaglobal.providers.task_router import get_task_router
+from iaglobal.execution.token_bucket import LocalModelGate
 from iaglobal.metabolism.jol_metrics import JOLMetricsCollector
-from iaglobal.graphs.comms.acetylcholine_bus import AcetylcholineBus
 from iaglobal.utils.logger import get_logger
 
 logger = get_logger("iaglobal.stress_tribunal")
@@ -112,9 +108,7 @@ class TestTaskRouterMapping:
     def test_timeout_per_tier(self, task_router_instance):
         """Cada tier tem timeout apropriado."""
         router = task_router_instance
-        assert (
-            router.get_timeout_for_tier("reviewer") == 600.0
-        )
+        assert router.get_timeout_for_tier("reviewer") == 600.0
         assert router.get_timeout_for_tier("coder") == 60.0
         assert router.get_timeout_for_tier("sentinel") == 10.0
 
@@ -284,7 +278,7 @@ class TestConcurrentLoad:
             f"sentinel should have max 8 successes, got {sentinel_successes}"
         )
 
-        logger.info(f"Bucket limits validated: reviewer<=4, coder<=6, sentinel<=8")
+        logger.info("Bucket limits validated: reviewer<=4, coder<=6, sentinel<=8")
 
     @pytest.mark.asyncio
     async def test_concurrent_load_triggers_alerts(

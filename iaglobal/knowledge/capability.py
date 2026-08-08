@@ -10,7 +10,6 @@ que a implementa.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, FrozenSet
 
 
 @dataclass(frozen=True)

@@ -65,9 +65,12 @@ def _reset_bus():
 def test_success_credits_bandit_with_quality_score():
     bandit = BanditPolicy(epsilon=0.0)
     from iaglobal.graphs.bandit_feedback import BanditFeedbackObserver
+
     BanditFeedbackObserver(bandit)
 
-    _publish(_result(success=True, quality_score=0.92, selected_technology="weasyprint"))
+    _publish(
+        _result(success=True, quality_score=0.92, selected_technology="weasyprint")
+    )
 
     assert bandit.rewards.get("weasyprint") == [0.92]
 
@@ -77,6 +80,7 @@ def test_failure_credits_zero_to_bandit():
     arm was tried but produced no value."""
     bandit = BanditPolicy(epsilon=0.0)
     from iaglobal.graphs.bandit_feedback import BanditFeedbackObserver
+
     BanditFeedbackObserver(bandit)
 
     _publish(_result(success=False, quality_score=0.9, selected_technology="pandas"))
@@ -92,6 +96,7 @@ def test_low_quality_failure_does_not_inflate_reward():
     formula rejected during review)."""
     bandit = BanditPolicy(epsilon=0.0)
     from iaglobal.graphs.bandit_feedback import BanditFeedbackObserver
+
     BanditFeedbackObserver(bandit)
 
     _publish(_result(success=False, quality_score=0.1, selected_technology="pandas"))
@@ -108,6 +113,7 @@ def test_double_publish_double_credit_current_behavior():
     future responsibility of the EventStore)."""
     bandit = BanditPolicy(epsilon=0.0)
     from iaglobal.graphs.bandit_feedback import BanditFeedbackObserver
+
     BanditFeedbackObserver(bandit)
 
     r = _result(success=True, quality_score=0.75, selected_technology="pandas")
@@ -123,6 +129,7 @@ def test_double_publish_double_credit_current_behavior():
 def test_no_credit_when_selected_technology_none():
     bandit = BanditPolicy(epsilon=0.0)
     from iaglobal.graphs.bandit_feedback import BanditFeedbackObserver
+
     BanditFeedbackObserver(bandit)
 
     _publish(_result(success=True, selected_technology=None))
@@ -146,9 +153,7 @@ def test_observer_reconstructs_dataclass_from_dict():
     spy = SpyBandit()
     BanditFeedbackObserver(spy)
 
-    _publish(_result(
-        success=True, quality_score=0.88, selected_technology="sqlite3"
-    ))
+    _publish(_result(success=True, quality_score=0.88, selected_technology="sqlite3"))
 
     assert spy.call == ("sqlite3", 0.88, 1.0)
 
@@ -158,6 +163,7 @@ def test_observer_reconstructs_dataclass_from_dict():
 
 def test_get_bandit_auto_wires_observer():
     from iaglobal.graphs.bandit import _get_bandit
+
     b = _get_bandit()
     assert getattr(b, "_feedback_attached", False), (
         "auto-wire should set feedback_attached flag"

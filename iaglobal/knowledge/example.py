@@ -9,7 +9,6 @@ e pode ser usado como contexto para o LLM em vez de geração do zero.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Optional
 
 from iaglobal.knowledge.contracts import ValidationResult, KnowledgeProvenance
 

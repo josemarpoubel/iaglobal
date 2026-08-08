@@ -6,7 +6,6 @@ import logging
 import asyncio
 from typing import Dict, Any
 
-from iaglobal.core.result_adapter import extract_output
 from iaglobal.agents.security_audit_agent import SecurityAuditAgent
 from iaglobal.core.node_result import NodeResult
 

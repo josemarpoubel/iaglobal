@@ -17,6 +17,7 @@ from typing import Dict, Any, List, Optional
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.security.ast_gateway import ASTGateway
+from iaglobal.security.js_gateway import JSGateway
 from iaglobal.graphs.artifact_resolver import get_best_artifact, ResolvedArtifact
 from iaglobal.core.artifact import ArtifactKind
 from iaglobal.core.node_result import NodeResult
@@ -24,6 +25,7 @@ from iaglobal.core.node_result import NodeResult
 logger = get_logger("iaglobal.graphs.nodes.validator_retry")
 
 _ast_gateway = ASTGateway()
+_js_gateway = JSGateway()
 MAX_RETRIES = 3
 
 
@@ -209,6 +211,44 @@ def _fix_unclosed_quotes(code: str) -> str:
     return "".join(result)
 
 
+_NON_PYTHON_MARKERS = (
+    "function ",
+    "const ",
+    "let ",
+    "var ",
+    "export ",
+    "public class ",
+    "private ",
+    "protected ",
+    "static void",
+    "interface ",
+    "SELECT ",
+    "INSERT INTO ",
+    "CREATE TABLE",
+    "ALTER TABLE",
+    "DROP TABLE",
+)
+
+
+def _looks_like_non_python_code(code: str) -> bool:
+    """Heurística leve: distingue código não-Python dentro de kind=CODE.
+
+    O classificador em core/artifact.py usa uma lista monolítica de
+    code_indicators que inclui tokens de Python, JS, Java, SQL — tudo
+    vira ArtifactKind.CODE indiscriminadamente. Aqui detectamos que o
+    conteúdo provavelmente NÃO é Python para evitar que o ASTGateway
+    queime 3 retries contra um validador que nunca vai aceitar JS/SQL
+    como Python válido.
+
+    Não decide a linguagem certa (HTML continua tendo seu próprio
+    gate na linha 233). Só desvia para o validador apropriado.
+    """
+    stripped = code.strip()
+    if not stripped:
+        return False
+    return any(stripped.startswith(m) for m in _NON_PYTHON_MARKERS)
+
+
 async def run_validator_retry(ctx: Dict[str, Any]) -> NodeResult:
     start = time.time()
     memory = ctx.get("memory", {})
@@ -244,6 +284,52 @@ async def run_validator_retry(ctx: Dict[str, Any]) -> NodeResult:
                 "model": "validator_retry",
                 "latency_ms": (time.time() - start) * 1000.0,
                 "cost": 0.0,
+            },
+        )
+
+    if artifact.kind == ArtifactKind.CODE and _looks_like_non_python_code(code):
+        js_result = _js_gateway.parse(code)
+        latency_ms = (time.time() - start) * 1000.0
+        if js_result.valid:
+            logger.info(
+                "[VALIDATOR_RETRY] Código JS/Java/SQL detectado em kind=CODE — "
+                "validado via JSGateway | %d chars",
+                len(code),
+            )
+            return NodeResult(
+                success=True,
+                output=code,
+                metadata={
+                    "code_valid": True,
+                    "retries": 0,
+                    "syntax_error": None,
+                    "model": "validator_retry",
+                    "latency_ms": latency_ms,
+                    "cost": 0.0,
+                    "validator": "js_gateway",
+                },
+            )
+        logger.warning(
+            "[VALIDATOR_RETRY] Código não-Python detectado em kind=CODE — "
+            "JSGateway reportou %d erro(s) | linha %s",
+            len(js_result.errors),
+            js_result.error_line,
+        )
+        return NodeResult(
+            success=False,
+            output=code,
+            metadata={
+                "code_valid": False,
+                "retries": 0,
+                "syntax_error": "; ".join(js_result.errors),
+                "model": "validator_retry",
+                "latency_ms": latency_ms,
+                "cost": 0.0,
+                "validator": "js_gateway",
+                "error_line": js_result.error_line,
+                "error_column": js_result.error_column,
+                "js_errors": js_result.errors,
+                "detected_language": "javascript",
             },
         )
 

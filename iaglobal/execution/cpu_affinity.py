@@ -50,6 +50,20 @@ CPU_CEILING_DEEP_SLEEP = 0.25  # 1 geração ativa (homeostase de repouso)
 CPU_CEILING_DEFAULT_MIN = 2.0  # piso padrão em core-equivalentes
 CPU_CEILING_ENV = "CPU_GENERATION_CEILING"
 
+# ── Enforcement real de CPU no boot (sched_setaffinity) ───────────────────
+# O CpuAffinityManager sempre foi um weight-based scheduler: distribuía
+# budgets simbólicos (cpu_budget) mas NUNCA impôs limite no nível do SO —
+# um processo podia usar 100% de um núcleo (ou todos) livremente. Este
+# enforcement fecha essa lacuna: no boot (via bootstrap), o processo é
+# pinado a uma fração da capacidade total da máquina. Com 8 núcleos e a
+# fração default de 25%, o processo fica restrito a 2 cores — exatamente
+# "25% de cada núcleo", a regra que o projeto sempre documentou.
+CPU_AFFINITY_ENFORCE_ENV = "CPU_AFFINITY_ENFORCE"
+CPU_AFFINITY_FRACTION_ENV = "CPU_AFFINITY_FRACTION"
+CPU_AFFINITY_FRACTION_DEFAULT = 0.25  # 25% da capacidade (n cores x fracao)
+CPU_AFFINITY_FRACTION_MIN = 0.01
+CPU_AFFINITY_FRACTION_MAX = 1.0
+
 
 # =========================================================================
 # DATACLASSES DE METADADOS
@@ -173,6 +187,8 @@ class CpuAffinityManager:
     def __init__(self):
         self._lock = None
         self._total_cores: int = os.cpu_count() or 1
+        self._affinity_fraction = self._resolve_affinity_fraction()
+        self._enforced_cores: Optional[int] = None
         self._agents: Dict[str, AgentCpuMetrics] = {}
         self._budgets: Dict[str, float] = {}
         self._last_agent_map: Dict[str, int] = {}
@@ -181,6 +197,26 @@ class CpuAffinityManager:
         self._adrenaline_expiry = 0.0
         self._fitness_buffer: Dict[str, float] = {}
         self._flush_task: Optional[asyncio.Task] = None
+
+    @staticmethod
+    def _resolve_affinity_fraction() -> float:
+        """Fração da capacidade total de CPU imposta no boot.
+
+        Sempre 25% por núcleo (regra homeostática do projeto), ajustável
+        via env CPU_AFFINITY_FRACTION quando o dev precisar de um teto
+        diferente em máquinas específicas.
+        """
+        raw = os.environ.get(CPU_AFFINITY_FRACTION_ENV, "").strip()
+        if not raw:
+            return CPU_AFFINITY_FRACTION_DEFAULT
+        try:
+            frac = float(raw)
+        except ValueError:
+            return CPU_AFFINITY_FRACTION_DEFAULT
+        return max(
+            CPU_AFFINITY_FRACTION_MIN,
+            min(CPU_AFFINITY_FRACTION_MAX, frac),
+        )
 
     @property
     def lock(self):
@@ -205,6 +241,71 @@ class CpuAffinityManager:
     def _core_from_hash(self, agent_id: str) -> int:
         """Deriva um core lógico do hash (sem fixação real)."""
         return int(self._hash_agent(agent_id), 16) % self._total_cores
+
+    def affinity_target_cores(self) -> int:
+        """Número de cores a que o processo deve ser pinado (dinâmico).
+
+        Regra do projeto: 25% da capacidade total da máquina. Em 8 núcleos
+        → 2 cores; em 48 núcleos → 12 cores. Detecta `os.cpu_count()` da
+        máquina onde roda, então um dev migrando de máquina não precisa
+        configurar nada — o teto acompanha o hardware.
+        """
+        return max(1, int(self._total_cores * self._affinity_fraction))
+
+    def apply_process_affinity(self) -> dict:
+        """Impõe no nível do SO o limite de CPU prometido pelo scheduler.
+
+        O CpuAffinityManager distribuía budgets simbólicos (cpu_budget)
+        mas nunca restringiu o processo de fato — um pipeline podia usar
+        100% de todos os núcleos. Este método chama `os.sched_setaffinity`
+        para pinar TODAS as threads do processo atual a `fração × ncores`
+        (default 25%). `sched_setaffinity(0, ...)` só afeta a thread
+        chamadora, então iteramos /proc/self/task para que o teto valha
+        para o processo inteiro — não só para a thread do bootstrap.
+        Fail-safe: sem sched_setaffinity (ex: Windows/macOS ou restrição
+        do SO) retorna status informando que o enforcement não se aplicou.
+        """
+        target = self.affinity_target_cores()
+        mask = set(range(target))
+        if not hasattr(os, "sched_setaffinity"):
+            return {
+                "enforced": False,
+                "reason": "sched_setaffinity_indisponivel",
+                "total_cores": self._total_cores,
+                "target_cores": target,
+            }
+        try:
+            applied = 0
+            # Pina TODAS as threads do processo, não só a thread chamadora.
+            pids = {os.getpid()}
+            try:
+                for tid in os.listdir(f"/proc/{os.getpid()}/task"):
+                    pids.add(int(tid))
+            except OSError:
+                pass
+            for tid in pids:
+                try:
+                    os.sched_setaffinity(tid, mask)
+                    applied += 1
+                except (OSError, ProcessLookupError):
+                    continue
+            self._enforced_cores = target
+            effective = os.sched_getaffinity(0)
+            return {
+                "enforced": True,
+                "threads_afetadas": applied,
+                "total_cores": self._total_cores,
+                "target_cores": target,
+                "fraction": self._affinity_fraction,
+                "effective_affinity": sorted(effective),
+            }
+        except OSError as e:
+            return {
+                "enforced": False,
+                "reason": f"os_error: {e}",
+                "total_cores": self._total_cores,
+                "target_cores": target,
+            }
 
     def _get_or_create_metrics(self, agent_id: str) -> AgentCpuMetrics:
         # Nota: Assume-se que esta função seja chamada DENTRO do lock

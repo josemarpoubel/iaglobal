@@ -10,8 +10,6 @@ os candidatos disponíveis.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime
-from typing import Dict, FrozenSet, List, Optional
 
 from iaglobal.knowledge.contracts import MaturityLevel, KnowledgeProvenance
 

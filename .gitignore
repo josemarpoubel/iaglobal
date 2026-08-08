@@ -8,15 +8,16 @@ iaglobal/memory/data/provider_metrics/*.jsonl
 iaglobal/memory/data/result/.counter.lock
 iaglobal/memory/data/tools_registry.pkl
 iaglobal/memory/data/ancestry_tree.jsonl
-
-# Obsidian vault files
-iaglobal/obsidian/**/*.md
-iaglobal/obsidian/**/*.cbor
+iaglobal/memory/data/result/*
+iaglobal/memory/data/script/*
+iaglobal/memory/data/*.log
+iaglobal/memory/data/cache/
+iaglobal/memory/data/error/
+iaglobal/memory/data/work/
+iaglobal/memory/data/logs/
+iaglobal/memory/data/life_signals.json
 
 # Environment files
-.env
-.env.local
-.env.*
 .env.example
 
 # Python artifacts
@@ -28,32 +29,16 @@ __pycache__/
 # Virtual environment
 venv/
 
-# Runtime artifacts
-iaglobal/memory/data/result/*
-iaglobal/memory/data/script/*
-iaglobal/memory/data/*.log
-
-# Test artifacts
-tests/temp/
-
-# Runtime caches and execution artifacts
-iaglobal/memory/data/cache/
-iaglobal/memory/data/error/
-iaglobal/memory/data/work/
-iaglobal/memory/data/logs/
-iaglobal/memory/data/life_signals.json
-
 # Root-level runtime artifacts (avoid accidental commits)
 *.db
 *.log
 *.pkl
 *.lock
 
-# Epigenetic state (regenerable)
-iaglobal/obsidian/epigenetic/*.cbor
+# Obsidian vault files
+iaglobal/obsidian/**/*.md
+iaglobal/obsidian/**/*.cbor
 
-# Runtime / Obsidian (raiz)
-obsidian/
 
 # Runtime bandit
 iaglobal/memory/bandit_evolution.json

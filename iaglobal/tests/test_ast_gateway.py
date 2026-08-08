@@ -1,8 +1,6 @@
 # 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 """Tests for ASTGateway — único ponto de entrada para parsing AST."""
 
-import ast
-import pytest
 
 from iaglobal.security.ast_gateway import ASTGateway, ASTResult
 from iaglobal.security.sandbox_rules import SandboxRules

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import FrozenSet, Optional
 
-from iaglobal.knowledge.contracts import KnowledgeProvenance, MaturityLevel
+from iaglobal.knowledge.contracts import MaturityLevel
 from iaglobal.knowledge.package import PackageDescriptor, PackageHealth, PyPIMetadata
 from iaglobal.knowledge.technology import TechnologyDescriptor, TechnologyScore
 

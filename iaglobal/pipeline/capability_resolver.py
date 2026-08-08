@@ -22,7 +22,7 @@ reconstruir cada escolha.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Dict, List, Literal, Optional, Tuple
+from typing import Dict, List, Literal, Optional
 
 from iaglobal.pipeline.mission import MissionContract
 
@@ -218,7 +218,6 @@ class PipelineCapabilityResolver:
         mission_id: str,
     ) -> Optional[CapabilityPlan]:
         """Map ``KnowledgeEngine`` output into a ``CapabilityPlan``."""
-        from iaglobal.knowledge.capability import Capability
 
         cap = self._mission_to_capability(contract)
         if cap is None:

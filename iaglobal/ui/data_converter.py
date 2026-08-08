@@ -156,7 +156,7 @@ def get_agent_status() -> Dict:
                     ).isoformat(),
                     "data": convert_cbor_to_json(data),
                 }
-        except Exception as e:
+        except Exception:
             continue
 
     return {
@@ -198,7 +198,7 @@ def get_metabolic_state() -> Dict:
                         file_path.stat().st_mtime
                     ).isoformat(),
                 }
-        except Exception as e:
+        except Exception:
             continue
 
     # Procurar arquivos de energia/ATP
@@ -225,7 +225,7 @@ def get_metabolic_state() -> Dict:
                         file_path.stat().st_mtime
                     ).isoformat(),
                 }
-        except Exception as e:
+        except Exception:
             continue
 
     return metabolic_data
@@ -264,7 +264,7 @@ def get_epigenetic_markers(agent_id: Optional[str] = None) -> Dict:
                         "data": marker_data,
                     }
                 )
-        except Exception as e:
+        except Exception:
             continue
 
     return {

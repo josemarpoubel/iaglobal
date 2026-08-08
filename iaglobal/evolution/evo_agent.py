@@ -193,7 +193,9 @@ def _count_nutrition_results(enriched_prompt: str) -> int:
     """Conta padrões descobertos no contexto injetado (linhas de resultado)."""
     if not enriched_prompt or "[CONTEXTO]" not in enriched_prompt:
         return 0
-    return sum(1 for line in enriched_prompt.split("\n") if line.strip().startswith("- "))
+    return sum(
+        1 for line in enriched_prompt.split("\n") if line.strip().startswith("- ")
+    )
 
 
 class EvoAgent:
@@ -972,7 +974,6 @@ Resultados: {web_data.get("results_count", 0)} padrões descobertos
         from iaglobal.tools.builtins.code_executor import execute_code
         from iaglobal.immunity.failure_analyzer import (
             parse_error,
-            fingerprint_error,
             check_vaccine,
             register_vaccine,
         )

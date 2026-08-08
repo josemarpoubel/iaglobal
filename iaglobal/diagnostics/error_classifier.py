@@ -18,7 +18,7 @@ Cada classificador:
 
 from __future__ import annotations
 
-from typing import Optional, Dict, Any, List
+from typing import Optional, Dict, Any
 from iaglobal.diagnostics.error_descriptor import (
     ErrorDescriptor,
     ErrorCategory,

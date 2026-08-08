@@ -10,7 +10,6 @@ import time
 import asyncio
 from typing import Dict, Any
 
-from iaglobal.core.result_adapter import extract_output
 from iaglobal.agents.tester_agent import TesterAgent
 from iaglobal.utils.logger import get_logger
 

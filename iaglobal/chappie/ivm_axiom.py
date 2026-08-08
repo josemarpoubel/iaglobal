@@ -407,12 +407,12 @@ class IVMAxiom:
             logger.error("[IVMAxiom] Falha ao carregar estado: %s", e, exc_info=True)
 
     def _salvar_estado(self, chave: str, dados: Dict[str, Any]) -> None:
-        """Salva estado na memória de curto prazo."""
+        """Salva estado na memória de curto prazo via upsert por chave."""
         if not self._stm:
             return
 
         try:
-            self._stm.add(dados, metadata={"chave": chave, "tipo": "ivm_axiom"})
+            self._stm.upsert(chave, dados, metadata={"tipo": "ivm_axiom"})
             logger.debug("[IVMAxiom] Estado salvo na memória | chave=%s", chave)
         except Exception as e:
             logger.error("[IVMAxiom] Falha ao salvar estado: %s", e)
@@ -592,13 +592,11 @@ class IVMAxiom:
                     "timestamp": datetime.now(UTC).isoformat(),
                 }
 
-                chave_entrada = (
-                    f"ivm_update_{agent_name}_{datetime.now(UTC).timestamp()}"
-                )
-                self._stm.add(
+                chave_entrada = f"ivm_update_{agent_name}"
+                self._stm.upsert(
+                    chave_entrada,
                     entrada_individual,
                     metadata={
-                        "chave": chave_entrada,
                         "tipo": "ivm_update",
                         "agent_name": agent_name,
                         "current_ivm": metricas.ivm,

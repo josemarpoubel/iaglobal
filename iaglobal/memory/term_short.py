@@ -91,6 +91,8 @@ class ShortTermMemory:
         self._spill_threshold_mb = spill_rss_threshold_mb
         # True quando o cache RAM foi drenado por pressao de memoria
         self._spilled = False
+        # Conta writes desde o ultimo trim do SQLite (limita o banco ao max_size)
+        self._writes_since_trim = 0
         if self.db_path:
             self._init_db()
             self._load()
@@ -104,13 +106,18 @@ class ShortTermMemory:
                 CREATE TABLE IF NOT EXISTS stm_entries (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     data BLOB,
-                    created_at TEXT
+                    created_at TEXT,
+                    chave TEXT
                 )
             """)
             cols = [row[1] for row in conn.execute("PRAGMA table_info(stm_entries)")]
             if "consolidated_at" not in cols:
+                conn.execute("ALTER TABLE stm_entries ADD COLUMN consolidated_at TEXT")
+            if "chave" not in cols:
+                conn.execute("ALTER TABLE stm_entries ADD COLUMN chave TEXT")
                 conn.execute(
-                    "ALTER TABLE stm_entries ADD COLUMN consolidated_at TEXT"
+                    "CREATE INDEX IF NOT EXISTS idx_stm_entries_chave "
+                    "ON stm_entries(chave)"
                 )
             conn.commit()
 
@@ -123,6 +130,7 @@ class ShortTermMemory:
         self._buffer.append(entry)
         self._timestamps.append(datetime.now(timezone.utc))
         self._save_entry(entry)
+        self._trim_db_if_needed()
         self._maybe_spill()
 
     def get_recent(self, n: int = 10) -> List[Any]:
@@ -198,15 +206,88 @@ class ShortTermMemory:
                 except Exception:
                     pass
 
-    def _save_entry(self, entry: dict) -> None:
+    def _trim_db_if_needed(self) -> None:
+        """Limita o SQLite às max_size entradas mais recentes.
+
+        O deque RAM é bounded por maxlen, mas o SQLite acumulava tudo por
+        TTL (24h no IVM) — centenas de milhares de snapshots de ~96KB em
+        produção. Aqui, a cada `max_size` writes, apaga as entradas mais
+        antigas além das max_size mais recentes, mantendo o banco delimitado.
+        """
         if not self.db_path:
             return
+        self._writes_since_trim += 1
+        if self._writes_since_trim < self.max_size:
+            return
+        self._writes_since_trim = 0
         with self._lock:
             try:
                 with sqlite3.connect(self.db_path, timeout=5.0) as conn:
                     conn.execute(
-                        "INSERT INTO stm_entries (data, created_at) VALUES (?, ?)",
-                        (cbor2.dumps(entry), entry["timestamp"]),
+                        """
+                        DELETE FROM stm_entries
+                        WHERE id NOT IN (
+                            SELECT id FROM stm_entries
+                            ORDER BY id DESC LIMIT ?
+                        )
+                    """,
+                        (self.max_size,),
+                    )
+                    conn.commit()
+            except Exception:
+                pass
+
+    def upsert(self, chave: str, item: Any, metadata: Optional[Dict] = None) -> None:
+        """Persiste por chave: substitui a entrada anterior com a mesma chave.
+
+        O IVM gravava um snapshot completo (~96KB) a cada atualização de
+        métricas, criando um append infinito de duplicatas. Com upsert,
+        cada chave (ex: ivm_axiom_historico) mantém apenas a versão mais
+        recente — o que _carregar_estado já esperava (merge por chave).
+        """
+        entry = {
+            "content": item,
+            "metadata": {**(metadata or {}), "chave": chave},
+            "timestamp": datetime.now(timezone.utc).isoformat(),
+        }
+        if self.db_path:
+            with self._lock:
+                try:
+                    with sqlite3.connect(self.db_path, timeout=5.0) as conn:
+                        conn.execute(
+                            "DELETE FROM stm_entries WHERE chave = ?",
+                            (chave,),
+                        )
+                        conn.execute(
+                            "INSERT INTO stm_entries (data, created_at, chave) VALUES (?, ?, ?)",
+                            (cbor2.dumps(entry), entry["timestamp"], chave),
+                        )
+                        conn.commit()
+                except Exception:
+                    pass
+        # Mantém apenas uma entrada com a chave no cache RAM
+        pares = [
+            (e, t)
+            for e, t in zip(self._buffer, self._timestamps)
+            if e.get("metadata", {}).get("chave") != chave
+        ]
+        self._buffer = deque((e for e, _ in pares), maxlen=self.max_size)
+        self._timestamps = deque((t for _, t in pares), maxlen=self.max_size)
+        self._buffer.append(entry)
+        self._timestamps.append(datetime.now(timezone.utc))
+        self._trim_db_if_needed()
+        self._maybe_spill()
+
+    def _save_entry(self, entry: dict) -> None:
+        if not self.db_path:
+            return
+        chave = entry.get("metadata", {}).get("chave")
+        with self._lock:
+            try:
+                with sqlite3.connect(self.db_path, timeout=5.0) as conn:
+                    conn.execute(
+                        "INSERT INTO stm_entries (data, created_at, chave) VALUES (?, ?, ?)",
+                        (cbor2.dumps(entry), entry["timestamp"], chave),
                     )
                     conn.commit()
             except Exception:

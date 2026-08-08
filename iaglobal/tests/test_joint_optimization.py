@@ -2,12 +2,10 @@
 """Testes do JointOptimizationLoop — ribossomo metabólico."""
 
 import pytest
-from unittest.mock import AsyncMock, MagicMock, patch
+from unittest.mock import MagicMock
 
 from iaglobal.metabolism.joint_optimization import (
     JointOptimizationLoop,
-    joint_optimization_loop,
-    ExecutionSnapshot,
 )
 
 

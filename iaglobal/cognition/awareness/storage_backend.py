@@ -91,7 +91,6 @@ class SQLiteBackend(PersistenceBackend):
         return buf.getvalue()
 
     def restore(self, data: bytes) -> None:
-        import io
 
         src = __import__("sqlite3").connect(":memory:")
         src.backup(self._db)

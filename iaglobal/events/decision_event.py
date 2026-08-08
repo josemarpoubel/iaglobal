@@ -8,7 +8,6 @@ from typing import Any, Dict, List, Optional
 
 from iaglobal.events.domain_event import DomainEvent
 from iaglobal.events.event_id import EventId
-from iaglobal.events.event_types import EventType
 from iaglobal.utils.logger import logger
 
 
@@ -119,22 +118,24 @@ class CapabilityDecisionEvent(DomainEvent):
     def to_dict(self) -> Dict[str, Any]:
         # ``event_type`` vem do parent como string EventType.CAPABILITY_SELECTED.
         data = super().to_dict()
-        data.update({
-            "capability": self.capability,
-            "selected_technology": self.selected_technology,
-            "validation_confidence": self.validation_confidence,
-            "effective_score": self.effective_score,
-            "bandit_score": self.bandit_score,
-            "reason": tuple(self.reason),
-            "fallback_used": self.fallback_used,
-            "candidate_count": self.candidate_count,
-            "filtered_count": self.filtered_count,
-            "selected_provider": self.selected_provider,
-            "predecessor_event_id": (
-                str(self.predecessor_event_id)
-                if self.predecessor_event_id is not None
-                else None
-            ),
-            "decision_confidence": self.decision_confidence,
-        })
+        data.update(
+            {
+                "capability": self.capability,
+                "selected_technology": self.selected_technology,
+                "validation_confidence": self.validation_confidence,
+                "effective_score": self.effective_score,
+                "bandit_score": self.bandit_score,
+                "reason": tuple(self.reason),
+                "fallback_used": self.fallback_used,
+                "candidate_count": self.candidate_count,
+                "filtered_count": self.filtered_count,
+                "selected_provider": self.selected_provider,
+                "predecessor_event_id": (
+                    str(self.predecessor_event_id)
+                    if self.predecessor_event_id is not None
+                    else None
+                ),
+                "decision_confidence": self.decision_confidence,
+            }
+        )
         return data

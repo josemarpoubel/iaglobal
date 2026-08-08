@@ -45,9 +45,7 @@ WEB_CONTEXT = (
     "[CONTEXTO]\n## Web\n- resultado web\n## Referências\n"
     "- http://exemplo.com\n[INSTRUÇÃO]\nresponda"
 )
-OBSIDIAN_CONTEXT = (
-    "[CONTEXTO]\n## Obsidian (cache persistente)\n- snippet (score=0.9)\n[INSTRUÇÃO]\nresponda"
-)
+OBSIDIAN_CONTEXT = "[CONTEXTO]\n## Obsidian (cache persistente)\n- snippet (score=0.9)\n[INSTRUÇÃO]\nresponda"
 
 
 @pytest.mark.asyncio

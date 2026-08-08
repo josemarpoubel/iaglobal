@@ -382,7 +382,7 @@ if __name__ == "__main__":
             json.dumps(report, indent=2, ensure_ascii=False, default=str)
         )
         print(f"\n{'=' * 60}")
-        print(f"RELATÓRIO DE STRESS TEST — Fase 3.1")
+        print("RELATÓRIO DE STRESS TEST — Fase 3.1")
         print(f"Status: {report['status']}")
         print(f"Bottlenecks: {len(report.get('bottlenecks', []))}")
         print(f"Latência total: {report['metrics']['total_latency_ms']:.2f}ms")

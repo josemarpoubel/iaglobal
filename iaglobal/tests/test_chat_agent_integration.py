@@ -10,8 +10,6 @@ Valida:
   5. Erro: DNA divergente rejeitado, colônia vazia
 """
 
-import asyncio
-import time
 from unittest.mock import AsyncMock, MagicMock, patch
 
 import pytest
@@ -19,10 +17,8 @@ import pytest
 from iaglobal.interface.chat_agent import (
     IntencaoBiologica,
     EvoAgentColony,
-    RegistroEvoAgent,
     interagir_com_colonia,
     criar_colonia_evoagents,
-    LINEAGE_MARKER,
 )
 from iaglobal.evolution.evo_agent import EvoAgent
 

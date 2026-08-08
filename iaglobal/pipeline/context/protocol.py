@@ -30,6 +30,7 @@ from .memory_snapshot import MemorySnapshot
 from .security_snapshot import SecuritySnapshot
 from .performance_snapshot import PerformanceSnapshot
 
+
 @dataclass(frozen=True)
 class MissionContext:
     objective: str = ""
@@ -109,8 +110,6 @@ class MetricsContext:
 # ==============================================================================
 # EXECUTION CONTEXT (composição, não herança)
 # ==============================================================================
-
-
 
 
 @dataclass(frozen=True)

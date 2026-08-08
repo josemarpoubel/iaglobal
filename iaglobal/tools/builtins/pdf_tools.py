@@ -180,7 +180,6 @@ def generate_light_pdf(
     return output_path
 
 
-
 tool_library.register(
     name="generate_dark_pdf",
     fn=generate_dark_pdf,

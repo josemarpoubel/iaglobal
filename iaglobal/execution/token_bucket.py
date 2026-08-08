@@ -9,7 +9,7 @@ por um sistema de cadência dinâmica.
 
 import asyncio
 import time
-from typing import ClassVar, Dict, Optional
+from typing import ClassVar, Dict
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.metabolism.bucket_manager import TokenBucket
@@ -76,7 +76,11 @@ class LocalModelGate:
             )
 
         # Métricas de operação por tier
-        self._rejected_counts: Dict[str, int] = {"reviewer": 0, "coder": 0, "sentinel": 0}
+        self._rejected_counts: Dict[str, int] = {
+            "reviewer": 0,
+            "coder": 0,
+            "sentinel": 0,
+        }
         self._alerts_fired: Dict[str, int] = {"reviewer": 0, "coder": 0, "sentinel": 0}
         self._event: asyncio.Event = asyncio.Event()
 
@@ -143,7 +147,11 @@ class LocalModelGate:
         # o BucketManager.TokenBucket controla concorrência por capacidade.
         _ = self.get_priority(node_id)
 
-        tier_timeout: dict[str, float] = {"reviewer": 30.0, "coder": 10.0, "sentinel": 5.0}
+        tier_timeout: dict[str, float] = {
+            "reviewer": 30.0,
+            "coder": 10.0,
+            "sentinel": 5.0,
+        }
         _timeout = tier_timeout.get(tier, 5.0)
 
         acquired = await bucket.acquire(

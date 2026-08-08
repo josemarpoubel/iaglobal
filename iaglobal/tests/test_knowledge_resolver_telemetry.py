@@ -197,7 +197,6 @@ def test_event_evidence_is_read_only_mapping():
     """
     from datetime import datetime, timezone
 
-    from iaglobal.events import CapabilityDecisionEvent
     from iaglobal.events.event_id import EventId
     from types import MappingProxyType
 
@@ -230,7 +229,6 @@ def test_event_decision_confidence_is_aggregate():
     """
     from datetime import datetime, timezone
 
-    from iaglobal.events import CapabilityDecisionEvent
     from iaglobal.events.event_id import EventId
 
     e = CapabilityDecisionEvent(
@@ -339,7 +337,6 @@ async def test_no_double_emit_when_bridge_routes_through_engine():
     from iaglobal.knowledge.engine import KnowledgeEngine
     from iaglobal.models.event_bus import bus
     from iaglobal.pipeline.capability_resolver import PipelineCapabilityResolver
-    from iaglobal.knowledge.validator.python_validator import PythonValidator
 
     bus.reset()
     received: list[dict] = []

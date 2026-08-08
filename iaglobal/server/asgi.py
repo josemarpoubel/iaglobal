@@ -165,7 +165,7 @@ async def metrics_middleware(request: Request, call_next):
         response = await call_next(request)
         status = response.status_code
         return response
-    except Exception as e:
+    except Exception:
         status = 500
         raise
     finally:

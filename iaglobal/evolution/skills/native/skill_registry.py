@@ -14,6 +14,7 @@ from .skill import Skill
 
 from .skill import register_builtin_skills
 
+
 @dataclass
 class SkillEntry:
     skill: Skill

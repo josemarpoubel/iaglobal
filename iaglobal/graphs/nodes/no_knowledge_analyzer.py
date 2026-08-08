@@ -15,7 +15,6 @@ from iaglobal.memory.memory_vector import (
     store as mem_vector_store,
     init_db as vector_init_db,
 )
-from iaglobal.memory.async_memory import store_ltm_full
 from iaglobal.graphs.nodes._disk_swap import load_all_for_task
 
 logger = logging.getLogger(__name__)

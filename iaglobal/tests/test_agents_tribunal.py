@@ -167,7 +167,7 @@ def _print_summary():
     total = len(files)
     markers = sum(1 for f in files if GENESIS_HASH in _first_line(f))
     print(f"\n{'=' * 55}")
-    print(f"  ⚖️  TRIBUNAL DE GENESIS — agentes/")
+    print("  ⚖️  TRIBUNAL DE GENESIS — agentes/")
     print(f"  Arquivos: {total} | Com LINEAGE_MARKER: {markers}/{total}")
     print(f"{'=' * 55}\n")
 

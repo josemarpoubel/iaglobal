@@ -8,7 +8,6 @@ from iaglobal.core.result_adapter import (
     extract_artifact,
     extract_metadata,
     extract_errors,
-    extract_warnings,
     is_successful,
     extract_metric,
     is_skipped,

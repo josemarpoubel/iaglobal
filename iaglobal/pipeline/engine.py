@@ -613,7 +613,6 @@ class PipelineEngine:
                     if artifact:
                         from iaglobal.core.artifact import (
                             GeneratedArtifact,
-                            ArtifactKind,
                         )
 
                         if isinstance(artifact, GeneratedArtifact):

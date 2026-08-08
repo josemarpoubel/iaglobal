@@ -54,7 +54,9 @@ class TestNormalizeNodeResult:
         assert r.success is False
 
     def test_execution_metrics_fallback(self):
-        r = normalize_node_result({"success": True, "execution_metrics": {"latency": 1.5}})
+        r = normalize_node_result(
+            {"success": True, "execution_metrics": {"latency": 1.5}}
+        )
         assert r.metrics["latency"] == 1.5
 
     def test_singular_error_fallback(self):
@@ -87,7 +89,9 @@ def test_all_results_write_go_through_normalize():
     for node in ast.walk(tree):
         if isinstance(node, ast.Assign):
             for target in node.targets:
-                if isinstance(target, ast.Subscript) and isinstance(target.value, ast.Attribute):
+                if isinstance(target, ast.Subscript) and isinstance(
+                    target.value, ast.Attribute
+                ):
                     if (
                         isinstance(target.value.value, ast.Name)
                         and target.value.value.id == "self"

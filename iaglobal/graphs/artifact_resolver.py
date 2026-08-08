@@ -7,7 +7,7 @@ de heurísticas em dezenas de nós consumidores.
 """
 
 from dataclasses import dataclass
-from typing import Any, Dict, Optional, Tuple
+from typing import Any, Dict, Tuple
 
 from iaglobal.core.artifact import GeneratedArtifact, ArtifactKind
 from iaglobal.utils.logger import get_logger

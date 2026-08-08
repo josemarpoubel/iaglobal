@@ -11,7 +11,7 @@ Se faltar alguma dependência, o nó NÃO executa silenciosamente:
 """
 
 from dataclasses import dataclass, field
-from typing import Dict, Any, List, Optional
+from typing import Dict, Any, List
 
 
 class MissingContextError(RuntimeError):

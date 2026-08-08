@@ -338,6 +338,28 @@ class Bootstrap:
                     self.orchestrator is not None
                     and self.orchestrator.cpu_affinity is not None
                 ):
+                    # Enforcement real: pina o processo a 25% da capacidade
+                    # total de núcleos (dinâmico por máquina). Antes, o
+                    # scheduler distribuía budgets simbólicos mas nunca
+                    # impunha limite no SO — o processo usava 100% de um
+                    # núcleo (ou de todos) livremente.
+                    result = await asyncio.to_thread(
+                        self.orchestrator.cpu_affinity.apply_process_affinity
+                    )
+                    if result.get("enforced"):
+                        logger.info(
+                            "[CPU] Enforcement aplicado: %d núcleos de %d "
+                            "(%.0f%% da capacidade, regra de 25%%/núcleo)",
+                            result["target_cores"],
+                            result["total_cores"],
+                            result["fraction"] * 100,
+                        )
+                    else:
+                        logger.info(
+                            "[CPU] Enforcement não aplicado (%s) — processo "
+                            "sem teto de CPU no SO",
+                            result.get("reason", "desconhecido"),
+                        )
                     core = (
                         await self.orchestrator.cpu_affinity.pin_current("bootstrap")
                         or 0

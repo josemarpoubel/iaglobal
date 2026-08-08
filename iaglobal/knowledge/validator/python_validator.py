@@ -5,13 +5,11 @@ from __future__ import annotations
 import importlib.metadata
 import importlib.util
 import logging
-from typing import Optional
 
 from iaglobal.knowledge.contracts import MaturityLevel
 from iaglobal.knowledge.technology import TechnologyDescriptor
 from iaglobal.knowledge.validator.protocol import (
     TechnologyValidationResult,
-    TechnologyValidator,
 )
 
 logger = logging.getLogger(__name__)

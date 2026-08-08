@@ -11,7 +11,6 @@ import datetime
 import logging
 from typing import Any, Callable, Dict, List, Set, Optional
 
-from iaglobal.utils.life_signal_collector import instrument
 
 logger = logging.getLogger("iaglobal.graphs.communication.acetylcholine_bus")
 

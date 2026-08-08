@@ -8,7 +8,6 @@ Responsável por construção de cadeias de bloqueio e explicações legíveis.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 
 from iaglobal.cognition.awareness.models import (
     AgentActivity,

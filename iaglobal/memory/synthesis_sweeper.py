@@ -21,10 +21,8 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import json
-import logging
 import time
 from pathlib import Path
-from typing import Any
 
 from iaglobal._paths import CBOR2_DIR, JSON_DIR, SYNTHESIS_JSON_DIR
 from iaglobal.memory.db_manager import db

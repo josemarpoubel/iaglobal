@@ -13,13 +13,9 @@ Auditorias:
 """
 
 import asyncio
-import os
 import random
-import signal
 import sqlite3
 import statistics
-import subprocess
-import sys
 import tempfile
 import time
 from pathlib import Path
@@ -383,7 +379,7 @@ class TestAudit3PerformanceBaseline:
         max_lat = max(latencies)
         stddev = statistics.stdev(latencies) if len(latencies) >= 2 else 0
 
-        print(f"\n=== publish() Performance ===")
+        print("\n=== publish() Performance ===")
         print(
             f"p50={p50:.2f}ms  p95={p95:.2f}ms  p99={p99:.2f}ms  max={max_lat:.2f}ms  stddev={stddev:.2f}ms"
         )
@@ -428,7 +424,7 @@ class TestAudit3PerformanceBaseline:
         max_lat = max(latencies)
         stddev = statistics.stdev(latencies) if len(latencies) >= 2 else 0
 
-        print(f"\n=== snapshot() Performance ===")
+        print("\n=== snapshot() Performance ===")
         print(
             f"p50={p50:.2f}ms  p95={p95:.2f}ms  p99={p99:.2f}ms  max={max_lat:.2f}ms  stddev={stddev:.2f}ms"
         )
@@ -470,7 +466,7 @@ class TestAudit3PerformanceBaseline:
         )
         max_lat = max(latencies)
 
-        print(f"\n=== history() Performance ===")
+        print("\n=== history() Performance ===")
         print(f"p50={p50:.2f}ms  p95={p95:.2f}ms  p99={p99:.2f}ms  max={max_lat:.2f}ms")
 
         assert p99 < 50, f"p99 latency {p99:.2f}ms > 50ms"

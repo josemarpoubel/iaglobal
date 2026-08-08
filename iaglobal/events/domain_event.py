@@ -50,9 +50,7 @@ class DomainEvent:
         # ``Mapping`` interno continua mutável a menos que a gente o
         # envolva. ``__post_init__`` faz o freeze profundo em uma única
         # passagem.
-        object.__setattr__(
-            self, "evidence", MappingProxyType(dict(self.evidence))
-        )
+        object.__setattr__(self, "evidence", MappingProxyType(dict(self.evidence)))
 
     def to_dict(self) -> Dict[str, Any]:
         """Serialização base — subclasses podem estender via ``super``.

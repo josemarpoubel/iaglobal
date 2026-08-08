@@ -9,9 +9,6 @@ Nenhuma dependência externa: apenas lógica pura de mapeamento node_id → Agen
 """
 
 import pytest
-import os
-import sys
-import time
 
 
 from iaglobal.agents.agent_roles import AgentRole

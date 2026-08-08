@@ -60,7 +60,9 @@ def _decision_event(**overrides) -> CapabilityDecisionEvent:
     return CapabilityDecisionEvent(**payload)
 
 
-def _result_event(*, decision_event_id: EventId | None = None, **overrides) -> CapabilityResultEvent:
+def _result_event(
+    *, decision_event_id: EventId | None = None, **overrides
+) -> CapabilityResultEvent:
     if decision_event_id is None:
         decision_event_id = EventId("evt_dec_default")
     payload = dict(

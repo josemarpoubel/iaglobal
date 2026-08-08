@@ -104,7 +104,9 @@ async def test_utilizacao_alocada_pct_relativa_a_maquina(cpu_manager):
     rep = await cpu_manager.dispersion_report()
     assert rep["capacidade_total_core_equivalentes"] == cpu_manager._total_cores
     assert rep["total_budget_alocado"] == 1.0
-    assert rep["utilizacao_alocada_pct"] == pytest.approx(100.0 / cpu_manager._total_cores)
+    assert rep["utilizacao_alocada_pct"] == pytest.approx(
+        100.0 / cpu_manager._total_cores
+    )
 
 
 def test_local_model_concurrency_escala_com_cores(bandit_module):
@@ -249,3 +251,71 @@ def test_generate_atravessa_gate_e_libera_slot(monkeypatch, bandit_module):
     assert captured["active_during_gen"] == 1
     # Após o finally, o slot é liberado
     assert asyncio.run(cpu_affinity.active_generation_count()) == 0
+
+
+# ── 6. Enforcement real de CPU no boot (sched_setaffinity) ──
+
+
+def test_affinity_target_cores_dinamico(monkeypatch, cpu_manager):
+    """O teto é 25% da capacidade, detectado dinamicamente por máquina.
+
+    Regra do projeto: 25% por núcleo. Em 8 núcleos → 2 cores; em 48
+    núcleos → 12 cores. Um dev migrando de máquina não configura nada.
+    """
+    monkeypatch.setattr(cpu_manager, "_total_cores", 8)
+    assert cpu_manager.affinity_target_cores() == 2
+    monkeypatch.setattr(cpu_manager, "_total_cores", 48)
+    assert cpu_manager.affinity_target_cores() == 12
+    monkeypatch.setattr(cpu_manager, "_total_cores", 1)
+    assert cpu_manager.affinity_target_cores() == 1
+
+
+def test_affinity_fraction_default_25(monkeypatch, cpu_manager):
+    """Sem env, a fração é exatamente 0.25 (25% por núcleo)."""
+    monkeypatch.delenv("CPU_AFFINITY_FRACTION", raising=False)
+    assert cpu_manager._affinity_fraction == pytest.approx(0.25)
+
+
+def test_affinity_fraction_env_respeitado(monkeypatch):
+    """CPU_AFFINITY_FRACTION ajusta o teto e é limitada a [1%, 100%]."""
+    monkeypatch.setenv("CPU_AFFINITY_FRACTION", "0.5")
+    assert CpuAffinityManager()._affinity_fraction == pytest.approx(0.5)
+    monkeypatch.setenv("CPU_AFFINITY_FRACTION", "0.0")
+    assert CpuAffinityManager()._affinity_fraction == pytest.approx(0.01)
+    monkeypatch.setenv("CPU_AFFINITY_FRACTION", "abc")
+    assert CpuAffinityManager()._affinity_fraction == pytest.approx(0.25)
+
+
+def test_apply_process_affinity_pina_25_porcento(cpu_manager):
+    """apply_process_affinity() pina o processo à fração da capacidade.
+
+    Em máquinas com sched_setaffinity, TODAS as threads do processo atual
+    ficam restritas a `ncores × fração` cores — o enforcement real que o
+    scheduler simbólico sempre prometeu. Restaura a affinity após o teste.
+    """
+    import os
+
+    if not hasattr(os, "sched_setaffinity"):
+        pytest.skip("sched_setaffinity indisponível nesta plataforma")
+    original = os.sched_getaffinity(0)
+    try:
+        result = cpu_manager.apply_process_affinity()
+        assert result["enforced"] is True
+        assert result["fraction"] == pytest.approx(0.25)
+        expected_cores = max(1, int(cpu_manager._total_cores * 0.25))
+        assert result["target_cores"] == expected_cores
+        assert len(os.sched_getaffinity(0)) == expected_cores
+        assert cpu_manager._enforced_cores == expected_cores
+        # Toda thread do processo foi pinada (não só a thread chamadora)
+        assert result["threads_afetadas"] >= 1
+    finally:
+        os.sched_setaffinity(0, original)
+
+
+def test_apply_process_affinity_failsafe_sem_sched(cpu_manager, monkeypatch):
+    """Sem os.sched_setaffinity (ex: Windows), falha graciosa, sem teto."""
+    monkeypatch.delattr("os.sched_setaffinity", raising=False)
+    monkeypatch.delattr("os.sched_getaffinity", raising=False)
+    result = cpu_manager.apply_process_affinity()
+    assert result["enforced"] is False
+    assert "target_cores" in result

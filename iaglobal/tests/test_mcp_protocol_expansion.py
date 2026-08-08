@@ -127,9 +127,7 @@ class TestFileSystemTool:
         from iaglobal.mcp.file_system import FileSystemTool
 
         target = tests_temp_dir / "_mcp_test_tmp.json"
-        ok = _run(
-            FileSystemTool().write_file(str(target), '{"test": true}')
-        )
+        ok = _run(FileSystemTool().write_file(str(target), '{"test": true}'))
         assert ok is True
         assert target.exists()
         target.unlink(missing_ok=True)

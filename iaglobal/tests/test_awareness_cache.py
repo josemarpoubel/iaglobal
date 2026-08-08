@@ -18,7 +18,6 @@ from pathlib import Path
 from iaglobal.cognition.awareness import (
     AwarenessCache,
     AwarenessPersistence,
-    AgentActivity,
 )
 
 

@@ -5,7 +5,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Dict, List, Optional
 
-from iaglobal.core.artifact import ArtifactKind, GeneratedArtifact
+from iaglobal.core.artifact import GeneratedArtifact
 from iaglobal.events.event_id import EventId
 
 

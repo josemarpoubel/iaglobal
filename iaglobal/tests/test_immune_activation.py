@@ -8,20 +8,17 @@ Valida:
   3. Curva de aprendizado: segunda execução com vacina existente é mais rápida
 """
 
-import asyncio
 import time
 
 import pytest
 
-from iaglobal.evolution.epigenetic import get_flag, set_flag
+from iaglobal.evolution.epigenetic import get_flag
 from iaglobal.immunity.failure_analyzer import (
     parse_error,
-    fingerprint_error,
     check_vaccine,
     register_vaccine,
     generate_correction_plan,
 )
-from iaglobal.immunity.vaccine_ledger import vaccine_ledger
 from iaglobal.tools.builtins.code_executor import execute_code
 from iaglobal.metabolism.joint_optimization import joint_optimization_loop
 

@@ -74,6 +74,7 @@ def tests_data_subdir(name: str) -> Path:
     sub.mkdir(parents=True, exist_ok=True)
     return sub
 
+
 # =========================================================
 # RESULT OUTPUT (projetos numerados sequencialmente)
 # =========================================================

@@ -36,9 +36,7 @@ class LongTermMemory:
             """)
             cols = [row[1] for row in conn.execute("PRAGMA table_info(ltm_entries)")]
             if "consolidated_at" not in cols:
-                conn.execute(
-                    "ALTER TABLE ltm_entries ADD COLUMN consolidated_at TEXT"
-                )
+                conn.execute("ALTER TABLE ltm_entries ADD COLUMN consolidated_at TEXT")
             conn.commit()
 
     def store(

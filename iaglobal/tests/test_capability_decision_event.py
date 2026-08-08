@@ -86,8 +86,8 @@ class TestCapabilityDecisionEvent:
         assert d["capability"] == "data_analysis"
         assert d["selected_technology"] == "pandas"
         assert d["fallback_used"] is False
-        assert "created_at" in d        # DomainEvent lineage marker
-        assert d["id"] == "evt_test"     # EventId.value serialization
+        assert "created_at" in d  # DomainEvent lineage marker
+        assert d["id"] == "evt_test"  # EventId.value serialization
         assert len(d["reason"]) == 2
         assert "decision_confidence" in d
 

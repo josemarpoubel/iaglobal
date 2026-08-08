@@ -72,7 +72,9 @@ def test_escritor_e_leitor_compartilham_pool(_ivm_db_unique: Path):
     init_ivm_axiom_com_persistencia(db_path=_ivm_db_unique)
 
 
-def test_agente_via_get_ivm_axiom_escritor_observador_mesmo_objeto(_ivm_db_unique: Path):
+def test_agente_via_get_ivm_axiom_escritor_observador_mesmo_objeto(
+    _ivm_db_unique: Path,
+):
     """Fluxo real: agente usa get_ivm_axiom() (como agent_base) e observador vê."""
     init_ivm_axiom_com_persistencia(db_path=_ivm_db_unique)
 

@@ -22,16 +22,14 @@ Uso:
 
 from __future__ import annotations
 
-import asyncio
 import time
 import logging
-from typing import Optional, Dict, Any, List, Type
+from typing import Optional, Dict, Any, List
 from dataclasses import dataclass, field
 
 from iaglobal.diagnostics.error_descriptor import (
     ErrorDescriptor,
     ErrorCategory,
-    ErrorCause,
 )
 from iaglobal.diagnostics.error_classifier import error_classifier
 from iaglobal.diagnostics.repair_strategies import (

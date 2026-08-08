@@ -21,7 +21,7 @@ import time as _time
 from pathlib import Path
 from typing import Any, Dict, List, Optional
 
-from iaglobal.graphs.topology import PHASES, NODE_DEPENDENCIES, get_node_phase
+from iaglobal.graphs.topology import PHASES, NODE_DEPENDENCIES
 from iaglobal.graphs.skip_reason import REASON_LABELS
 
 NODE_COLORS = {

@@ -12,15 +12,13 @@ Cada cenário alimenta o JOL com RecoveryMetrics para calibração do BanditPoli
 
 import asyncio
 import time
-from dataclasses import dataclass, field
-from typing import Optional
+from dataclasses import dataclass
 
 import pytest
 
-from iaglobal.interface.diagnostico import DiagnosticoFalha, RecoveryMetrics
+from iaglobal.interface.diagnostico import RecoveryMetrics
 from iaglobal.immunity.failure_analyzer import (
     parse_error,
-    fingerprint_error,
     check_vaccine,
     register_vaccine,
     generate_correction_plan,

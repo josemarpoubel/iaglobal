@@ -33,7 +33,6 @@ from iaglobal.metabolism.metabolic_autocorrect import MetabolicAutocorrect
 from iaglobal.mcp.mcp_agent import MCPAgent
 from iaglobal.obsidian.omnimind import omni_mind
 from iaglobal.core.env_loader import load_env
-from typing import Dict, Any
 
 
 class MCPServer:

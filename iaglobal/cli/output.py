@@ -153,7 +153,7 @@ class HistoryRenderer:
 
     @staticmethod
     def render_list(entries: list):
-        print(f"\n  📜 Últimas execuções com DecisionEvents:\n")
+        print("\n  📜 Últimas execuções com DecisionEvents:\n")
         if not entries:
             print("  (nenhuma execução registrada)")
             print()
@@ -165,9 +165,9 @@ class HistoryRenderer:
 
     @staticmethod
     def render_stats(stats: dict):
-        print(f"\n  📊 DECISION EVENTS — Estatísticas\n")
+        print("\n  📊 DECISION EVENTS — Estatísticas\n")
         print(f"  Total no banco:  {stats['total']}")
-        print(f"  Por step:")
+        print("  Por step:")
         for step, count in sorted(
             stats.get("by_step", {}).items(), key=lambda x: -x[1]
         ):
@@ -244,7 +244,7 @@ class ReplayRenderer:
             )
             return
         print(f"\n{'=' * 60}")
-        print(f"  🧠 BANDIT TRAINED com histórico real")
+        print("  🧠 BANDIT TRAINED com histórico real")
         print(f"{'=' * 60}")
         print(f"  Modelo:      {result['model']}")
         print(f"  Recompensa:  {result['reward']}")

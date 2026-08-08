@@ -10,7 +10,6 @@ import threading
 import time
 
 import textwrap
-import logging
 
 from dataclasses import dataclass, field
 from datetime import datetime, timezone

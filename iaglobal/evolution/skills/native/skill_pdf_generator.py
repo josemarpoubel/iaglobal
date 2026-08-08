@@ -468,7 +468,6 @@ def register_skill():
     # Define run_fn após criação
     PDF_SKILL.run_fn = run_pdf_generator
 
-    from iaglobal.evolution.skills.native.skill_registry import skill_registry
 
     skill_registry.register(PDF_SKILL)
     print("[SKILL] pdf_generator registrada no SkillRegistry")

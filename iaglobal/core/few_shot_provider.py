@@ -22,7 +22,6 @@ DLQ (NEW):
   model prompt (visible to human/LLM as avoid-pattern)
 """
 
-import ast
 import asyncio
 import cbor2
 import hashlib

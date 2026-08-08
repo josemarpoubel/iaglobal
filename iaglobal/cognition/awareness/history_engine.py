@@ -9,8 +9,7 @@ Não executa SQL diretamente — acede dados via StorageRepository.
 
 from __future__ import annotations
 
-import time
-from typing import TYPE_CHECKING, Any
+from typing import Any
 
 from iaglobal.cognition.awareness.models import (
     AgentActivity,
@@ -73,7 +72,6 @@ class HistoryEngine:
             execution_id=execution_id, timestamp=timestamp
         )
         from iaglobal.cognition.awareness.awareness_schema import deserialize_metadata
-        from iaglobal.cognition.awareness.models import NodeStatus
 
         node_states: dict[str, AgentActivity] = {}
         for row in rows:

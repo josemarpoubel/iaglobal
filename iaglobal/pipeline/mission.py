@@ -11,7 +11,7 @@ from __future__ import annotations
 
 import re
 import unicodedata
-from typing import List, Optional
+from typing import Optional
 
 from iaglobal.pipeline.context.protocol import MissionContext as _MissionCtx
 

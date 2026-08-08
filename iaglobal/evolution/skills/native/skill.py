@@ -466,7 +466,7 @@ async def _run_performance_design(ctx: Dict[str, Any]) -> Dict[str, Any]:
     arch = _safe_get(ctx, "architecture", "task", "input.task")
     reqs = _safe_get(ctx, "requirements", "output")
     perf_checks = [
-        f"=== Performance Design Report ===",
+        "=== Performance Design Report ===",
         f"Arquitetura: {arch[:100]}",
         "Requisitos de performance analisados:",
         "  - Latência alvo: <200ms P95",

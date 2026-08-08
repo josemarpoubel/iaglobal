@@ -14,7 +14,6 @@ import pytest
 import asyncio
 import json
 import time
-from pathlib import Path
 
 from iaglobal.search.feedback_loop import (
     FeedbackLoop,
@@ -104,7 +103,9 @@ class TestFeedbackLoop:
         feedback_loop_dir = tests_temp_dir / "feedback_loop"
         feedback_loop_dir.mkdir(parents=True, exist_ok=True)
         index_file = feedback_loop_dir / "feedback_index.json"
-        monkeypatch.setattr(feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir)
+        monkeypatch.setattr(
+            feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir
+        )
         monkeypatch.setattr(feedback_loop.FeedbackLoop, "INDEX_FILE", index_file)
 
         # Limpar singleton e cache
@@ -442,7 +443,9 @@ class TestFeedbackLoopIntegration:
         feedback_loop_dir = tests_temp_dir / "feedback_loop"
         feedback_loop_dir.mkdir(parents=True, exist_ok=True)
         index_file = feedback_loop_dir / "feedback_index.json"
-        monkeypatch.setattr(feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir)
+        monkeypatch.setattr(
+            feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir
+        )
         monkeypatch.setattr(feedback_loop.FeedbackLoop, "INDEX_FILE", index_file)
 
         feedback_loop._feedback = None
@@ -543,7 +546,9 @@ class TestFeedbackLoopE2E:
         feedback_loop_dir = tests_temp_dir / "feedback_loop"
         feedback_loop_dir.mkdir(parents=True, exist_ok=True)
         index_file = feedback_loop_dir / "feedback_index.json"
-        monkeypatch.setattr(feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir)
+        monkeypatch.setattr(
+            feedback_loop.FeedbackLoop, "OBSIDIAN_PATH", feedback_loop_dir
+        )
         monkeypatch.setattr(feedback_loop.FeedbackLoop, "INDEX_FILE", index_file)
 
         feedback_loop._feedback = None

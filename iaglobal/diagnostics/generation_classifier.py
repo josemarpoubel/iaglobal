@@ -21,7 +21,6 @@ Uso:
 """
 
 import re
-from typing import Optional
 from dataclasses import dataclass
 
 

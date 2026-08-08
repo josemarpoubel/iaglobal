@@ -33,7 +33,6 @@ import pytest
 
 from iaglobal.events import (
     CapabilityDecisionEvent,
-    CapabilityResultEvent,
     EventId,
 )
 from iaglobal.events.event_types import EventType
@@ -75,7 +74,6 @@ def _build_isolated_engine():
 async def test_helper_emits_capability_result_with_lineage():
     """The engine helper must publish CAPABILITY_RESULT with the
     decision_event_id captured earlier."""
-    from iaglobal.pipeline.engine import PipelineEngine
     from iaglobal.pipeline.pipelinestate import PipelineState
 
     _reset_bus()
@@ -93,7 +91,7 @@ async def test_helper_emits_capability_result_with_lineage():
     state.syntax_valid = True
 
     # Inject a fake capability_plan in the engine state context
-    from iaglobal.pipeline.capability_resolver import CapabilityPlan, PlanStep
+    from iaglobal.pipeline.capability_resolver import CapabilityPlan
 
     plan = CapabilityPlan(artifact="pdf")
     plan.add_step("tool", "tool:pandas")
@@ -124,7 +122,6 @@ async def test_helper_emits_capability_result_with_lineage():
 async def test_helper_aborts_when_no_predecessor():
     """Per ADR-0004: result without predecessor does not exist.
     Without ``state.decision_event_id`` the helper is silent."""
-    from iaglobal.pipeline.engine import PipelineEngine
     from iaglobal.pipeline.pipelinestate import PipelineState
 
     _reset_bus()
@@ -144,7 +141,6 @@ async def test_helper_aborts_when_no_predecessor():
 async def test_helper_publishes_failure_event_too():
     """Failure path also publishes CAPABILITY_RESULT with
     ``success=False`` — feedback learns from errors too."""
-    from iaglobal.pipeline.engine import PipelineEngine
     from iaglobal.pipeline.pipelinestate import PipelineState
 
     _reset_bus()
@@ -181,7 +177,6 @@ def test_decision_to_result_causal_edge_in_engine_runtime():
     independently — exercises only the engine-side wiring.
     """
     from iaglobal.pipeline.capability_resolver import CapabilityPlan
-    from iaglobal.pipeline.engine import PipelineEngine
     from iaglobal.pipeline.pipelinestate import PipelineState
 
     _reset_bus()
@@ -261,7 +256,6 @@ def test_decision_to_result_causal_edge_in_engine_runtime():
 async def test_one_result_event_per_run():
     """A given ``PipelineState`` with a single ``decision_event_id``
     produces exactly one ``CAPABILITY_RESULT`` (no duplicates)."""
-    from iaglobal.pipeline.engine import PipelineEngine
     from iaglobal.pipeline.pipelinestate import PipelineState
 
     _reset_bus()

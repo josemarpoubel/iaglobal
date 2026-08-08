@@ -1,4 +1,3 @@
-import ast
 import re
 
 from dataclasses import dataclass, field
@@ -10,7 +9,6 @@ from .syntax import validar_sintaxe
 from iaglobal.utils.logger import logger
 from iaglobal.security.ast_gateway import ASTGateway
 from iaglobal.diagnostics.python_normalizer import (
-    PythonNormalizer,
     normalize_before_repair,
 )
 

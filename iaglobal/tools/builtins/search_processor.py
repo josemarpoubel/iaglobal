@@ -14,6 +14,7 @@ from typing import Any, Dict, List
 
 from iaglobal.tools.tool_library import tool_library
 
+
 def process_search_results(
     raw_text: str, max_code_blocks: int = 3, max_facts: int = 6
 ) -> str:
@@ -94,7 +95,6 @@ def process_search_results_structured(raw_text: str) -> Dict[str, Any]:
         "char_count": len(raw_text),
         "source_count": len(urls) + len(bullets),
     }
-
 
 
 tool_library.register(

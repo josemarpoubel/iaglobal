@@ -410,7 +410,7 @@ def _format_markdown_report(
         "",
         "### Barreira Imunológica — Integridade do Cache/Telemetria",
         (
-            f"- Eventos detectados: "
+            "- Eventos detectados: "
             + ", ".join(f"{k}={v}" for k, v in immune_events.items() if v)
             if any(immune_events.values())
             else "- _sem eventos de degradação nesta sessão_"

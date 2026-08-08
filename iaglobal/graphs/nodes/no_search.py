@@ -76,7 +76,9 @@ async def _try_source(name: str, fn: Callable, task: str, timeout: int = 12) -> 
             )
             return result_str
     except asyncio.TimeoutError:
-        logger.debug("[SEARCH] Timeout atingido para a fonte: %s (limite de %ds)", name, timeout)
+        logger.debug(
+            "[SEARCH] Timeout atingido para a fonte: %s (limite de %ds)", name, timeout
+        )
     except Exception as e:
         logger.debug("[SEARCH] Falha controlada na fonte %s: %s", name, e)
     return ""
@@ -140,7 +142,9 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
     task = str(ctx.get("input", {}).get("task", ""))
 
     if not task or len(task) < 5:
-        await asyncio.to_thread(record_error, SOURCE, "Empty task string", {"task": task})
+        await asyncio.to_thread(
+            record_error, SOURCE, "Empty task string", {"task": task}
+        )
         latency_ms = (time.time() - start_time) * 1000.0
         return {
             "output": "",
@@ -198,7 +202,9 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
             batch = active_sources[batch_start : batch_start + _BATCH_SIZE]
 
             # Agenda a execução concorrente do lote atual
-            tasks = [_try_source(name, fn, task, timeout) for name, fn, timeout in batch]
+            tasks = [
+                _try_source(name, fn, task, timeout) for name, fn, timeout in batch
+            ]
             results = await asyncio.gather(*tasks, return_exceptions=True)
 
             for (name, _, _), result in zip(batch, results):
@@ -270,7 +276,9 @@ async def run_search(ctx: Dict[str, Any]) -> Dict[str, Any]:
                 timeout=60.0,
             )
             if len(fallback_text) > 50:
-                logger.info("[SEARCH] Fallback LLM gerou %d caracteres", len(fallback_text))
+                logger.info(
+                    "[SEARCH] Fallback LLM gerou %d caracteres", len(fallback_text)
+                )
                 return {
                     "output": fallback_text,
                     "search_results": fallback_text,

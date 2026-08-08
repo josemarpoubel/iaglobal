@@ -5,7 +5,6 @@ import threading
 from enum import Enum
 from typing import Any, Dict, List, Optional
 from pathlib import Path
-import json
 
 from iaglobal._paths import GLUTATHIONE_POOL_FILE
 from iaglobal.utils.atomic_io import AtomicJSONStore
@@ -52,7 +51,7 @@ class GlutathionePool:
         if threat_type == "loop":
             self.add_guardrail(
                 name=f"guardrail_loop_{threat_data.get('node', 'unknown')}",
-                description=f"Isolamento automático de nó em loop",
+                description="Isolamento automático de nó em loop",
                 detector="loop_detector",
             )
             return {
@@ -64,7 +63,7 @@ class GlutathionePool:
         if threat_type == "regression":
             self.add_guardrail(
                 name=f"guardrail_regression_{threat_data.get('node', 'unknown')}",
-                description=f"Correção automática de regressão",
+                description="Correção automática de regressão",
                 detector="regression_detector",
             )
             return {
@@ -76,12 +75,12 @@ class GlutathionePool:
         if threat_type == "hallucination":
             self.add_guardrail(
                 name=f"guardrail_hallucination_{hash(str(threat_data.get('issues', ''))) % 10000:04d}",
-                description=f"Escalamento de alucinação detectada",
+                description="Escalamento de alucinação detectada",
                 detector="hallucination_detector",
             )
             return {
                 "response": ImmuneResponse.ESCALATE.value,
-                "action": f"Alucinação detectada — escalando",
+                "action": "Alucinação detectada — escalando",
                 "guardrails_applied": 1,
             }
 

@@ -16,7 +16,7 @@ def _expected_concurrency(model_name: str, bp) -> int:
     """Retorna a concorrência esperada para um modelo, lendo do provider_config."""
     if "groq/" in model_name or "nvidia/" in model_name:
         return bp.CLOUD_MODEL_CONCURRENCY
-    from iaglobal.providers.provider_config import COGNITIVE_MODELS, CognitiveRole
+    from iaglobal.providers.provider_config import COGNITIVE_MODELS
 
     raw = model_name.replace("ollama/", "", 1)
     for role, cfg in COGNITIVE_MODELS.items():
@@ -126,7 +126,7 @@ async def test_semaphore_invariante_acquire_release(monkeypatch):
     # Verifica _model_in_use: todos devem ser False
     stuck = [m for m, v in bp._model_in_use.items() if v]
     assert not stuck, f"Modelos presos como em uso: {stuck}"
-    print(f"  Model in use: OK ✅")
+    print("  Model in use: OK ✅")
 
 
 async def test_semaphore_invariante_multiplos_modelos(monkeypatch):
@@ -262,7 +262,7 @@ async def test_semaphore_sem_vazamento_apos_falha_total(monkeypatch):
             )
 
     print(f"  Falha total: todas {n_concurrent} retornaram vazio ✅")
-    print(f"  Semáforos íntegros após falha ✅")
+    print("  Semáforos íntegros após falha ✅")
 
 
 async def test_ciclo_completo_arbiter_bandit_sem_vazamento(monkeypatch):
@@ -275,7 +275,6 @@ async def test_ciclo_completo_arbiter_bandit_sem_vazamento(monkeypatch):
     """
     monkeypatch.setenv("ARBITER_MODE", "enforce")
 
-    import iaglobal.graphs.bandit as bm
     from iaglobal.agents.critic_agent import _get_critic
 
     # Mock tools + memory para NAO resolver localmente

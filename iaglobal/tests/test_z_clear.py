@@ -27,7 +27,6 @@ Invocação:
 
 from pathlib import Path
 
-import pytest
 
 from iaglobal._paths import DATA_ROOT, TESTS_DATA_DIR
 

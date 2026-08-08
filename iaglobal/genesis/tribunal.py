@@ -148,7 +148,7 @@ class GenesisTribunal:
 
         linha = "=" * 60
         print(f"\n{linha}")
-        print(f"  ⚖️  TRIBUNAL DE GENESIS")
+        print("  ⚖️  TRIBUNAL DE GENESIS")
         print(f"  DNA Ancestral: {GENESIS_HASH_OFFICIAL[:24]}...")
         print(f"{linha}")
 

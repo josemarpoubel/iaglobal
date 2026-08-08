@@ -5,7 +5,6 @@ Nota: TokenBucket agora usa (capacity, fill_rate, max_concurrent) em vez de (rat
 """
 
 import asyncio
-import time
 
 import pytest
 

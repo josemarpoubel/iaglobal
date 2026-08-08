@@ -109,7 +109,9 @@ class BanditPolicy:
             str, Dict
         ] = {}  # Memória por contexto/domínio para epigenética
         self._epigenetic_flags: Dict[str, bool] = {}  # Flags epigenéticas
-        self._cpu_slot_acquired = False  # guard: slot de CPU reservado no CpuAffinityManager
+        self._cpu_slot_acquired = (
+            False  # guard: slot de CPU reservado no CpuAffinityManager
+        )
 
         # Inicializa pesos a partir de variável de ambiente
         initial_weights = os.getenv("BANDIT_INITIAL_WEIGHTS", "")
@@ -219,7 +221,6 @@ class BanditPolicy:
         try:
             from iaglobal.providers.provider_config import (
                 COGNITIVE_MODELS,
-                CognitiveRole,
             )
 
             for role, cfg in COGNITIVE_MODELS.items():
@@ -995,13 +996,16 @@ class BanditPolicy:
                         execution_id=execution_id,
                     )
                     if not any(
-                        p in model_selected for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
+                        p in model_selected
+                        for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
                     ):
                         try:
                             from iaglobal.execution.token_bucket import LocalModelGate
 
                             gate = await LocalModelGate.get_instance()
-                            await gate.release(effective_agent, model_name=model_selected)
+                            await gate.release(
+                                effective_agent, model_name=model_selected
+                            )
                         except Exception:
                             pass
                     _sem_acquired = False

@@ -10,14 +10,15 @@ Garante que:
    os dados reais, não um dict vazio
 """
 
-import pytest
 from typing import Dict, Any
 
 
 class TestBuildContractCtx:
     """Verifica que _build_contract_ctx passa memory por referência."""
 
-    async def test_memory_present_in_contract_ctx(self,):
+    async def test_memory_present_in_contract_ctx(
+        self,
+    ):
         from iaglobal.evolution.skills.native.skill_executor import (
             SkillExecutor,
         )

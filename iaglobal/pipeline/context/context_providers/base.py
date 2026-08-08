@@ -18,11 +18,10 @@ Exemplo:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Callable, Dict, List, Optional, Tuple, Type
+from dataclasses import dataclass
+from typing import Any, List, Optional, Tuple, Type
 
 from ..protocol import (
-    ContextProvider,
     PipelineExecutionContext,
     MissionContext,
     NodeContext,

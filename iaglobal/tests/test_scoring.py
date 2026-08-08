@@ -2,7 +2,6 @@
 """Tests for CodeScorer — qualidade de código via AST centralizado."""
 
 import ast
-import json
 from pathlib import Path
 
 import pytest
@@ -45,7 +44,6 @@ class TestCaptureFailure:
         errors = ["invalid decimal literal"]
         _capture_failure(code, errors)
 
-        from iaglobal.validation.scoring import _capture_failure as cf
 
         dump_dir = tests_temp_dir / "failure_dumps"
         if dump_dir.exists():

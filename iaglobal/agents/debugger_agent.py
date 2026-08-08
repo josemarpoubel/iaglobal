@@ -313,7 +313,7 @@ Retorne APENAS o código Python refinado, sem explicações ou markdown.
             )
             return fixed_code, model
 
-        except Exception as e:
+        except Exception:
             logger.exception("[DebuggerAgent] Self-healing failure")
             self.bandit.update_policy(
                 node="debugger_agent",

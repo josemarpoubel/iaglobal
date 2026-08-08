@@ -42,7 +42,6 @@ except ImportError:
     )
 
 
-
 # Bootstrap: importa cada módulo provider para disparar registry.register()
 def _bootstrap_providers() -> None:
     import importlib
@@ -75,7 +74,6 @@ _bootstrap_providers()
 # ── CognitiveRouter: Tribunal Cognitivo de 3 Camadas ──────────────────────
 # Mapeia tipo de tarefa → rota metabólica, extraindo capacidade do
 # ProviderConfig.  Desacoplado do gerenciamento de buckets (Passo 3).
-
 
 
 QWEN_MODEL_ID = get_model_config(CognitiveRole.OPERARIO)["model_id"]

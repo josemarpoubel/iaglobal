@@ -28,7 +28,6 @@ Estrutura de saída (dict):
 """
 
 import json
-import statistics
 import sys
 from datetime import datetime
 from pathlib import Path

@@ -15,7 +15,6 @@ Uso:
 """
 
 from pathlib import Path
-from typing import Optional
 from functools import lru_cache
 
 from iaglobal.utils.logger import get_logger

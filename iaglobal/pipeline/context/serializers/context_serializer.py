@@ -12,7 +12,7 @@ from __future__ import annotations
 
 from typing import Optional
 
-from ..protocol import NodeContext, NodeSection, CharTokenEstimator
+from ..protocol import NodeContext, CharTokenEstimator
 
 
 class ContextSerializer:

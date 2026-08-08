@@ -5,11 +5,9 @@ Testes para PythonNormalizer.
 """
 
 import pytest
-import ast
 
 from iaglobal.diagnostics.python_normalizer import (
     PythonNormalizer,
-    NormalizeResult,
     normalize_before_repair,
 )
 

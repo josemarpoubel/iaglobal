@@ -14,7 +14,6 @@
 #   summary = collector.get_summary()
 
 import json
-import time
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, Dict, Any
@@ -315,7 +314,7 @@ def print_summary() -> None:
         f"Last Event:                      {summary['last_event_timestamp'] or 'N/A'}"
     )
     print()
-    print(f"Data Files:")
+    print("Data Files:")
     print(f"  Interventions: {summary['data_files']['interventions']}")
     print(f"  Corrections:   {summary['data_files']['corrections']}")
     print()

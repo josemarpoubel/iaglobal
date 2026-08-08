@@ -53,8 +53,8 @@ enabled_engines:
   - docker_hub
 
 outgoing:
-  request_timeout: 5.0
-  max_request_timeout: 10.0
+  request_timeout: 20.0
+  max_request_timeout: 30.0
   useragent_suffix: "iaglobal/1.0"
   # Proxies:
   #   http: http://proxy:8080

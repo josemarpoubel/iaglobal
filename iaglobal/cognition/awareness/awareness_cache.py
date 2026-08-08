@@ -11,7 +11,6 @@ from __future__ import annotations
 
 import asyncio
 import cbor2
-import logging
 import sqlite3
 import time
 from typing import Any
@@ -20,20 +19,16 @@ from iaglobal.utils.logger import get_logger
 from iaglobal.cognition.awareness.awareness_schema import (
     init_schema,
     deserialize_metadata,
-    serialize_metadata,
-    serialize_json,
     deserialize_json,
 )
 from iaglobal.cognition.awareness.models import (
     AgentActivity,
     NodeDomain,
-    NodeStatus,
     CausalChain,
     DomainSnapshot,
     EpisodicMemory,
     ConfidenceTrace,
     ArtifactConfidence,
-    ConfidenceSnapshot,
     AwarenessExecutionContext,
     serialize_confidence_trace,
     deserialize_confidence_trace,

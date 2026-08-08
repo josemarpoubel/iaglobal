@@ -16,7 +16,7 @@ Cobertura:
     - Configuração: ProviderConfig.SEARXNG_URL carregada corretamente.
     - Unit: searxng_search() com sucesso mockado, circuit breaker, TTL.
     - Integração: pipeline e router invocam searxng_search() durante execução.
-    """
+"""
 
 import json
 import time
@@ -130,14 +130,13 @@ class TestSearxngSearchUnit:
 
     def test_circuit_breaker_skips_network_when_offline(self):
         # Primeira falha marca offline
-        with mock.patch(
-            "urllib.request.urlopen", side_effect=OSError("recusada")
-        ):
+        with mock.patch("urllib.request.urlopen", side_effect=OSError("recusada")):
             ss.searxng_search("q1")
 
         # Segunda chamada dentro do TTL não deve tentar rede
         with mock.patch(
-            "urllib.request.urlopen", side_effect=AssertionError("rede não deve ser tocada")
+            "urllib.request.urlopen",
+            side_effect=AssertionError("rede não deve ser tocada"),
         ):
             assert ss.searxng_search("q2") == ""
 
@@ -158,7 +157,9 @@ class TestSearxngSearchUnit:
                 return False
 
             def read(self):
-                return json.dumps({"results": [{"title": "T", "url": "http://u", "content": "c"}]}).encode()
+                return json.dumps(
+                    {"results": [{"title": "T", "url": "http://u", "content": "c"}]}
+                ).encode()
 
         with mock.patch("urllib.request.urlopen", return_value=_FakeResp()):
             ss.searxng_search("q2")

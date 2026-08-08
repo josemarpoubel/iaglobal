@@ -31,7 +31,6 @@ from typing import Any, Dict, Optional
 
 from iaglobal.events.domain_event import DomainEvent
 from iaglobal.events.event_id import EventId
-from iaglobal.events.event_types import EventType
 
 
 @dataclass(frozen=True)

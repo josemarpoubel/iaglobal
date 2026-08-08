@@ -14,8 +14,6 @@ import pytest
 from iaglobal.search.query_expander import (
     QueryExpander,
     ExpandedQuery,
-    expand_query,
-    get_expansion_stats,
 )
 
 

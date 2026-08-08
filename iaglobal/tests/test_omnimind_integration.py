@@ -11,10 +11,7 @@ Teste avançado de integração da OmniMind — cobre 5 áreas:
 
 import json
 import logging
-import os
-import tempfile
 import threading
-import time
 from pathlib import Path
 
 import pytest
@@ -22,16 +19,12 @@ import pytest
 from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
 from iaglobal.genesis.lineage_gate import (
     set_revocation_file,
-    get_revoked_nodes,
     verify_lineage_token,
     set_open_mode,
 )
 from iaglobal.obsidian.omnimind import (
     OmniMind,
     Orientacao,
-    LEIS_HOLLIWELL,
-    AXIOMAS_BIOLOGICOS,
-    LEIS_UNIVERSAIS,
 )
 
 logging.basicConfig(level=logging.CRITICAL)

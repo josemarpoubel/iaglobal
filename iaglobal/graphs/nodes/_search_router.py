@@ -78,7 +78,9 @@ def _exchange_rate(query: str) -> str:
             "CAD",
             "AUD",
         ]
-        lines = [f"Taxas de câmbio base {base} ({data.get('time_last_update_utc', '')})"]
+        lines = [
+            f"Taxas de câmbio base {base} ({data.get('time_last_update_utc', '')})"
+        ]
         for t in targets:
             if t != base and t in rates:
                 lines.append(f"  {t}: {rates[t]:.4f}")
@@ -143,7 +145,9 @@ def _fetch_rss(url: str, max_items: int = 3) -> str:
             summary = entry.find("{http://www.w3.org/2005/Atom}summary")
             items.append(
                 {
-                    "title": title.text.strip() if title is not None and title.text else "",
+                    "title": title.text.strip()
+                    if title is not None and title.text
+                    else "",
                     "link": link.attrib.get("href", "") if link is not None else "",
                     "summary": summary.text.strip()[:200]
                     if summary is not None and summary.text
@@ -157,8 +161,12 @@ def _fetch_rss(url: str, max_items: int = 3) -> str:
                 desc = item.find("description")
                 items.append(
                     {
-                        "title": title.text.strip() if title is not None and title.text else "",
-                        "link": link.text.strip() if link is not None and link.text else "",
+                        "title": title.text.strip()
+                        if title is not None and title.text
+                        else "",
+                        "link": link.text.strip()
+                        if link is not None and link.text
+                        else "",
                         "summary": desc.text.strip()[:200]
                         if desc is not None and desc.text
                         else "",

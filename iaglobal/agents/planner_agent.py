@@ -83,7 +83,7 @@ class PlannerAgent(AgentBase):
         # Se a conversão literal retornar a representação em memória do objeto, limpa para não poluir o prompt
         if texto_extraido.startswith("<") and texto_extraido.endswith(">"):
             logger.warning(
-                f"⚠️ [PLANNER]: Extração falhou na varredura de atributos. Usando fallback de string genérica."
+                "⚠️ [PLANNER]: Extração falhou na varredura de atributos. Usando fallback de string genérica."
             )
             return "Desenvolver código funcional conforme especificações do sistema."
 

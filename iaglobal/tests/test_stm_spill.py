@@ -123,8 +123,69 @@ def test_spill_disabled_when_flag_false(stm_db: Path):
 def test_spill_env_fraction_parsed(stm_db: Path, monkeypatch):
     """STM_SPILL_RSS_FRACTION define o threshold default (fracao da RAM)."""
     monkeypatch.setenv("STM_SPILL_RSS_FRACTION", "0.7")
-    with patch(
-        "iaglobal.memory.term_short._total_ram_mb", return_value=16000
-    ):
+    with patch("iaglobal.memory.term_short._total_ram_mb", return_value=16000):
         stm = ShortTermMemory(db_path=stm_db, spill_enabled=False)
     assert stm._spill_threshold_mb == int(16000 * 0.7)
+
+
+def test_upsert_keeps_single_row_per_key(stm_db: Path):
+    """upsert() substitui a entrada anterior com a mesma chave — sem append infinito."""
+    stm = ShortTermMemory(max_size=50, db_path=stm_db, spill_enabled=False)
+    for i in range(3):
+        stm.upsert("ivm_axiom_historico", {"v": i}, metadata={"tipo": "ivm_axiom"})
+    stm.upsert("ivm_axiom_metricas", {"v": 1}, metadata={"tipo": "ivm_axiom"})
+
+    import sqlite3
+
+    conn = sqlite3.connect(stm_db)
+    rows = conn.execute("SELECT chave, data FROM stm_entries ORDER BY chave").fetchall()
+    conn.close()
+
+    assert len(rows) == 2, "uma linha por chave, nao acumulo"
+    import cbor2
+
+    historico = cbor2.loads(rows[0][1])
+    assert historico["content"]["v"] == 2, "vale a ultima versao"
+    assert stm.count() == 2
+
+
+def test_upsert_shared_across_instances(stm_db: Path):
+    """Apos upsert, uma nova instancia (mesmo banco) enxerga so a ultima versao."""
+    stm = ShortTermMemory(max_size=50, db_path=stm_db, spill_enabled=False)
+    for i in range(4):
+        stm.upsert("chave_x", {"v": i})
+
+    stm2 = ShortTermMemory(max_size=50, db_path=stm_db, spill_enabled=False)
+    entradas = stm2.get_all_with_metadata()
+    assert len(entradas) == 1
+    assert entradas[0]["content"]["v"] == 3
+
+
+def test_sqlite_trimmed_to_max_size(stm_db: Path):
+    """O SQLite e delimitado: apos muitos writes, nao cresce alem de ~2x max_size."""
+    stm = ShortTermMemory(max_size=10, db_path=stm_db, spill_enabled=False)
+    for i in range(50):
+        stm.add(f"item-{i}")
+
+    import sqlite3
+
+    conn = sqlite3.connect(stm_db)
+    n = conn.execute("SELECT COUNT(*) FROM stm_entries").fetchone()[0]
+    conn.close()
+
+    assert n <= 2 * 10 + 1, f"banco delimitado (tinha {n} linhas)"
+    assert stm.get_recent(1) == ["item-49"]
+
+
+def test_upsert_registers_chave_column(stm_db: Path):
+    """O schema ganha a coluna chave idempotente (backward-compatible)."""
+    stm = ShortTermMemory(max_size=10, db_path=stm_db, spill_enabled=False)
+    stm.add("sem-chave")
+    stm.upsert("com-chave", {"v": 1})
+
+    import sqlite3
+
+    conn = sqlite3.connect(stm_db)
+    cols = [r[1] for r in conn.execute("PRAGMA table_info(stm_entries)")]
+    assert "chave" in cols
+    conn.close()

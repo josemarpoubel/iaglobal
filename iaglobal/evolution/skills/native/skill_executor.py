@@ -8,7 +8,7 @@ from iaglobal.utils.logger import logger
 from .skill import Skill, ExecutionPolicy
 from .skill_registry import skill_registry
 
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING
 
 # O TYPE_CHECKING só é lido pelo analisador de tipos (não causa importação circular)
 if TYPE_CHECKING:
@@ -196,7 +196,7 @@ class SkillExecutor:
     ) -> Dict[str, Any]:
         try:
             return await self.execute(skill_name, ctx, version)
-        except SkillExecutionError as e:
+        except SkillExecutionError:
             skill = self.registry.get(skill_name)
             if not skill or _depth >= 2:
                 raise

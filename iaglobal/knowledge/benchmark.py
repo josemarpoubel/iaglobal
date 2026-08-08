@@ -10,9 +10,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import datetime
-from typing import Dict, Optional
+from typing import Optional
 
-from iaglobal.knowledge.contracts import Severity, KnowledgeProvenance
+from iaglobal.knowledge.contracts import KnowledgeProvenance
 
 
 @dataclass(frozen=True)

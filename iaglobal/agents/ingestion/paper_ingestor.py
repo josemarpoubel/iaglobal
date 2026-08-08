@@ -319,5 +319,3 @@ async def ingest_batch(
             paths.append(result)
 
     return paths
-
-

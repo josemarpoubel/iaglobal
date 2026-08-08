@@ -15,12 +15,12 @@ import asyncio
 import time
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import TYPE_CHECKING, Dict, List, Optional, Set
+from typing import TYPE_CHECKING, Dict, List, Optional
 
 from iaglobal.utils.logger import get_logger
 
 if TYPE_CHECKING:
-    from iaglobal.graphs.node import Node
+    pass
 
 logger = get_logger("iaglobal")
 

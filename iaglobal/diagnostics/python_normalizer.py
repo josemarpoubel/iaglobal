@@ -177,7 +177,7 @@ class PythonNormalizer:
                 check=True,
                 timeout=5,
             )
-        except (subprocess.CalledProcessError, FileNotFoundError) as e:
+        except (subprocess.CalledProcessError, FileNotFoundError):
             logger.warning(
                 f"Ruff não encontrado ({self.ruff_cmd}). Instale com: pip install ruff"
             )

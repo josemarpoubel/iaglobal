@@ -6,7 +6,6 @@ Garante que os 3 modelos Ollama locais estão configurados e roteados
 corretamente, e que nenhum path hardcoded quebra a distribuição.
 """
 
-import os
 import pytest
 
 from iaglobal.providers.provider_config import (

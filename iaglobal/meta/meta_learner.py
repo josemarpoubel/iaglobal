@@ -363,7 +363,7 @@ class MetaLearner:
                 self.evolution_backlog[k] = EvolutionBacklogItem(**v)
             self.auto_tuned_configs.update(state.get("auto_tuned_configs", {}))
             self.execution_history = state.get("execution_history", [])
-            logger.info(f"🧠 [META] Estado carregado")
+            logger.info("🧠 [META] Estado carregado")
         except Exception as e:
             logger.error(f"🧠 [META] Erro ao carregar estado: {e}")
 

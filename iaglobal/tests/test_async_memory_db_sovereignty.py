@@ -20,7 +20,6 @@ from pathlib import Path
 
 import pytest
 
-from iaglobal._paths import MEMORIES_DB
 from iaglobal.memory.async_memory import add_ltm, add_stm
 
 
@@ -42,9 +41,7 @@ def fresh_memories_db(tests_temp_dir, monkeypatch):
     monkeypatch.setattr(am, "_memory_vector", None)
     monkeypatch.setattr("iaglobal._paths.MEMORIES_DB", target)
     monkeypatch.setattr("iaglobal.memory.async_memory.MEMORIES_DB", target)
-    monkeypatch.setattr(
-        "iaglobal.obsidian.consolidation.MEMORIES_DB", target
-    )
+    monkeypatch.setattr("iaglobal.obsidian.consolidation.MEMORIES_DB", target)
     return target
 
 

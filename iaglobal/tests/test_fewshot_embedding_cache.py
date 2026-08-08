@@ -50,7 +50,9 @@ def test_embedding_cache_lru_eviction(provider_with_cache):
     assert len(provider_with_cache._embedding_cache) <= fsp.LRU_CACHE_SIZE
     for i in range(10):
         assert "key_{}".format(i) not in provider_with_cache._embedding_cache
-    assert "key_{}".format(fsp.LRU_CACHE_SIZE + 9) in provider_with_cache._embedding_cache
+    assert (
+        "key_{}".format(fsp.LRU_CACHE_SIZE + 9) in provider_with_cache._embedding_cache
+    )
 
 
 def test_save_and_load_embedding_cache(provider_with_cache):

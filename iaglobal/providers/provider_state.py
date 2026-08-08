@@ -17,7 +17,6 @@ from iaglobal.utils.logger import logger as util_logger
 logger = logging.getLogger("iaglobal.providers")
 
 
-
 # =============================================================================
 # Provider Statistics
 # =============================================================================

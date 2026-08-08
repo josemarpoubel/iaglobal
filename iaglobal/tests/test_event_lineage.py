@@ -118,7 +118,7 @@ def test_domain_event_to_dict_round_trip():
     """``to_dict()`` returns a JSON-friendly dict with ISO timestamp."""
     e = _domain_event_with_evidence(evidence={"a": 1, "b": [1, 2]})
     d = e.to_dict()
-    assert d["id"] == "evt_dom"           # EventId.value as str
+    assert d["id"] == "evt_dom"  # EventId.value as str
     assert d["event_type"] == "test_event"
     assert d["mission_id"] == "m-dom"
     assert d["created_at"].startswith("2026-07-25T")

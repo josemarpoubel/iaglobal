@@ -257,7 +257,7 @@ async def _run_cli_impl():
             DecisionReplaySystem.batch_compare_what_if, ids, args.model
         )
 
-        print(f"✅ Relatório de Lote:")
+        print("✅ Relatório de Lote:")
         print(f"   - Modelo Testado: {report.get('model_tested', 'N/A')}")
         print(
             f"   - Consistência (Melhoria): {report.get('consistency_score', 0) * 100:.1f}%"
@@ -454,7 +454,7 @@ async def _run_cli_impl():
             else " ".join(args.prompt)
         )
 
-        print(f"🛰️ [IAGLOBAL] Processando tarefa...\n")
+        print("🛰️ [IAGLOBAL] Processando tarefa...\n")
 
         await asyncio.to_thread(_ensure_searxng)
 
@@ -481,7 +481,7 @@ async def _run_cli_impl():
                 prompt = await asyncio.to_thread(input, ">>> ")
                 if prompt.lower().strip() in ["exit", "quit"]:
                     break
-                print(f"🛰️ [IAGLOBAL] Processando...\n")
+                print("🛰️ [IAGLOBAL] Processando...\n")
 
                 # Execução assíncrona no modo interativo
                 result = await orch.pipeline.execute(

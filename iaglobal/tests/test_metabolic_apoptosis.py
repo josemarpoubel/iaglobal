@@ -4,7 +4,6 @@
 Valida ciclo completo de evolucao e purificacao de skills.
 """
 
-import asyncio
 import time
 import pytest
 

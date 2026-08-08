@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from typing import Optional
 
 from iaglobal.knowledge.constraints.extractor import ConstraintSet
 from iaglobal.knowledge.technology import TechnologyDescriptor
