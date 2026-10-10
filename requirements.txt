@@ -10,7 +10,7 @@ cachetools
 cbor2
 charset-normalizer
 cryptography
-datasets==4.8.5
+datasets==5.0.1
 ddgs
 deepdiff
 django
