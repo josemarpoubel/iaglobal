@@ -1,11 +1,13 @@
 # iaglobal/pipeline/engine.py
 
 import asyncio
+import gc
 import logging
 import re
 import time
 import uuid
 
+from functools import wraps
 from pathlib import Path
 from typing import Optional, Dict, Any
 
@@ -13,15 +15,88 @@ from .pipelinestate import PipelineState, TaskIntent
 from .result import PipelineResult
 from .stages import PipelineStage
 
-from iaglobal._paths import SCRIPTS_DIR, RESULTS_DIR
 from iaglobal.validation.validation_engine import ValidationEngine
 from iaglobal.validation.js_validator import detect_lang
 from iaglobal.diagnostics.python_normalizer import normalize_before_repair
+from iaglobal.diagnostics.generation_classifier import GenerationClassifier
 from iaglobal.providers.provider_router import CREDIT_CANDIDATES as credit_candidates_fn
 
 from iaglobal.utils.logger import get_logger
+from iaglobal.core.node_result import NodeResult
 
 logger = get_logger("iaglobal")
+
+
+_INSTRUMENT_COUNTERS: Dict[str, int] = {}
+_INSTRUMENT_EVERY_N = 10  # amostragem: loga a cada N invocacoes
+
+
+def _count_live_instances() -> Dict[str, int]:
+    """Conta instancias vivas de classes de memoria. Barato (gc.get_objects)
+    mas nao gratis - chamado via amostragem no decorator abaixo."""
+    counts: Dict[str, int] = {}
+    for obj in gc.get_objects():
+        cls_name = type(obj).__name__
+        if cls_name in ("ShortTermMemory", "LongTermMemory", "SemanticCache"):
+            counts[cls_name] = counts.get(cls_name, 0) + 1
+    return counts
+
+
+def instrument_memory(stage_name: str):
+    """Decorator que loga contagem de instancias de memoria + RSS a cada N calls.
+
+    Nao bloqueia nem altera o fluxo. Falha de instrumentacao e engolida
+    para nao poluir o pipeline real.
+    """
+
+    def decorator(fn):
+        @wraps(fn)
+        async def wrapper(self, *args, **kwargs):
+            _INSTRUMENT_COUNTERS[stage_name] = (
+                _INSTRUMENT_COUNTERS.get(stage_name, 0) + 1
+            )
+            n = _INSTRUMENT_COUNTERS[stage_name]
+            if n % _INSTRUMENT_EVERY_N != 0:
+                return await fn(self, *args, **kwargs)
+            start = time.time()
+            try:
+                result = await fn(self, *args, **kwargs)
+                success = True
+                return result
+            except Exception as exc:
+                success = False
+                raise exc
+            finally:
+                try:
+                    counts = _count_live_instances()
+                    import os
+
+                    rss_kb = 0
+                    try:
+                        with open(f"/proc/{os.getpid()}/status") as f:
+                            for line in f:
+                                if line.startswith("VmRSS:"):
+                                    rss_kb = int(line.split()[1])
+                                    break
+                    except Exception:
+                        pass
+                    elapsed_ms = (time.time() - start) * 1000
+                    logger.info(
+                        "[INSTRUMENT] %s call#%d | %sms | RSS=%dMB | live=%s",
+                        stage_name,
+                        n,
+                        f"{elapsed_ms:.1f}",
+                        rss_kb // 1024,
+                        counts,
+                    )
+                except Exception as instr_err:
+                    logger.debug("[INSTRUMENT] Falha na instrumentacao: %s", instr_err)
+            # unreachable but mypy linter may complain
+            return None
+
+        return wrapper
+
+    return decorator
 
 
 class PipelineEngine:
@@ -38,6 +113,7 @@ class PipelineEngine:
     ) -> PipelineResult:
         return await self.async_execute(prompt, metadata, force)
 
+    @instrument_memory("async_execute")
     async def async_execute(
         self,
         prompt: str,
@@ -58,20 +134,54 @@ class PipelineEngine:
                 raise RuntimeError("🚨 [PIPELINE] Prompt vazio ou inválido.")
 
             # -- Mission Cortex: análise da missão antes de qualquer nó --
+            from iaglobal.events.event_id import EventId
             from iaglobal.pipeline.mission import MissionAnalyzer
             from iaglobal.pipeline.context import PipelineExecutionContext
+            from iaglobal.pipeline.capability_resolver import (
+                PipelineCapabilityResolver,
+            )
+            from iaglobal.events.event_types import EventType
+            from iaglobal.models.event_bus import bus
+
+            # Etapa 6: captura o EventId do CAPABILITY_SELECTED para
+            # alimentar o predecessor_event_id do CAPABILITY_RESULT.
+            # Subscribe é local — unsubscribe após resolver.resolve
+            # para não vazar o handler entre pipelines.
+            captured_decision_ids: list[EventId] = []
+
+            def _capture_decision_id(event):
+                if getattr(event, "data", None) and "id" in event.data:
+                    captured_decision_ids.append(EventId(event.data["id"]))
+                return None
+
+            bus.subscribe(EventType.CAPABILITY_SELECTED, _capture_decision_id)
 
             analyzer = MissionAnalyzer()
             mission = analyzer.analyze(prompt)
+            contract = analyzer.derive_contract(prompt)
+            resolver = PipelineCapabilityResolver(legacy_fallback=True)
+            capability_plan = await resolver.resolve(
+                contract,
+                mission_text=prompt,
+                mission_id=state.task_id,
+            )
+            bus.unsubscribe(EventType.CAPABILITY_SELECTED, _capture_decision_id)
+            if captured_decision_ids:
+                # Último (mais recente) EventId é o que governa esta run.
+                state.decision_event_id = captured_decision_ids[-1]
+
             exec_ctx = PipelineExecutionContext(mission=mission)
             state.execution_context = exec_ctx
             # Legado: espelho para nós não migrados (remover quando todos virarem providers)
             state.context["mission"] = mission
+            state.context["mission_contract"] = contract
+            state.context["capability_plan"] = capability_plan
             logger.info(
-                "🧠 [MISSION] domain=%s | project=%s | entities=%s",
+                "🧠 [MISSION] domain=%s | project=%s | entities=%s | plan_steps=%d",
                 mission.domain,
                 mission.project_type,
                 mission.entities,
+                len(capability_plan.steps) if capability_plan else 0,
             )
 
             # Inicialização do grafo
@@ -123,7 +233,7 @@ class PipelineEngine:
             try:
                 await asyncio.to_thread(self.orchestrator.evolver.set_task, prompt)
             except Exception as e:
-                logger.debug("Aviso: Evolver não pôde definir tarefa: %s", e)
+                logger.info("Aviso: Evolver não pôde definir tarefa: %s", e)
 
             logger.info("🚀 [ASYNC PIPELINE] Starting: %s", state.task_id)
 
@@ -194,8 +304,8 @@ class PipelineEngine:
                 )
                 _generation_kind = classify_generation(state.generated_code or "").value
                 _qa_result = (
-                    state.execution_context.context.get("qa")
-                    if hasattr(state, "execution_context") and state.execution_context
+                    state.context.get("qa")
+                    if hasattr(state, "context") and state.context
                     else None
                 )
 
@@ -213,11 +323,17 @@ class PipelineEngine:
                     execution_id=state.task_id,
                 )
             except Exception as e:
-                logger.debug("[PIPELINE] EvolutionFeedbackHook skip: %s", e)
+                logger.info("[PIPELINE] EvolutionFeedbackHook skip: %s", e)
 
             state.current_stage = PipelineStage.COMPLETE.name
             # FIX BUG #5: _save_script em thread pool
             script_path = await asyncio.to_thread(self._save_script, state)
+
+            # Etapa 6: emitir CAPABILITY_RESULT fechando a linha causal
+            # da decisão registrada em state.decision_event_id. Erros
+            # de emissão são silenciosos (logger) para não propagar
+            # exceção no fim do pipeline bem-sucedido.
+            await self._emit_capability_result(state, success=True)
 
             return PipelineResult(
                 success=True,
@@ -230,6 +346,16 @@ class PipelineEngine:
         except Exception as e:
             logger.exception("💥 [ASYNC PIPELINE] Failure: %s", e)
             state.current_stage = PipelineStage.FAILED.name
+            # Etapa 6: mesmo no caminho de falha, tentar emitir o
+            # CAPABILITY_RESULT (success=False) — feedback aprendemos
+            # com o que falhou também.
+            try:
+                await self._emit_capability_result(state, success=False)
+            except Exception as emit_err:  # noqa: BLE001 — nunca propagar
+                logger.info(
+                    "[CAPABILITY_RESULT] Falha ao emitir resultado de erro: %s",
+                    emit_err,
+                )
             return PipelineResult(
                 success=False,
                 error=str(e),
@@ -320,9 +446,10 @@ class PipelineEngine:
                         result["total_chars"],
                     )
         except Exception as e:
-            logger.debug("[INGEST] Auto-detecção: %s", e)
+            logger.info("[INGEST] Auto-detecção: %s", e)
 
         prompt = state.prompt
+        # 1. Classificação heurística por palavra-chave
         state.intent = (
             TaskIntent.CODE
             if any(
@@ -340,7 +467,10 @@ class PipelineEngine:
                 )
             )
             else TaskIntent.HTML
-            if any(k in prompt.lower() for k in ("html", "página", "site", "frontend"))
+            if any(
+                k in prompt.lower()
+                for k in ("html", "página", "site", "frontend", "app")
+            )
             else TaskIntent.JSON
             if any(k in prompt.lower() for k in ("json", "retorne apenas"))
             else TaskIntent.CHAT
@@ -350,6 +480,15 @@ class PipelineEngine:
             )
             else TaskIntent.GENERAL
         )
+        # 2. Sobreposição pelo contrato semântico da missão (mais preciso que heurística)
+        contract = state.context.get("mission_contract")
+        if contract and hasattr(contract, "artifact"):
+            if contract.artifact == "web_app":
+                state.intent = TaskIntent.HTML
+                logger.info("[INTENT] Contrato=%s → HTML", contract.artifact)
+            elif contract.artifact in ("cli_tool", "python_script", "library"):
+                state.intent = TaskIntent.CODE
+                logger.info("[INTENT] Contrato=%s → CODE", contract.artifact)
         if ingested_context:
             prompt = f"{state.prompt}\n\n[ARQUIVOS INGERIDOS]\n{ingested_context}"
 
@@ -426,6 +565,17 @@ class PipelineEngine:
 
         raw_results = graph_result.get("raw_results", {})
 
+        qa_entry = raw_results.get("qa")
+        if qa_entry:
+            if isinstance(qa_entry, dict):
+                qa_payload = qa_entry.get("qa")
+            elif hasattr(qa_entry, "metadata"):
+                qa_payload = qa_entry.metadata.get("qa")
+            else:
+                qa_payload = None
+            if qa_payload is not None:
+                state.context["qa"] = qa_payload
+
         if not raw_results:
             logger.warning(
                 "[PIPELINE] raw_results vazio. Chaves disponíveis: %s",
@@ -439,27 +589,66 @@ class PipelineEngine:
             )
 
         dag_nodes = [
-            "result_agent",
-            "documentation",
-            "code_executor",
-            "multi_coder",
             "coder",
+            "multi_coder",
+            "code_executor",
+            "result_agent",
+            "backend_builder",
+            "frontend_builder",
+            "database_builder",
+            "api_builder",
+            "documentation",
         ]
 
         for node_name in dag_nodes:
             node_result = raw_results.get(node_name)
-            if isinstance(node_result, dict):
+            if isinstance(node_result, (dict, NodeResult)):
                 output = (
                     node_result.get("output") or node_result.get("final_file") or ""
                 )
+                artifact = node_result.get("artifact")
+
                 if output and len(str(output)) > 10:
-                    state.generated_code = str(output)
+                    # Usa artifact tipado se disponível, senão classifica
+                    if artifact:
+                        from iaglobal.core.artifact import (
+                            GeneratedArtifact,
+                        )
+
+                        if isinstance(artifact, GeneratedArtifact):
+                            _artifact_type = artifact.kind.value
+                            _artifact = artifact
+                        else:
+                            _artifact_type = (
+                                GenerationClassifier().classify(str(output)).type
+                            )
+                            _artifact = None
+                    else:
+                        _artifact_type = (
+                            GenerationClassifier().classify(str(output)).type
+                        )
+                        _artifact = None
+
+                    if _artifact_type.upper() not in ("CODE", "HTML"):
+                        logger.info(
+                            "⛔ [PIPELINE] Nó %s produziu %s (não CODE/HTML) — descartando como código",
+                            node_name,
+                            _artifact_type,
+                        )
+                        continue
+
+                    # Se temos artifact tipado, usa ele; senão, usa output como str (compat)
+                    if _artifact:
+                        state.set_artifact(_artifact)
+                    else:
+                        state.generated_code = str(output)
+
                     state.score = node_result.get("score", 50)
                     state.script_path = node_result.get("final_file", "")
                     logger.info(
-                        "✅ [ASYNC PIPELINE] Sucesso no nó %s: %d chars",
+                        "✅ [ASYNC PIPELINE] Sucesso no nó %s: %d chars (type=CODE)",
                         node_name,
-                        len(state.generated_code),
+                        len(state.generated_code or ""),
                     )
                     return
 
@@ -474,12 +663,42 @@ class PipelineEngine:
             return
 
         for node_name, node_result in raw_results.items():
-            if isinstance(node_result, dict):
+            if isinstance(node_result, (dict, NodeResult)):
                 output = (
                     node_result.get("output") or node_result.get("final_file") or ""
                 )
+                artifact = node_result.get("artifact")
+
                 if output and len(str(output)) > 10:
-                    state.generated_code = str(output)
+                    # Usa artifact tipado se disponível
+                    if artifact:
+                        from iaglobal.core.artifact import GeneratedArtifact
+
+                        if isinstance(artifact, GeneratedArtifact):
+                            _art_type = artifact.kind.value
+                            _artifact = artifact
+                        else:
+                            _art_type = (
+                                GenerationClassifier().classify(str(output)).type
+                            )
+                            _artifact = None
+                    else:
+                        _art_type = GenerationClassifier().classify(str(output)).type
+                        _artifact = None
+
+                    if _art_type.upper() not in ("CODE", "HTML"):
+                        logger.info(
+                            "⛔ [PIPELINE] Nó fallback %s produziu %s — descartando",
+                            node_name,
+                            _art_type,
+                        )
+                        continue
+
+                    if _artifact:
+                        state.set_artifact(_artifact)
+                    else:
+                        state.generated_code = str(output)
+
                     state.score = (
                         node_result.get("score", 50)
                         if isinstance(node_result.get("score"), (int, float))
@@ -489,7 +708,7 @@ class PipelineEngine:
                     logger.info(
                         "✅ [ASYNC PIPELINE] Sucesso via '%s' (fallback): %d chars",
                         node_name,
-                        len(state.generated_code),
+                        len(state.generated_code or ""),
                     )
                     return
 
@@ -517,6 +736,24 @@ class PipelineEngine:
 
         code = state.generated_code or ""
         code = self._extract_fenced_code(code)
+
+        # Contrato: apenas CODE passa para validação AST
+        # Se temos artifact tipado, usa ele; senão, classifica
+        if state.generated_artifact:
+            _art_type = state.generated_artifact.kind.value
+        else:
+            _art_type = GenerationClassifier().classify(code).type
+
+        if _art_type.upper() not in ("CODE", "HTML"):
+            logger.info(
+                "[VALIDATION] Artefato e %s (nao CODE/HTML) — pulando AST e marcando invalid_syntax",
+                _art_type,
+            )
+            state.syntax_valid = False
+            state.errors.append(
+                f"Conteudo recuperado e {_art_type}, nao codigo executavel — pipeline deve gerar codigo"
+            )
+            return
 
         # Detecta se é código Python ou apenas texto/report
         lang = detect_lang(code)
@@ -555,7 +792,11 @@ class PipelineEngine:
             or ("> " in code and len(code.split("\n")) > 5)
         )
 
-        if is_analysis_task or is_markdown_or_text or state.intent in (TaskIntent.CHAT, TaskIntent.DOCUMENT):
+        if (
+            is_analysis_task
+            or is_markdown_or_text
+            or state.intent in (TaskIntent.CHAT, TaskIntent.DOCUMENT)
+        ):
             logger.info(
                 "[VALIDATION] Tarefa de análise/texto/chat detectada — pulando validação Python AST"
             )
@@ -612,6 +853,7 @@ class PipelineEngine:
                 self._detected_lang = lang
 
     def _extract_fenced_code(self, code: str) -> str:
+        # 1. Remove cercas Markdown (```python ... ```)
         m = re.search(r"```(\w+)?\n(.+?)\n```", code, re.DOTALL)
         if m:
             lang = (m.group(1) or "").lower()
@@ -622,10 +864,44 @@ class PipelineEngine:
                     lang,
                     len(extracted),
                 )
-                if lang in self.LANG_EXT:
-                    self._detected_lang = lang  # FIX BUG #3a: armazena a linguagem
-                return extracted
-        return code
+            if lang in self.LANG_EXT:
+                self._detected_lang = lang  # FIX BUG #3a: armazena a linguagem
+            code = extracted if extracted else code
+        # 2. Remove bullets Unicode/inline e bullets no início de linha
+        code = code.replace("\u2022", " ")
+        code = re.sub(r"^\s*[•*\-\u2022]\s+", "", code, flags=re.MULTILINE)
+        code = re.sub(r"[ \t]+", " ", code)
+        return code.strip()
+
+    def _get_preferred_ext(self, state: PipelineState) -> str:
+        contract = state.context.get("mission_contract")
+        if contract and hasattr(contract, "artifact"):
+            if contract.artifact == "web_app":
+                return ".html"
+            if contract.artifact == "api":
+                return ".py"
+        if state.intent == TaskIntent.HTML:
+            return ".html"
+
+        # Fallback: usar ArtifactKind do artefato gerado, que tem
+        # classificação mais precisa que heurísticas de conteúdo.
+        # O coder já classifica o código via GeneratedArtifact.from_str()
+        # antes de retornar — usar esse resultado evita que detectores
+        # secundários (ex: _detect_extension em _paths.py linha 300)
+        # classifiquem incorretamente como .json quando o código
+        # começa com "{" (scaffold JSON em volta de HTML).
+        artifact = state.generated_artifact
+        if artifact is not None:
+            from iaglobal.core.artifact import ArtifactKind
+
+            kind = artifact.kind
+            if kind == ArtifactKind.HTML:
+                return ".html"
+            if kind == ArtifactKind.JSON:
+                return ".json"
+            if kind == ArtifactKind.MARKDOWN:
+                return ".md"
+        return ""
 
     def _save_script(self, state: PipelineState) -> Optional[Path]:
         """Salva o script em disco via save_result_artifact."""
@@ -634,8 +910,9 @@ class PipelineEngine:
         code = state.generated_code
         if not code or not code.strip():
             return None
-        project_dir = save_result_artifact(state.prompt, {}, code)
-        ext = self._detect_extension(code, state.intent)
+        preferred_ext = self._get_preferred_ext(state)
+        project_dir = save_result_artifact(state.prompt, {}, code, preferred_ext)
+        ext = self._detect_extension(code, state.intent, state)
         return project_dir / f"output{ext}"
 
     LANG_EXT = {
@@ -670,9 +947,32 @@ class PipelineEngine:
         "dockerfile": ".dockerfile",
     }
 
-    def _detect_extension(self, code: str, intent: Optional[TaskIntent] = None) -> str:
+    def _detect_extension(
+        self,
+        code: str,
+        intent: Optional[TaskIntent] = None,
+        state: Optional[PipelineState] = None,
+    ) -> str:
+        # 0. Contrato da missão vence heurísticas de conteúdo
+        if state and state.context.get("mission_contract"):
+            contract = state.context["mission_contract"]
+            if hasattr(contract, "artifact"):
+                if contract.artifact == "web_app":
+                    return ".html"
+                if contract.artifact == "api":
+                    return ".py"
+
+        # 1. Respeita a linguagem da missão (prioridade máxima)
+        if state and state.context.get("mission"):
+            mission_lang = getattr(state.context["mission"], "language", None)
+            if mission_lang and mission_lang.lower() in self.LANG_EXT:
+                return self.LANG_EXT[mission_lang.lower()]
+
+        # 2. Fallback para linguagem detectada do bloco de código (fenced)
         if self._detected_lang and self._detected_lang in self.LANG_EXT:
             return self.LANG_EXT[self._detected_lang]
+
+        # 3. Heurísticas de conteúdo
         if "<?php" in code:
             return ".php"
         if "<%" in code or "<%=" in code:
@@ -683,6 +983,7 @@ class PipelineEngine:
             return ".txt"
         return ".py"
 
+    @instrument_memory("persistence_stage")
     async def _async_persistence_stage(self, state: PipelineState) -> None:
         state.current_stage = PipelineStage.PERSISTENCE.name
         logger.info("📝 archivando aprendizado (async) ...")
@@ -708,6 +1009,85 @@ class PipelineEngine:
             },
         )
         logger.info("✅ tudo ok, aprendi mais uma lição!")
+
+    async def _emit_capability_result(
+        self,
+        state: PipelineState,
+        success: bool,
+    ) -> None:
+        """Emite ``CAPABILITY_RESULT`` com linhagem explícita.
+
+        Pré-requisito: ``state.decision_event_id`` preenchido pelo
+        subscribe local em ``async_execute``. Sem predecessor, não
+        emite (regra do ADR-0004 — todo resultado deriva de decisão).
+        """
+        import time as _time
+        from datetime import datetime, timezone
+        from uuid import uuid4
+
+        if state.decision_event_id is None:
+            return  # sem predecessor → não emite
+
+        from iaglobal.events.event_id import EventId as _EventId
+        from iaglobal.events.event_types import EventType as _EventType
+        from iaglobal.events.result_event import CapabilityResultEvent
+        from iaglobal.models.event_bus import bus as _bus
+
+        capability = "unknown"
+        selected_technology: Optional[str] = None
+        plan = state.context.get("capability_plan")
+        if plan is not None:
+            capability = getattr(plan, "artifact", "unknown") or "unknown"
+            for step in getattr(plan, "steps", []) or []:
+                if step.kind == "tool" and step.name.startswith("tool:"):
+                    selected_technology = step.name.split(":", 1)[1]
+                    break
+
+        artifact_kind = "unknown"
+        if getattr(state, "generated_artifact", None) is not None:
+            try:
+                artifact_kind = state.generated_artifact.kind.value
+            except Exception:  # noqa: BLE001
+                pass
+
+        validation_status = "passed" if state.syntax_valid else "failed"
+        try:
+            latency_ms = max(
+                0.0,
+                (_time.time() - float(state.started_at)) * 1000.0,
+            )
+        except Exception:  # noqa: BLE001
+            latency_ms = 0.0
+
+        event = CapabilityResultEvent(
+            id=_EventId(value=str(uuid4())[:8]),
+            event_type=_EventType.CAPABILITY_RESULT,
+            mission_id=state.task_id,
+            created_at=datetime.now(timezone.utc),
+            decision_event_id=state.decision_event_id,
+            capability=capability,
+            selected_technology=selected_technology,
+            success=success,
+            artifact_kind=artifact_kind,
+            validation_status=validation_status,
+            quality_score=float(getattr(state, "score", 0.0) or 0.0),
+            repair_count=int(getattr(state, "retries", 0) or 0),
+            latency_ms=latency_ms,
+            evidence={
+                "errors": list(getattr(state, "errors", []) or []),
+            },
+        )
+        _bus.publish(
+            event.event_type,
+            data=event.to_dict(),
+            source="PipelineEngine",
+        )
+        logger.info(
+            "📤 [CAPABILITY_RESULT] id=%s → decision_event_id=%s success=%s",
+            str(event.id),
+            str(event.decision_event_id),
+            success,
+        )
 
     async def _async_metabolism_stage(self, state: PipelineState) -> None:
         """Promove/rejeita candidatos de skills via ciclo de metilação."""
@@ -752,19 +1132,21 @@ class PipelineEngine:
                 "[METABOLISM] Stage skip: %s", e
             )
 
+    @instrument_memory("learn_stage")
     async def _async_learn_stage(self, state: PipelineState) -> None:
         if not state.generated_code or len(state.generated_code) < 20:
             return
         try:
-            from iaglobal._paths import MEMORIES_DB
-            from iaglobal.memory.term_short import ShortTermMemory
-            from iaglobal.memory.term_long import LongTermMemory
-            from iaglobal.memory.semantic_cache import SemanticCache
+            from iaglobal.memory.async_memory import (
+                _get_ltm,
+                _get_stm,
+                _get_memory_vector,
+            )
 
             def _learn_sync():
-                stm = ShortTermMemory(db_path=MEMORIES_DB)
-                ltm = LongTermMemory(db_path=MEMORIES_DB)
-                cache = SemanticCache()
+                stm = _get_stm()
+                ltm = _get_ltm()
+                cache = _get_memory_vector()
                 stm.add(f"Q: {state.prompt}", {"type": "query", "source": "pipeline"})
                 stm.add(
                     f"A: {state.generated_code[:200]}",
@@ -780,4 +1162,4 @@ class PipelineEngine:
             await asyncio.to_thread(_learn_sync)
             logger.info("[LEARN] STM/LTM/cache atualizados: %s", state.prompt[:60])
         except Exception as e:
-            logger.debug("[LEARN] Erro: %s", e)
+            logger.info("[LEARN] Erro: %s", e)

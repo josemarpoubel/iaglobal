@@ -1,11 +1,11 @@
 # iaglobal/events/event_dispatcher.py
 
 import asyncio
+import logging
 from typing import Callable, Dict, List, Any, Coroutine, Union
 
-from iaglobal.utils.logger import get_logger
 
-logger = get_logger("iaglobal.events.event_dispatcher")
+logger = logging.getLogger("ia-global")
 
 # Tipo que aceita funções normais ou corrotinas
 HandlerType = Union[Callable[[dict], Any], Callable[[dict], Coroutine[Any, Any, Any]]]
@@ -30,7 +30,7 @@ class DecisionEventDispatcher:
             return
 
         # Log de recepção de evento no roteador
-        logger.debug(f"📥 [DISPATCHER] Evento roteado para processamento assíncrono")
+        logger.debug("📥 [DISPATCHER] Evento roteado para processamento assíncrono")
         coro = self._process_event(event)
         loop.create_task(coro)
 

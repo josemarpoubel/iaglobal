@@ -206,7 +206,7 @@ class LineageGuardian:
                     valid=False,
                     agent_name=agent_name,
                     lineage_marker=lineage_marker,
-                    reason=f"DNA divergente do Genesis Hash oficial",
+                    reason="DNA divergente do Genesis Hash oficial",
                     metadata={
                         "expected": GENESIS_HASH_OFFICIAL[:16],
                         "found": lineage_marker[:16] if lineage_marker else "N/A",
@@ -242,7 +242,7 @@ class LineageGuardian:
                         valid=False,
                         agent_name=agent_name,
                         lineage_marker=lineage_marker,
-                        reason=f"DNA divergente do Genesis Hash oficial (módulo alternativo)",
+                        reason="DNA divergente do Genesis Hash oficial (módulo alternativo)",
                         metadata={
                             "expected": GENESIS_HASH_OFFICIAL[:16],
                             "found": lineage_marker[:16] if lineage_marker else "N/A",

@@ -8,9 +8,11 @@ permite que o próprio agente decida processar os resultados com Python,
 extraindo código, fatos e referências de forma estruturada.
 """
 
-import json
 import re
 from typing import Any, Dict, List
+
+
+from iaglobal.tools.tool_library import tool_library
 
 
 def process_search_results(
@@ -94,8 +96,6 @@ def process_search_results_structured(raw_text: str) -> Dict[str, Any]:
         "source_count": len(urls) + len(bullets),
     }
 
-
-from iaglobal.tools.tool_library import tool_library
 
 tool_library.register(
     name="search_context_processor",

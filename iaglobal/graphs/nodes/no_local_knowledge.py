@@ -12,15 +12,10 @@ import asyncio
 from typing import Dict, Any, List
 
 from iaglobal.evolution.evolution_agents.knowledge_agent import knowledge
-from iaglobal.memory.term_long import LongTermMemory
-from iaglobal.memory.term_short import ShortTermMemory
-from iaglobal._paths import CORE_DB
+from iaglobal.memory.async_memory import _get_ltm, _get_stm
 
 logger = logging.getLogger(__name__)
 
-# Instanciação lazy protegida das memórias locais
-_ltm = LongTermMemory(db_path=CORE_DB)
-_stm = ShortTermMemory()
 _MIN_KNOWLEDGE_CHARS = 200
 
 
@@ -47,7 +42,7 @@ def _query_local(task: str) -> List[Dict[str, Any]]:
 
     # 2. Consulta à Long-Term Memory (LTM)
     try:
-        ltm_results = _ltm.retrieve(task, top_k=3) or []
+        ltm_results = _get_ltm().retrieve(task, top_k=3) or []
         for m in ltm_results:
             if isinstance(m, dict):
                 content = m.get("content", "")[:500]
@@ -75,7 +70,7 @@ def _query_local(task: str) -> List[Dict[str, Any]]:
 
     # 4. Consulta à Short-Term Memory (STM)
     try:
-        recent = _stm.get_recent(5) or []
+        recent = _get_stm().get_recent(5) or []
         for m in recent:
             content = str(m)[:500]
             if len(content) > 30:

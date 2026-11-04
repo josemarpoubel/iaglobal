@@ -8,8 +8,6 @@ prompt = "crie um app de vendas para um restaurante com tema escuro..."
 """
 
 import pytest
-from typing import Dict, Any
-from unittest.mock import MagicMock
 
 
 # ============================================================
@@ -142,7 +140,8 @@ def test_tool_library_rejeita_pdf_para_task_dev():
 
     Bug corrigido: penalidade de domínio (-0.35) para task dev vs tool não-dev.
     """
-    import tempfile, importlib
+    import tempfile
+    import importlib
 
     tlib_mod = importlib.import_module("iaglobal.tools.tool_library")
     db_path = tempfile.mktemp(suffix=".pkl")
@@ -175,7 +174,8 @@ def test_tool_library_aceita_pdf_para_task_documento():
     A penalidade de domínio NÃO deve ser aplicada quando a task é
     genuinamente de geração de documento.
     """
-    import tempfile, importlib
+    import tempfile
+    import importlib
 
     tlib_mod = importlib.import_module("iaglobal.tools.tool_library")
     db_path = tempfile.mktemp(suffix=".pkl")
@@ -341,7 +341,7 @@ def test_mission_analyzer_nao_confunde_pagamento_com_game():
     )
     assert m.domain == "ecommerce", f"Deveria ser ecommerce, obteve '{m.domain}'"
     assert m.project_type != "game", (
-        f"'game' dentro de 'pagamento' causou falso positivo"
+        "'game' dentro de 'pagamento' causou falso positivo"
     )
 
 
@@ -384,7 +384,8 @@ def test_cadeia_completa_classificacao():
     assert "funcionarios" in reqs_text
 
     # 2. ToolLibrary
-    import tempfile, importlib
+    import tempfile
+    import importlib
 
     tlib_mod = importlib.import_module("iaglobal.tools.tool_library")
     db_path = tempfile.mktemp(suffix=".pkl")

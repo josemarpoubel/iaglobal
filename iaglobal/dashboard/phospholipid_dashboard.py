@@ -13,7 +13,6 @@ from typing import Any
 from iaglobal._paths import PROJECT_ROOT
 from iaglobal.observability.registry import (
     PhospholipidRegistry,
-    AUDIT_PATH,
     registry as default_registry,
 )
 from iaglobal.utils.logger import get_logger

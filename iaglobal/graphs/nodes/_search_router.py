@@ -7,6 +7,7 @@ import urllib.parse
 import re
 import xml.etree.ElementTree as ET
 import logging
+import asyncio
 from typing import List, Tuple, Callable
 
 logger = logging.getLogger(__name__)
@@ -93,7 +94,7 @@ def _worldbank(query: str) -> str:
     """Busca indicadores do Banco Mundial."""
     try:
         q = urllib.parse.quote(query.strip())
-        url = f"https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD?format=json&per_page=5"
+        url = "https://api.worldbank.org/v2/country/all/indicator/NY.GDP.MKTP.CD?format=json&per_page=5"
         with urllib.request.urlopen(url, timeout=8) as r:
             data = json.loads(r.read().decode("utf-8"))
         if len(data) < 2:
@@ -402,35 +403,14 @@ def classify_task(task: str) -> List[Tuple[str, Callable]]:
 
 
 async def run_search_router(task: str) -> str:
-    """Executa as fontes especializadas classificadas para a task."""
-    if False:
-        _restcountries("")
-        _exchange_rate("")
-        _worldbank("")
-        _bbc_news("")
-        _techcrunch("")
-        _spaceflight_news("")
-        _weather("")
-        _openlibrary("")
+    """Executa as fontes especializadas classificadas para a task.
+
+    Queries sem categoria especializada caem no `_general_knowledge_search`
+    (SearXNG local, que agrega Google+Bing+DDG e tem circuit breaker próprio).
+    """
     sources = classify_task(task)
     if not sources:
-        return ""
-
-    if False:
-        from iaglobal.graphs.nodes import _search_sources as sources
-
-        sources.google_scrape("")
-        sources.bing_scrape("")
-        sources.github_search("")
-        sources.stackoverflow_search("")
-        sources.grokipedia_search("")
-        sources.brave_search("")
-        sources.startpage_search("")
-        sources.mojeek_search("")
-        sources.qwant_search("")
-        sources.searxng_search("")
-
-    import asyncio
+        return await _general_knowledge_search(task)
 
     all_results = []
     for name, fn in sources:
@@ -443,3 +423,17 @@ async def run_search_router(task: str) -> str:
             logger.debug("[ROUTER] %s: %s", name, e)
 
     return "\n\n".join(all_results)
+
+
+async def _general_knowledge_search(task: str) -> str:
+    """Fallback de conhecimento geral via SearXNG (meta-buscador local)."""
+    from iaglobal.graphs.nodes import _search_sources as _ss
+
+    try:
+        r = await asyncio.to_thread(_ss.searxng_search, task)
+        if not r:
+            return ""
+        return f"=== SEARXNG ===\n{r}"
+    except Exception as e:
+        logger.debug("[ROUTER] SearXNG: %s", e)
+        return ""

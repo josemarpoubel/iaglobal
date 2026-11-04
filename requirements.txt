@@ -73,3 +73,5 @@ ujson
 uvicorn
 watchdog
 websockets
+tree-sitter
+tree-sitter-javascript

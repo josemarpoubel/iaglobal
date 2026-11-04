@@ -42,6 +42,28 @@ FITNESS_DECAY = 0.95  # decaimento temporal do fitness a cada ciclo
 FLUSH_INTERVAL = 5.0  # intervalo (s) entre persists em lote do fitness
 FLUSH_MAX_BATCH = 50  # max registros no buffer antes de flush forçado
 
+# ── Teto de gerações LLM ativas (gate global de CPU) ──────────────────────
+# O BanditPolicy usa estes valores para complementar o semáforo por modelo
+# com um limite GLOBAL de gerações concorrentes (core-equivalentes).
+CPU_CEILING_ADRENALINE = None  # usado em ADRENALINE = total de núcleos
+CPU_CEILING_DEEP_SLEEP = 0.25  # 1 geração ativa (homeostase de repouso)
+CPU_CEILING_DEFAULT_MIN = 2.0  # piso padrão em core-equivalentes
+CPU_CEILING_ENV = "CPU_GENERATION_CEILING"
+
+# ── Enforcement real de CPU no boot (sched_setaffinity) ───────────────────
+# O CpuAffinityManager sempre foi um weight-based scheduler: distribuía
+# budgets simbólicos (cpu_budget) mas NUNCA impôs limite no nível do SO —
+# um processo podia usar 100% de um núcleo (ou todos) livremente. Este
+# enforcement fecha essa lacuna: no boot (via bootstrap), o processo é
+# pinado a uma fração da capacidade total da máquina. Com 8 núcleos e a
+# fração default de 25%, o processo fica restrito a 2 cores — exatamente
+# "25% de cada núcleo", a regra que o projeto sempre documentou.
+CPU_AFFINITY_ENFORCE_ENV = "CPU_AFFINITY_ENFORCE"
+CPU_AFFINITY_FRACTION_ENV = "CPU_AFFINITY_FRACTION"
+CPU_AFFINITY_FRACTION_DEFAULT = 0.25  # 25% da capacidade (n cores x fracao)
+CPU_AFFINITY_FRACTION_MIN = 0.01
+CPU_AFFINITY_FRACTION_MAX = 1.0
+
 
 # =========================================================================
 # DATACLASSES DE METADADOS
@@ -62,6 +84,7 @@ class AgentCpuMetrics:
     fitness_score: float = 0.5
     ivm_atual: float = 0.5
     em_modo_sobrevivencia: bool = False
+    generations_ativas: int = 0  # gerações LLM concorrentes (gate de CPU)
     ultimo_ajuste: float = field(default_factory=time.time)
 
     @property
@@ -99,6 +122,7 @@ class AgentCpuMetrics:
             "produtividade": round(self.produtividade, 3),
             "eficiencia_energetica": round(self.eficiencia_energetica, 3),
             "em_modo_sobrevivencia": self.em_modo_sobrevivencia,
+            "generations_ativas": self.generations_ativas,
         }
 
 
@@ -163,6 +187,8 @@ class CpuAffinityManager:
     def __init__(self):
         self._lock = None
         self._total_cores: int = os.cpu_count() or 1
+        self._affinity_fraction = self._resolve_affinity_fraction()
+        self._enforced_cores: Optional[int] = None
         self._agents: Dict[str, AgentCpuMetrics] = {}
         self._budgets: Dict[str, float] = {}
         self._last_agent_map: Dict[str, int] = {}
@@ -171,6 +197,26 @@ class CpuAffinityManager:
         self._adrenaline_expiry = 0.0
         self._fitness_buffer: Dict[str, float] = {}
         self._flush_task: Optional[asyncio.Task] = None
+
+    @staticmethod
+    def _resolve_affinity_fraction() -> float:
+        """Fração da capacidade total de CPU imposta no boot.
+
+        Sempre 25% por núcleo (regra homeostática do projeto), ajustável
+        via env CPU_AFFINITY_FRACTION quando o dev precisar de um teto
+        diferente em máquinas específicas.
+        """
+        raw = os.environ.get(CPU_AFFINITY_FRACTION_ENV, "").strip()
+        if not raw:
+            return CPU_AFFINITY_FRACTION_DEFAULT
+        try:
+            frac = float(raw)
+        except ValueError:
+            return CPU_AFFINITY_FRACTION_DEFAULT
+        return max(
+            CPU_AFFINITY_FRACTION_MIN,
+            min(CPU_AFFINITY_FRACTION_MAX, frac),
+        )
 
     @property
     def lock(self):
@@ -195,6 +241,71 @@ class CpuAffinityManager:
     def _core_from_hash(self, agent_id: str) -> int:
         """Deriva um core lógico do hash (sem fixação real)."""
         return int(self._hash_agent(agent_id), 16) % self._total_cores
+
+    def affinity_target_cores(self) -> int:
+        """Número de cores a que o processo deve ser pinado (dinâmico).
+
+        Regra do projeto: 25% da capacidade total da máquina. Em 8 núcleos
+        → 2 cores; em 48 núcleos → 12 cores. Detecta `os.cpu_count()` da
+        máquina onde roda, então um dev migrando de máquina não precisa
+        configurar nada — o teto acompanha o hardware.
+        """
+        return max(1, int(self._total_cores * self._affinity_fraction))
+
+    def apply_process_affinity(self) -> dict:
+        """Impõe no nível do SO o limite de CPU prometido pelo scheduler.
+
+        O CpuAffinityManager distribuía budgets simbólicos (cpu_budget)
+        mas nunca restringiu o processo de fato — um pipeline podia usar
+        100% de todos os núcleos. Este método chama `os.sched_setaffinity`
+        para pinar TODAS as threads do processo atual a `fração × ncores`
+        (default 25%). `sched_setaffinity(0, ...)` só afeta a thread
+        chamadora, então iteramos /proc/self/task para que o teto valha
+        para o processo inteiro — não só para a thread do bootstrap.
+        Fail-safe: sem sched_setaffinity (ex: Windows/macOS ou restrição
+        do SO) retorna status informando que o enforcement não se aplicou.
+        """
+        target = self.affinity_target_cores()
+        mask = set(range(target))
+        if not hasattr(os, "sched_setaffinity"):
+            return {
+                "enforced": False,
+                "reason": "sched_setaffinity_indisponivel",
+                "total_cores": self._total_cores,
+                "target_cores": target,
+            }
+        try:
+            applied = 0
+            # Pina TODAS as threads do processo, não só a thread chamadora.
+            pids = {os.getpid()}
+            try:
+                for tid in os.listdir(f"/proc/{os.getpid()}/task"):
+                    pids.add(int(tid))
+            except OSError:
+                pass
+            for tid in pids:
+                try:
+                    os.sched_setaffinity(tid, mask)
+                    applied += 1
+                except (OSError, ProcessLookupError):
+                    continue
+            self._enforced_cores = target
+            effective = os.sched_getaffinity(0)
+            return {
+                "enforced": True,
+                "threads_afetadas": applied,
+                "total_cores": self._total_cores,
+                "target_cores": target,
+                "fraction": self._affinity_fraction,
+                "effective_affinity": sorted(effective),
+            }
+        except OSError as e:
+            return {
+                "enforced": False,
+                "reason": f"os_error: {e}",
+                "total_cores": self._total_cores,
+                "target_cores": target,
+            }
 
     def _get_or_create_metrics(self, agent_id: str) -> AgentCpuMetrics:
         # Nota: Assume-se que esta função seja chamada DENTRO do lock
@@ -242,9 +353,11 @@ class CpuAffinityManager:
                 assignment[agent] = core
 
         logger.info(
-            "[CPU] Distribuição balanceada: %d agentes, %.0f%% budget cada, %d cores",
+            "[CPU] Distribuição balanceada: %d agentes, %.0f%% de 1 núcleo cada, "
+            "%d núcleos (capacidade %d core-equivalentes)",
             len(agents),
             budget * 100,
+            self._total_cores,
             self._total_cores,
         )
         return assignment
@@ -290,6 +403,7 @@ class CpuAffinityManager:
 
             return {
                 "total_cores": self._total_cores,
+                "capacidade_total_core_equivalentes": self._total_cores,
                 "agents_mapped": total_agents,
                 "max_load": max_load,
                 "min_load": min_load,
@@ -303,6 +417,11 @@ class CpuAffinityManager:
                 "budgets": budgets,
                 "agentes_em_sobrevivencia": agentes_em_sobrevivencia,
                 "total_budget_alocado": round(sum(budgets.values()), 3)
+                if budgets
+                else 0,
+                "utilizacao_alocada_pct": round(
+                    sum(budgets.values()) / self._total_cores * 100.0, 1
+                )
                 if budgets
                 else 0,
             }
@@ -814,6 +933,77 @@ class CpuAffinityManager:
     async def get_all_metrics(self) -> Dict[str, dict]:
         async with self.lock:
             return {aid: m.to_dict() for aid, m in self._agents.items()}
+
+    # ==============================================================
+    # GATE DE GERAÇÃO LLM — coordenação com o BanditPolicy
+    # ==============================================================
+
+    def _generation_ceiling(self) -> float:
+        """Teto de gerações ativas em core-equivalentes.
+
+        Cada slot ativo consome a fração `cpu_budget` do agente sobre um
+        núcleo (0.25 = 25% de 1 núcleo). O teto padrão é TODOS os núcleos
+        da máquina (dinâmico via os.cpu_count()) — ajustável via env
+        `CPU_GENERATION_CEILING`. Assim a concorrência de gerações LLM
+        escala com nproc: com budget 0.25 cabem `cores / 0.25 = 4 × cores`
+        gerações simultâneas. Modos metabólicos alteram o teto: ADRENALINE
+        libera todos os núcleos; DEEP_SLEEP restringe a 1 geração
+        (0.25 core-equivalente).
+        """
+        if self._metabolic_state == "ADRENALINE":
+            return float(self._total_cores)
+        if self._metabolic_state == "DEEP_SLEEP":
+            return CPU_CEILING_DEEP_SLEEP
+        raw = os.environ.get(CPU_CEILING_ENV, "")
+        if raw:
+            try:
+                return float(raw)
+            except ValueError:
+                pass
+        return max(CPU_CEILING_DEFAULT_MIN, float(self._total_cores))
+
+    async def begin_generation(self, agent_id: str) -> bool:
+        """Reserva um slot de geração LLM ativa (gate global de CPU).
+
+        Complementa o semáforo por modelo do BanditPolicy: enquanto o
+        semáforo limita a concorrência POR MODELO, este gate limita a
+        concorrência GLOBAL de gerações respeitando os budgets metabólicos.
+        Rejeita (False) se a carga agregada de slots ativos já satura o teto
+        ou se o agente está em modo de sobrevivência — o chamador deve
+        degradar (synthetic_success), sem nunca estourar o event loop.
+        """
+        async with self.lock:
+            metrics = self._get_or_create_metrics(agent_id)
+            if metrics.em_modo_sobrevivencia:
+                return False
+            budget = metrics.cpu_budget or BUDGET_PADRAO
+            ceiling = self._generation_ceiling()
+            load = sum(
+                m.cpu_budget for m in self._agents.values() if m.generations_ativas > 0
+            )
+            if load + budget > ceiling:
+                return False
+            metrics.generations_ativas += 1
+            return True
+
+    async def end_generation(
+        self, agent_id: str, sucesso: bool, uso_cpu: float = 0.0
+    ) -> None:
+        """Encerra um slot de geração ativa e registra a tarefa no agente.
+
+        O uso de CPU reportado (quando > 0) é federado ao IVMAxiom via
+        `reportar_uso_cpu` — mantendo o sinal de CPU vivo para o IVM canônico.
+        """
+        async with self.lock:
+            metrics = self._get_or_create_metrics(agent_id)
+            metrics.generations_ativas = max(0, metrics.generations_ativas - 1)
+        await self.registrar_tarefa(agent_id, sucesso)
+        if uso_cpu > 0:
+            await self.reportar_uso_cpu(agent_id, uso_cpu)
+
+    async def active_generation_count(self) -> int:
+        async with self.lock:
+            return sum(1 for m in self._agents.values() if m.generations_ativas > 0)
 
 
 # =========================================================================

@@ -8,7 +8,7 @@ from iaglobal.utils.logger import logger
 from .skill import Skill, ExecutionPolicy
 from .skill_registry import skill_registry
 
-from typing import TYPE_CHECKING, Any, Dict
+from typing import TYPE_CHECKING
 
 # O TYPE_CHECKING só é lido pelo analisador de tipos (não causa importação circular)
 if TYPE_CHECKING:
@@ -47,7 +47,7 @@ class SkillExecutor:
         memory = ctx.get("memory", {})
 
         for node_name, node_result in memory.items():
-            if not isinstance(node_result, dict):
+            if not isinstance(node_result, dict) and not hasattr(node_result, "get"):
                 continue
             output = node_result.get("output")
             if output is not None:
@@ -78,9 +78,13 @@ class SkillExecutor:
                             if out_name not in contract_ctx:
                                 contract_ctx[out_name] = output_text
 
-            for key, value in node_result.items():
-                if key in skill.inputs and key not in ("output",):
-                    contract_ctx[key] = copy.deepcopy(value)
+            # NodeResult não tem .items() (apenas .get()). Só itera quando
+            # for dict — para NodeResult, o bloco acima (linhas 52-79) já
+            # popula contract_ctx via output/metadata.
+            if isinstance(node_result, dict):
+                for key, value in node_result.items():
+                    if key in skill.inputs and key not in ("output",):
+                        contract_ctx[key] = copy.deepcopy(value)
 
         for key in skill.inputs:
             if key in ctx:
@@ -88,6 +92,12 @@ class SkillExecutor:
 
         if "workdir" in ctx:
             contract_ctx["workdir"] = ctx["workdir"]
+
+        # SEMPRE passa memory por referência para que bridge functions
+        # (ex: _coder_run_fn) consigam reconstruir o contexto completo do nó.
+        # NÃO usar deepcopy — memory contém instâncias vivas (ex: _agent_bus,
+        # _mailbox_manager) que não são deep-copyáveis e perderiam identidade.
+        contract_ctx["memory"] = memory
 
         if "execution_result" in skill.inputs:
             contract_ctx["execution_result"] = copy.deepcopy(memory)
@@ -186,7 +196,7 @@ class SkillExecutor:
     ) -> Dict[str, Any]:
         try:
             return await self.execute(skill_name, ctx, version)
-        except SkillExecutionError as e:
+        except SkillExecutionError:
             skill = self.registry.get(skill_name)
             if not skill or _depth >= 2:
                 raise

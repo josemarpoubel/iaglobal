@@ -2,7 +2,6 @@
 
 """Minimal executor module - provides blackjack_executar_local wrapper."""
 
-import os
 
 from iaglobal.utils.logger import get_logger
 

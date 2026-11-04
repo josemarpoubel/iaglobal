@@ -5,7 +5,6 @@ import threading
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
 from pathlib import Path
-import json
 import time
 
 from iaglobal._paths import HOMOCYSTEINE_POOL_FILE

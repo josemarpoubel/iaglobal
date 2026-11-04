@@ -8,16 +8,16 @@ from typing import Dict, Any
 from iaglobal.evolution.skills.native.skill_executor import SkillExecutor
 from iaglobal.evolution.skills.native.skill_registry import skill_registry
 from iaglobal.evolution.skills.native.skill import Skill, ExecutionPolicy
-from iaglobal.utils.logger import logger
 from iaglobal.immunity.pathogen_analyzer import pathogen_analyzer
 from iaglobal.obsidian.law_compliance_logger import law_compliance_logger
+
+import iaglobal.evolution.skills.native.skill_model_router  # noqa: F401
+import iaglobal.evolution.skills.native.skill_rag_optimizer  # noqa: F401
+import iaglobal.evolution.skills.native.skill_prompt_structurer  # noqa: F401
 
 logger = logging.getLogger(__name__)
 
 # Import skills to ensure registration
-import iaglobal.evolution.skills.native.skill_model_router  # noqa: F401
-import iaglobal.evolution.skills.native.skill_rag_optimizer  # noqa: F401
-import iaglobal.evolution.skills.native.skill_prompt_structurer  # noqa: F401
 
 IVM_THRESHOLD = 0.5
 

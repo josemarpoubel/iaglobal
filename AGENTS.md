@@ -22,7 +22,7 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 - **Node structure.** Each pipeline node lives in its own file `iaglobal/graphs/nodes/no_<name>.py` and exports `async def run_<name>(...)`. `nodes.py` is a dynamic proxy — keep it lightweight.
 - **Telemetry contract.** Every node result that performs heavy work must include the key `"execution_metrics"` (not `__execution_metrics__`). Shape: `{"success": bool, "latency": float, "cost": float, "model": str}`.
 - **Lineage marker.** Every `.py` file must start with `# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136`.
-- **Test artifacts.** All test-generated files go to `iaglobal/tests/temp/`. Use the `tests_temp_dir` fixture. Do not write to project root.
+- **Test artifacts.** All test-generated files go to `iaglobal/memory/data/temp/tests/` (via :data:`iaglobal._paths.TESTS_DATA_DIR`, exposed through the `tests_temp_dir` fixture). Do not write to project root or to other parts of `memory/data/` — only the canonical tests landing zone.
 
 ## Architecture Boundaries
 
@@ -33,6 +33,51 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 | `immunity/` | defense, apoptosis, vaccines, pruning | LLM generation |
 | `providers/` | external model transport | business logic |
 | `graphs/` | DAG, topology, nodes, execution | direct OS calls |
+
+## 💾 Persistence Authority — `_paths.py` is Mandatory
+
+**Single source of truth for disk persistence:** `iaglobal/_paths.py`.
+
+Every artifact, project directory, counter file, lock file, log file, database
+path, or directory that needs to live under `iaglobal/memory/data/` MUST go
+through helpers exported by `iaglobal/_paths.py` (e.g. `save_result_artifact`,
+`next_project_dir`, `RESULTS_DIR`, `DATA_ROOT`, `LOGS_DIR`, `db_path()`).
+
+### Rationale
+
+`iaglobal/memory/data/result/` is the canonical landing zone for pipeline
+artifacts. The pipeline (`iaglobal/pipeline/engine.py`), the orchestrator, and
+the result node (`iaglobal/graphs/nodes/no_result_agent.py`) MUST NOT open
+files at `iaglobal/memory/data/...` paths directly. They MUST import the path
+helpers from `_paths.py` and use them.
+
+Direct `open()` / `Path(...) / "..."` writes against `memory/data/` bypass
+the project's sequential numbering (`project01`, `project02`, ...), the
+locking semantics (`_RESULT_LOCK_FILE`), the cleanup invariants, and the
+per-test isolation contract (`tests_temp_dir` fixture).
+
+### How to add a new persisted artifact
+
+1. Add a helper in `iaglobal/_paths.py` that returns the `Path` (or accepts
+   content and returns where it was written).
+2. Import the helper in the caller:
+   ```python
+   from iaglobal._paths import save_result_artifact  # or the new helper
+   ```
+3. If the helper takes a new parameter, extend it the same way the contract
+   is documented — never bypass it by writing to the filesystem directly.
+4. Add a regression test in `iaglobal/tests/test_save_result_artifact.py`
+   (or a sibling test file) that uses the `tests_temp_dir` fixture and
+   asserts the artifact lands in `tests_temp_dir`, not in `memory/data/`.
+
+### Violations
+
+Direct disk writes against `iaglobal/memory/data/` from outside `_paths.py`
+will be rejected by code review and may be flagged by the auditor. The
+historical incident that motivated this rule was `pipeline/engine.py:840`
+calling `save_result_artifact(state.prompt, {}, code, preferred_ext)` while
+`_paths.py` only accepted 3 args — the fix is tracked in
+`tests/test_save_result_artifact.py::test_engine_save_script_com_preferred_ext_compativel`.
 
 ## Commands
 
@@ -50,6 +95,151 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 | CLI history | `iaglobal history --list` / `iaglobal history <id> --explain` |
 | Run evolution lab | `OLLAMA_BASE_URL=http://localhost:11434 evolution-lab` |
 | Set SEARXNG_URL | `export SEARXNG_URL=http://localhost:8005` (default) |
+| MCP unified server (stdio) | `python -m iaglobal.mcp.server --mode stdio` (use this; legacy `iaglobal.api.mcp_server` is deprecated) |
+| Two-phase bootstrap proof | `python iaglobal/tests/test_verify_mcp.py` — exige 1/1/1 markers |
+| Install git hooks (smoke gate) | `bash scripts/install-hooks.sh` (rode uma vez por clone) |
+| Architectural decision records | `docs/adr/000*.md` (Status, Context, Decision, Consequences) |
+
+## MCS — MCP Coordenation & Anti-Revert
+
+> O incidente de **agentes revertendo alterações um do outro em silêncio** quebrou o projeto. Esta seção codifica a regra para que isso não aconteça de novo.
+
+### Regra 0 — Não reverter trabalho alheio em curso
+
+Antes de qualquer `git restore`, `git checkout -- <file>`, `git reset` ou operação destrutiva, verifique:
+
+```bash
+git status -s
+git log -1 --format='%H %an: %s'
+git diff --stat
+```
+
+Se **qualquer arquivo mostra trabalho não-commitado** que não seja seu, **NÃO TOQUE**. Pergunte primeiro.
+
+### Sinalização de trabalho em curso
+
+Para iniciar uma sessão de trabalho que toca arquivos sensíveis (`iaglobal/cli/bootstrap.py`, `iaglobal/mcp/server.py`, `iaglobal/api/__init__.py`, `run_mcp.sh`):
+
+1. **Reservar via branch dedicada**:
+   ```bash
+   git checkout -b wip/<nome>-<YYYYMMDD>  # ex: wip/bootstrap-two-phase-20260724
+   ```
+2. **Nunca** trabalhar diretamente sobre `main` sem branch.
+3. Manter o WIP commitado em **commits granulares** a cada 15-30 minutos de trabalho:
+   ```bash
+   git add -p           # stage só hunks intencionais
+   git commit -m "wip: <descrição focada>"
+   ```
+
+### Smoke gate obrigatório
+
+Antes de qualquer commit que toque arquivos de bootstrap/MCP, **todos** devem rodar:
+
+```bash
+python iaglobal/tests/test_verify_mcp.py
+```
+
+A asserção **deve passar** com exit 0. Em particular:
+- `phase1_complete == 1`
+- `phase2_complete == 1`
+- `orchestrator_init_logged == 1`
+- Latência de ferramentas de leitura ≤ 1.5s; bootstrap ≤ 30s.
+
+Se falhar, há regressão de singleton task ou caminho de bootstrap — **não commitar**.
+
+### Convenção de nomenclatura para branches em curso
+
+| Prefixo | Significado |
+|---------|-------------|
+| `wip/...` | trabalho pessoal em andamento, não-PR |
+| `feat/...` | feature pronta para PR |
+| `fix/...` | bug fix pronto para PR |
+| `hotfix/...` | correção urgente production |
+
+### Quando reverter é aceitável
+
+Reverter é aceitável **apenas** quando:
+- O trabalho é **inteiramente seu** e você optou por refazer.
+- O outro agente já **mergeou via PR ou explicitamente desistiu** (`git log`, branch apagada).
+- Há aprovação registrada via issue/comentário.
+
+**Nunca** reverter porque "parece que vai contra o que eu queria" — abra issue/PR em vez disso.
+
+## Bootstrap Two-Phase Contract
+
+> Phase1 deve ser **sub-segundo** para que MCP/FastAPI/etc. respondam ao handshake. Phase2 é pesada (~13s) e roda em background como **uma única Task singleton**.
+
+### Helpers obrigatórios em `iaglobal/mcp/server.py`
+
+```python
+async def _ensure_phase1() -> None:
+    """Idempotente. Await Phase1 (~50ms), agenda Phase2 em background."""
+    from iaglobal.cli.bootstrap import bootstrap as _bootstrap
+    await _bootstrap.ensure_phase1()
+
+async def _ensure_full() -> "Orchestrator":
+    """Idempotente. Await Phase2 e sincroniza IAGlobalAPI."""
+    from iaglobal.cli.bootstrap import bootstrap as _bootstrap
+    orch = await _bootstrap.initialize()
+    api = _get_api()
+    if not api._initialized and orch is not None:
+        api._orchestrator = orch
+        api._initialized = True
+    return orch
+
+def _ready() -> bool: ...                    # True se Phase2 concluiu
+def _boot_snapshot() -> dict: ...            # progresso: phase1/2, elapsed, steps
+```
+
+### Padrão de uso em tools MCP
+
+```python
+@mcp.tool()
+async def minha_tool() -> str:
+    await _ensure_phase1()
+    snap = _boot_snapshot()
+    if not snap["phase2_done"]:
+        return "BOOTING: descrição amigável do estado atual"
+    await _ensure_full()
+    return _get_api().minha_leitura_pesada()
+```
+
+**Nunca** chame `_get_api().orca_sei()` direto sem `_ensure_full()` — `IAGlobalAPI.orchestrator` lança `RuntimeError` se `_initialized=False`.
+
+### Singleton lock
+
+| Estado | Quem agenda | Quem re-agenda |
+|--------|-------------|-----------------|
+| Phase1 pendente | `ensure_phase1` (no-op após primeira) | ninguém |
+| Phase2 pendente | `_schedule_phase2` em background | ninguém |
+| Phase2 concluída | feito | ninguém (NÃO re-agendar — bug que re-rodava Phase2 antes fixado) |
+
+A asserção `if self._phase2_task is None:` (não `is None or done`) é o que garante **execução única**.
+
+## MCP Server Entrypoint Contract
+
+| Use este | ~~Não use mais~~ |
+|----------|-------------------|
+| `python -m iaglobal.mcp.server --mode stdio` | `python -m iaglobal.api.mcp_server` (DEPRECATED) |
+| `python -m iaglobal.mcp.server --mode both` | — (mata SSE 8100 + HTTP 8101 + stdio) |
+| `python -m iaglobal.mcp.server --mode http` | atende `/health`, `/metrics`, `/audit`, `/fix` |
+
+**Quem usa `run_mcp.sh`**: o script já aponta para o unified (`iaglobal.mcp.server --mode stdio`). Se alguém editá-lo de volta para `iaglobal.api.mcp_server`, **reverter**.
+
+### Ferramentas canonicas no unified
+
+| Tool | Categoria | Phase dep |
+|------|-----------|-----------|
+| `metabolic_audit`, `get_ivm` | metabólica | nenhuma |
+| `run_task` | execução | Phase2 (via `_ensure_full`) |
+| `get_status`, `get_system_health`, `get_bandit_scores` | leitura | lazy (BOOTING se Phase2) |
+| `get_provider_metrics`, `get_model_metrics` | leitura | nenhuma (lê singletons) |
+| `get_insights`, `list_scripts`, `get_history`, `get_execution_history` | leitura | lazy |
+| `evolution_status`, `evolve_strategy`, `evolution_dashboard` | runtime | Phase1+ |
+| `web_search`, `web_fetch`, `read_file`, `write_file`, `list_dir`, `execute_code` | utilitários | nenhuma |
+| `reflexion_fix`, `reflexion_loop`, `get_error_history` | auto-cura | Phase1+ |
+
+Adicionar uma nova tool ao **unified** (não ao deprecated): seguir o padrão lazy.
 
 ## Before You Commit
 
@@ -57,12 +247,16 @@ Run tests: `python -m pytest iaglobal/tests/ -q`
 2. Run `python -m iaglobal.auditoria_arquitetural` to detect orphaned functions or naming collisions.
 3. Verify no file lost the lineage marker header.
 4. If you touched pipeline nodes, run `python -m pytest iaglobal/tests/test_topology_contract.py -v`.
+5. **Se tocou bootstrap, mcp/server, api/__init__ ou run_mcp.sh**: rode `python iaglobal/tests/test_verify_mcp.py`. Exit ≠ 0 = regressão de singleton/duplicação. Não commitar.
+6. **Se criou branch `wip/...`**: ao terminar, faça merge ou descarte explicitamente — branches WIP abandonadas são vetor de reverts acidentais.
+7. **Em novo clone**: rode `bash scripts/install-hooks.sh` para que o smoke gate rode automaticamente em todo commit que toque arquivos sensíveis.
+8. **Decisões arquiteturais relevantes**: registre em `docs/adr/NNNN-slug.md` (ver ADR 0001 e 0002 para tom/estrutura).
 
 ## 🧬 Testing Standards
 
 ### 📁 Output Directory
 
-**EVERY** file generated during test execution (logs, databases, reports, temporary artifacts) must be written to `tests/temp/`.
+**EVERY** file generated during test execution (logs, databases, reports, temporary artifacts) must be written to `iaglobal/memory/data/temp/tests/` via :data:`iaglobal._paths.TESTS_DATA_DIR` (helper :func:`iaglobal._paths.tests_data_subdir`).
 
 ```python
 from pathlib import Path
@@ -71,11 +265,13 @@ def test_exemplo(tests_temp_dir: Path):
     db_path = tests_temp_dir / "meu_teste.db"
 ```
 
-The `conftest.py` file provides the `tests_temp_dir` fixture, which points to `tests/temp/`. The fixture automatically cleans up files between runs (except for `__pycache__`).
+The `conftest.py` file provides the `tests_temp_dir` fixture, which delegates to `iaglobal._paths.TESTS_DATA_DIR = DATA_ROOT / "temp" / "tests"`. Tests persist artifacts here — this directory is the canonical landing zone for test output, version-controlled and shared across runs.
 
 ### ❌ Prohibited
 
 - Writing files to the project root directory (`./`)
+- Writing to `iaglobal/memory/data/{result, json, cbor2, db, cache, logs, ...}` directly — these are owned by the lib (see 💾 Persistence Authority). Tests must not bypass them.
+- Writing to `iaglobal/tests/temp/` (deprecated — replaced by `memory/data/temp/tests/`).
 - Using `tempfile.mkdtemp()` — prefer `tests_temp_dir`
 - Hardcoding absolute paths (`/home/...`)
 - Using `Path(__file__).parent.parent / "file"` for writing (read-only)
@@ -83,12 +279,12 @@ The `conftest.py` file provides the `tests_temp_dir` fixture, which points to `t
 ### ✅ Allowed
 
 - pytest's native `tmp_path` for ephemeral data (provided it doesn't clutter the project)
-- `tests_temp_dir` for artifacts that need to be inspected after the test
+- `tests_temp_dir` (== `TESTS_DATA_DIR`) for test artifacts
 - `Path(__file__).parent.parent / "iaglobal"` for **reading** source code
 
 ### 🧹 Cleanup
 
-The `_clean_tests_temp` fixture automatically removes files from `tests/temp/` at the end of each test session. To persist an artifact, manually move it out of `tests/temp/`.
+`TESTS_DATA_DIR` is **persistent** — not auto-cleaned between runs. The cleanup happens at the end of the test session via `iaglobal/tests/test_z_clear.py` (the last test in alphabetical order, which only runs if all previous tests passed). Tests should write to scoped subdirectories (`tests_temp_dir / "<test_name>"`) so that re-runs don't read stale state from previous runs. Use `tests_data_subdir("<name>")` for canonical subdirs that should always exist.
 
 ### ⚙️ Configuration
 
@@ -245,6 +441,53 @@ All AI model calls must go through `BanditPolicy` for:
 - Performance metrics tracking
 - Credit/reward assignment
 - Fallback chain management
+
+---
+
+## 🧬 Memory Consolidation — Pull, Not Push
+
+`CognitiveProxy` (executor síncrono) escreve em `MEMORIES_DB` (SQLite, tabelas `stm_entries`/`ltm_entries`) sem saber que o Obsidian existe. `REMSleepEngine` (consolidação assíncrona periódica) **puxa** essas entradas como segunda fonte e reaproveita o pipeline de síntese existente — sem dual-write, sem wrapper de substituição.
+
+### Por que pull e não push (3 alternativas descartadas)
+
+| Alternativa | Por que não |
+|-------------|-------------|
+| **Dual-write** (`stm.add()` + `SubconsciousAPI.escrever_curto_prazo()` no mesmo call site) | Toda vez que duas implementações fazem a mesma coisa em paralelo, elas divergem na primeira falha parcial. Dessincronia invisível até a próxima auditoria forense. |
+| **Substituir STM/LTM por wrapper sobre o vault** | STM deve ser rápido e efêmero (hipocampo: write de alta frequência, baixa latência). SQLite serve. Markdown + REMSleep foi desenhado para síntese periódica em lote — não para receber write por interação. |
+| **Documentar a separação e deixar como está** | Sem ponte, o proxy nunca alimenta `ancestry_tree`, `epigenetic_registry` nem o registro de vacinas. Aprendizado vazando pelo ralo permanentemente. |
+
+### Arquitetura
+
+```
+[CognitiveProxy.run()]  ── escreve normal, sem mudança ──►  MEMORIES_DB (SQLite)
+
+
+[REMSleepEngine.iniciar_fase_rem()]  (ciclo periódico, já existente)
+       ├─► lê DLQ (00_Quarentena/)             ← já fazia
+       ├─► lê MEMORIES_DB (stm/ltm do proxy)   ← NOVO: segunda fonte via _processar_staging_db()
+       ├─► sintetiza (NÃO copia 1:1)
+       ├─► escreve em 03_Long_Term/ via SubconsciousAPI
+       └─► atualiza mapa_conexoes (04_Synapses/)
+```
+
+### Comportamento do watermark (`consolidated_at`)
+
+- Marca **"revisado"**, não "promovido" — toda entrada processada recebe o timestamp, tenha gerado insight ou não. Falha não é motivo para re-tentar: `_solicitar_sintese_ia` e `_gravar_longo_prazo` já passam pela `BanditPolicy` com circuit breaker, então falha transitória tende a ser absorvida antes de chegar aqui. Exceção = marca mesmo assim (poison-pill safe — uma entrada corrompida não pode ficar eternamente no topo da fila FIFO).
+- Autofagia separada (`iaglobal learn prune-staging [--days N]`, default 60) apaga apenas entradas que **já foram revisadas** e continuam estagnadas além do horizonte — nunca toca em nada que ainda não teve chance de síntese.
+
+### Concorrência
+
+- `MEMORIES_DB` opera em `journal_mode=WAL` (propriedade do arquivo, herdado por qualquer conexão que abrir depois).
+- `_open_memories_conn()` (REM) seta a pragma defensivamente para garantir o modo mesmo num banco recém-criado sem o proxy ter rodado antes.
+- `_mark_consolidated_batch()` faz **1 commit por lote** (não 1 por linha) — reduz contention contra o write de alta frequência do proxy na mesma tabela.
+- `_autofagia_staging_estagnado()` **NÃO** roda dentro de `iniciar_fase_rem()`. Tem guard obrigatório `dias_limite > 0` (defesa em profundidade: CLI + função) — `dias_limite <= 0` viraria `DELETE WHERE created_at < agora`, apagando todo staging revisado instantaneamente.
+
+### Referências
+
+- `iaglobal/obsidian/consolidation.py` — `_processar_staging_db()`, `_autofagia_staging_estagnado()`, helpers (`_open_memories_conn`, `_fetch_unconsolidated`, `_mark_consolidated_batch`)
+- `iaglobal/memory/term_short.py`, `iaglobal/memory/term_long.py` — `_init_db` ganha `ALTER TABLE ... ADD COLUMN consolidated_at TEXT` idempotente via `PRAGMA table_info` (não via try/except — cheque antes de tentar)
+- `iaglobal/cli/learn.py` — subcomando `prune-staging [--days N]`
+- `iaglobal/_paths.py` — `MEMORIES_DB` (path canônico)
 
 ---
 

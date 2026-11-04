@@ -1,12 +1,27 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # iaglobal/memory/async_memory.py
-"""Async wrapper for memory operations - não bloqueia o event loop."""
+"""Async wrapper for memory operations - não bloqueia o event loop.
+
+Banco canonico de STM/LTM: MEMORIES_DB (DB_DIR/memories.db).
+Outros bancos (CORE_DB, MEMORY_SWAP_DIR/stm.db) NAO devem receber tabelas
+stm_entries/ltm_entries -- convergencia aplicada neste modulo para que
+produtores (async_memory, CognitiveProxy, pipeline.engine) e consumidores
+(obsidian.consolidation._processar_staging_db) compartilhem o mesmo banco.
+
+Spill-to-disk: ShortTermMemory drena o cache RAM quando o RSS do processo
+cruza STM_SPILL_RSS_FRACTION (default 0.5 da RAM total). As entradas vivem
+no SQLite (ja gravadas no add), entao drenar a RAM nao perde nada e NAO
+escreve arquivos .cbor2 (o mecanismo historico que criava orfaos). Ao ler,
+re-hidrata do SQLite sob demanda. MEMORY_SWAP_DIR nao e mais escrito por
+este modulo — o swap correto e RAM->SQLite, nao arquivos soltos.
+"""
 
 import asyncio
 from typing import Dict, Any, List, Optional
 from iaglobal.memory.term_long import LongTermMemory
 from iaglobal.memory.term_short import ShortTermMemory
 from iaglobal.memory.memory_vector import MemoryVector
-from iaglobal._paths import CORE_DB, MEMORY_SWAP_DIR
+from iaglobal._paths import MEMORIES_DB
 import logging
 
 logger = logging.getLogger(__name__)
@@ -20,14 +35,14 @@ _memory_vector: Optional[MemoryVector] = None
 def _get_ltm() -> LongTermMemory:
     global _ltm
     if _ltm is None:
-        _ltm = LongTermMemory(db_path=CORE_DB)
+        _ltm = LongTermMemory(db_path=MEMORIES_DB)
     return _ltm
 
 
 def _get_stm() -> ShortTermMemory:
     global _stm
     if _stm is None:
-        _stm = ShortTermMemory(db_path=MEMORY_SWAP_DIR / "stm.db")
+        _stm = ShortTermMemory(db_path=MEMORIES_DB)
     return _stm
 
 
@@ -78,6 +93,91 @@ async def get_ltm_stats() -> Dict[str, Any]:
     except Exception as e:
         logger.error("[ASYNC_MEMORY] Erro stats LTM: %s", e)
         return {}
+
+
+async def store_ltm_full(
+    content: str,
+    metadata: Optional[Dict[str, Any]] = None,
+    source: str = "internal",
+) -> None:
+    """Async wrapper para LongTermMemory.store(content, metadata, source).
+
+    Compat\u00edvel com a assinatura original de LTM.store() para callers que
+    precisam do par\u00e2metro `source` (ex: no_knowledge_analyzer).
+    """
+    try:
+        ltm = _get_ltm()
+        await asyncio.to_thread(ltm.store, content, metadata, source)
+        logger.info(
+            "[ASYNC_MEMORY] LTM store (full): %s | source=%s",
+            content[:50],
+            source,
+        )
+    except Exception as e:
+        logger.error("[ASYNC_MEMORY] Erro no LTM.store: %s", e)
+
+
+async def clear_stm() -> None:
+    """Async wrapper para ShortTermMemory.clear (limpeza total da STM)."""
+    try:
+        stm = _get_stm()
+        await asyncio.to_thread(stm.clear)
+        logger.info("[ASYNC_MEMORY] STM limpa.")
+    except Exception as e:
+        logger.error("[ASYNC_MEMORY] Erro ao limpar STM: %s", e)
+
+
+async def get_recent_stm(n: int = 10) -> List[Any]:
+    """Async wrapper para ShortTermMemory.get_recent(n)."""
+    try:
+        stm = _get_stm()
+        return await asyncio.to_thread(stm.get_recent, n)
+    except Exception as e:
+        logger.error("[ASYNC_MEMORY] Erro ao ler STM recentes: %s", e)
+        return []
+
+
+class AsyncMemory:
+    """Wrapper OO sobre os singletons de async_memory.
+
+    Delega \u00e0s fun\u00e7\u00f5es de m\u00f3dulo (add_ltm etc.) para preservar a invariante
+    de singleton global: cada inst\u00e2ncia desta classe aponta para os mesmos
+    objetos STM/LTM/MemoryVector compartilhados por todo o processo.
+
+    Existe para satisfazer callers que esperam uma API OO (ex:
+    no_validator_retry.py), sem reintroduzir o anti-padr\u00e3o de criar uma
+    inst\u00e2ncia nova de LTM/STM por request.
+    """
+
+    async def store(
+        self,
+        key: str,
+        value: Dict[str, Any],
+        source: Optional[str] = None,
+    ) -> None:
+        if source is None:
+            await add_ltm(key, value)
+            return
+        # Compoe content descritivo: indexacao semantica em LTM usa `content`
+        # diretamente em _match_score(), e embedding em MemoryVector usa o texto.
+        # Gravar so `key` empobrece a recuperacao futura.
+        try:
+            import json
+
+            payload = json.dumps(value, ensure_ascii=False, default=str)
+        except Exception:
+            payload = str(value)
+        content = f"{key}\n{payload}"
+        await store_ltm_full(content=content, metadata=value, source=source)
+
+    async def retrieve(self, query: str, top_k: int = 5) -> List[Dict]:
+        return await retrieve_ltm(query, top_k)
+
+    async def add(self, item: str, metadata: Optional[Dict] = None) -> None:
+        await add_stm(item, metadata)
+
+    async def get_recent(self, n: int = 10) -> List[Any]:
+        return await get_recent_stm(n)
 
 
 async def add_memory_vector(text: str, mtype: str = "evolution") -> None:

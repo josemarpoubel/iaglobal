@@ -8,10 +8,9 @@ Metáfora biológica:
 """
 
 import re
-import ast
 import logging
-from dataclasses import dataclass, field
-from typing import List, Optional
+from dataclasses import dataclass
+from typing import List
 
 from iaglobal.security.ast_gateway import ASTGateway
 

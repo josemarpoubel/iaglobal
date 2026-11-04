@@ -17,12 +17,9 @@ Métricas de qualidade:
   4. Bandit score (IVM médio quando executada)
 """
 
-import asyncio
 import time
-import logging
-from dataclasses import dataclass, field
-from typing import Dict, List, Optional
-from pathlib import Path
+from dataclasses import dataclass
+from typing import Dict, List
 
 from iaglobal.utils.logger import get_logger
 
@@ -466,7 +463,6 @@ Retorne APENAS um número.
 
         # Lista todas as memórias
         try:
-            from pathlib import Path
             from iaglobal._paths import PACKAGE_DIR
 
             obsidian_dir = PACKAGE_DIR / "obsidian" / "04_Synapses" / "search_memory"

@@ -100,7 +100,7 @@ class MembraneKey:
             if data.get("key") == key and data.get("validated", False):
                 return True
 
-        logger.warning(f"[MEMBRANE] Key invalid or not found")
+        logger.warning("[MEMBRANE] Key invalid or not found")
         return False
 
     def grant_permission(self, system_name: str, permission: str) -> bool:

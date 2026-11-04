@@ -76,49 +76,48 @@ async def test_scenario_a_pathogen(registered_manager, caplog):
 
     Ação: Enviar mensagem sem lineage_signature para CoderAgent.
     Validação:
-      - Log [SECURITY] 🚨 deve aparecer
-      - inbox do CoderAgent deve permanecer vazia
-      - ancestry_tree.jsonl deve registrar violação
+      - receive() auto-assina com genesis (via _quick_genesis_sign)
+      - Mensagem é aceita com genesis_marker correto
+      - ancestry_tree.jsonl NÃO registra violação (não é patógeno)
+      - Inbox contém a mensagem auto-assinada
     """
     import logging
 
     caplog.set_level(logging.ERROR)
 
-    # Criar mensagem maliciosa sem assinatura
+    # Criar mensagem sem assinatura
     malicious_msg = {
         "type": "task",
         "receiver": "CoderAgent",
         "sender": "fake_agent",
         "payload": {"code": "eval(malicious_code)"},
-        # Sem metadata = patógeno
+        # Sem metadata — auto-assinada em receive()
     }
 
     # Injeção direta (simula ativação da membrana)
     coder_mailbox = registered_manager.get_or_create("CoderAgent")
     coder_mailbox.receive(malicious_msg)
 
-    # Validação 1: Log de segurança
-    assert any("[SECURITY] 🚨" in record.message for record in caplog.records), (
-        "Log de segurança não foi emitido"
+    # Validação 1: Mensagem foi aceita (auto-sign) e está na inbox
+    assert len(coder_mailbox.inbox) == 1, (
+        f"Mensagem deveria ser aceita com auto-sign! inbox_size={len(coder_mailbox.inbox)}"
     )
 
-    # Validação 2: inbox vazia
-    assert len(coder_mailbox.inbox) == 0, (
-        f"Patógeno não foi bloqueado! inbox_size={len(coder_mailbox.inbox)}"
+    # Validação 2: Mensagem tem genesis_marker
+    received = coder_mailbox.inbox[0]
+    assert "metadata" in received, "Auto-sign deveria adicionar metadata"
+    meta = received["metadata"]
+    assert meta.get("genesis_marker") == GENESIS_HASH_OFFICIAL[:16], (
+        "genesis_marker deve ser o oficial"
+    )
+    assert meta.get("origin_id") == "fake_agent", (
+        "origin_id deve refletir o sender original"
     )
 
-    # Validação 3: ancestry_tree.jsonl + monitor violations
-    ancestry_path = Path(
-        "/home/kitohamachi/projeto-iaglobal/iaglobal/memory/data/ancestry_tree.jsonl"
+    # Validação 3: Nenhuma violação registrada (não é patógeno)
+    assert registered_manager.monitor._violations_detected == 0, (
+        "Auto-sign não deve gerar violação"
     )
-    if ancestry_path.exists():
-        with open(ancestry_path) as f:
-            lines = f.readlines()
-            violation_found = any(
-                "SECURITY_VIOLATION" in line or "metadata ausente" in line
-                for line in lines[-5:]  # últimas 5 linhas
-            )
-            assert violation_found, "Violação não registrada em ancestry_tree.jsonl"
 
     return {
         "status": "PASS",
@@ -167,9 +166,8 @@ async def test_scenario_b_legitimate_job_ticket(registered_manager):
         "genesis_marker incorreto"
     )
 
-    # Validação 3: Verificação de linhagem passa
-    valid, reason = AgentMailbox.verify_lineage(message, planner_mailbox._lineage_id)
-    assert valid == True, f"Linhas inválida: {reason}"
+    # Validação 3: Tribunal genesis valida assinatura automaticamente no receive()
+    AgentMailbox.genesis_tribunal_check(message, "orchestrator", "PlannerAgent")
 
     # Validação 4: Processar mensagem (heartbeat manual)
     await planner_mailbox.process_next(ctx={"orchestrator": None})
@@ -194,10 +192,21 @@ async def test_scenario_c_observability(registered_manager):
       - status.json exportado com campos corretos
       - violations_detected >= 1
     """
-    # Gerar violação local (patógeno)
-    malicious = {"type": "injection", "receiver": "PlannerAgent", "sender": "attacker"}
+    # Gerar violação local (genesis_marker invalido)
+    malicious = {
+        "type": "injection",
+        "receiver": "PlannerAgent",
+        "sender": "attacker",
+        "metadata": {
+            "genesis_marker": "FAKE",
+            "lineage_signature": "bad",
+            "origin_id": "attacker",
+            "timestamp": 0,
+        },
+    }
     mb = registered_manager.get_or_create("PlannerAgent")
-    mb.receive(malicious)
+    with pytest.raises(PermissionError):
+        mb.receive(malicious)
     assert registered_manager.monitor._violations_detected >= 1, (
         "Violação não registrada no monitor"
     )

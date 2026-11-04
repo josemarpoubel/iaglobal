@@ -19,6 +19,16 @@ from iaglobal.utils.logger import logger
 from iaglobal.utils.life_signal_collector import instrument
 
 # Import opcional da BanditPolicy Evolutiva (Geração 2)
+from iaglobal.providers.ollama_provider import async_generate as ollama_async_generate
+from iaglobal.providers.contract import registry
+from iaglobal.providers.provider_config import (
+    CognitiveRole,
+    get_model_config,
+    get_role_by_model_id,
+)
+from iaglobal.metabolism.bucket_manager import BucketManager
+from contextvars import ContextVar
+
 try:
     from iaglobal.policy import BanditPolicyEvolutiva
 
@@ -30,9 +40,6 @@ except ImportError:
     logger.warning(
         "⚠️  BanditPolicyEvolutiva não disponível, usando BanditPolicy clássica"
     )
-
-from iaglobal.providers.ollama_provider import async_generate as ollama_async_generate
-from iaglobal.providers.contract import registry
 
 
 # Bootstrap: importa cada módulo provider para disparar registry.register()
@@ -67,14 +74,6 @@ _bootstrap_providers()
 # ── CognitiveRouter: Tribunal Cognitivo de 3 Camadas ──────────────────────
 # Mapeia tipo de tarefa → rota metabólica, extraindo capacidade do
 # ProviderConfig.  Desacoplado do gerenciamento de buckets (Passo 3).
-from iaglobal.providers.provider_config import (
-    ProviderConfig,
-    CognitiveRole,
-    get_model_config,
-    get_role_by_model_id,
-)
-
-from iaglobal.metabolism.bucket_manager import BucketManager
 
 
 QWEN_MODEL_ID = get_model_config(CognitiveRole.OPERARIO)["model_id"]
@@ -89,11 +88,8 @@ class CognitiveRouter:
     """
 
     ROUTE_MAP: dict[str, str] = {
+        # Modelo único: qwen2.5:0.5b
         "critic": "ollama",
-        "failure_analysis": "ollama",
-        "arbitrar_geracao": "ollama",
-        "pipeline.requirement_correction": "ollama",
-        "system_design": "ollama",
         "coder": "ollama",
         "multi_coder": "ollama",
         "backend_builder": "ollama",
@@ -111,6 +107,10 @@ class CognitiveRouter:
         "deployment_plan": "ollama",
         "task_breakdown": "ollama",
         "documentation": "ollama",
+        "failure_analysis": "ollama",
+        "arbitrar_geracao": "ollama",
+        "pipeline.requirement_correction": "ollama",
+        "system_design": "ollama",
         "sandbox_validator": "ollama",
         "lsp_validator": "ollama",
         "semantic_validator": "ollama",
@@ -174,11 +174,11 @@ class CognitiveRouter:
 # os limites metabólicos e aplicando fallback se necessário.
 
 _ROUTE_TIMEOUT: dict[str, float] = {
-    "ollama": 120.0,
+    "ollama": 30.0,
 }
 
 _ESTIMATED_TOKENS: dict[str, int] = {
-    "ollama": 8192,
+    "ollama": 1024,
 }
 
 
@@ -318,13 +318,11 @@ _HF_ROUTER_ALIASES = [
 PROVIDERS: dict[str, Callable] = dict(registry.sync)
 ASYNC_PROVIDERS: dict[str, Callable] = dict(registry.async_)
 
-# Aliases sync — hf_router_*
+# Aliases — hf_router_*
 if "hf_router" in PROVIDERS:
     _hfr_sync = PROVIDERS["hf_router"]
     for _a in _HF_ROUTER_ALIASES:
         PROVIDERS.setdefault(_a, _hfr_sync)
-
-# Aliases async — hf_router_*
 if "hf_router" in ASYNC_PROVIDERS:
     _hfra = ASYNC_PROVIDERS["hf_router"]
     for _a in _HF_ROUTER_ALIASES:
@@ -491,7 +489,6 @@ BANDIT_NODE = "model_router"
 # Sinaliza se a resposta servida veio de cache (hit) dentro da task corrente.
 # Usado para NÃO inflacionar a Produtividade (P) e a Eficiência (E) do IVM:
 # servir do cache não é geração real do agente (evita métrica falsa de "bom").
-from contextvars import ContextVar
 
 _SERVED_FROM_CACHE: ContextVar[bool] = ContextVar("served_from_cache", default=False)
 
@@ -1256,7 +1253,7 @@ async def async_route_generate(
             return await async_route_generate_parallel(
                 prompt, task_type=task_type, node_id=node_id
             )
-        provider = original.split("/")[0] if "/" in original else "ollama"
+        provider = original.split("/")[0]
         logger.info(
             "[ROUTER] async_route_generate model=%s provider=%s task_type=%s",
             original,
@@ -1275,7 +1272,7 @@ async def async_route_generate(
             )
             record_membrane_decision(node_id, "redirected_local", [original])
             enriched = await _enrich_prompt_with_learned_knowledge(prompt, task_type)
-            # Preserva o model_id do original (ex: ollama/yasserrmd/GLM4.7-...)
+            # Preserva o model_id do original (ex: ollama/qwen2.5:0.5b)
             redirected = (
                 original if original.startswith("ollama/") else f"ollama/{original}"
             )

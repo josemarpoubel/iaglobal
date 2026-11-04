@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# pre-commit hook: roda test_verify_mcp.py quando arquivos sensíveis foram tocados.
+# Idempotente e quick (smoke).
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+SMOKE="$REPO_ROOT/iaglobal/tests/test_verify_mcp.py"
+
+SENSITIVE_PATTERNS=(
+    'iaglobal/cli/bootstrap\.py$'
+    'iaglobal/mcp/server\.py$'
+    'iaglobal/api/__init__\.py$'
+    'run_mcp\.sh$'
+)
+
+staged="$(git diff --cached --name-only)"
+
+needs_smoke=0
+for pat in "${SENSITIVE_PATTERNS[@]}"; do
+    if echo "$staged" | grep -E "$pat" >/dev/null 2>&1; then
+        needs_smoke=1
+        break
+    fi
+done
+
+if [ "$needs_smoke" -eq 0 ]; then
+    exit 0
+fi
+
+echo "[pre-commit] Arquivos sensíveis tocados — executando smoke gate..."
+if [ ! -f "$SMOKE" ]; then
+    echo "[pre-commit] AVISO: smoke '$SMOKE' não encontrado; pulando."
+    exit 0
+fi
+
+PYTHON="${PYTHON:-python}"
+if ! command -v "$PYTHON" >/dev/null 2>&1; then
+    if [ -x "$REPO_ROOT/venv/bin/python" ]; then
+        PYTHON="$REPO_ROOT/venv/bin/python"
+    else
+        echo "[pre-commit] Python não encontrado; pulando smoke gate."
+        exit 0
+    fi
+fi
+
+cd "$REPO_ROOT"
+if "$PYTHON" "$SMOKE"; then
+    echo "[pre-commit] ✅ smoke gate OK"
+    exit 0
+else
+    echo "[pre-commit] ❌ smoke gate FALHOU — corrija antes de commitar"
+    exit 1
+fi

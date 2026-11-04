@@ -9,6 +9,7 @@ from datetime import datetime
 from iaglobal.agents.result_agent import ResultAgent
 from iaglobal._paths import save_result_artifact, LOG_DIR
 from iaglobal.memory.memory_error import record_error
+from iaglobal.core.artifact import GeneratedArtifact, ArtifactKind
 
 logger = logging.getLogger(__name__)
 
@@ -39,13 +40,35 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
                         payload.get("approved"),
                     )
 
-    doc_output = memory.get("documentation", {}).get("output", "")
+    doc_data = memory.get("documentation", {}) or {}
+    doc_output = doc_data.get("output", "")
     if not doc_output:
-        doc_output = memory.get("documentation", {}).get("document", "")
+        doc_output = doc_data.get("document", "")
+    doc_artifact: GeneratedArtifact = doc_data.get("artifact")
 
-    coder_output = memory.get("multi_coder", {}).get("output", "")
-    if not coder_output:
-        coder_output = memory.get("coder", {}).get("output", "")
+    mc_data = memory.get("multi_coder", {}) or {}
+    coder_data = memory.get("coder", {}) or {}
+    coder_output = mc_data.get("output", "") or coder_data.get("output", "")
+    coder_artifact: GeneratedArtifact = mc_data.get("artifact") or coder_data.get(
+        "artifact"
+    )
+
+    # Collect builder outputs — always; used both for aggregation and saving
+    _BUILDER_KEYS: tuple[tuple[str, str], ...] = (
+        ("frontend_builder", "Frontend"),
+        ("backend_builder", "Backend"),
+        ("database_builder", "Database"),
+        ("api_builder", "API"),
+    )
+    files: dict[str, str] = {}
+    builder_has_content = False
+    for key, _label in _BUILDER_KEYS:
+        src_data = memory.get(key, {})
+        if isinstance(src_data, dict):
+            src_out = src_data.get("output", "")
+            if src_out and len(src_out) > 20:
+                files[f"{key}.py"] = src_out
+                builder_has_content = True
 
     is_code_task = any(
         lang in task.lower()
@@ -67,35 +90,58 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "bash",
         ]
     )
-    if is_code_task and coder_output:
+
+    # When builders produced real code, aggregate as the primary output
+    if builder_has_content:
+        parts: list[str] = []
+        for key, label in _BUILDER_KEYS:
+            src_data = memory.get(key, {})
+            if isinstance(src_data, dict):
+                content = src_data.get("output", "")
+                if content and len(content) > 20:
+                    parts.append(f"# === {label} ===\n{content}")
+        output = "\n\n\n".join(parts)
+        chosen_artifact = GeneratedArtifact(
+            kind=ArtifactKind.CODE,
+            content=output,
+            source="result_agent.aggregated",
+            metadata={"files": list(files.keys())},
+        )
+    elif is_code_task and coder_output:
         output = coder_output
+        chosen_artifact = coder_artifact or GeneratedArtifact.from_str(
+            coder_output, source="result_agent.coder"
+        )
     else:
         output = doc_output or coder_output
-
-    files = {}
-    for src in [
-        "frontend_builder",
-        "backend_builder",
-        "database_builder",
-        "api_builder",
-    ]:
-        src_data = memory.get(src, {})
-        if isinstance(src_data, dict):
-            src_out = src_data.get("output", "")
-            if src_out and len(src_out) > 20:
-                files[f"{src}.py"] = src_out
+        chosen_artifact = (
+            doc_artifact
+            or coder_artifact
+            or (
+                GeneratedArtifact.from_str(output, source="result_agent.fallback")
+                if output
+                else GeneratedArtifact(
+                    kind=ArtifactKind.ERROR,
+                    content="",
+                    source="result_agent",
+                    metadata={"reason": "empty_output"},
+                )
+            )
+        )
 
     project_dir = None
     final_path = None
 
     if output:
         try:
-            is_doc = bool(doc_output) and not (is_code_task and coder_output)
+            is_doc_p = bool(doc_output) and not (is_code_task and coder_output)
+            if chosen_artifact is not None:
+                is_doc_p = chosen_artifact.is_search_or_doc
             project_dir = await asyncio.to_thread(
                 save_result_artifact, task=task, files=files, code=output
             )
 
-            if is_doc and project_dir:
+            if is_doc_p and project_dir:
                 pdf_found = None
                 pdf_name = "output.pdf"
                 static_name = "documento.pdf"
@@ -254,6 +300,7 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
         **ctx,
         "output": output,
         "final_file": final_path or "",
+        "artifact": chosen_artifact,
         "result": {
             "task": task,
             "has_output": bool(output),
@@ -264,6 +311,9 @@ async def run_result_agent(ctx: Dict[str, Any]) -> Dict[str, Any]:
             "summary": contract.get("summary", ""),
             "health": contract.get("health", {}),
             "checksum": contract.get("final_result", {}).get("checksum", ""),
+            "artifact_kind": chosen_artifact.kind.value
+            if chosen_artifact
+            else "UNKNOWN",
         },
         "execution_metrics": {
             "success": bool(output),

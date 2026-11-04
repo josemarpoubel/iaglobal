@@ -29,6 +29,17 @@ async def run_learn(args, orch) -> None:
         await _cmd_suggest()
     elif subcommand == "map":
         await _cmd_map()
+    elif subcommand in ("prune-staging", "prune_staging"):
+        dias = 60
+        for arg in subargs:
+            if arg.startswith("--days="):
+                try:
+                    dias = int(arg.split("=", 1)[1])
+                except ValueError:
+                    print(f"Ignorando valor invalido para --days: {arg}")
+            elif arg.isdigit():
+                dias = int(arg)
+        await _cmd_prune_staging(dias)
     elif subcommand == "auto-tune":
         await _cmd_autotune()
     else:
@@ -56,12 +67,12 @@ async def _cmd_status() -> None:
 
     print("\n APRENDIZADO DO CHAPPIE")
     print("=" * 50)
-    print(f"  Vault Obsidian:")
+    print("  Vault Obsidian:")
     print(f"    Instintos (01):    {instincts}")
     print(f"    Curto Prazo (02):  {short}")
     print(f"    Longo Prazo (03):  {long_}")
     print(f"    Sinapses (04):     {synapses}")
-    print(f"  Meta-Learner:")
+    print("  Meta-Learner:")
     print(f"    Sugestoes:         {len(learner.suggestions)}")
     print(f"    Backlog:           {len(learner.evolution_backlog)}")
     print(f"    Padroes Sucesso:   {len(learner.success_patterns)}")
@@ -74,7 +85,7 @@ async def _cmd_status() -> None:
 
         bandit_evo = get_bandit_evolution()
         evo_status = bandit_evo.get_status_evolution()
-        print(f"  BanditEvolution:")
+        print("  BanditEvolution:")
         print(f"    Ciclos:            {evo_status.get('ciclos_completados', 0)}")
         print(f"    Providers:         {evo_status.get('total_providers', 0)}")
         print(f"    Banidos:           {evo_status.get('providers_banidos', 0)}")
@@ -176,6 +187,33 @@ async def _cmd_map() -> None:
     print(" Reconstruindo mapa sinaptico...")
     await sub.atualizar_mapa_conexoes()
     print(" Mapa sinaptico reconstruido.")
+
+
+async def _cmd_prune_staging(dias: int = 60) -> None:
+    """Autofagia do staging MEMORIES_DB (entradas revisadas + estagnadas).
+
+    Ciclos separados: este NAO roda dentro de iniciar_fase_rem(). Use
+    com pouca frequencia -- o horizonte default (60 dias) eh generoso.
+
+    Guard obrigatorio: ``dias`` precisa ser positivo. ``--days 0`` (ou
+    negativo) viraria ``DELETE ... WHERE created_at < agora`` -- apaga
+    tudo que ja foi revisado, independente de idade real. Typo num
+    argumento manual eh exatamente o cenario onde esse tipo de footgun
+    dispara em producao.
+    """
+    if dias <= 0:
+        print(f"--days deve ser positivo (recebido: {dias}). Operacao cancelada.")
+        return
+    from iaglobal.obsidian.consolidation import REMSleepEngine
+
+    engine = REMSleepEngine()
+    result = await engine._autofagia_staging_estagnado(dias_limite=dias)
+    print("\n AUTO-FAGIA STAGING DB")
+    print("=" * 50)
+    print(f"  Horizonte:             {dias} dias")
+    print(f"  stm_entries removidas: {result.get('stm_deleted', 0)}")
+    print(f"  ltm_entries removidas: {result.get('ltm_deleted', 0)}")
+    print("=" * 50)
 
 
 async def _cmd_autotune() -> None:

@@ -13,9 +13,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import (
     Any,
-    Callable,
     Dict,
-    List,
     Optional,
     Protocol,
     Tuple,
@@ -26,6 +24,11 @@ from typing import (
 # ==============================================================================
 # CONTEXTOS ESPECIALIZADOS (frozen, cada um com responsabilidade única)
 # ==============================================================================
+
+
+from .memory_snapshot import MemorySnapshot
+from .security_snapshot import SecuritySnapshot
+from .performance_snapshot import PerformanceSnapshot
 
 
 @dataclass(frozen=True)
@@ -107,11 +110,6 @@ class MetricsContext:
 # ==============================================================================
 # EXECUTION CONTEXT (composição, não herança)
 # ==============================================================================
-
-
-from .memory_snapshot import MemorySnapshot
-from .security_snapshot import SecuritySnapshot
-from .performance_snapshot import PerformanceSnapshot
 
 
 @dataclass(frozen=True)

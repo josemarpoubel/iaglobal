@@ -298,7 +298,6 @@ class TestSnippetSynthesizerAsync:
     @pytest.mark.asyncio
     async def test_synthesize_with_fallback(self, synthesizer, sample_snippets):
         """synthesize deve usar fallback se LLM falhar."""
-        from unittest.mock import AsyncMock, patch
 
         # Patch no import correto
         with patch(

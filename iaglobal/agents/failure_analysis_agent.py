@@ -423,7 +423,7 @@ class FailureAnalysisAgent(AgentBase):
                         {
                             "type": "import_blocklist",
                             "rule": f"block_unknown_{matches[0].lower() if matches else 'module'}",
-                            "description": f"Bloquear import de módulos não verificados",
+                            "description": "Bloquear import de módulos não verificados",
                         }
                     )
                 elif category == "security":

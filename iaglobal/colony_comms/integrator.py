@@ -89,15 +89,15 @@ class ColonyIntegrator:
     def _format_obsidian_note(organism_id: str, result: dict) -> str:
         lines = [
             f"# 🧬 Colony Result — {organism_id}",
-            f"",
+            "",
             f"- **Task ID:** {result.get('task_id', 'unknown')}",
             f"- **Timestamp:** {result.get('timestamp', 'N/A')}",
             f"- **Success:** {'✅' if result.get('success') else '❌'}",
             f"- **Workers:** {result.get('num_workers', 0)}",
             f"- **Total Latency:** {result.get('total_latency_ms', 0)}ms",
-            f"",
-            f"## Outputs",
-            f"",
+            "",
+            "## Outputs",
+            "",
         ]
         for i, output in enumerate(result.get("outputs", [])):
             if isinstance(output, dict):

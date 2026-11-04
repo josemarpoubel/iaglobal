@@ -5,12 +5,12 @@ import logging
 import time
 from typing import Dict
 
-logging.basicConfig(level=logging.WARNING)
-
 from iaglobal.graphs.builder import build_pipeline_from_nodes
 from iaglobal.graphs.execution_graph import ExecutionGraph
 from iaglobal.graphs.node import Node
 import iaglobal.graphs.topology as topology
+
+logging.basicConfig(level=logging.WARNING)
 
 
 class TimedExecutionGraph(ExecutionGraph):
@@ -132,7 +132,7 @@ async def main():
 
     t0 = time.time()
     ctx = {"input": {"task": "gerar script python hello world"}, "output": ""}
-    result = graph.run(ctx)
+    graph.run(ctx)
     total = time.time() - t0
 
     print(report(graph.timings, total))

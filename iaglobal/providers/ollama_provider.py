@@ -13,6 +13,8 @@ from iaglobal.providers.provider_config import (
 )
 from iaglobal.providers.token_usage import TokenCollector
 
+from iaglobal.providers.contract import registry as _registry
+
 logger = logging.getLogger("iaglobal.providers.ollama")
 
 _loaded_models: set[str] = set()
@@ -58,7 +60,7 @@ async def warmup(model: str | None = None) -> bool:
 
 async def warmup_cognitive_cortex() -> dict[str, bool]:
     """Desperta os modelos locais do Tribunal Cognitivo em paralelo."""
-    from iaglobal.providers.provider_config import get_all_active_models, CognitiveRole
+    from iaglobal.providers.provider_config import get_all_active_models
 
     models_to_wake = get_all_active_models()
     print(f"🧠 Iniciando warmup do córtex cognitivo: {models_to_wake}")
@@ -104,7 +106,7 @@ async def async_generate(
 
     role = get_role_by_model_id(model)
     model_config = get_model_config(role) if role else None
-    num_predict = model_config.get("num_predict", 8192) if model_config else 8192
+    num_predict = model_config.get("num_predict", 1024) if model_config else 1024
     num_ctx = model_config.get("context_window", 4096) if model_config else 4096
     # Optimized parameters for small local models:
     # - temperature=0.1 → deterministic, avoids syntax hallucination
@@ -216,7 +218,6 @@ async def async_generate(
 
 
 # Auto-registro no ProviderRegistry
-from iaglobal.providers.contract import registry as _registry
 
 _registry.register_funcs(
     "ollama",

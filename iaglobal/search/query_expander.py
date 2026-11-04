@@ -11,7 +11,6 @@ Integra com:
 - SearchMiddleware (chama antes de buscar)
 """
 
-import time
 from typing import List, Optional
 from dataclasses import dataclass
 

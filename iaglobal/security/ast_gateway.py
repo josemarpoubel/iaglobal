@@ -114,14 +114,14 @@ class ASTGateway:
             return "Remova zeros à esquerda de literais inteiros"
         if "invalid syntax" in msg:
             return "Verifique parênteses, colchetes e dois-pontos na linha indicada"
+        if "expected an indented block" in msg:
+            return "Adicione um bloco indentado após a definição da função/classe"
         if (
             "unindent" in msg.lower()
             or "indent" in msg.lower()
             or "IndentationError" in type(e).__name__
         ):
             return "Verifique indentação — tabs e espaços podem estar misturados. Use indentação uniforme (4 espaços)"
-        if "expected an indented block" in msg:
-            return "Adicione um bloco indentado após a definição da função/classe"
         return f"Erro de sintaxe: {msg}"
 
     def _scan(self, tree: ast.AST) -> List[Dict[str, Any]]:
@@ -191,11 +191,11 @@ class ASTGateway:
                         )
 
                 elif isinstance(node.func, ast.Attribute):
-                    if node.func.attr in {
+                    attr_lower = node.func.attr.lower()
+                    if attr_lower in {
                         "system",
                         "popen",
                         "spawn",
-                        "execute",
                         "eval",
                         "exec",
                     }:

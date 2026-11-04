@@ -16,14 +16,13 @@ Uso:
 
 import os
 import time
+import logging
 import asyncio
-import concurrent.futures
 
 from typing import Optional, Dict, Any, List
 
-from iaglobal.utils.logger import get_logger
 
-logger = get_logger("iaglobal.api")
+logger = logging.getLogger("ia-global")
 
 
 class IAGlobalAPI:
@@ -38,7 +37,7 @@ class IAGlobalAPI:
         self._initialized = False
         if not lazy_init:
             try:
-                loop = asyncio.get_running_loop()
+                asyncio.get_running_loop()
                 logger.debug(
                     "[API] Event loop ativo detectado — inicialização adiada para initialize_async()"
                 )
@@ -98,6 +97,8 @@ class IAGlobalAPI:
 
     @property
     def orchestrator(self):
+        if self._orchestrator is not None:
+            return self._orchestrator
         if not self._initialized:
             raise RuntimeError(
                 "IAGlobalAPI não inicializado. Chame initialize() ou "
@@ -151,8 +152,6 @@ class IAGlobalAPI:
 
     def get_status(self) -> Dict[str, Any]:
         """Retorna status completo do sistema."""
-        from iaglobal.cli.status import Dashboard
-
         graph = getattr(self.orchestrator, "graph", None)
         runtime = getattr(self.orchestrator, "evolution_runtime", None)
         evolver = getattr(self.orchestrator, "evolver", None)

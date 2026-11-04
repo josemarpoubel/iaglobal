@@ -17,6 +17,7 @@ from pathlib import Path
 from typing import Dict, Any, Tuple
 
 from iaglobal.security.sandbox_executor import SandboxExecutor
+from iaglobal.core.artifact import GeneratedArtifact, ArtifactKind
 from iaglobal._paths import (
     save_result_artifact,
     RESULTS_DIR,
@@ -130,18 +131,39 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
     memory = ctx.get("memory", {})
     task = str(ctx.get("input", {}).get("task", ""))
 
+    # Tenta pegar artifact tipado primeiro, fallback para output (compat)
+    def _get_code_from_source(src_key: str) -> Tuple[str, GeneratedArtifact]:
+        src_data = memory.get(src_key, {})
+        artifact = src_data.get("artifact")
+        if artifact and isinstance(artifact, GeneratedArtifact):
+            return artifact.content, artifact
+        output = src_data.get("output", "") or src_data.get("code", "")
+        if output:
+            return output, GeneratedArtifact.from_str(
+                output, source=f"code_executor.{src_key}"
+            )
+        return "", None
+
     # Prioriza frontend_builder sobre coder/multi_coder
-    raw_code = (
-        memory.get("frontend_builder", {}).get("output", "")
-        or memory.get("frontend_builder", {}).get("output", "")
-        or memory.get("coder", {}).get("output", "")
-        or memory.get("multi_coder", {}).get("output", "")
-    )
+    for src_key in ["frontend_builder", "coder", "multi_coder"]:
+        raw_code, artifact = _get_code_from_source(src_key)
+        if raw_code:
+            chosen_artifact = artifact
+            break
+    else:
+        raw_code = ""
+        chosen_artifact = None
 
     if not raw_code:
         logger.warning("[EXECUTOR] Nenhum código detectado para execução.")
         return {
             "output": "",
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="code_executor",
+                metadata={"reason": "no_code_detected"},
+            ),
             "final_file": None,
             "executed": False,
             "success": True,
@@ -157,6 +179,12 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
     if len(cleaned) < 10:
         return {
             "output": "",
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content=cleaned,
+                source="code_executor",
+                metadata={"reason": "code_too_short"},
+            ),
             "final_file": None,
             "executed": False,
             "success": True,
@@ -345,6 +373,34 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
             else ""
         )
 
+        # Classifica o output final como artifact tipado
+        if output_text:
+            final_artifact = GeneratedArtifact.from_str(
+                output_text, source="code_executor"
+            )
+        elif saved:
+            # Se salvou arquivo mas output_text vazio, tenta ler o arquivo
+            try:
+                final_artifact = GeneratedArtifact.from_str(
+                    Path(saved).read_text(encoding="utf-8"),
+                    source="code_executor",
+                    language=ext.lstrip(".") if ext else "text",
+                )
+            except Exception:
+                final_artifact = GeneratedArtifact(
+                    kind=ArtifactKind.ERROR,
+                    content="",
+                    source="code_executor",
+                    metadata={"reason": "cannot_read_saved_file"},
+                )
+        else:
+            final_artifact = GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="code_executor",
+                metadata={"reason": "empty_output", "error": str(error)[:200]},
+            )
+
         # Publica resultado no AcetylcholineBus
         bus = _get_bus()
         await bus.publish(
@@ -365,6 +421,7 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
         return {
             "output": output_text,
+            "artifact": final_artifact,
             "executed": True,
             "final_file": saved,
             "extension": ext,
@@ -400,6 +457,12 @@ async def run_code_executor(ctx: Dict[str, Any]) -> Dict[str, Any]:
 
         return {
             "output": "",
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content="",
+                source="code_executor",
+                metadata={"reason": "exception", "error": str(e)[:200]},
+            ),
             "executed": False,
             "final_file": None,
             "exec_error": str(e),

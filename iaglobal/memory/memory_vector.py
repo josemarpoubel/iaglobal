@@ -89,16 +89,6 @@ def store(text: str, mtype: str = "fact") -> None:
             (mtype, text.strip(), vec),
         )
         conn.commit()
-    except sqlite3.OperationalError:
-        # Tabela memory pode não existir se init_db() não foi chamado ainda
-        conn.close()
-        init_db()
-        conn = get_vector_db()
-        conn.execute(
-            "INSERT INTO memory (type, content, embedding) VALUES (?, ?, ?)",
-            (mtype, text.strip(), vec),
-        )
-        conn.commit()
     finally:
         conn.close()
 
@@ -107,7 +97,7 @@ def store(text: str, mtype: str = "fact") -> None:
         from iaglobal.storage.converter import DataBridge
 
         DataBridge.sincronizar_sqlite_para_cbor(
-            os.path.basename(_paths.CORE_DB),
+            os.path.basename(_paths.EMBEDDINGS_DB),
             "memory",
             os.path.basename(_paths.EMBEDDINGS_DB),
         )

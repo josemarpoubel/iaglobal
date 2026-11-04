@@ -23,14 +23,14 @@ def classify_generation(text: str) -> GenerationKind:
 
     stripped = text.lstrip()
 
-    if stripped.startswith("<!DOCTYPE") or stripped.startswith("<html"):
-        return GenerationKind.HTML
-
     if stripped.startswith("```"):
         return GenerationKind.CODE
 
     if "<?php" in stripped[:500]:
         return GenerationKind.CODE
+
+    if stripped.startswith("<!DOCTYPE") or stripped.startswith("<html"):
+        return GenerationKind.HTML
 
     if (
         stripped.startswith("HTTP/")

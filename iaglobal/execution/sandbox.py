@@ -20,10 +20,11 @@ from iaglobal.validation.ast_security import (
 from iaglobal.validation.validation_engine import ValidationEngine
 from iaglobal.security.ast_gateway import ASTGateway
 
-_ast_gateway = ASTGateway()
 from iaglobal.immunity.glutathione_guardrails import GlutathioneGuardrails
 from iaglobal.utils.logger import logger
 from iaglobal._paths import DATA_DIR
+
+_ast_gateway = ASTGateway()
 
 # 🔒 CONFIGURAÇÕES DE SEGURANÇA E AMBIENTE
 

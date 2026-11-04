@@ -3,6 +3,7 @@
 import os
 import cbor2
 import json
+import logging
 import shutil
 import hashlib
 import tempfile
@@ -15,9 +16,9 @@ from jsonschema import validate
 from deepdiff import DeepDiff
 
 from iaglobal._paths import DATA_ROOT
-from iaglobal.utils.logger import get_logger
 
-logger = get_logger("iaglobal.storage.converter")
+# Sincroniza o logger com o arquivo central utils/logger.py se ele já estiver carregado
+logger = logging.getLogger("ia-global")
 
 
 class DataBridge:
@@ -109,7 +110,8 @@ class DataBridge:
             if target_path.exists():
                 backup = DataBridge._create_backup(target_path)
 
-            import time, gc
+            import time
+            import gc
 
             gc.collect()
             time.sleep(0.05)

@@ -11,6 +11,7 @@ from typing import Dict, Any, Optional, Set, Tuple
 
 from iaglobal.utils.logger import logger
 from iaglobal.utils.hash_utils import LineageID
+from iaglobal.core.node_result import normalize_node_result
 
 from .node import Node
 
@@ -35,17 +36,12 @@ from iaglobal.graphs.comms.acetylcholine_bus import (
 )
 from iaglobal.sandbox.sandbox_expansion import sandbox_expansion
 from iaglobal.graphs.contracts.node_contract import MissingContextError
-from iaglobal.graphs.recovery import RecoveryPolicy, RecoveryDecision, RecoveryResult
-from iaglobal.graphs.skip_reason import REASON_LABELS
+from iaglobal.graphs.recovery import RecoveryPolicy, RecoveryDecision
 from iaglobal.obsidian.omnimind import omni_mind
 from iaglobal.observability.execution_events import (
-    get_event_bus as get_exec_event_bus,
     emit as emit_exec_event,
     NODE_STARTED,
     NODE_FINISHED,
-    PROVIDER_SELECTED,
-    FALLBACK as EVENT_FALLBACK,
-    RETRY as EVENT_RETRY,
 )
 
 
@@ -499,12 +495,14 @@ class ExecutionGraph:
             )
 
             # Atualização em memória
-            self.results[dep_name] = {
-                "error": f"Abortado pela Sanity Barrier: falha em '{failed_node_name}'",
-                "node": dep_name,
-                "status": "ABORTED",
-                "success": False,
-            }
+            self.results[dep_name] = normalize_node_result(
+                {
+                    "error": f"Abortado pela Sanity Barrier: falha em '{failed_node_name}'",
+                    "node": dep_name,
+                    "status": "ABORTED",
+                    "success": False,
+                }
+            )
             self.skip_reasons[dep_name] = "aborted_by_sanity_barrier"
 
             # Atualização assíncrona no DB
@@ -695,11 +693,13 @@ class ExecutionGraph:
         checkpoint = await asyncio.to_thread(checkpoint_db.get_checkpoint, execution_id)
         if checkpoint:
             for node_name, state in checkpoint.items():
-                self.results[node_name] = {
-                    "output": state.get("result_data"),
-                    "status": "COMPLETED",
-                    "success": True,
-                }
+                self.results[node_name] = normalize_node_result(
+                    {
+                        "output": state.get("result_data"),
+                        "status": "COMPLETED",
+                        "success": True,
+                    }
+                )
                 executed.add(node_name)
                 await asyncio.to_thread(
                     exec_registry.complete_node, execution_id, node_name
@@ -770,12 +770,27 @@ class ExecutionGraph:
                 )
 
                 if is_failed:
-                    error_msg = (
-                        str(result.get("error", "Execution Failed"))
-                        if isinstance(result, dict)
-                        else str(result)
-                    )
-                    logger.warning("[GRAPH] Nó '%s' falhou: %s", name, error_msg)
+                    if isinstance(result, dict):
+                        error = result.get("error")
+                        error_msg = str(error) if error else "Execution Failed"
+                    else:
+                        s = str(result)
+                        error_msg = s if s else "Execution Failed"
+
+                    if is_exception:
+                        # exc_info=result captura traceback da exceção
+                        # retornada por asyncio.gather(return_exceptions=True).
+                        # Não usar logger.exception() — não estamos em except ativo.
+                        logger.error(
+                            "[GRAPH] Nó '%s' falhou: %s",
+                            name,
+                            error_msg,
+                            exc_info=result
+                            if isinstance(result, BaseException)
+                            else None,
+                        )
+                    else:
+                        logger.error("[GRAPH] Nó '%s' falhou: %s", name, error_msg)
 
                     if isinstance(result, MissingContextError):
                         recovery = await self._recovery.handle_missing_context(
@@ -854,7 +869,7 @@ class ExecutionGraph:
                         error_message=error_msg,
                     )
                 else:
-                    self.results[name] = result
+                    self.results[name] = normalize_node_result(result)
                     await asyncio.to_thread(
                         checkpoint_db.update_node_status,
                         execution_id,
@@ -894,11 +909,13 @@ class ExecutionGraph:
         checkpoint = await asyncio.to_thread(checkpoint_db.get_checkpoint, execution_id)
         if checkpoint:
             for name, state in checkpoint.items():
-                self.results[name] = {
-                    "output": state.get("result_data"),
-                    "status": "COMPLETED",
-                    "success": True,
-                }
+                self.results[name] = normalize_node_result(
+                    {
+                        "output": state.get("result_data"),
+                        "status": "COMPLETED",
+                        "success": True,
+                    }
+                )
                 node_status[name] = "COMPLETED"
                 executed.add(name)
                 await asyncio.to_thread(exec_registry.complete, execution_id, name)
@@ -982,7 +999,7 @@ class ExecutionGraph:
                             self.skip_reasons[dep] = "aborted_by_sanity_barrier"
                             executed.add(dep)
                 else:
-                    self.results[name] = result
+                    self.results[name] = normalize_node_result(result)
                     node_status[name] = "COMPLETED"
                     await asyncio.to_thread(
                         checkpoint_db.update_node_status,

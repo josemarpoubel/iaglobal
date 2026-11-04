@@ -10,6 +10,7 @@ Multi-Armed Bandit para seleção de provedores LLM com:
 
 import asyncio
 import hashlib
+import os
 import random
 import time
 from collections import defaultdict
@@ -34,6 +35,11 @@ def _get_bandit() -> "BanditPolicy":
     Auto-injeta CreditAssignmentEngine se ainda não configurado,
     garantindo que qualquer chamador (nodes, agents, scripts) tenha
     métricas registradas mesmo sem passar pelo Orchestrator.initialize().
+
+    Auto-anexa o ``BanditFeedbackObserver`` (Etapa 7 do ADR-0004) — o
+    observer subscreve CAPABILITY_RESULT no bus e credita o Bandit
+    com base no desfecho. Idempotente: o flag ``_feedback_attached``
+    impede múltiplas instâncias.
     """
     global _bandit_instance
     if _bandit_instance is None:
@@ -44,6 +50,15 @@ def _get_bandit() -> "BanditPolicy":
             from iaglobal.graphs.credit import CreditAssignmentEngine
 
             _bandit_instance.credit_engine = CreditAssignmentEngine()
+        except Exception:
+            pass
+    # Auto-wire: BanditFeedbackObserver (Etapa 7 do ADR-0004)
+    if not getattr(_bandit_instance, "_feedback_attached", False):
+        try:
+            from iaglobal.graphs.bandit_feedback import BanditFeedbackObserver
+
+            BanditFeedbackObserver(_bandit_instance)
+            _bandit_instance._feedback_attached = True
         except Exception:
             pass
     return _bandit_instance
@@ -60,7 +75,11 @@ class BanditPolicy:
 
     # Configuração de concorrência máxima por tipo de modelo
     CLOUD_MODEL_CONCURRENCY = 1  # Groq, NVIDIA, etc — 1 por vez para evitar 429
-    LOCAL_MODEL_CONCURRENCY = 4  # Ollama local pode lidar com mais
+    # Local: escala com os cores detectados (max(2, cores // 2)) — em uma
+    # máquina de 8 cores → 4; em 48 cores → 24. Ollama paraleliza inference
+    # em todos os cores disponíveis, então o gate global do cpu_affinity é
+    # quem limita a saturação real.
+    LOCAL_MODEL_CONCURRENCY = max(2, (os.cpu_count() or 4) // 2)
 
     def __init__(
         self,
@@ -90,6 +109,9 @@ class BanditPolicy:
             str, Dict
         ] = {}  # Memória por contexto/domínio para epigenética
         self._epigenetic_flags: Dict[str, bool] = {}  # Flags epigenéticas
+        self._cpu_slot_acquired = (
+            False  # guard: slot de CPU reservado no CpuAffinityManager
+        )
 
         # Inicializa pesos a partir de variável de ambiente
         initial_weights = os.getenv("BANDIT_INITIAL_WEIGHTS", "")
@@ -199,7 +221,6 @@ class BanditPolicy:
         try:
             from iaglobal.providers.provider_config import (
                 COGNITIVE_MODELS,
-                CognitiveRole,
             )
 
             for role, cfg in COGNITIVE_MODELS.items():
@@ -260,10 +281,6 @@ class BanditPolicy:
             # Qwen (Operário)    ~3-10s
             if is_cloud:
                 timeout = 3.0
-            elif "glm4" in model_name.lower() or "glm" in model_name.lower():
-                timeout = 180.0
-            elif "lfm" in model_name.lower():
-                timeout = 60.0
             else:
                 timeout = 30.0
 
@@ -963,6 +980,41 @@ class BanditPolicy:
                 _st.record_starvation(node_id, candidates, 3, execution_id=execution_id)
                 return ""
 
+            # 2.4 CPU Affinity — gate GLOBAL de gerações ativas.
+            # Complementa o semáforo por modelo: enquanto o semáforo limita a
+            # concorrência POR MODELO, o CpuAffinityManager limita a
+            # concorrência GLOBAL respeitando budgets metabólicos (estase,
+            # sobrevivência, teto configurável). Rejeição = degrada como
+            # synthetic_success, sem estourar o event loop — consistente com
+            # o comportamento do LocalModelGate.
+            if not await self._try_reserve_cpu_slot(effective_agent):
+                self.logger.warning(
+                    "[CPU] %s: teto de gerações ativas atingido — "
+                    "degradando para synthetic_success",
+                    effective_agent,
+                )
+                if _sem_acquired and model_selected:
+                    self.release_model(
+                        model_selected,
+                        node_id=effective_agent,
+                        execution_id=execution_id,
+                    )
+                    if not any(
+                        p in model_selected
+                        for p in ("groq/", "nvidia/", "openrouter/", "gemini/")
+                    ):
+                        try:
+                            from iaglobal.execution.token_bucket import LocalModelGate
+
+                            gate = await LocalModelGate.get_instance()
+                            await gate.release(
+                                effective_agent, model_name=model_selected
+                            )
+                        except Exception:
+                            pass
+                    _sem_acquired = False
+                return ""
+
             # 2.5 SearchMiddleware — enriquece prompt com contexto web via RAG
             # Todos os agentes (exceto critic, que avalia código) recebem
             # contexto web para reduzir dependência do conhecimento do modelo.
@@ -1111,6 +1163,9 @@ class BanditPolicy:
                         await gate.release(effective_agent, model_name=model_selected)
                     except Exception:
                         pass
+            # 7b. Libera o slot de geração ativa no CpuAffinityManager
+            # (gate global de CPU) e reporta o uso para o IVM canônico.
+            await self._release_cpu_slot(effective_agent, success)
             # 8. Telemetria metabólica (IVM) — portão universal de todo acesso a
             # modelo de IA. Captura AgentBase e chamadas diretas de nós sem
             # distinção, curando o split-brain de observabilidade do IVMAxiom.
@@ -1140,3 +1195,37 @@ class BanditPolicy:
                     gate.report_latency(latency * 1000.0)
                 except Exception:
                     pass
+
+    async def _try_reserve_cpu_slot(self, agent_id: str) -> bool:
+        """Reserva um slot de geração LLM ativa no CpuAffinityManager.
+
+        Guard de execução única: o slot é reservado uma vez por chamada de
+        `generate()`; o finally só libera se a reserva aconteceu de fato.
+        A integração é fail-open: se o CpuAffinityManager falhar ao instanciar
+        (módulo opcional), a geração segue sem o gate — o semáforo por modelo
+        continua sendo a proteção primária.
+        """
+        if self._cpu_slot_acquired:
+            return True
+        try:
+            from iaglobal.execution.cpu_affinity import cpu_affinity
+
+            if not await cpu_affinity.begin_generation(agent_id):
+                return False
+            self._cpu_slot_acquired = True
+            return True
+        except Exception:
+            return True
+
+    async def _release_cpu_slot(self, agent_id: str, success: bool) -> None:
+        """Libera o slot de geração ativa reservado por `_try_reserve_cpu_slot`."""
+        if not self._cpu_slot_acquired:
+            return
+        try:
+            from iaglobal.execution.cpu_affinity import cpu_affinity
+
+            await cpu_affinity.end_generation(agent_id, sucesso=success)
+        except Exception:
+            pass
+        finally:
+            self._cpu_slot_acquired = False

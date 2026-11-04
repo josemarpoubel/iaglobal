@@ -180,7 +180,7 @@ class Dashboard:
             ]
             if evo_nodes:
                 top = sorted(evo_nodes, key=lambda n: n.fitness(), reverse=True)[:3]
-                lines.append(f"  Top EVO     :")
+                lines.append("  Top EVO     :")
                 for n in top:
                     lines.append(
                         f"    {n.name:<40} fitness={n.fitness():.4f} sr={n.success_rate:.2f} lat={n.avg_latency:.4f}s"

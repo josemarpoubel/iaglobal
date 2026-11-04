@@ -349,7 +349,9 @@ class MetabolicRhythm:
 
             # Homeostasis = média ponderada
             homeostasis = (
-                (cpu_score * PESO_CPU) + (atp_score * PESO_ATP) + (stability_score * PESO_ESTABILIDADE)
+                (cpu_score * PESO_CPU)
+                + (atp_score * PESO_ATP)
+                + (stability_score * PESO_ESTABILIDADE)
             )
 
             self._state.homeostasis_score = homeostasis

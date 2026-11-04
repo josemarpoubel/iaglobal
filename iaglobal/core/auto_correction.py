@@ -17,7 +17,7 @@ import time
 import hashlib
 import asyncio
 from dataclasses import dataclass, field
-from typing import List, Tuple, Set, Dict, Any, Optional
+from typing import List, Tuple, Set, Dict, Any
 
 from iaglobal.utils.logger import get_logger
 from iaglobal.security.ast_gateway import ASTGateway

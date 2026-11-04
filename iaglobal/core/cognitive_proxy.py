@@ -522,7 +522,7 @@ class CognitiveProxy:
             )
 
         try:
-            logger.info(f"[COGNITIVE-PROXY] Fallback para Ollama local")
+            logger.info("[COGNITIVE-PROXY] Fallback para Ollama local")
             result = blackjack_executar_local("qwen2.5:0.5b", prompt)
             elapsed = time.time() - start
             self._record_bandit_result("ollama/qwen2.5:0.5b", bool(result), elapsed)
@@ -614,11 +614,11 @@ class CognitiveProxy:
         is_empty = not current_output or len(current_output.strip()) < 10
 
         if has_unknown:
-            logger.info(f"[PROXY] Output contém UNKNOWN — aceitando (intencional)")
+            logger.info("[PROXY] Output contém UNKNOWN — aceitando (intencional)")
             return current_output, 0
 
         if is_empty:
-            logger.warning(f"[PROXY] Output vazio — rejeitando")
+            logger.warning("[PROXY] Output vazio — rejeitando")
             return current_output, 0
 
         # FeedbackEngine: validação formal (sintaxe + AST + segurança)
@@ -639,7 +639,7 @@ class CognitiveProxy:
             snap_data = snapshotter.rollback()
             if snap_data:
                 self.state_buffer.load_snapshot(snap_data)
-                logger.info(f"[PROXY] Rollback executado: estado restaurado")
+                logger.info("[PROXY] Rollback executado: estado restaurado")
 
         # Critic como sensor passivo (APENAS score semântico)
         try:

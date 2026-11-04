@@ -3751,7 +3751,7 @@ ESTIMATED_TOKENS_PER_EXAMPLE = 300
                             │
                             ▼
 ┌─────────────────────────────────────────────────────────────┐
-│           SearXNG Container (localhost:8005)           │
+│           SearXNG Instance (localhost:8005)                 │
 │  ┌──────────────────────────────────────────────────────┐   │
 │  │  /search?q={query}&format=json&language=en           │   │
 │  │ → JSON: { results: [ {title, url, content, engine} ]}│   │
@@ -3858,10 +3858,10 @@ return "\n\n".join(lines)
 **Variável de Ambiente**:
 ```bash
 # .env
-SEARXNG_URL=http://localhost:8005
+SEARXNG_URL=http://localhost:4000
 ```
 
-**Default**: `http://localhost:8005` (se não especificado)
+**Default**: `http://localhost:4000` (se não especificado)
 
 ### Comparação: SearXNG vs Outros Provedores
 

@@ -19,11 +19,13 @@ ALLOWED_READ_PREFIXES = [
     BASE / "tests",
     BASE / "docs",
     BASE / "memory" / "data" / "json",
+    BASE / "iaglobal" / "memory" / "data" / "temp" / "tests",
 ]
 
 ALLOWED_WRITE_PREFIXES = [
     BASE / "memory" / "data" / "json",
     BASE / "memory" / "data" / "script",
+    BASE / "iaglobal" / "memory" / "data" / "temp" / "tests",
 ]
 
 

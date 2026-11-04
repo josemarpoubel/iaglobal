@@ -6,7 +6,6 @@ no_auditor_sentinel — Auditoria de integridade do genesis em tempo real.
 Detecta divergências hash e dispara shutdown preventivo.
 """
 
-import logging
 from typing import Dict, Any
 
 from iaglobal.immunity.entropy_sentinel import entropy_sentinel

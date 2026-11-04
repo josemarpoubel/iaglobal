@@ -9,7 +9,6 @@ Funções puras — sem efeitos colaterais, sem acesso a banco de dados.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
 
 from iaglobal.cognition.awareness.models import (
     ConfidenceTrace,

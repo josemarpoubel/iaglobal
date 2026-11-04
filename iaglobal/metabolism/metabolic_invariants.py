@@ -131,7 +131,7 @@ async def main():
     """Executa verificação única."""
     invariants = MetabolicInvariants()
     result = await invariants.check_all()
-    print(f"🔍 INVARIANTES DE SAÚDE METABÓLICA")
+    print("🔍 INVARIANTES DE SAÚDE METABÓLICA")
     print("=" * 50)
     for invariant, status in result.items():
         print(f"{invariant.upper()}: {status['status']}")

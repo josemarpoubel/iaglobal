@@ -858,7 +858,6 @@ class SearchMiddleware:
         Pode ser refatorado futuramente para rodar via SandboxExecutor
         se o processamento se tornar muito complexo.
         """
-        import json
         import re
 
         if not raw_context:

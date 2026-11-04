@@ -30,7 +30,7 @@ class MemoryManager:
 
     def create_snapshot(self):
         """Método unificado para disparar o backup."""
-        logger.info(f"💾 Iniciando snapshot de memória...")
+        logger.info("💾 Iniciando snapshot de memória...")
         # Chame a lógica de backup que você já tem aqui dentro
         # Exemplo: self.run_backup() ou o código que você já usa para o .tar.gz
         try:

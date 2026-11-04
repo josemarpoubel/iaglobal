@@ -374,7 +374,7 @@ def format_metrics_report(
 ) -> str:
     """Formata estatísticas como tabela terminal."""
     if not stats:
-        return f"  (no data)"
+        return "  (no data)"
 
     lines = []
     lines.append(f"  {'─' * 72}")

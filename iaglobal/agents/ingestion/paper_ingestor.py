@@ -20,6 +20,8 @@ from dataclasses import dataclass, asdict
 from iaglobal._paths import TEMP_DIR, JSON_DIR
 from iaglobal.utils.logger import get_logger
 
+import asyncio
+
 logger = get_logger("iaglobal.agents.ingestion.paper_ingestor")
 
 REPOSITORIES = {
@@ -317,6 +319,3 @@ async def ingest_batch(
             paths.append(result)
 
     return paths
-
-
-import asyncio

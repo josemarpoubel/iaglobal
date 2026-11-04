@@ -106,7 +106,7 @@ class TesterAgent(AgentBase):
                 linhas.append(f"    def test_{cls.lower()}_basic(self):")
                 linhas.append(f'        """Testa criacao basica de {cls}."""')
                 linhas.append(f"        instance = {cls}()")
-                linhas.append(f"        assert instance is not None")
+                linhas.append("        assert instance is not None")
                 linhas.append("")
         if estrutura["funcoes"]:
             for nome, params in estrutura["funcoes"]:
@@ -125,12 +125,12 @@ class TesterAgent(AgentBase):
                         args = ""
                     call = f"{nome}({args})" if args else f"{nome}()"
                     linhas.append(f"        result = {call}")
-                    linhas.append(f"        assert result is not None")
+                    linhas.append("        assert result is not None")
                 else:
                     linhas.append(f"    def test_{nome}_executa(self):")
                     linhas.append(f'        """Testa que {nome} executa sem erros."""')
                     linhas.append(f"        result = {nome}()")
-                    linhas.append(f"        assert result is not None")
+                    linhas.append("        assert result is not None")
                 linhas.append("")
         if not estrutura["funcoes"] and not estrutura["classes"]:
             linhas.append("def test_basic():")

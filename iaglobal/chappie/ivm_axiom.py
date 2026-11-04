@@ -1,3 +1,4 @@
+# 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
 # ============================================================
 # CHAPPIE COMPONENTE 4/4: IVM AXIOM
 # Lei da Compensação Metabólica + Lei do Sucesso
@@ -406,12 +407,12 @@ class IVMAxiom:
             logger.error("[IVMAxiom] Falha ao carregar estado: %s", e, exc_info=True)
 
     def _salvar_estado(self, chave: str, dados: Dict[str, Any]) -> None:
-        """Salva estado na memória de curto prazo."""
+        """Salva estado na memória de curto prazo via upsert por chave."""
         if not self._stm:
             return
 
         try:
-            self._stm.add(dados, metadata={"chave": chave, "tipo": "ivm_axiom"})
+            self._stm.upsert(chave, dados, metadata={"tipo": "ivm_axiom"})
             logger.debug("[IVMAxiom] Estado salvo na memória | chave=%s", chave)
         except Exception as e:
             logger.error("[IVMAxiom] Falha ao salvar estado: %s", e)
@@ -591,13 +592,11 @@ class IVMAxiom:
                     "timestamp": datetime.now(UTC).isoformat(),
                 }
 
-                chave_entrada = (
-                    f"ivm_update_{agent_name}_{datetime.now(UTC).timestamp()}"
-                )
-                self._stm.add(
+                chave_entrada = f"ivm_update_{agent_name}"
+                self._stm.upsert(
+                    chave_entrada,
                     entrada_individual,
                     metadata={
-                        "chave": chave_entrada,
                         "tipo": "ivm_update",
                         "agent_name": agent_name,
                         "current_ivm": metricas.ivm,
@@ -879,7 +878,7 @@ class IVMAxiom:
             "persistencia": {
                 "ativa": self._stm is not None,
                 "db_path": str(self.db_path) if self.db_path else None,
-                "stm_status": self._stm.swap_status() if self._stm else None,
+                "stm_status": self._stm_status() if self._stm else None,
             },
         }
 
@@ -912,8 +911,32 @@ class IVMAxiom:
     def obter_status_memoria(self) -> Optional[Dict[str, Any]]:
         """Obtém status da memória de curto prazo."""
         if self._stm:
-            return self._stm.swap_status()
+            return self._stm_status()
         return None
+
+    def _stm_status(self) -> Dict[str, Any]:
+        """Status real da STM, incluindo o estado do spill-to-disk.
+
+        spill_status() reporta o RSS do processo vs o threshold de spill e
+        se o cache RAM esta drenado (spilled). As entradas vivem no SQLite
+        (MEMORIES_DB) — o spill apenas tira o cache da RAM, sem perda.
+        """
+        if not self._stm:
+            return {"ativa": False}
+        status: Dict[str, Any] = {
+            "ativa": True,
+            "count": self._stm.count(),
+            "max_size": self._stm.max_size,
+            "db_path": str(getattr(self._stm, "db_path", None)) or None,
+            "ttl_seconds": getattr(self._stm, "ttl_seconds", None),
+        }
+        spill = getattr(self._stm, "spill_status", None)
+        if callable(spill):
+            try:
+                status["spill"] = spill()
+            except Exception:
+                pass
+        return status
 
 
 # Singleton global

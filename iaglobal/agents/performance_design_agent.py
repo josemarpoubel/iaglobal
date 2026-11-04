@@ -1131,9 +1131,9 @@ class FrontendRules:
             issue_id="FE-004",
             title=f"Migrar para {strategy}",
             action=(
-                f"Dados estáticos → SSG (Next.js getStaticProps). "
-                f"Dados por usuário → SSR (getServerSideProps) ou ISR. "
-                f"Use Next.js, Nuxt ou Astro para suporte nativo."
+                "Dados estáticos → SSG (Next.js getStaticProps). "
+                "Dados por usuário → SSR (getServerSideProps) ou ISR. "
+                "Use Next.js, Nuxt ou Astro para suporte nativo."
             ),
             rationale=f"{strategy} entrega HTML pré-renderizado — indexação perfeita + TTFB < 200ms.",
             effort="high",

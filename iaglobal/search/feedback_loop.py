@@ -289,7 +289,7 @@ class FeedbackLoop:
             f"- **Tokens:** {record.tokens_used}" if record.tokens_used else "",
             "",
             "---",
-            f"*Persistido por iaglobal.FeedbackLoop*",
+            "*Persistido por iaglobal.FeedbackLoop*",
         ]
 
         return "\n".join(filter(None, lines))

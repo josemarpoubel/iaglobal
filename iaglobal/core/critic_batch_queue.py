@@ -186,6 +186,8 @@ class CriticBatchQueue:
         if bandit:
             try:
                 candidates = [
+                    "groq/llama-3.3-70b-versatile",
+                    "nvidia/mistralai/mistral-large-3-675b-instruct-2512",
                     "ollama/qwen2.5:0.5b",
                 ]
                 resultado = await bandit.generate(

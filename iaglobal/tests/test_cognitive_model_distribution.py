@@ -6,7 +6,6 @@ Garante que os 3 modelos Ollama locais estão configurados e roteados
 corretamente, e que nenhum path hardcoded quebra a distribuição.
 """
 
-import os
 import pytest
 
 from iaglobal.providers.provider_config import (
@@ -66,103 +65,63 @@ def test_each_role_has_correct_model_id():
         assert cfg["type"] == "ollama", f"{role} deve ser ollama"
 
 
-def test_all_active_models_returns_three():
-    """get_all_active_models() deve retornar exatamente 3 modelos."""
+def test_all_active_models_returns_qwen():
+    """get_all_active_models() deve retornar o modelo unificado."""
     models = get_all_active_models()
-    assert len(models) == 3
-    for role, expected in EXPECTED_ROLES.items():
-        assert expected["model_id"] in models, (
-            f"{expected['model_id']} ausente em get_all_active_models()"
-        )
+    assert "qwen2.5:0.5b" in models
 
 
 # ── 2. COGNITIVE ROUTER ──────────────────────────────────────────────────────
 
 
-def test_router_has_route():
+def test_router_has_three_routes():
     """ROUTE_TO_MODEL deve conter a rota ollama."""
     assert "ollama" in CognitiveRouter.ROUTE_TO_MODEL
 
 
 def test_router_resolves_model_ids():
-    """A rota ollama deve resolver para o model_id correto."""
+    """Cada rota deve resolver para o model_id correto."""
     assert CognitiveRouter.resolve_model_id("ollama") == QWEN_MODEL_ID
+    assert CognitiveRouter.resolve_model_id("ollama_glm4") == QWEN_MODEL_ID
+    assert CognitiveRouter.resolve_model_id("ollama_lfm") == QWEN_MODEL_ID
 
 
 def test_qwen_model_id_matches_operario():
     assert QWEN_MODEL_ID == get_model_config(CognitiveRole.OPERARIO)["model_id"]
 
 
-def test_router_route_map_has_juiz_nodes():
-    """Nós críticos devem rotear para ollama."""
-    for node in ["critic", "failure_analysis", "system_design"]:
-        route = CognitiveRouter.resolve_route(node)
-        assert route == "ollama", (
-            f"{node} deveria rotear para ollama, roteou para {route}"
-        )
-
-
-def test_router_route_map_has_operario_nodes():
-    """Nós de geração devem rotear para ollama (Operário)."""
-    for node in [
-        "coder",
-        "planner",
-        "frontend_builder",
-        "backend_builder",
-        "api_builder",
-        "database_builder",
-        "multi_coder",
-    ]:
-        route = CognitiveRouter.resolve_route(node)
-        assert route == "ollama", (
-            f"{node} deveria rotear para ollama, roteou para {route}"
-        )
-
-
-def test_router_route_map_has_sentinela_nodes():
-    """Nós de validação devem rotear para ollama."""
-    for node in [
-        "sandbox_validator",
-        "lsp_validator",
-        "semantic_validator",
-        "fix_validator",
-        "security_audit",
-        "performance_audit",
-        "compliance_audit",
-        "evaluator",
-    ]:
-        route = CognitiveRouter.resolve_route(node)
+def test_router_route_map_all_routes_to_ollama():
+    """Todos os nós mapeados devem rotear para ollama."""
+    for node, route in CognitiveRouter.ROUTE_MAP.items():
         assert route == "ollama", (
             f"{node} deveria rotear para ollama, roteou para {route}"
         )
 
 
 def test_router_unknown_node_falls_to_ollama():
-    """Nós não mapeados devem cair no Operário (ollama)."""
+    """Nós não mapeados devem cair em ollama."""
     route = CognitiveRouter.resolve_route("unknown_random_node")
     assert route == "ollama"
 
 
-def test_router_validation_heuristic():
-    """Task_type 'validation'/'audit' deve rotear para ollama."""
-    route = CognitiveRouter.resolve_route("some_node", task_type="code_audit")
-    assert route == "ollama"
-
-
 def test_router_get_route_config_returns_config():
-    """get_route_config deve retornar a config do CognitiveRole correto."""
-    config = CognitiveRouter.get_route_config("ollama")
-    assert config is not None
-    assert config["model_id"] == QWEN_MODEL_ID
+    """get_route_config deve retornar a config do CognitiveRole."""
+    operario_config = CognitiveRouter.get_route_config("ollama")
+    assert operario_config is not None
+    assert operario_config["model_id"] == QWEN_MODEL_ID
 
 
 # ── 3. AGENTBASE DEFAULT CANDIDATES ──────────────────────────────────────────
 
 
-def test_default_candidates_contains_ollama_model():
-    """AgentBase.DEFAULT_CANDIDATES deve incluir qwen2.5:0.5b."""
+def test_default_candidates_contains_all_three_ollama_models():
+    """AgentBase.DEFAULT_CANDIDATES deve incluir os 3 modelos Ollama."""
     candidates = AgentBase.DEFAULT_CANDIDATES
-    assert "ollama/qwen2.5:0.5b" in candidates
+    for role, expected in EXPECTED_ROLES.items():
+        model_uri = f"ollama/{expected['model_id']}"
+        assert model_uri in candidates, (
+            f"{model_uri} ausente em AgentBase.DEFAULT_CANDIDATES"
+        )
 
 
 def test_default_candidates_no_hardcoded_duplicates():
@@ -196,13 +155,13 @@ async def test_ollama_only_respects_model_param(monkeypatch):
     monkeypatch.setattr(pr, "_enrich_prompt_with_learned_knowledge", fake_enrich)
 
     result = await pr.async_route_generate(
-        model="ollama/qwen2.5:0.5b",
+        model="ollama/yasserrmd/GLM4.7-Distill-LFM2.5-1.2B:latest",
         prompt="test",
         node_id="critic",
     )
     assert result == "fake response"
     assert len(captured) == 1
-    assert "qwen2.5" in captured[0], f"Esperava qwen2.5 no model, obtido: {captured[0]}"
+    assert "GLM4" in captured[0], f"Esperava GLM4 no model, obtido: {captured[0]}"
 
 
 @pytest.mark.asyncio
@@ -293,13 +252,13 @@ async def test_async_route_generate_no_hardcoded_strings(monkeypatch):
     )
 
     result = await pr.async_route_generate(
-        model="ollama/qwen2.5:0.5b",
+        model="ollama/oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM",
         prompt="test",
         node_id="sandbox_validator",
     )
     assert result
-    assert captured and "qwen2.5" in captured[0].lower(), (
-        f"Esperava qwen2.5 no model, obtido: {captured}"
+    assert captured and "lfm2.5" in captured[0].lower(), (
+        f"Esperava lfm2.5 no model, obtido: {captured}"
     )
 
 

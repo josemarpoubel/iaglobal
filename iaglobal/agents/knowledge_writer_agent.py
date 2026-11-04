@@ -158,7 +158,7 @@ class KnowledgeWriterAgent(AgentBase):
                 results["faqs"].append(faq["question"])
                 logger.info(f"[KB-WRITER] FAQ armazenada: {faq['question'][:50]}")
             else:
-                logger.debug(f"[KB-WRITER] FAQ já existia (frequência incrementada)")
+                logger.debug("[KB-WRITER] FAQ já existia (frequência incrementada)")
 
         relations = self._extract_relations(combined, concepts)
         for rel in relations:

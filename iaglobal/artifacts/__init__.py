@@ -1,1 +1,4 @@
-from iaglobal.artifacts.artifact_factory import ArtifactFactory, artifact_factory
+from iaglobal.artifacts.artifact_factory import (
+    ArtifactFactory as ArtifactFactory,
+    artifact_factory as artifact_factory,
+)

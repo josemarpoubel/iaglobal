@@ -15,6 +15,7 @@ from iaglobal.tools.search import async_search_tool
 from iaglobal.tools.web_brain import WebBrain
 from iaglobal.agents.search_agent import SearchAgent
 from iaglobal.graphs.nodes._search_wikipedia import _wikipedia_async
+from iaglobal.graphs.nodes import _search_sources as _search_sources_mod
 from iaglobal.graphs.nodes._search_sources import (
     google_playwright_search,
     bing_playwright_search,
@@ -27,7 +28,6 @@ from iaglobal.graphs.nodes._search_sources import (
     duckduckgo_text_search,
     youcom_search,
     yacy_search,
-    searxng_search,
 )
 from iaglobal.graphs.nodes._search_router import run_search_router
 from iaglobal.graphs.nodes._disk_swap import save_search, load_search
@@ -89,6 +89,12 @@ async def _async_router_wrapper(task: str):
     return await run_search_router(task)
 
 
+def _searxng_source(task: str) -> str:
+    # Lookup lazy via módulo para permitir interceptação determinística em
+    # testes (mock.patch.object(_search_sources, "searxng_search")).
+    return _search_sources_mod.searxng_search(task)
+
+
 async def _async_search_agent_wrapper(task: str):
     return await _search_agent.process_task(task)
 
@@ -99,9 +105,9 @@ async def _async_web_brain_wrapper(task: str):
 
 SOURCES: List[Tuple[str, Callable, int]] = [
     ("ddg_text", duckduckgo_text_search, 15),
+    ("searxng", _searxng_source, 15),
     ("google_pw", google_playwright_search, 25),
     ("bing_pw", bing_playwright_search, 20),
-    ("searxng", searxng_search, 10),
     ("router", _async_router_wrapper, 20),
     ("duckduckgo", async_search_tool, 15),
     ("ddg_enhanced", ddg_enhanced_search, 15),

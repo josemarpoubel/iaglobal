@@ -14,7 +14,6 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 from iaglobal.cognition.awareness.time_provider import ClockProvider
-from iaglobal.cognition.awareness.storage_backend import PersistenceBackend
 
 if TYPE_CHECKING:
     from asyncio import Lock

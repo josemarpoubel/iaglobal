@@ -68,8 +68,8 @@ async def run_agentmailbox(ctx: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     return {
-        "mailbox_manager": manager,
-        "agent_bus": bus,
+        "_mailbox_manager": manager,
+        "_agent_bus": bus,
         "output": f"AgentMailbox ativo para {len(node_names)} agentes",
         "agentmailbox": {
             "registered_agents": len(node_names),

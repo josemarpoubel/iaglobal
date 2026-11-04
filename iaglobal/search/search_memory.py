@@ -241,7 +241,7 @@ class SearchMemory:
             lines.append("")
 
         lines.append("---")
-        lines.append(f"*Persistido por iaglobal.SearchMemory*")
+        lines.append("*Persistido por iaglobal.SearchMemory*")
 
         return "\n".join(lines)
 

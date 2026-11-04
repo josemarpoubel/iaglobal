@@ -1,1 +1,314 @@
-{"updated_at": "", "learning_errors": [], "runtime_errors": []}
+{
+  "updated_at": "2026-08-08T01:53:29.841425Z",
+  "learning_errors": [],
+  "runtime_errors": [
+    {
+      "timestamp": "2026-08-05T16:25:29.425079Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-05T17:25:29.430133Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-05T18:25:29.434716Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-05T19:25:29.439595Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-05T20:25:29.447674Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-05T21:25:29.452655Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-05T21:25:39.391837Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "\u274c Falha ao limpar toxinas: 'SubconsciousAPI' object has no attribute 'buscar_tarefas'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-05T21:25:39.392434Z",
+      "component": "iaglobal.mcp.unified",
+      "source": "iaglobal.mcp.unified",
+      "message": "\u274c Falha ao publicar m\u00e9tricas: 'OmniMind' object has no attribute 'registrar_viola\u00e7\u00e3o_lei'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-05T22:25:29.458333Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-05T23:25:29.462832Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T00:25:29.467290Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T01:25:29.471606Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T02:25:29.476852Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T03:25:29.481990Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T03:25:50.890255Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "\u274c Falha ao limpar toxinas: 'SubconsciousAPI' object has no attribute 'buscar_tarefas'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-06T03:25:50.891354Z",
+      "component": "iaglobal.mcp.unified",
+      "source": "iaglobal.mcp.unified",
+      "message": "\u274c Falha ao publicar m\u00e9tricas: 'OmniMind' object has no attribute 'registrar_viola\u00e7\u00e3o_lei'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-06T04:25:29.487084Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T05:25:29.491272Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T06:25:29.495660Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T07:25:29.500776Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T08:25:29.505708Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T09:25:29.511028Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T09:26:03.560957Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "\u274c Falha ao limpar toxinas: 'SubconsciousAPI' object has no attribute 'buscar_tarefas'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-06T09:26:03.561961Z",
+      "component": "iaglobal.mcp.unified",
+      "source": "iaglobal.mcp.unified",
+      "message": "\u274c Falha ao publicar m\u00e9tricas: 'OmniMind' object has no attribute 'registrar_viola\u00e7\u00e3o_lei'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-06T10:25:29.516779Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T11:25:29.522968Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T12:25:29.527445Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T13:25:29.533778Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T14:25:29.539044Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T15:25:29.543464Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T15:26:14.577013Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "\u274c Falha ao limpar toxinas: 'SubconsciousAPI' object has no attribute 'buscar_tarefas'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-06T15:26:14.577969Z",
+      "component": "iaglobal.mcp.unified",
+      "source": "iaglobal.mcp.unified",
+      "message": "\u274c Falha ao publicar m\u00e9tricas: 'OmniMind' object has no attribute 'registrar_viola\u00e7\u00e3o_lei'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-06T16:25:29.547809Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T17:25:29.552960Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T18:25:29.558040Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T19:25:29.563219Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T20:25:29.572107Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: unable to open database file",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 496, in _fetch_unconsolidated\n    conn = self._open_memories_conn()\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 487, in _open_memories_conn\n    conn = sqlite3.connect(str(MEMORIES_DB), timeout=30.0)\nsqlite3.OperationalError: unable to open database file\n"
+    },
+    {
+      "timestamp": "2026-08-06T21:14:52.661775Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: no such table: stm_entries",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 498, in _fetch_unconsolidated\n    cur = conn.execute(\n        f\"SELECT id, data, created_at FROM {table} \"\n        f\"WHERE consolidated_at IS NULL ORDER BY created_at ASC LIMIT ?\",\n        (limit,),\n    )\nsqlite3.OperationalError: no such table: stm_entries\n"
+    },
+    {
+      "timestamp": "2026-08-06T21:25:29.581398Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: no such table: stm_entries",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 498, in _fetch_unconsolidated\n    cur = conn.execute(\n        f\"SELECT id, data, created_at FROM {table} \"\n        f\"WHERE consolidated_at IS NULL ORDER BY created_at ASC LIMIT ?\",\n        (limit,),\n    )\nsqlite3.OperationalError: no such table: stm_entries\n"
+    },
+    {
+      "timestamp": "2026-08-06T21:26:37.396393Z",
+      "component": "iaglobal",
+      "source": "iaglobal",
+      "message": "\u274c Falha ao limpar toxinas: 'SubconsciousAPI' object has no attribute 'buscar_tarefas'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-06T21:26:37.397947Z",
+      "component": "iaglobal.mcp.unified",
+      "source": "iaglobal.mcp.unified",
+      "message": "\u274c Falha ao publicar m\u00e9tricas: 'OmniMind' object has no attribute 'registrar_viola\u00e7\u00e3o_lei'",
+      "traceback": ""
+    },
+    {
+      "timestamp": "2026-08-08T01:28:04.385446Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: no such table: stm_entries",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 498, in _fetch_unconsolidated\n    cur = conn.execute(\n        f\"SELECT id, data, created_at FROM {table} \"\n        f\"WHERE consolidated_at IS NULL ORDER BY created_at ASC LIMIT ?\",\n        (limit,),\n    )\nsqlite3.OperationalError: no such table: stm_entries\n"
+    },
+    {
+      "timestamp": "2026-08-08T01:53:29.359615Z",
+      "component": "iaglobal.obsidian.consolidation",
+      "source": "iaglobal.obsidian.consolidation",
+      "message": "[REMSleep] Falha ao processar staging DB: no such table: stm_entries",
+      "traceback": "Traceback (most recent call last):\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 229, in iniciar_fase_rem\n    staging_result = await self._processar_staging_db()\n                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 540, in _processar_staging_db\n    rows = await asyncio.to_thread(\n           ^^^^^^^^^^^^^^^^^^^^^^^^\n        self._fetch_unconsolidated, table, max_batch\n        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n    )\n    ^\n  File \"/usr/lib/python3.13/asyncio/threads.py\", line 25, in to_thread\n    return await loop.run_in_executor(None, func_call)\n           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^\n  File \"/usr/lib/python3.13/concurrent/futures/thread.py\", line 59, in run\n    result = self.fn(*self.args, **self.kwargs)\n  File \"/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py\", line 498, in _fetch_unconsolidated\n    cur = conn.execute(\n        f\"SELECT id, data, created_at FROM {table} \"\n        f\"WHERE consolidated_at IS NULL ORDER BY created_at ASC LIMIT ?\",\n        (limit,),\n    )\nsqlite3.OperationalError: no such table: stm_entries\n"
+    },
+    {
+      "timestamp": "2026-08-08T01:53:29.841004Z",
+      "component": "iaglobal.mcp",
+      "source": "iaglobal.mcp",
+      "message": "Falha na sonda fugue_compartment: '>' not supported between instances of 'coroutine' and 'float'",
+      "traceback": ""
+    }
+  ]
+}

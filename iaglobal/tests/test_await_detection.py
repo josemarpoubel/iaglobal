@@ -317,7 +317,7 @@ def _print_report(violations, total_files, total_async_funcs, total_async_all):
     print(f"{'=' * 60}")
 
     if not violations:
-        print(f"\n  NENHUMA VIOLACAO ENCONTRADA")
+        print("\n  NENHUMA VIOLACAO ENCONTRADA")
         return
 
     categories = {}

@@ -16,10 +16,12 @@ import pytest
 
 pytestmark = pytest.mark.asyncio(loop_scope="function")
 
-# Modelo Ollama sob teste (extraído do provider_config.py)
+# Modelos Ollama sob teste (extraídos do provider_config.py)
+GLM4 = "ollama/yasserrmd/GLM4.7-Distill-LFM2.5-1.2B:latest"
 QWEN = "ollama/qwen2.5:0.5b"
+LFM = "ollama/oamazonasgabriel/lfm2.5-230m:bf16-8gbRAM"
 
-CONCURRENCY = {QWEN: 3}
+CONCURRENCY = {GLM4: 1, QWEN: 3, LFM: 5}
 
 
 @pytest.fixture(autouse=True)
@@ -50,7 +52,7 @@ async def _get_bp():
 
 async def test_cada_modelo_tem_semaphore_proprio():
     bp = await _get_bp()
-    for model in [QWEN, QWEN, QWEN]:
+    for model in [GLM4, QWEN, LFM]:
         sem = await bp._get_model_semaphore(model)
         assert sem is not None, f"Semáforo não criado para {model}"
         assert isinstance(sem, asyncio.Semaphore)
@@ -74,8 +76,8 @@ async def test_mesmo_semaphore_retornado_em_chamadas_repetidas():
 
 async def test_glm4_concurrency_um():
     bp = await _get_bp()
-    sem = await bp._get_model_semaphore(QWEN)
-    assert sem._value == 1, "QWEN (Juiz) deve ter concurrency=1"
+    sem = await bp._get_model_semaphore(GLM4)
+    assert sem._value == 1, "GLM4 (Juiz) deve ter concurrency=1"
 
 
 async def test_qwen_concurrency_tres():
@@ -86,8 +88,8 @@ async def test_qwen_concurrency_tres():
 
 async def test_lfm_concurrency_cinco():
     bp = await _get_bp()
-    sem = await bp._get_model_semaphore(QWEN)
-    assert sem._value == 5, "QWEN (Sentinela) deve ter concurrency=5"
+    sem = await bp._get_model_semaphore(LFM)
+    assert sem._value == 5, "LFM (Sentinela) deve ter concurrency=5"
 
 
 # ── 2. ACQUIRE / RELEASE ─────────────────────────────────────────────────────
@@ -139,7 +141,7 @@ async def test_release_sem_acquire_nao_quebra():
 
 async def test_glm4_semaphore_limite_um():
     bp = await _get_bp()
-    sem = await bp._get_model_semaphore(QWEN)
+    sem = await bp._get_model_semaphore(GLM4)
     assert sem._value == 1
     await sem.acquire()
     assert sem._value == 0
@@ -166,7 +168,7 @@ async def test_qwen_semaphore_limite_tres():
 
 async def test_lfm_semaphore_limite_cinco():
     bp = await _get_bp()
-    sem = await bp._get_model_semaphore(QWEN)
+    sem = await bp._get_model_semaphore(LFM)
     for _ in range(5):
         await sem.acquire()
     assert sem._value == 0
@@ -180,9 +182,9 @@ async def test_lfm_semaphore_limite_cinco():
 
 async def test_semaphore_independente_entre_modelos():
     bp = await _get_bp()
-    sg = await bp._get_model_semaphore(QWEN)
+    sg = await bp._get_model_semaphore(GLM4)
     sq = await bp._get_model_semaphore(QWEN)
-    sl = await bp._get_model_semaphore(QWEN)
+    sl = await bp._get_model_semaphore(LFM)
     await sg.acquire()
     await sq.acquire()
     assert sg._value == 0
@@ -316,6 +318,6 @@ async def test_semaphore_compartilhado_entre_instancias():
 
     bp1 = BanditPolicy()
     bp2 = BanditPolicy()
-    s1 = await bp1._get_model_semaphore(QWEN)
-    s2 = await bp2._get_model_semaphore(QWEN)
+    s1 = await bp1._get_model_semaphore(GLM4)
+    s2 = await bp2._get_model_semaphore(GLM4)
     assert s1 is s2, "Semáforo deve ser compartilhado entre instâncias"

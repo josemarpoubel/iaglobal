@@ -18,9 +18,10 @@ from iaglobal.evolution.skills.native.skill_registry import (
     skill_registry as _global_registry,
 )
 
-from iaglobal.utils.logger import get_logger
+import logging
 
-logger = get_logger("iaglobal.evolution.skills.utils.dynamic_registry")
+
+logger = logging.getLogger("ia-global")
 
 
 class DynamicSkillRegistry:

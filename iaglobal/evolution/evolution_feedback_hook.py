@@ -18,12 +18,11 @@ Persistência:
 
 from __future__ import annotations
 
-import enum
 import json
 import time as _time
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, Optional
 
 from iaglobal.utils.logger import get_logger
 

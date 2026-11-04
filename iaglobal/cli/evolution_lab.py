@@ -37,9 +37,10 @@ from iaglobal.evolution.evolution_replay import EvolutionReplay, CORE_NODE_NAMES
 from iaglobal.evolution.skills.native.skill_registry import skill_registry
 from iaglobal.memory.memory_storage import init_storage
 
-from iaglobal.utils.logger import get_logger
+import logging
 
-logger = get_logger("iaglobal.cli.evolution_lab")
+
+logger = logging.getLogger("ia-global")
 
 # ── Helpers ──────────────────────────────────────────────────────────────
 
@@ -528,7 +529,7 @@ def _print_patch(patch):
             if before.get("strategy") != after.get("strategy"):
                 print(f"        strategy: {before['strategy']} → {after['strategy']}")
     if patch.strategy_shifts:
-        print(f"    Strategy shifts:")
+        print("    Strategy shifts:")
         for name, (old_s, new_s) in patch.strategy_shifts.items():
             print(f"      {name}: {old_s} → {new_s}")
     print(

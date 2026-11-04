@@ -1,16 +1,17 @@
 # iaglobal/models/event_bus.py
 
 import uuid
+import logging
 import threading
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Callable, Dict, List, Any, Optional
 
-from iaglobal.utils.logger import get_logger
+from iaglobal.events.event_types import EventType  # noqa: F401
 
 __all__ = ["bus", "EventType"]
 
-logger = get_logger("iaglobal.models.event_bus")
+logger = logging.getLogger("ia-global")
 
 
 # =========================================================
@@ -35,8 +36,6 @@ class Event:
 # =========================================================
 # EVENT TYPES (canonical source: iaglobal/events/event_types.py)
 # =========================================================
-
-from iaglobal.events.event_types import EventType  # noqa: F401
 
 
 # =========================================================

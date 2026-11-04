@@ -135,10 +135,6 @@ class TestTransitiveInvalidation:
     @pytest.mark.asyncio
     async def test_no_visited_loop(self):
         """Grafo com ciclo não deve loop infinito."""
-        try:
-            from iaglobal.graphs.loop_detector import LoopDetector
-        except ImportError:
-            LoopDetector = None
         a = _make_node("A")
         b = _make_node("B", depends_on=["A"])
         # ciclo artificial: A depende de B (não deveria ocorrer, mas

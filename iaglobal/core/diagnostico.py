@@ -63,7 +63,7 @@ class AnalisadorRotas:
 
         # Imprime um painel visual explicativo no console para o desenvolvedor
         print("\n" + "🚨" + "=" * 58)
-        print(f" PANEL DE DIAGNÓSTICO DE FALHA EM ROTA (RCA)")
+        print(" PANEL DE DIAGNÓSTICO DE FALHA EM ROTA (RCA)")
         print("=" * 60)
         for chave, valor in relatorio.items():
             print(f"👉 {chave:<18}: {valor}")

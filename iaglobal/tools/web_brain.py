@@ -12,7 +12,6 @@ from typing import List, Dict
 from datetime import datetime, timezone
 
 from iaglobal.tools.search_tools import SearchTools
-from iaglobal.utils.logger import logger
 
 logger = logging.getLogger(__name__)
 

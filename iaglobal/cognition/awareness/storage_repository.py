@@ -20,9 +20,6 @@ from iaglobal.cognition.awareness.storage_backend import PersistenceBackend
 if TYPE_CHECKING:
     from iaglobal.cognition.awareness.models import (
         AgentActivity,
-        CausalChain,
-        ConfidenceSnapshot,
-        EpisodicMemory,
     )
 
 

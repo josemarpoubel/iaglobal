@@ -7,9 +7,10 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 
+from iaglobal._paths import MTA_POOL_FILE
+
 logger = logging.getLogger(__name__)
 
-from iaglobal._paths import MTA_POOL_FILE
 
 POOL_FILE = MTA_POOL_FILE
 

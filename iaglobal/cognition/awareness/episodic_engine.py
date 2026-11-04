@@ -8,7 +8,7 @@ Responsável por exportar e restaurar memórias episódicas completas.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from iaglobal.cognition.awareness.models import EpisodicMemory
@@ -44,10 +44,7 @@ class EpisodicEngine:
         - Obsidian 04_Synapses (consolidação)
         - Auditoria e replay
         """
-        from iaglobal.cognition.awareness.models import AgentActivity, EpisodicMemory
-        from iaglobal.cognition.awareness.storage_repository import (
-            StorageRepository,
-        )
+        from iaglobal.cognition.awareness.models import EpisodicMemory
 
         start = start_time or self._clock.now()
         end = self._clock.now()

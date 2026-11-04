@@ -12,6 +12,7 @@ import asyncio
 from typing import Dict, Any
 
 from iaglobal.memory.memory_error import record_error
+from iaglobal.core.artifact import GeneratedArtifact, ArtifactKind
 
 logger = logging.getLogger(__name__)
 
@@ -47,8 +48,34 @@ async def run_prompt_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
     )
 
     try:
-        search_sources = ["search"]
-        sections = ["=== TAREFA ORIGINAL ===\n" + task]
+        # Para tarefas de geração de código, não injetar resultados de busca
+        # Apenas injetar resultados de busca para tarefas de análise ou escrita
+        if any(
+            word in task.lower()
+            for word in [
+                "gerar",
+                "crie",
+                "código",
+                "code",
+                "app",
+                "aplicativo",
+                "frontend",
+                "backend",
+                "html",
+                "javascript",
+                "python",
+            ]
+        ):
+            search_sources = []  # Não injetar resultados de busca para geração de código
+        else:
+            search_sources = [
+                "search"
+            ]  # Injetar resultados de busca para outras tarefas
+
+        sections = [
+            "=== TAREFA ORIGINAL ===\n" + task,
+            "=== INSTRUÇÃO PARA O MODELO ===\nGenerate ONLY executable code. No explanations, no markdown, no text, no links. Just the code.",
+        ]
 
         # Varre e concatena os resultados de buscas anteriores de forma resiliente
         for src in search_sources:
@@ -66,7 +93,42 @@ async def run_prompt_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         knowledge_data = memory.get("knowledge", {}) or {}
         knowledge_summary = knowledge_data.get("summary", "")
         if knowledge_summary:
-            sections.append("=== CONHECIMENTO EXTRAIDO ===\n" + knowledge_summary)
+            # Barreira: se o "conhecimento" na verdade é texto de busca/documentação,
+            # não injetar para tarefas de geração de código (evita contaminação do prompt)
+            from iaglobal.core.artifact import GeneratedArtifact as _GA
+
+            _ks_artifact = _GA.from_str(
+                knowledge_summary, source="prompt_builder.knowledge"
+            )
+            is_code_task = any(
+                word in task.lower()
+                for word in [
+                    "gerar",
+                    "crie",
+                    "código",
+                    "code",
+                    "app",
+                    "aplicativo",
+                    "frontend",
+                    "backend",
+                    "html",
+                    "javascript",
+                    "python",
+                    "api",
+                    "fastapi",
+                    "flask",
+                    "django",
+                    "react",
+                    "vue",
+                ]
+            )
+            if is_code_task and not _ks_artifact.is_code:
+                logger.info(
+                    "[PROMPT_BUILDER] Conhecimento é %s (nao CODE) — descartando para tarefa de codigo",
+                    _ks_artifact.kind.value,
+                )
+            else:
+                sections.append("=== CONHECIMENTO EXTRAIDO ===\n" + knowledge_summary)
 
         # Injeta os conceitos e termos identificados por frequência
         knowledge_concepts = knowledge_data.get("concepts", []) or []
@@ -108,6 +170,13 @@ async def run_prompt_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "output": built_prompt,
             "built_prompt": built_prompt,
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.PLAN,
+                content=built_prompt,
+                source="prompt_builder",
+                confidence=1.0 if is_success else 0.5,
+                metadata={"sections": len(sections)},
+            ),
             "prompt_sections": {
                 src: bool(
                     memory.get(src, {}).get("output")
@@ -137,6 +206,12 @@ async def run_prompt_builder(ctx: Dict[str, Any]) -> Dict[str, Any]:
         return {
             "output": task,
             "built_prompt": task,
+            "artifact": GeneratedArtifact(
+                kind=ArtifactKind.ERROR,
+                content=task,
+                source="prompt_builder",
+                metadata={"reason": "exception", "error": str(e)[:200]},
+            ),
             "prompt_sections": {},
             "success": False,
             "execution_metrics": {

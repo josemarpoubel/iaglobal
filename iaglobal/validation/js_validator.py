@@ -215,7 +215,7 @@ def _try_parse(code: str) -> Optional[Dict[str, Any]]:
         else:
             ast = esprima.parseScript(code, options)
         return ast
-    except Exception as e:
+    except Exception:
         return None
 
 

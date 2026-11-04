@@ -19,7 +19,6 @@ from __future__ import annotations
 
 import asyncio
 import hashlib
-import logging
 import sys
 import time
 from pathlib import Path

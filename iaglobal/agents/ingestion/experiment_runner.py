@@ -14,19 +14,17 @@ Integra com:
 
 import json
 import re
-import ast
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Dict, List, Optional, Any
 from dataclasses import dataclass, asdict
 
 from iaglobal.security.ast_gateway import ASTGateway
-
-_ast_gateway = ASTGateway()
-from datetime import datetime, timezone
-
 from iaglobal._paths import JSON_DIR
 from iaglobal.utils.logger import get_logger
 from iaglobal.agents.ingestion.hypothesis_generator import Hypothesis
+
+_ast_gateway = ASTGateway()
 
 logger = get_logger("iaglobal.agents.ingestion.experiment_runner")
 
@@ -389,7 +387,7 @@ Retorne APENAS o código Python, sem explicações ou markdown.
         metrics = self._extract_metrics_from_stdout(stdout)
 
         # Avaliar critério de sucesso
-        success_criteria = hypothesis.success_criteria.lower()
+        hypothesis.success_criteria.lower()
 
         # Verificar indicadores de sucesso no output
         success_indicators = ["success: true", "success: true", "✅", "passed", "valid"]

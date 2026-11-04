@@ -19,7 +19,7 @@ from __future__ import annotations
 
 import time
 import asyncio
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import Optional
 
 from pydantic import BaseModel, Field
@@ -32,7 +32,6 @@ from iaglobal.utils.logger import get_logger
 # --- ajustar para os módulos reais do projeto ---
 from iaglobal.evolution.evo_agent import EvoAgent
 from iaglobal.agents.critic_agent import _get_critic
-from iaglobal.genesis.identity import GENESIS_HASH_OFFICIAL
 
 logger = get_logger("iaglobal")
 

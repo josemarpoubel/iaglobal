@@ -1,8 +1,275 @@
-2026-07-23 22:38:17,395 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-23 22:38:17,475 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-23 22:38:34,335 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-23 22:38:34,368 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-23 22:38:59,035 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-23 22:38:59,054 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
-2026-07-23 22:40:53,033 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
-2026-07-23 22:40:53,052 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/workspace/iaglobal/memory/data/omnimind_state.json
+2026-08-06 18:14:44,429 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-08-06 18:14:44,459 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-08-06 18:14:44,526 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-08-06 18:14:44,591 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-08-06 18:14:44,591 [INFO] [iaglobal.mcp.unified] 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+2026-08-06 18:14:44,591 [INFO] [iaglobal.mcp.unified] 🔮 MCP Unified Server inicializando...
+2026-08-06 18:14:44,591 [INFO] [iaglobal.mcp.unified] 🔮 Iniciando MCP Unified Server em 127.0.0.1:8100
+2026-08-06 18:14:44,615 [INFO] [iaglobal.cli.bootstrap] ✅ [BOOTSTRAP] Estrutura de diretórios verificada.
+2026-08-06 18:14:44,615 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] LifeSignalCollector ativo — /home/kitohamachi/iaglobal-main/iaglobal/memory/data/life_signals.json
+2026-08-06 18:14:44,618 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] ErrorPersistence ativo.
+2026-08-06 18:14:44,621 [INFO] [iaglobal] [GÊNESIS] ✅ Tribunal: Blueprint autêntico
+2026-08-06 18:14:44,644 [INFO] [iaglobal.cli.bootstrap] ⚖️ [TRIBUNAL] DNA ancestral e agentes aprovados.
+2026-08-06 18:14:44,871 [INFO] [iaglobal] ✅ Banco de vetores inicializado em: /home/kitohamachi/iaglobal-main/iaglobal/memory/data/db/core.db
+2026-08-06 18:14:44,881 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initialized (data_root=/home/kitohamachi/iaglobal-main/iaglobal/memory/data)
+2026-08-06 18:14:44,881 [INFO] [iaglobal.cli.bootstrap] 🛠️ [BOOTSTRAP] Orchestrator instanciado (Phase1).
+2026-08-06 18:14:44,881 [INFO] [iaglobal.cli.bootstrap] ⚡ [BOOTSTRAP] Phase1 completo — MCP pode responder.
+2026-08-06 18:14:44,881 [INFO] [iaglobal.cli.bootstrap] 🛌 [BOOTSTRAP] Phase2 agendada em background.
+2026-08-06 18:14:44,881 [INFO] [iaglobal.mcp.unified] ⚡ MCP pronto para handshake (phase1=True, phase2_running=True)
+2026-08-06 18:14:44,881 [INFO] [iaglobal.mcp.unified] ✅ MCP Unified integrado ao AcetylcholineBus
+2026-08-06 18:14:44,909 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initializing components...
+2026-08-06 18:14:44,912 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Bandit initialized
+2026-08-06 18:14:49,661 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-08-06 18:14:49,670 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-08-06 18:14:50,781 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Pipeline initialized
+2026-08-06 18:14:50,791 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] CPU affinity initialized
+2026-08-06 18:14:51,391 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-08-06 18:14:51,405 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-08-06 18:14:51,431 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-08-06 18:14:51,463 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: search_context_processor | tags=['search', 'web', 'context', 'processor', 'code extraction', 'fact extraction', 'url extraction', 'structured output'] | emb=sim
+2026-08-06 18:14:51,490 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: search_context_processor_structured | tags=['search', 'web', 'context', 'processor', 'structured', 'json', 'data extraction'] | emb=sim
+2026-08-06 18:14:51,800 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-08-06 18:14:51,800 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-08-06 18:14:51,800 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-08-06 18:14:51,801 [INFO] [iaglobal] [COMPLIANCE] CoderAgent: approved=True
+2026-08-06 18:14:51,801 [INFO] [iaglobal] [MAILBOX] CoderAgent criado
+2026-08-06 18:14:51,801 [INFO] [iaglobal] [CoderAgent] Executor registrado com compliance=True
+2026-08-06 18:14:51,801 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] CoderAgent bindado ao MailboxManager
+2026-08-06 18:14:51,805 [INFO] [iaglobal] [COMPLIANCE] PlannerAgent: approved=True
+2026-08-06 18:14:51,805 [INFO] [iaglobal] [MAILBOX] PlannerAgent criado
+2026-08-06 18:14:51,805 [INFO] [iaglobal] [PlannerAgent] Executor registrado com compliance=True
+2026-08-06 18:14:51,805 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] PlannerAgent bindado ao MailboxManager
+2026-08-06 18:14:51,981 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Fully initialized
+2026-08-06 18:14:51,982 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] Orchestrator async init completo
+2026-08-06 18:14:52,015 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Memória de curto prazo inicializada | db=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/cache/memory_swap/ivm.db
+2026-08-06 18:14:52,030 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=ativa | stm_max_size=1000
+2026-08-06 18:14:52,030 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Singleton inicializado com persistência | db=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/cache/memory_swap/ivm.db
+2026-08-06 18:14:52,031 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Inicializado | interval=1.00h | ivm_threshold=0.50 | vault=/home/kitohamachi/iaglobal-main/iaglobal/obsidian
+2026-08-06 18:14:52,031 [INFO] [iaglobal.chappie.error_enricher] [ErrorEnricher] Inicializado | vault=/home/kitohamachi/iaglobal-main/iaglobal/obsidian | auto_learn=True | pattern_threshold=3
+2026-08-06 18:14:52,031 [INFO] [iaglobal.chappie.lineage_guardian] [LineageGuardian] Inicializado | cache_ttl=300s | block_invalid=True | nodes_dir=/home/kitohamachi/iaglobal-main/iaglobal/graphs/nodes
+2026-08-06 18:14:52,031 [INFO] [iaglobal.cli.bootstrap] 🧬 [CHAPPIE] 4/4 módulos ativos
+2026-08-06 18:14:52,571 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Daemon iniciado.
+2026-08-06 18:14:52,571 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] IVM global via JOL: 0.5000 (threshold=0.50)
+2026-08-06 18:14:52,572 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Iniciando consolidação única.
+2026-08-06 18:14:52,572 [INFO] [iaglobal.cli.bootstrap] [CPU] Enforcement aplicado: 2 núcleos de 8 (25% da capacidade, regra de 25%/núcleo)
+2026-08-06 18:14:52,572 [INFO] [iaglobal.cli.bootstrap] [CPU] Affinity core 5
+2026-08-06 18:14:52,573 [INFO] [iaglobal] [CPU] Distribuição balanceada: 89 agentes, 1% de 1 núcleo cada, 8 núcleos (capacidade 8 core-equivalentes)
+2026-08-06 18:14:52,573 [INFO] [iaglobal.cli.bootstrap] [CPU] 89 agentes registrados em 8 cores (ate 32 geracoes locais concorrentes: 25%/agente x 8 cores)
+2026-08-06 18:14:52,573 [INFO] [iaglobal] [CPU] ⚡ Boost de prioridade aplicado: critic → 50%
+2026-08-06 18:14:52,573 [INFO] [iaglobal] [CPU] 🚀 Batch crítico com 1 agentes em modo de alta prioridade (50% CPU)
+2026-08-06 18:14:52,629 [INFO] [iaglobal] [BATCH_WRITER] Iniciado: flush_ms=2000 max_batch=100
+2026-08-06 18:14:52,631 [INFO] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Task de monitoramento iniciada | task_id=139870109602000
+2026-08-06 18:14:52,631 [INFO] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Iniciando sonda | threshold=250ms | interval=1s | probe_sleep=10ms
+2026-08-06 18:14:52,659 [ERROR] [iaglobal.obsidian.consolidation] [REMSleep] Falha ao processar staging DB: no such table: stm_entries
+Traceback (most recent call last):
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 229, in iniciar_fase_rem
+    staging_result = await self._processar_staging_db()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 540, in _processar_staging_db
+    rows = await asyncio.to_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+        self._fetch_unconsolidated, table, max_batch
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/lib/python3.13/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 498, in _fetch_unconsolidated
+    cur = conn.execute(
+        f"SELECT id, data, created_at FROM {table} "
+        f"WHERE consolidated_at IS NULL ORDER BY created_at ASC LIMIT ?",
+        (limit,),
+    )
+sqlite3.OperationalError: no such table: stm_entries
+2026-08-06 18:14:52,663 [INFO] [iaglobal.obsidian.consolidation] [REMSleep] Nenhuma memória de curto prazo para consolidar.
+2026-08-06 18:14:52,663 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Consolidação única concluída | status=sem_memorias | consolidadas=0 | erros=0
+2026-08-06 18:14:52,664 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Próxima consolidação em 1.0 horas.
+2026-08-06 18:14:54,479 [INFO] [iaglobal.cli.bootstrap] [WARMUP] 1/1 providers aquecidos
+2026-08-06 18:14:54,479 [INFO] [iaglobal.cli.bootstrap] ✅ [BOOTSTRAP] Phase2 completa — sistema operacional.
+2026-08-07 22:27:59,447 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-08-07 22:27:59,456 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-08-07 22:27:59,473 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-08-07 22:27:59,526 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-08-07 22:27:59,526 [INFO] [iaglobal.mcp.unified] 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+2026-08-07 22:27:59,526 [INFO] [iaglobal.mcp.unified] 🔮 MCP Unified Server inicializando...
+2026-08-07 22:27:59,527 [INFO] [iaglobal.mcp.unified] 🔮 Iniciando MCP Unified Server em 127.0.0.1:8100
+2026-08-07 22:27:59,538 [INFO] [iaglobal.cli.bootstrap] ✅ [BOOTSTRAP] Estrutura de diretórios verificada.
+2026-08-07 22:27:59,538 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] LifeSignalCollector ativo — /home/kitohamachi/iaglobal-main/iaglobal/memory/data/life_signals.json
+2026-08-07 22:27:59,539 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] ErrorPersistence ativo.
+2026-08-07 22:27:59,540 [INFO] [iaglobal] [GÊNESIS] ✅ Tribunal: Blueprint autêntico
+2026-08-07 22:28:00,154 [INFO] [iaglobal.cli.bootstrap] ⚖️ [TRIBUNAL] DNA ancestral e agentes aprovados.
+2026-08-07 22:28:00,175 [INFO] [iaglobal] ✅ Banco de vetores inicializado em: /home/kitohamachi/iaglobal-main/iaglobal/memory/data/db/core.db
+2026-08-07 22:28:00,177 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initialized (data_root=/home/kitohamachi/iaglobal-main/iaglobal/memory/data)
+2026-08-07 22:28:00,177 [INFO] [iaglobal.cli.bootstrap] 🛠️ [BOOTSTRAP] Orchestrator instanciado (Phase1).
+2026-08-07 22:28:00,177 [INFO] [iaglobal.cli.bootstrap] ⚡ [BOOTSTRAP] Phase1 completo — MCP pode responder.
+2026-08-07 22:28:00,177 [INFO] [iaglobal.cli.bootstrap] 🛌 [BOOTSTRAP] Phase2 agendada em background.
+2026-08-07 22:28:00,178 [INFO] [iaglobal.mcp.unified] ⚡ MCP pronto para handshake (phase1=True, phase2_running=True)
+2026-08-07 22:28:00,178 [INFO] [iaglobal.mcp.unified] ✅ MCP Unified integrado ao AcetylcholineBus
+2026-08-07 22:28:00,183 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initializing components...
+2026-08-07 22:28:00,185 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Bandit initialized
+2026-08-07 22:28:01,991 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-08-07 22:28:01,995 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-08-07 22:28:02,619 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Pipeline initialized
+2026-08-07 22:28:02,622 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] CPU affinity initialized
+2026-08-07 22:28:02,773 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 5 tools do disco
+2026-08-07 22:28:03,198 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-08-07 22:28:03,213 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-08-07 22:28:03,239 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-08-07 22:28:03,273 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: search_context_processor | tags=['search', 'web', 'context', 'processor', 'code extraction', 'fact extraction', 'url extraction', 'structured output'] | emb=sim
+2026-08-07 22:28:03,302 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: search_context_processor_structured | tags=['search', 'web', 'context', 'processor', 'structured', 'json', 'data extraction'] | emb=sim
+2026-08-07 22:28:03,620 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-08-07 22:28:03,620 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-08-07 22:28:03,620 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-08-07 22:28:03,620 [INFO] [iaglobal] [COMPLIANCE] CoderAgent: approved=True
+2026-08-07 22:28:03,620 [INFO] [iaglobal] [MAILBOX] CoderAgent criado
+2026-08-07 22:28:03,621 [INFO] [iaglobal] [CoderAgent] Executor registrado com compliance=True
+2026-08-07 22:28:03,621 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] CoderAgent bindado ao MailboxManager
+2026-08-07 22:28:03,621 [INFO] [iaglobal] [COMPLIANCE] PlannerAgent: approved=True
+2026-08-07 22:28:03,621 [INFO] [iaglobal] [MAILBOX] PlannerAgent criado
+2026-08-07 22:28:03,622 [INFO] [iaglobal] [PlannerAgent] Executor registrado com compliance=True
+2026-08-07 22:28:03,622 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] PlannerAgent bindado ao MailboxManager
+2026-08-07 22:28:03,706 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Fully initialized
+2026-08-07 22:28:03,707 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] Orchestrator async init completo
+2026-08-07 22:28:03,708 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Memória de curto prazo inicializada | db=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/cache/memory_swap/ivm.db
+2026-08-07 22:28:03,708 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=ativa | stm_max_size=1000
+2026-08-07 22:28:03,708 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Singleton inicializado com persistência | db=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/cache/memory_swap/ivm.db
+2026-08-07 22:28:03,708 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Inicializado | interval=1.00h | ivm_threshold=0.50 | vault=/home/kitohamachi/iaglobal-main/iaglobal/obsidian
+2026-08-07 22:28:03,708 [INFO] [iaglobal.chappie.error_enricher] [ErrorEnricher] Inicializado | vault=/home/kitohamachi/iaglobal-main/iaglobal/obsidian | auto_learn=True | pattern_threshold=3
+2026-08-07 22:28:03,708 [INFO] [iaglobal.chappie.lineage_guardian] [LineageGuardian] Inicializado | cache_ttl=300s | block_invalid=True | nodes_dir=/home/kitohamachi/iaglobal-main/iaglobal/graphs/nodes
+2026-08-07 22:28:03,709 [INFO] [iaglobal.cli.bootstrap] 🧬 [CHAPPIE] 4/4 módulos ativos
+2026-08-07 22:28:04,369 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Daemon iniciado.
+2026-08-07 22:28:04,369 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] IVM global via JOL: 0.5000 (threshold=0.50)
+2026-08-07 22:28:04,369 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Iniciando consolidação única.
+2026-08-07 22:28:04,369 [INFO] [iaglobal.cli.bootstrap] [CPU] Enforcement aplicado: 2 núcleos de 8 (25% da capacidade, regra de 25%/núcleo)
+2026-08-07 22:28:04,369 [INFO] [iaglobal.cli.bootstrap] [CPU] Affinity core 5
+2026-08-07 22:28:04,371 [INFO] [iaglobal] [CPU] Distribuição balanceada: 89 agentes, 1% de 1 núcleo cada, 8 núcleos (capacidade 8 core-equivalentes)
+2026-08-07 22:28:04,371 [INFO] [iaglobal.cli.bootstrap] [CPU] 89 agentes registrados em 8 cores (ate 32 geracoes locais concorrentes: 25%/agente x 8 cores)
+2026-08-07 22:28:04,371 [INFO] [iaglobal] [CPU] ⚡ Boost de prioridade aplicado: critic → 50%
+2026-08-07 22:28:04,371 [INFO] [iaglobal] [CPU] 🚀 Batch crítico com 1 agentes em modo de alta prioridade (50% CPU)
+2026-08-07 22:28:04,374 [INFO] [iaglobal] [BATCH_WRITER] Iniciado: flush_ms=2000 max_batch=100
+2026-08-07 22:28:04,374 [INFO] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Task de monitoramento iniciada | task_id=140537426204064
+2026-08-07 22:28:04,375 [INFO] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Iniciando sonda | threshold=250ms | interval=1s | probe_sleep=10ms
+2026-08-07 22:28:04,382 [ERROR] [iaglobal.obsidian.consolidation] [REMSleep] Falha ao processar staging DB: no such table: stm_entries
+Traceback (most recent call last):
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 229, in iniciar_fase_rem
+    staging_result = await self._processar_staging_db()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 540, in _processar_staging_db
+    rows = await asyncio.to_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+        self._fetch_unconsolidated, table, max_batch
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/lib/python3.13/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 498, in _fetch_unconsolidated
+    cur = conn.execute(
+        f"SELECT id, data, created_at FROM {table} "
+        f"WHERE consolidated_at IS NULL ORDER BY created_at ASC LIMIT ?",
+        (limit,),
+    )
+sqlite3.OperationalError: no such table: stm_entries
+2026-08-07 22:28:04,387 [INFO] [iaglobal.obsidian.consolidation] [REMSleep] Nenhuma memória de curto prazo para consolidar.
+2026-08-07 22:28:04,387 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Consolidação única concluída | status=sem_memorias | consolidadas=0 | erros=0
+2026-08-07 22:28:04,387 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Próxima consolidação em 1.0 horas.
+2026-08-07 22:28:06,226 [INFO] [iaglobal.cli.bootstrap] [WARMUP] 1/1 providers aquecidos
+2026-08-07 22:28:06,226 [INFO] [iaglobal.cli.bootstrap] ✅ [BOOTSTRAP] Phase2 completa — sistema operacional.
+2026-08-07 22:53:20,575 [INFO] [iaglobal.skill_model_router] [SkillModelRouter] Inicializado | cache_size=1024
+2026-08-07 22:53:20,606 [INFO] [iaglobal] OmniMind desperta | proposito='Evoluir inteligência artificial auto-sustentável através de ' | 11 leis Holliwell | 10 axiomas biológicos | estado=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/omnimind_state.json
+2026-08-07 22:53:20,670 [INFO] [iaglobal.entropy_sentinel] [EntropySentinel] Sentinela da Lei da Ordem initialized | threshold_apoptose=0.80 | min_exec=30 | history=100
+2026-08-07 22:53:20,733 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-08-07 22:53:20,733 [INFO] [iaglobal.mcp.unified] 🧬 LINEAGE_MARKER: cc7017b56557586095e8dc6dae27b3e61feac8ab7bb9c2ca229a3723bc250524f3b65d01c3a7d148ba2f0282e63484bfb884f6425a36aba3cee3edd37b01e136
+2026-08-07 22:53:20,733 [INFO] [iaglobal.mcp.unified] 🔮 MCP Unified Server inicializando...
+2026-08-07 22:53:20,733 [INFO] [iaglobal.mcp.unified] 🔮 Iniciando MCP Unified Server em 127.0.0.1:8100
+2026-08-07 22:53:20,756 [INFO] [iaglobal.cli.bootstrap] ✅ [BOOTSTRAP] Estrutura de diretórios verificada.
+2026-08-07 22:53:20,757 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] LifeSignalCollector ativo — /home/kitohamachi/iaglobal-main/iaglobal/memory/data/life_signals.json
+2026-08-07 22:53:20,758 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] ErrorPersistence ativo.
+2026-08-07 22:53:20,761 [INFO] [iaglobal] [GÊNESIS] ✅ Tribunal: Blueprint autêntico
+2026-08-07 22:53:20,780 [INFO] [iaglobal.cli.bootstrap] ⚖️ [TRIBUNAL] DNA ancestral e agentes aprovados.
+2026-08-07 22:53:20,807 [INFO] [iaglobal] ✅ Banco de vetores inicializado em: /home/kitohamachi/iaglobal-main/iaglobal/memory/data/db/core.db
+2026-08-07 22:53:20,811 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initialized (data_root=/home/kitohamachi/iaglobal-main/iaglobal/memory/data)
+2026-08-07 22:53:20,811 [INFO] [iaglobal.cli.bootstrap] 🛠️ [BOOTSTRAP] Orchestrator instanciado (Phase1).
+2026-08-07 22:53:20,811 [INFO] [iaglobal.cli.bootstrap] ⚡ [BOOTSTRAP] Phase1 completo — MCP pode responder.
+2026-08-07 22:53:20,811 [INFO] [iaglobal.cli.bootstrap] 🛌 [BOOTSTRAP] Phase2 agendada em background.
+2026-08-07 22:53:20,811 [INFO] [iaglobal.mcp.unified] ⚡ MCP pronto para handshake (phase1=True, phase2_running=True)
+2026-08-07 22:53:20,811 [INFO] [iaglobal.mcp.unified] ✅ MCP Unified integrado ao AcetylcholineBus
+2026-08-07 22:53:20,844 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Initializing components...
+2026-08-07 22:53:20,847 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Bandit initialized
+2026-08-07 22:53:25,745 [INFO] [iaglobal] ENV loaded from /home/kitohamachi/iaglobal-main/.env
+2026-08-07 22:53:25,757 [INFO] [iaglobal] 🧬 [GERAÇÃO 2] BanditPolicyEvolutiva carregada com sucesso!
+2026-08-07 22:53:27,177 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Pipeline initialized
+2026-08-07 22:53:27,190 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] CPU affinity initialized
+2026-08-07 22:53:27,335 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Carregados 5 tools do disco
+2026-08-07 22:53:28,090 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_dark_pdf | tags=['pdf', 'dark', 'escuro', 'tema escuro', 'elegante', 'documento', 'gerar pdf', 'converter pdf'] | emb=sim
+2026-08-07 22:53:28,105 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: generate_light_pdf | tags=['pdf', 'light', 'claro', 'tema claro', 'documento', 'gerar pdf'] | emb=sim
+2026-08-07 22:53:28,133 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: code_executor | tags=['code', 'executor', 'python', 'bash', 'run', 'test', 'debug'] | emb=sim
+2026-08-07 22:53:28,169 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: search_context_processor | tags=['search', 'web', 'context', 'processor', 'code extraction', 'fact extraction', 'url extraction', 'structured output'] | emb=sim
+2026-08-07 22:53:28,196 [INFO] [iaglobal.tools.library] [TOOL_LIBRARY] Registrada: search_context_processor_structured | tags=['search', 'web', 'context', 'processor', 'structured', 'json', 'data extraction'] | emb=sim
+2026-08-07 22:53:28,504 [INFO] [iaglobal.chappie.bandit_evolution] [BanditEvolution] Chappie BanditEvolution inicializado
+2026-08-07 22:53:28,504 [INFO] [iaglobal.agents.agent_base] [AgentBase] BanditPolicy atualizado para BanditPolicyEvolution (Chappie)
+2026-08-07 22:53:28,504 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=inativa | stm_max_size=1000
+2026-08-07 22:53:28,504 [INFO] [iaglobal] [COMPLIANCE] CoderAgent: approved=True
+2026-08-07 22:53:28,504 [INFO] [iaglobal] [MAILBOX] CoderAgent criado
+2026-08-07 22:53:28,504 [INFO] [iaglobal] [CoderAgent] Executor registrado com compliance=True
+2026-08-07 22:53:28,504 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] CoderAgent bindado ao MailboxManager
+2026-08-07 22:53:28,508 [INFO] [iaglobal] [COMPLIANCE] PlannerAgent: approved=True
+2026-08-07 22:53:28,509 [INFO] [iaglobal] [MAILBOX] PlannerAgent criado
+2026-08-07 22:53:28,509 [INFO] [iaglobal] [PlannerAgent] Executor registrado com compliance=True
+2026-08-07 22:53:28,509 [INFO] [iaglobal.core.orchestrator] [SYNAPSE] PlannerAgent bindado ao MailboxManager
+2026-08-07 22:53:28,720 [INFO] [iaglobal.core.orchestrator] [Orchestrator:default] Fully initialized
+2026-08-07 22:53:28,720 [INFO] [iaglobal.cli.bootstrap] [BOOTSTRAP] Orchestrator async init completo
+2026-08-07 22:53:28,721 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Memória de curto prazo inicializada | db=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/cache/memory_swap/ivm.db
+2026-08-07 22:53:28,721 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Inicializado | baseline=1000ms | persistencia=ativa | stm_max_size=1000
+2026-08-07 22:53:28,721 [INFO] [iaglobal.chappie.ivm_axiom] [IVMAxiom] Singleton inicializado com persistência | db=/home/kitohamachi/iaglobal-main/iaglobal/memory/data/cache/memory_swap/ivm.db
+2026-08-07 22:53:28,721 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Inicializado | interval=1.00h | ivm_threshold=0.50 | vault=/home/kitohamachi/iaglobal-main/iaglobal/obsidian
+2026-08-07 22:53:28,721 [INFO] [iaglobal.chappie.error_enricher] [ErrorEnricher] Inicializado | vault=/home/kitohamachi/iaglobal-main/iaglobal/obsidian | auto_learn=True | pattern_threshold=3
+2026-08-07 22:53:28,722 [INFO] [iaglobal.chappie.lineage_guardian] [LineageGuardian] Inicializado | cache_ttl=300s | block_invalid=True | nodes_dir=/home/kitohamachi/iaglobal-main/iaglobal/graphs/nodes
+2026-08-07 22:53:28,722 [INFO] [iaglobal.cli.bootstrap] 🧬 [CHAPPIE] 4/4 módulos ativos
+2026-08-07 22:53:29,343 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Daemon iniciado.
+2026-08-07 22:53:29,343 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] IVM global via JOL: 0.5000 (threshold=0.50)
+2026-08-07 22:53:29,344 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Iniciando consolidação única.
+2026-08-07 22:53:29,344 [INFO] [iaglobal.cli.bootstrap] [CPU] Enforcement aplicado: 2 núcleos de 8 (25% da capacidade, regra de 25%/núcleo)
+2026-08-07 22:53:29,344 [INFO] [iaglobal.cli.bootstrap] [CPU] Affinity core 5
+2026-08-07 22:53:29,345 [INFO] [iaglobal] [CPU] Distribuição balanceada: 89 agentes, 1% de 1 núcleo cada, 8 núcleos (capacidade 8 core-equivalentes)
+2026-08-07 22:53:29,345 [INFO] [iaglobal.cli.bootstrap] [CPU] 89 agentes registrados em 8 cores (ate 32 geracoes locais concorrentes: 25%/agente x 8 cores)
+2026-08-07 22:53:29,345 [INFO] [iaglobal] [CPU] ⚡ Boost de prioridade aplicado: critic → 50%
+2026-08-07 22:53:29,345 [INFO] [iaglobal] [CPU] 🚀 Batch crítico com 1 agentes em modo de alta prioridade (50% CPU)
+2026-08-07 22:53:29,349 [INFO] [iaglobal] [BATCH_WRITER] Iniciado: flush_ms=2000 max_batch=100
+2026-08-07 22:53:29,351 [INFO] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Task de monitoramento iniciada | task_id=140365923633824
+2026-08-07 22:53:29,351 [INFO] [iaglobal.core.mitochondrial_probe] [MITO-PROBE] Iniciando sonda | threshold=250ms | interval=1s | probe_sleep=10ms
+2026-08-07 22:53:29,356 [ERROR] [iaglobal.obsidian.consolidation] [REMSleep] Falha ao processar staging DB: no such table: stm_entries
+Traceback (most recent call last):
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 229, in iniciar_fase_rem
+    staging_result = await self._processar_staging_db()
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 540, in _processar_staging_db
+    rows = await asyncio.to_thread(
+           ^^^^^^^^^^^^^^^^^^^^^^^^
+        self._fetch_unconsolidated, table, max_batch
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/usr/lib/python3.13/asyncio/threads.py", line 25, in to_thread
+    return await loop.run_in_executor(None, func_call)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/usr/lib/python3.13/concurrent/futures/thread.py", line 59, in run
+    result = self.fn(*self.args, **self.kwargs)
+  File "/home/kitohamachi/iaglobal-main/iaglobal/obsidian/consolidation.py", line 498, in _fetch_unconsolidated
+    cur = conn.execute(
+        f"SELECT id, data, created_at FROM {table} "
+        f"WHERE consolidated_at IS NULL ORDER BY created_at ASC LIMIT ?",
+        (limit,),
+    )
+sqlite3.OperationalError: no such table: stm_entries
+2026-08-07 22:53:29,364 [INFO] [iaglobal.obsidian.consolidation] [REMSleep] Nenhuma memória de curto prazo para consolidar.
+2026-08-07 22:53:29,364 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Consolidação única concluída | status=sem_memorias | consolidadas=0 | erros=0
+2026-08-07 22:53:29,364 [INFO] [iaglobal.chappie.vacuum] [VacuumDaemon] Próxima consolidação em 1.0 horas.
+2026-08-07 22:53:29,840 [ERROR] [iaglobal.mcp] Falha na sonda fugue_compartment: '>' not supported between instances of 'coroutine' and 'float'
+2026-08-07 22:53:30,461 [WARNING] [iaglobal.mcp] Falha ao registrar no OmniMind: 'OmniMind' object has no attribute 'registrar_violação_lei'
