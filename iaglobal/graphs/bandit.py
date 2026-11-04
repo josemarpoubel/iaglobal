@@ -897,8 +897,8 @@ class BanditPolicy:
             # Primeiro tenta CognitiveRouter.ROUTE_MAP (match exato),
             # depois TaskRouter (regex patterns).
             try:
-                from iaglobal.providers.task_router import get_task_router
                 from iaglobal.providers.provider_router import CognitiveRouter
+                from iaglobal.providers.task_router import get_task_router
 
                 _route_node = effective_agent if effective_agent != node_id else node_id
                 route = CognitiveRouter.ROUTE_MAP.get(_route_node)
@@ -911,12 +911,16 @@ class BanditPolicy:
                     route = router.route_for_tier(tier)
                     route = CognitiveRouter.ROUTE_TO_MODEL.get(route, route)
                     tier_timeout = router.get_timeout_for_tier(tier)
-                if route in candidates or any(
-                    route.split("_")[0] in c for c in candidates
+                route_candidate = route
+                if route_candidate not in candidates:
+                    namespaced_route = f"ollama/{route_candidate}"
+                    if namespaced_route in candidates:
+                        route_candidate = namespaced_route
+                if route_candidate in candidates or any(
+                    route_candidate.split("_")[0] in c for c in candidates
                 ):
-                    prefixed = route if "/" in route else f"ollama/{route}"
-                    candidates = [prefixed] + [
-                        c for c in candidates if c != route and c != prefixed
+                    candidates = [route_candidate] + [
+                        c for c in candidates if c != route_candidate
                     ]
                 timeout = min(timeout, tier_timeout) if timeout else tier_timeout
                 self.logger.debug(
